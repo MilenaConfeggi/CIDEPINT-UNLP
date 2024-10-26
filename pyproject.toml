@@ -8,6 +8,7 @@ packages = [{include = "web", from = "src"}]
 
 [tool.poetry.dependencies]
 python = "^3.12"
+flask = "^3.0.3"
 
 
 [build-system]

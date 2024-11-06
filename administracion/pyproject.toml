@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "web"
+version = "0.1.0"
+description = ""
+authors = ["León Felder <leonfelder45@gmail.com>"]
+readme = "README.md"
+packages = [{include = "web", from = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+flask = "^3.0.3"
+psycopg2-binary = "^2.9.10"
+flask-session = "^0.8.0"
+flask-bcrypt = "^1.0.1"
+flask-sqlalchemy = "^3.1.1"
+python-dotenv = "^1.0.1"
+flask-wtf = "^1.2.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

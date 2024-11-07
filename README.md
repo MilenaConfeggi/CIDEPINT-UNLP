@@ -1,8 +1,12 @@
 # CIDEPINT-UNLP
 manage.py permite ejecutar los comandos de flask y que los distintos backends accedan a la bd 
 ## Para usar manage.py:
+```bash
 python manage.py (servicios/administracion) run
+```
+```bash
 python manage.py (servicios/administracion) reset-db
+```
 ## Configuración:
 ### Creamos la bd:
 ```bash

@@ -1,9 +1,7 @@
 from flask import Flask
-import os
-import sys
-import importlib
 from servicios.backend.src.core.config import config
-from models import db, MedioDePago
+from servicios.backend.src.core.services import servicioPresupuesto
+from models import db
 
 def create_app(env="development", static_folder=""):
     app = Flask(__name__)
@@ -29,6 +27,7 @@ def create_app(env="development", static_folder=""):
         """
         Comando para crear los seeds de la base de datos
         """
+        servicioPresupuesto.crearTodo()
 
     return app
     

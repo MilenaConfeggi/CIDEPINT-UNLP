@@ -7,6 +7,6 @@ bp = Blueprint('mails', __name__, url_prefix='/mails')
 @bp.get("/")
 def listar_mails():
     mails = servicioMail.listar_mails()
-    data = mailsSchema.dumps(mails)
+    data = mailsSchema.dump(mails, many=True)
 
-    return data, 200
+    return jsonify(data), 200

@@ -4,11 +4,13 @@ from servicios.backend.src.core.seeds import seedsMuestra
 from servicios.backend.src.core.seeds import seedsMails
 from models import db
 from servicios.backend.src.web.controllers.mails import bp as mails_bp
+from flask_cors import CORS
 
 def create_app(env="development", static_folder=""):
     app = Flask(__name__)
     app.config.from_object(config[env])
     db.init_app(app)
+    CORS(app)
     @app.route("/")
     def home():
         return "SLAY"

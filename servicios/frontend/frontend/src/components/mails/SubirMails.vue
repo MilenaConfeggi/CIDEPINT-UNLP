@@ -1,8 +1,8 @@
 <template>
-    <form @submit.prevent="submitForm">
+    <form @submit.prevent="submitForm" enctype="multipart/form-data">
       <div>
-        <label for="nombre_archivo">Nombre del Archivo:</label>
-        <input type="text" id="nombre_archivo" v-model="formData.nombre_archivo" required />
+        <label for="archivo">Archivo:</label>
+        <input type="file" id="archivo" @change="handleFileUpload" required />
       </div>
       <button type="submit">Enviar</button>
     </form>
@@ -12,20 +12,19 @@
 export default {
   data() {
     return {
-      formData: {
-        nombre_archivo: '',
-      },
+      formData: new FormData(),
     };
   },
   methods: {
+    handleFileUpload(event) {
+      const file = event.target.files[0];
+      this.formData.append('archivo', file);
+    },
     async submitForm() {
       try {
         const response = await fetch('http://127.0.0.1:5000/mails/subir_mail/1', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(this.formData),
+          body: this.formData,
         });
 
         if (!response.ok) {

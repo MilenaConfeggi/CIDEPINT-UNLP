@@ -1,6 +1,6 @@
-from flask import Flask
+from flask import Flask, render_template
 from servicios.backend.src.core.config import config
-from servicios.backend.src.core.services import servicioPresupuesto
+from servicios.backend.src.core.seeds import seedsMuestra
 from models import db
 
 def create_app(env="development", static_folder=""):
@@ -10,6 +10,7 @@ def create_app(env="development", static_folder=""):
     @app.route("/")
     def home():
         return "SLAY"
+    
     
     @app.cli.command(name="reset-db")
     def reset_db():
@@ -27,7 +28,8 @@ def create_app(env="development", static_folder=""):
         """
         Comando para crear los seeds de la base de datos
         """
-        servicioPresupuesto.crearTodo()
+        seedsMuestra.seeds_muestras()
+        print("Muestras creadas!")
 
     return app
     

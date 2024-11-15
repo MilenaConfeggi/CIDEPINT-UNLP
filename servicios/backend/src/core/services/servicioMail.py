@@ -1,9 +1,10 @@
 from models import db
 from models.mails.mail import Mail
+from datetime import datetime
 
 def crear_mail(data, legajo_id):
     nuevo_mail = Mail(
-        fecha=data.get('fecha'),
+        fecha=datetime.now(),
         nombre_archivo=data.get('nombre_archivo'),
         legajo_id=legajo_id
     )

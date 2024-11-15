@@ -14,17 +14,14 @@ def seed_mails():
 
     mails_data = [
         {
-            'fecha': datetime(2023, 1, 1),
             'nombre_archivo': 'mail1.pdf',
             'legajo_id': legajo_provisional.id
         },
         {
-            'fecha': datetime(2023, 2, 1),
             'nombre_archivo': 'mail2.pdf',
             'legajo_id': legajo_provisional.id
         },
         {
-            'fecha': datetime(2023, 3, 1),
             'nombre_archivo': 'mail3.pdf',
             'legajo_id': legajo_provisional.id
         }

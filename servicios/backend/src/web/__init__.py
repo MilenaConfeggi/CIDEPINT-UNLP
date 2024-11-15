@@ -1,6 +1,7 @@
 from flask import Flask, render_template
 from servicios.backend.src.core.config import config
 from servicios.backend.src.core.seeds import seedsMuestra
+from servicios.backend.src.core.seeds import seedsMails
 from models import db
 
 def create_app(env="development", static_folder=""):
@@ -30,6 +31,8 @@ def create_app(env="development", static_folder=""):
         """
         seedsMuestra.seeds_muestras()
         print("Muestras creadas!")
+        seedsMails.seeds_mails()
+        print("Mails creados!")
 
     return app
     

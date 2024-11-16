@@ -8,7 +8,8 @@ import { RouterLink, RouterView } from 'vue-router'
       <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="50" height="50" />
       <div class="nav-links">
         <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/mails/1">Mails</RouterLink> <!-- Puedes cambiar el 1 por cualquier número de legajo -->
+        <RouterLink to="/mails/1">Mails</RouterLink>
+        <RouterLink to="/muestras/1">Muestras</RouterLink> 
       </div>
     </nav>
     <main>

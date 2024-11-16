@@ -21,12 +21,8 @@ def listar_mails(id_legajo):
 def obtener_imagen(id_legajo, filename):
     folder_path = os.path.normpath(os.path.join(UPLOAD_FOLDER, "mails", str(id_legajo)))
     file_path = os.path.normpath(os.path.join(folder_path, filename))
-    print(f"Folder path: {folder_path}")
-    print(f"File path: {file_path}")
     if not os.path.exists(file_path):
-        print("File not found")
         abort(404, description="Resource not found")
-    print("File found, sending from directory")
     return send_from_directory(folder_path, filename)
 
 @bp.post("/subir_mail/<int:id_legajo>")

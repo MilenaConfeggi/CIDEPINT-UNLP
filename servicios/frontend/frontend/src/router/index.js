@@ -15,6 +15,12 @@ const router = createRouter({
       name: "mails",
       component: () => import("../views/MailsView.vue"),
       props: true,
+    },
+    {
+      path: "/muestras/:legajoId",
+      name: "muestras",
+      component: () => import("../views/MuestrasIdentificadasView.vue"),
+      props: true,
     }
   ],
 })

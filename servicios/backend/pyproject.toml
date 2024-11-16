@@ -12,6 +12,9 @@ flask = "^3.0.3"
 sqlalchemy = "^2.0.36"
 pymysql = "^1.1.1"
 python-dotenv = "^1.0.1"
+marshmallow = "^3.23.1"
+flask-cors = "^5.0.0"
+flask-wtf = "^1.2.2"
 
 
 [tool.poetry.group.dev.dependencies]

@@ -3,15 +3,19 @@ from servicios.backend.src.core.config import config
 from servicios.backend.src.core.seeds import seedsMuestra
 from servicios.backend.src.core.seeds import seedsMails
 from models import db
+from servicios.backend.src.web.controllers.mails import bp as mails_bp
+from flask_cors import CORS
 
 def create_app(env="development", static_folder=""):
     app = Flask(__name__)
     app.config.from_object(config[env])
     db.init_app(app)
+    CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
     @app.route("/")
     def home():
         return "SLAY"
-    
+
+    app.register_blueprint(mails_bp)
     
     @app.cli.command(name="reset-db")
     def reset_db():

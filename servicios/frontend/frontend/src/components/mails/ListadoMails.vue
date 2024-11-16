@@ -15,6 +15,9 @@
           <div class="card-body">
             <h5 class="card-title">{{ mail.nombre_archivo }}</h5>
             <p class="card-text">Fecha de carga: {{ mail.fecha }}</p>
+            <button @click="confirmarEliminarMail(mail.id)" class="btn-icon">
+              <i class="fas fa-trash-alt"></i>
+            </button>
           </div>
         </div>
       </div>
@@ -29,6 +32,7 @@
 import { useMailsStore } from '@/stores/mails';
 import { storeToRefs } from 'pinia';
 import { onMounted, watch } from 'vue';
+import axios from 'axios';
 
 export default {
   props: {
@@ -49,13 +53,30 @@ export default {
       return `http://127.0.0.1:5000/mails/imagenes/${legajoId}/${filename}`;
     };
 
+    const confirmarEliminarMail = (idMail) => {
+      if (confirm("¿Estás seguro de que deseas eliminar este mail?")) {
+        eliminarMail(idMail);
+      }
+    };
+
+    const eliminarMail = async (idMail) => {
+      try {
+        const response = await axios.post(`http://127.0.0.1:5000/mails/eliminar_mail/${idMail}`);
+        if (response.status === 200) {
+          fetchMails(); // Refrescar la lista de mails después de eliminar
+        }
+      } catch (error) {
+        console.error('Error al eliminar el mail:', error);
+      }
+    };
+
     onMounted(() => {
       fetchMails();
     });
 
     watch(() => props.legajoId, fetchMails);
 
-    return { mails, error, getImageUrl };
+    return { mails, error, getImageUrl, confirmarEliminarMail };
   }
 };
 </script>
@@ -73,5 +94,24 @@ export default {
   max-height: 100%;
   max-width: 100%;
   object-fit: contain;
+}
+
+.card-body {
+  position: relative;
+}
+
+.btn-icon {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  color: #dc3545;
+  cursor: pointer;
+  font-size: 1.2rem;
+}
+
+.btn-icon:hover {
+  color: #a71d2a;
 }
 </style>

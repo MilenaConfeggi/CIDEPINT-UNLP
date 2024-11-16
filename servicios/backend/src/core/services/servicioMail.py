@@ -27,3 +27,9 @@ def validar_nombre(filename, id_legajo):
 def listar_mails(nro_legajo):
     mails = Mail.query.filter_by(legajo_id=nro_legajo).all()
     return mails
+
+def eliminar_mail(id_mail):
+    mail = Mail.query.get(id_mail)
+    db.session.delete(mail)
+    db.session.commit()
+    return mail

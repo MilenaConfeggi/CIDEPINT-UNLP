@@ -65,7 +65,7 @@ export default {
     };
 
     const getImageUrl = (legajoId, filename) => {
-      return `http://127.0.0.1:5000/mails/imagenes/${legajoId}/${filename}`;
+      return `${import.meta.env.VITE_API_URL}/mails/imagenes/${legajoId}/${filename}`;
     };
 
     const confirmarEliminarMail = (idMail) => {
@@ -76,7 +76,7 @@ export default {
 
     const eliminarMail = async (idMail) => {
       try {
-        const response = await axios.post(`http://127.0.0.1:5000/mails/eliminar_mail/${idMail}`);
+        const response = await axios.post(`${import.meta.env.VITE_API_URL}/mails/eliminar_mail/${idMail}`);
         if (response.status === 200) {
           fetchMails(); // Refrescar la lista de mails después de eliminar
         }

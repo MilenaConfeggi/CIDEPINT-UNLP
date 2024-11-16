@@ -23,8 +23,8 @@ def crear_foto(data, muestra_id):
     db.session.commit()
     return nueva_foto
 
-def listar_muestras():
-    return Muestra.query.all()
+def listar_muestras(id_legajo):
+    return Muestra.query.filter_by(legajo_id=id_legajo).all()
 
 def listar_fotos():
     return Foto.query.all()

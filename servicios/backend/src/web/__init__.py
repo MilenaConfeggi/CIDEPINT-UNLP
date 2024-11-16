@@ -4,6 +4,7 @@ from servicios.backend.src.core.seeds import seedsMuestra
 from servicios.backend.src.core.seeds import seedsMails
 from models import db
 from servicios.backend.src.web.controllers.mails import bp as mails_bp
+from servicios.backend.src.web.controllers.muestras import bp as muestras_bp
 from flask_cors import CORS
 
 def create_app(env="development", static_folder=""):
@@ -16,7 +17,8 @@ def create_app(env="development", static_folder=""):
         return "SLAY"
 
     app.register_blueprint(mails_bp)
-    
+    app.register_blueprint(muestras_bp)
+
     @app.cli.command(name="reset-db")
     def reset_db():
         """

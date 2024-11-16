@@ -4,7 +4,7 @@ import ListadoMails from '../components/mails/ListadoMails.vue'
 import SubirMails from '../components/mails/SubirMails.vue'
 
 const route = useRoute()
-const legajoId = route.params.legajoId
+const legajoId = Number(route.params.legajoId)  
 </script>
 
 <template>

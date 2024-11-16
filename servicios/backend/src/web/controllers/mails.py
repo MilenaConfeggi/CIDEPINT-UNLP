@@ -1,14 +1,13 @@
-from marshmallow import ValidationError
-from servicios.backend.src.core.services import servicioMail
-from flask import Blueprint, jsonify, request
-from servicios.backend.src.web.schemas.mails import mailsSchema, mailSchema
 from servicios.backend.src.core.config import Config
-from werkzeug.utils import secure_filename
+from werkzeug.utils import secure_filename, safe_join
 import os
+from flask import send_from_directory, jsonify, abort, Blueprint, request
+from servicios.backend.src.core.services import servicioMail
+from servicios.backend.src.web.schemas.mails import mailsSchema
 
 # Define allowed file extensions
 
-UPLOAD_FOLDER = "documentos/"
+UPLOAD_FOLDER = os.path.abspath("documentos")
 
 bp = Blueprint('mails', __name__, url_prefix='/mails')
 
@@ -16,8 +15,19 @@ bp = Blueprint('mails', __name__, url_prefix='/mails')
 def listar_mails(id_legajo):
     mails = servicioMail.listar_mails(id_legajo)
     data = mailsSchema.dump(mails, many=True)
-
     return jsonify(data), 200
+
+@bp.get("/imagenes/<int:id_legajo>/<filename>")
+def obtener_imagen(id_legajo, filename):
+    folder_path = os.path.normpath(os.path.join(UPLOAD_FOLDER, "mails", str(id_legajo)))
+    file_path = os.path.normpath(os.path.join(folder_path, filename))
+    print(f"Folder path: {folder_path}")
+    print(f"File path: {file_path}")
+    if not os.path.exists(file_path):
+        print("File not found")
+        abort(404, description="Resource not found")
+    print("File found, sending from directory")
+    return send_from_directory(folder_path, filename)
 
 @bp.post("/subir_mail/<int:id>")
 def cargar_mail(id):

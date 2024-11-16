@@ -12,9 +12,9 @@ UPLOAD_FOLDER = "documentos/"
 
 bp = Blueprint('mails', __name__, url_prefix='/mails')
 
-@bp.get("/")
-def listar_mails():
-    mails = servicioMail.listar_mails()
+@bp.get("/<int:id_legajo>")
+def listar_mails(id_legajo):
+    mails = servicioMail.listar_mails(id_legajo)
     data = mailsSchema.dump(mails, many=True)
 
     return jsonify(data), 200

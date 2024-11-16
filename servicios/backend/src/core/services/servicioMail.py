@@ -17,8 +17,6 @@ def crear_mail(data, legajo_id):
 def validar_tipo(filename): 
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-
-
-def listar_mails():
-    mails = Mail.query.all()
+def listar_mails(nro_legajo):
+    mails = Mail.query.filter_by(legajo_id=nro_legajo).all()
     return mails

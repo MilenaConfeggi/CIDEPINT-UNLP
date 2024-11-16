@@ -1,6 +1,5 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
 </script>
 
 <template>
@@ -9,7 +8,7 @@ import HelloWorld from './components/HelloWorld.vue'
       <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="50" height="50" />
       <div class="nav-links">
         <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/mails">Mails</RouterLink>
+        <RouterLink to="/mails/1">Mails</RouterLink> <!-- Puedes cambiar el 1 por cualquier número de legajo -->
       </div>
     </nav>
     <main>
@@ -38,6 +37,7 @@ import HelloWorld from './components/HelloWorld.vue'
 .nav-links a {
   color: white;
   text-decoration: none;
+  cursor: pointer;
 }
 
 .nav-links a:hover {

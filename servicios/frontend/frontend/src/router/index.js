@@ -11,9 +11,10 @@ const router = createRouter({
       component: HomeView,
     },
     {
-      path: "/mails",
+      path: '/mails/:legajoId',
       name: "mails",
       component: () => import("../views/MailsView.vue"),
+      props: true,
     }
   ],
 })

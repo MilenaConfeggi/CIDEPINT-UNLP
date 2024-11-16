@@ -14,15 +14,15 @@ def seed_mails():
 
     mails_data = [
         {
-            'nombre_archivo': 'mail1.pdf',
+            'nombre_archivo': 'mail1.jpg',
             'legajo_id': legajo_provisional.id
         },
         {
-            'nombre_archivo': 'mail2.pdf',
+            'nombre_archivo': 'mail2.jpg',
             'legajo_id': legajo_provisional.id
         },
         {
-            'nombre_archivo': 'mail3.pdf',
+            'nombre_archivo': 'mail3.jpg',
             'legajo_id': legajo_provisional.id
         }
     ]

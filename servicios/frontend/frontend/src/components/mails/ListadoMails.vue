@@ -5,7 +5,7 @@
     <div v-if="mails.length" class="row">
       <div v-for="mail in mails" :key="mail.id" class="col-md-3 mb-4">
         <div class="card">
-          <div class="card-img-container">
+          <div class="card-img-container" @click="mostrarVerMail(mail)">
             <img
               :src="getImageUrl(mail.legajo_id, mail.nombre_archivo)"
               alt="Imagen de mail"
@@ -25,13 +25,25 @@
     <div v-else class="text-center">
       <p class="text-muted">No hay mails disponibles.</p>
     </div>
+
+    <!-- Modal de VerMail -->
+    <div v-if="mostrarVerMailModal" class="modal-overlay" @click="cerrarVerMail">
+      <div class="modal-content" @click.stop>
+        <button class="close-button" @click="cerrarVerMail">&times;</button>
+        <div v-if="mailSeleccionado">
+          <div class="text-center">
+            <img :src="getImageUrl(mailSeleccionado.legajo_id, mailSeleccionado.nombre_archivo)" alt="Imagen de mail" class="img-fluid large-image" />
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import { useMailsStore } from '@/stores/mails';
 import { storeToRefs } from 'pinia';
-import { onMounted, watch } from 'vue';
+import { onMounted, watch, ref } from 'vue';
 import axios from 'axios';
 
 export default {
@@ -44,6 +56,9 @@ export default {
   setup(props) {
     const store = useMailsStore();
     const { mails, error } = storeToRefs(store);
+
+    const mostrarVerMailModal = ref(false);
+    const mailSeleccionado = ref(null);
 
     const fetchMails = async () => {
       await store.fetchMails(props.legajoId);
@@ -70,13 +85,23 @@ export default {
       }
     };
 
+    const mostrarVerMail = (mail) => {
+      mailSeleccionado.value = mail;
+      mostrarVerMailModal.value = true;
+    };
+
+    const cerrarVerMail = () => {
+      mostrarVerMailModal.value = false;
+      mailSeleccionado.value = null;
+    };
+
     onMounted(() => {
       fetchMails();
     });
 
     watch(() => props.legajoId, fetchMails);
 
-    return { mails, error, getImageUrl, confirmarEliminarMail };
+    return { mails, error, getImageUrl, confirmarEliminarMail, mostrarVerMail, cerrarVerMail, mostrarVerMailModal, mailSeleccionado };
   }
 };
 </script>
@@ -87,7 +112,8 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #f8f9fa; 
+  background-color: #ffffff; 
+  cursor: pointer;
 }
 
 .card-img {
@@ -98,6 +124,10 @@ export default {
 
 .card-body {
   position: relative;
+  color: #000000;
+  background-color: #ffffff; 
+  padding-bottom: 40px; 
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); 
 }
 
 .btn-icon {
@@ -113,5 +143,43 @@ export default {
 
 .btn-icon:hover {
   color: #a71d2a;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; 
+}
+
+.modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 80%;
+  width: 100%;
+  position: relative;
+}
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.img-fluid.large-image {
+  max-width: 100%;
+  height: auto;
+  max-height: 80vh; 
 }
 </style>

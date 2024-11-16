@@ -1,20 +1,26 @@
 <template>
-  <div>
-    <h1>Listado de Mails</h1>
-    <div v-if="error" class="error">{{ error }}</div>
-    <div v-if="mails.length" class="cards-container">
-      <div v-for="mail in mails" :key="mail.id" class="card">
-        <img :src="getImageUrl(mail.legajo_id, mail.nombre_archivo)" alt="Imagen de mail" class="card-img" />
-        <div class="card-body">
-          <p>ID: {{ mail.id }}</p>
-          <p>Fecha: {{ mail.fecha }}</p>
-          <p>Nombre de Archivo: {{ mail.nombre_archivo }}</p>
-          <p>Legajo ID: {{ mail.legajo_id }}</p>
+  <div class="container mt-4">
+    <h1 class="text-center mb-4">Mails para el legajo {{ legajoId }}</h1>
+    <div v-if="error" class="alert alert-danger" role="alert">{{ error }}</div>
+    <div v-if="mails.length" class="row">
+      <div v-for="mail in mails" :key="mail.id" class="col-md-3 mb-4">
+        <div class="card">
+          <div class="card-img-container">
+            <img
+              :src="getImageUrl(mail.legajo_id, mail.nombre_archivo)"
+              alt="Imagen de mail"
+              class="card-img"
+            />
+          </div>
+          <div class="card-body">
+            <h5 class="card-title">{{ mail.nombre_archivo }}</h5>
+            <p class="card-text">Fecha de carga: {{ mail.fecha }}</p>
+          </div>
         </div>
       </div>
     </div>
-    <div v-else>
-      No hay mails disponibles.
+    <div v-else class="text-center">
+      <p class="text-muted">No hay mails disponibles.</p>
     </div>
   </div>
 </template>
@@ -40,9 +46,7 @@ export default {
     };
 
     const getImageUrl = (legajoId, filename) => {
-      const url = `http://127.0.0.1:5000/mails/imagenes/${legajoId}/${filename}`;
-      console.log(url);  // Imprimir la URL en la consola
-      return url;
+      return `http://127.0.0.1:5000/mails/imagenes/${legajoId}/${filename}`;
     };
 
     onMounted(() => {
@@ -57,31 +61,17 @@ export default {
 </script>
 
 <style scoped>
-.error {
-  color: red;
-}
-
-.cards-container {
+.card-img-container {
+  height: 150px;
   display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.card {
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  overflow: hidden;
-  width: 200px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  justify-content: center;
+  align-items: center;
+  background-color: #f8f9fa; 
 }
 
 .card-img {
-  width: 100%;
-  height: 150px;
-  object-fit: cover;
-}
-
-.card-body {
-  padding: 1rem;
+  max-height: 100%;
+  max-width: 100%;
+  object-fit: contain;
 }
 </style>

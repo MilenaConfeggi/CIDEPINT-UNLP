@@ -26,7 +26,7 @@
   
       const fetchMail = async () => {
         try {
-          const response = await axios.get(`http://127.0.0.1:5000/mails/${mailId}`);
+          const response = await axios.get(`${import.meta.env.VITE_API_URL}/mails/${mailId}`);
           mail.value = response.data;
         } catch (err) {
           error.value = 'Error al cargar el mail';
@@ -35,7 +35,7 @@
       };
   
       const getImageUrl = (legajoId, filename) => {
-        return `http://127.0.0.1:5000/mails/imagenes/${legajoId}/${filename}`;
+        return `${import.meta.env.VITE_API_URL}/mails/imagenes/${legajoId}/${filename}`;
       };
   
       onMounted(() => {
@@ -51,6 +51,6 @@
   .img-fluid.large-image {
     max-width: 100%;
     height: auto;
-    max-height: 80vh; /* Ajusta la altura máxima para que la imagen no sea demasiado alta */
+    max-height: 80vh; 
   }
   </style>

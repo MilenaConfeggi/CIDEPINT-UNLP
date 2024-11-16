@@ -10,7 +10,7 @@ export const useMailsStore = defineStore("mails", {
         async fetchMails(id_legajo) {
             try {
                 this.error = null;
-                const response = await axios.get(`http://127.0.0.1:5000/mails/${id_legajo}`);
+                const response = await axios.get(`${import.meta.env.VITE_API_URL}/mails/${id_legajo}`);
                 this.mails = response.data;
             } catch (error) {
                 this.error = "error";

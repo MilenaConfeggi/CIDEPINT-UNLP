@@ -95,7 +95,7 @@ export default {
 
       try {
         const response = await fetch(
-          `http://127.0.0.1:5000/mails/subir_mail/${this.legajoId}`,
+          `${import.meta.env.VITE_API_URL}/mails/subir_mail/${this.legajoId}`,
           {
             method: 'POST',
             body: this.formData,

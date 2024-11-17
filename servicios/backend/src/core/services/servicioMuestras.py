@@ -59,3 +59,6 @@ def crear_foto(data, muestra_id):
 
 def listar_fotos(id_muestra):
     return Foto.query.filter_by(muestra_id=id_muestra).all()
+
+def listar_fotos_por_legajo(id_legajo):
+    return Foto.query.join(Muestra).filter(Muestra.legajo_id == id_legajo).all()

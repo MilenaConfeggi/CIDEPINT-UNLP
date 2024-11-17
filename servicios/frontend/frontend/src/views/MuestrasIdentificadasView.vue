@@ -1,10 +1,11 @@
 <script setup>
 import { ref } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import ListadoMuestras from '../components/muestras/ListadoMuestras.vue';
 import IdentificarMuestras from '../components/muestras/IdentificarMuestras.vue';
 
 const route = useRoute();
+const router = useRouter();
 const legajoId = Number(route.params.legajoId);
 
 // Propiedad reactiva para controlar la visibilidad de la ventana modal
@@ -19,12 +20,20 @@ const mostrarFormularioIdentificar = () => {
 const cerrarFormularioIdentificar = () => {
   mostrarIdentificarMuestras.value = false;
 };
+
+// Función para cambiar la vista a MuestrasCarpetasView
+const cambiarVistaCarpetas = () => {
+  router.push({ name: 'muestrasCarpetas', params: { legajoId } });
+};
 </script>
 
 <template>
   <main>
+    <!-- Botón para cambiar la vista a MuestrasCarpetasView -->
+    <button class="carpetas-button" @click="cambiarVistaCarpetas">Ver Carpetas</button>
     <!-- Botón para mostrar la ventana modal -->
     <button class="upload-button" @click="mostrarFormularioIdentificar">Identificar muestra</button>
+
 
     <!-- ListadoMuestras siempre visible -->
     <ListadoMuestras :legajo-id="legajoId" />
@@ -81,9 +90,25 @@ const cerrarFormularioIdentificar = () => {
   cursor: pointer;
   font-size: 16px;
   transition: background-color 0.3s ease;
+  margin-right: 10px; /* Añadir margen entre los botones */
+}
+.carpetas-button {
+  background-color: #4caaaf; 
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+  margin-right: 10px; /* Añadir margen entre los botones */
 }
 
 .upload-button:hover {
   background-color: #45a049; 
+}
+
+.carpetas-button:hover {
+  background-color: #345a88; 
 }
 </style>

@@ -1,33 +1,39 @@
 <template>
   <div class="container mt-4">
-    <h3 class="text-center mb-4">Identificar Muestras</h3>
-    <form @submit.prevent="submitForm">
-      <div v-for="(muestra, index) in muestras" :key="index" class="mb-3">
-        <label :for="'fechaIngreso' + index" class="form-label">Fecha de Ingreso:</label>
-        <input
-          type="date"
-          :id="'fechaIngreso' + index"
-          v-model="muestra.fechaIngreso"
-          class="form-control"
-          required
-        />
-        <label :for="'idenCliente' + index" class="form-label">Identificación del Cliente:</label>
-        <input
-          type="text"
-          :id="'idenCliente' + index"
-          v-model="muestra.idenCliente"
-          class="form-control"
-          required
-        />
-        <button type="button" @click="removeMuestra(index)" class="btn-icon">
-          <i class="fas fa-trash-alt"></i>
-        </button>
-      </div>
-      <button type="button" @click="addMuestra" class="btn btn-secondary mb-3">Agregar Muestra</button>
-      <div v-if="error" class="alert alert-danger" role="alert">{{ error }}</div>
-      <div v-if="successMessage" class="alert alert-success" role="alert">{{ successMessage }}</div>
-      <button type="submit" class="btn btn-success custom-button" :disabled="isSubmitting">Identificar</button>
-    </form>
+    <div class="title-container">
+      <hr class="line">
+      <h3 class="text-center mb-4">Identificar Muestras</h3>
+      <hr class="line">
+    </div>
+    <div class="form-container">
+      <form @submit.prevent="submitForm">
+        <div v-for="(muestra, index) in muestras" :key="index" class="mb-3">
+          <label :for="'fechaIngreso' + index" class="form-label">Fecha de Ingreso:</label>
+          <input
+            type="date"
+            :id="'fechaIngreso' + index"
+            v-model="muestra.fechaIngreso"
+            class="form-control"
+            required
+          />
+          <label :for="'idenCliente' + index" class="form-label">Identificación del Cliente:</label>
+          <input
+            type="text"
+            :id="'idenCliente' + index"
+            v-model="muestra.idenCliente"
+            class="form-control"
+            required
+          />
+          <button type="button" @click="removeMuestra(index)" class="btn-icon">
+            <i class="fas fa-trash-alt"></i>
+          </button>
+        </div>
+        <button type="button" @click="addMuestra" class="btn btn-secondary mb-3">Agregar Muestra</button>
+        <div v-if="error" class="alert alert-danger" role="alert">{{ error }}</div>
+        <div v-if="successMessage" class="alert alert-success" role="alert">{{ successMessage }}</div>
+        <button type="submit" class="btn btn-success custom-button" :disabled="isSubmitting">Identificar</button>
+      </form>
+    </div>
   </div>
 </template>
 
@@ -137,5 +143,10 @@ export default {
 
 .btn-icon:hover {
   color: #a71d2a;
+}
+.form-container {
+  max-height: 400px; 
+  overflow-y: auto;
+  overflow-x: hidden; 
 }
 </style>

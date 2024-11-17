@@ -2,6 +2,7 @@ from models import db
 from models.muestras.muestra import Muestra
 from models.muestras.foto import Foto
 from datetime import datetime
+from flask import jsonify
 
 def crear_muestra(data, legajo_id):
     anio_actual = datetime.now().year
@@ -37,6 +38,7 @@ def listar_muestras(id_legajo):
 def listar_fotos():
     return Foto.query.all()
 
+
 def validar_identificacion_cliente(data, legajo_id):
     muestra = Muestra.query.filter_by(iden_cliente=data.get('iden_cliente'), legajo_id=legajo_id).first()
     if muestra:
@@ -48,3 +50,14 @@ def validar_entre_cargadas(muestras, muestra):
         if elem.get('iden_cliente') == muestra.get('iden_cliente'):
             return False
     return True
+
+def validar_longitud(muestra):
+    if len(muestra.get('iden_cliente')) > 100:
+        return False
+    return True
+
+def validar_fecha(muestra):
+    if muestra.get('fecha_ingreso') > datetime.now().date():
+        return False
+    return True
+

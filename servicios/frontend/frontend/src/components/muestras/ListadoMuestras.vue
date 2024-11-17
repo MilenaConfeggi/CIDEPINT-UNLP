@@ -1,13 +1,17 @@
 <template>
     <div class="container mt-4">
-      <h1 class="text-center mb-4">Muestras para el legajo {{ legajoId }}</h1>
+      <div class="title-container">
+      <hr class="line">
+      <h1 class="text-center mb-4 title">Muestras para el legajo {{ legajoId }}</h1>
+      <hr class="line">
+    </div>
       <div v-if="error" class="alert alert-danger" role="alert">{{ error }}</div>
       <div v-if="muestras.length" class="row">
         <div v-for="muestra in muestras" :key="muestra.id" class="col-md-3 mb-4">
           <div class="card">
             <div class="card-body">
               <h5 class="card-title">Número de muestra: {{ muestra.nro_muestra }}</h5>
-              <p class="card-text">Cliente: {{ muestra.iden_cliente }}</p>
+              <p class="card-text">Iden cliente: {{ muestra.iden_cliente }}</p>
               <p class="card-text">Fecha de ingreso: {{ muestra.fecha_ingreso }}</p>
             </div>
           </div>

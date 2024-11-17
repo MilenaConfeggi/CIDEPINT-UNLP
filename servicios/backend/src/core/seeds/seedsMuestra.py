@@ -15,20 +15,17 @@ def seed_muestras():
 
     muestras_data = [
         {
-            'nro_muestra': '001',
-            'fecha_ingreso': datetime(2023, 1, 1),
+            'fecha_ingreso': datetime(2024, 1, 1),
             'iden_cliente': 'Muestra 1',
             'legajo_id': legajo_provisional.id
         },
         {
-            'nro_muestra': '002',
-            'fecha_ingreso': datetime(2023, 2, 1),
+            'fecha_ingreso': datetime(2024, 2, 1),
             'iden_cliente': 'Muestra 2',
             'legajo_id': legajo_provisional.id
         },
         {
-            'nro_muestra': '003',
-            'fecha_ingreso': datetime(2023, 3, 1),
+            'fecha_ingreso': datetime(2024, 3, 1),
             'iden_cliente': 'Muestra 3',
             'legajo_id': legajo_provisional.id
         }

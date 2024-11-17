@@ -61,3 +61,9 @@ def obtener_imagen(id_muestra, filename):
     if not os.path.exists(file_path):
         abort(404, description="Resource not found")
     return send_from_directory(folder_path, filename)
+
+@bp.get("/fotos_por_legajo/<int:id_legajo>")
+def listar_fotos_por_legajo(id_legajo):
+    fotos = servicioMuestras.listar_fotos_por_legajo(id_legajo)
+    data = fotosSchema.dump(fotos, many=True)
+    return jsonify(data), 200

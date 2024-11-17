@@ -15,9 +15,6 @@
             <div class="card-body">
               <h5 class="card-title">{{ foto.nombre_archivo }}</h5>
               <p class="card-text">Fecha de carga: {{ foto.fecha }}</p>
-              <button @click="confirmarEliminarFoto(foto.id)" class="btn-icon">
-                <i class="fas fa-trash-alt"></i>
-              </button>
             </div>
           </div>
         </div>
@@ -77,16 +74,6 @@
         }
       };
   
-      const eliminarFoto = async (idFoto) => {
-        try {
-          const response = await axios.post(`${import.meta.env.VITE_API_URL}/muestras/eliminar_foto/${idFoto}`);
-          if (response.status === 200) {
-            fetchFotos(); // Refrescar la lista de fotos después de eliminar
-          }
-        } catch (error) {
-          console.error('Error al eliminar la foto:', error);
-        }
-      };
   
       const mostrarVerFoto = (foto) => {
         fotoSeleccionada.value = foto;

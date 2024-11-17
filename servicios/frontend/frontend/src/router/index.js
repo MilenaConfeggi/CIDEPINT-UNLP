@@ -22,7 +22,12 @@ const router = createRouter({
       component: () => import("../views/MuestrasIdentificadasView.vue"),
       props: true,
     },
-
+    {
+      path: "/muestras/:legajoId/carpetas",
+      name: "muestrasCarpetas",
+      component: () => import("../views/MuestrasCarpetasView.vue"),
+      props: true,
+    },
   ],
 })
 

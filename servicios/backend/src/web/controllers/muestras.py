@@ -1,6 +1,6 @@
 from servicios.backend.src.core.services import servicioMuestras
 from flask import Blueprint, jsonify, abort, request, send_from_directory
-from servicios.backend.src.web.schemas.muestras import muestrasSchema, muestraSchema
+from servicios.backend.src.web.schemas.muestras import muestrasSchema, muestraSchema, fotosSchema
 import os
 from marshmallow import ValidationError
 
@@ -46,3 +46,18 @@ def cargar_muestra(id_legajo):
         return jsonify({"message": "Ha ocurrido un error inesperado, revise que muestras se han cargado antes de volver a intentarlo"}), 400
     except Exception as e:
         return jsonify({"message": "Ha ocurrido un error inesperado, revise que muestras se han cargado antes de volver a intentarlo"}), 500
+    
+
+@bp.get("/fotos/<int:id_muestra>")
+def listar_fotos(id_muestra):
+    fotos = servicioMuestras.listar_fotos(id_muestra)
+    data = fotosSchema.dump(fotos, many=True)
+    return jsonify(data), 200
+
+@bp.get("/imagenes/<int:id_muestra>/<filename>")
+def obtener_imagen(id_muestra, filename):
+    folder_path = os.path.normpath(os.path.join(UPLOAD_FOLDER, "muestras", str(id_muestra)))
+    file_path = os.path.normpath(os.path.join(folder_path, filename))
+    if not os.path.exists(file_path):
+        abort(404, description="Resource not found")
+    return send_from_directory(folder_path, filename)

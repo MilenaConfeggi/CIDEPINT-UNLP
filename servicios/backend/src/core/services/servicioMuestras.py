@@ -2,7 +2,6 @@ from models import db
 from models.muestras.muestra import Muestra
 from models.muestras.foto import Foto
 from datetime import datetime
-from flask import jsonify
 
 def crear_muestra(data, legajo_id):
     anio_actual = datetime.now().year
@@ -22,22 +21,9 @@ def crear_muestra(data, legajo_id):
     db.session.commit()
     return nueva_muestra
 
-def crear_foto(data, muestra_id):
-    nueva_foto = Foto(
-        nombre_archivo=data.get('nombre_archivo'),
-        fecha=data.get('fecha'),
-        muestra_id=muestra_id
-    )
-    db.session.add(nueva_foto)
-    db.session.commit()
-    return nueva_foto
 
 def listar_muestras(id_legajo):
     return Muestra.query.filter_by(legajo_id=id_legajo).all()
-
-def listar_fotos():
-    return Foto.query.all()
-
 
 def validar_identificacion_cliente(data, legajo_id):
     muestra = Muestra.query.filter_by(iden_cliente=data.get('iden_cliente'), legajo_id=legajo_id).first()
@@ -61,3 +47,15 @@ def validar_fecha(muestra):
         return False
     return True
 
+def crear_foto(data, muestra_id):
+    nueva_foto = Foto(
+        nombre_archivo=data.get('nombre_archivo'),
+        fecha=data.get('fecha'),
+        muestra_id=muestra_id
+    )
+    db.session.add(nueva_foto)
+    db.session.commit()
+    return nueva_foto
+
+def listar_fotos(id_muestra):
+    return Foto.query.filter_by(muestra_id=id_muestra).all()

@@ -21,7 +21,8 @@ const router = createRouter({
       name: "muestras",
       component: () => import("../views/MuestrasIdentificadasView.vue"),
       props: true,
-    }
+    },
+
   ],
 })
 

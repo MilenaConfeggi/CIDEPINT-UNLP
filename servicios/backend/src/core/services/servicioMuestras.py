@@ -15,6 +15,7 @@ def crear_muestra(data, legajo_id):
         nro_muestra=nro_muestra,
         fecha_ingreso=data.get('fecha_ingreso'),
         iden_cliente=data.get('iden_cliente'),
+        terminada= False,
         legajo_id=legajo_id
     )
     db.session.add(nueva_muestra)

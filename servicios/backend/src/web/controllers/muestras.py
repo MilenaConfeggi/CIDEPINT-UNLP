@@ -1,7 +1,8 @@
-from servicios.backend.src.core.services import servicioMuestras
+from servicios.backend.src.core.services import servicioMuestras, servicioMail
 from flask import Blueprint, jsonify, abort, request, send_from_directory
-from servicios.backend.src.web.schemas.muestras import muestrasSchema, muestraSchema, fotosSchema
+from servicios.backend.src.web.schemas.muestras import muestrasSchema, muestraSchema, fotosSchema, fotoSchema
 import os
+from werkzeug.utils import secure_filename
 from marshmallow import ValidationError
 
 UPLOAD_FOLDER = os.path.abspath("documentos")
@@ -51,6 +52,49 @@ def cargar_muestra(id_legajo):
 def terminar_muestra(id_muestra):
     muestra = servicioMuestras.terminar_muestra(id_muestra)
     return jsonify({"message": "La muestra se terminó con exito"}), 200
+
+
+@bp.post("/subir_fotos/<int:legajo_id>")
+def cargar_fotos(legajo_id):
+    if 'archivo' not in request.files:
+        return jsonify({"error": "Debes seleccionar un archivo"}), 400
+
+    archivo = request.files['archivo']
+    muestra_id = request.form.get('muestra_id')
+    fecha = request.form.get('fecha')
+
+    if not archivo or archivo.filename == '':
+        return jsonify({"error": "Por favor seleccione un archivo"}), 400
+
+    if not muestra_id or not fecha:
+        return jsonify({"error": "Muestra y fecha son requeridos"}), 400
+
+    try:
+        muestra_id = int(muestra_id)
+        foto_data = {
+            'nombre_archivo': archivo.filename,
+            'fecha': fecha,
+            'muestra_id': muestra_id
+        }
+        print(foto_data)
+        foto = fotoSchema.load(foto_data)
+        print(foto)
+        servicioMuestras.crear_foto(foto, muestra_id)
+        
+        # Guardar el archivo en el servidor
+        filename = secure_filename(archivo.filename)
+        folder_path = os.path.join(UPLOAD_FOLDER, "muestras", str(legajo_id))
+        os.makedirs(folder_path, exist_ok=True)
+        archivo.save(os.path.join(folder_path, filename))
+
+        return jsonify({"message": "Fotos subidas con éxito"}), 200
+    except ValidationError as err:
+        print(err.messages)  # Imprime los mensajes de error de validación
+        return jsonify({"message": f"Error en la validación de los datos: {err.messages}"}), 400
+    except Exception as e:
+        print(e)  # Imprime el error para depuración
+        return jsonify({"message": "Ha ocurrido un error inesperado"}), 500
+  
 
 @bp.get("/fotos/<int:id_muestra>")
 def listar_fotos(id_muestra):

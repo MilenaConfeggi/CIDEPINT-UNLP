@@ -14,7 +14,7 @@ muestrasSchema = MuestraSchema(many=True)
 class FotoSchema(Schema):
     id = fields.Int(dump_only=True)
     nombre_archivo = fields.Str(required=True)
-    muestra_id = fields.Int(dump_only=True)
+    muestra_id = fields.Int(required=True)
     fecha = fields.Date(required=True)
 
 fotoSchema = FotoSchema()

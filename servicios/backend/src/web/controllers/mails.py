@@ -38,7 +38,7 @@ def cargar_mail(id_legajo):
         if file and servicioMail.validar_tipo(file.filename):
             if(servicioMail.validar_nombre(file.filename, id_legajo) == False):
                 return jsonify({"error": "Ya existe un archivo con ese nombre para el legajo"}), 400
-            filename = secure_filename(file.filename)
+            filename = secure_filename(file.filename).replace(" ", "_")
             folder_path = os.path.join(UPLOAD_FOLDER, "mails", str(id_legajo))
             os.makedirs(folder_path, exist_ok=True)
             file.save(os.path.join(folder_path, filename))

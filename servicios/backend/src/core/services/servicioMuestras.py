@@ -49,8 +49,13 @@ def validar_longitud(muestra):
         return False
     return True
 
-def validar_fecha(muestra):
-    if muestra.get('fecha_ingreso') > datetime.now().date():
+def validar_fecha(fecha):
+    if isinstance(fecha, str):
+        fecha = datetime.strptime(fecha, '%Y-%m-%d').date()
+    print(fecha)
+    print(datetime.now().date())
+    if fecha > datetime.now().date():
+        print("entro")
         return False
     return True
 
@@ -69,3 +74,9 @@ def listar_fotos(id_muestra):
 
 def listar_fotos_por_legajo(id_legajo):
     return Foto.query.join(Muestra).filter(Muestra.legajo_id == id_legajo).all()
+
+def listar_fotos_por_fecha(legajo_id, fecha):
+    return Foto.query.join(Muestra).filter(
+        Muestra.legajo_id == legajo_id,
+        Foto.fecha == fecha
+    ).all()

@@ -7,3 +7,4 @@ class Foto(db.Model):
     fecha = db.Column(db.Date, nullable=False)
 
     muestra_id = db.Column(db.Integer, db.ForeignKey('muestra.id'), nullable=False)
+    muestra = db.relationship('Muestra', backref='fotos')

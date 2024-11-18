@@ -119,3 +119,9 @@ def listar_fotos_por_legajo(id_legajo):
     fotos = servicioMuestras.listar_fotos_por_legajo(id_legajo)
     data = fotosSchema.dump(fotos, many=True)
     return jsonify(data), 200
+
+@bp.get("/fotos_por_fecha/<int:id_legajo>/<fecha>")
+def listar_fotos_por_fecha(id_legajo, fecha):
+    fotos = servicioMuestras.listar_fotos_por_fecha(id_legajo, fecha)
+    data = fotosSchema.dump(fotos, many=True)
+    return jsonify(data), 200

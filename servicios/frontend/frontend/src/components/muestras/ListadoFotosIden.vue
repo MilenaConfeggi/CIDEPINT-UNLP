@@ -2,7 +2,7 @@
   <div class="container mt-4">
     <h1 class="text-center mb-4">Fotos para la muestra {{ muestraId }}</h1>
     <div v-if="error" class="alert alert-danger" role="alert">{{ error }}</div>
-    <div v-if="fotos.length" class="row">
+    <div v-if="fotos.length" class="row scrollable-container">
       <div v-for="foto in fotos" :key="foto.id" class="col-md-3 mb-4">
         <div class="card">
           <div class="card-img-container" @click="mostrarVerFoto(foto)">
@@ -68,12 +68,6 @@ export default {
       return `${import.meta.env.VITE_API_URL}/muestras/imagenes/${muestraId}/${filename.replace(/ /g, "_")}`;
     };
 
-    const confirmarEliminarFoto = (idFoto) => {
-      if (confirm("¿Estás seguro de que deseas eliminar esta foto?")) {
-        eliminarFoto(idFoto);
-      }
-    };
-
     const mostrarVerFoto = (foto) => {
       fotoSeleccionada.value = foto;
       mostrarVerFotoModal.value = true;
@@ -90,12 +84,17 @@ export default {
 
     watch(() => props.muestraId, fetchFotos);
 
-    return { fotos, error, getImageUrl, confirmarEliminarFoto, mostrarVerFoto, cerrarVerFoto, mostrarVerFotoModal, fotoSeleccionada };
+    return { fotos, error, getImageUrl, mostrarVerFoto, cerrarVerFoto, mostrarVerFotoModal, fotoSeleccionada };
   }
 };
 </script>
 
 <style scoped>
+.scrollable-container {
+  max-height: 60vh; /* Limitar la altura máxima del contenedor de fotos */
+  overflow-y: auto; /* Habilitar el desplazamiento vertical */
+}
+
 .card-img-container {
   height: 150px;
   display: flex;

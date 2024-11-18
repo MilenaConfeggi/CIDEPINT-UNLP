@@ -74,3 +74,9 @@ def listar_fotos(id_muestra):
 
 def listar_fotos_por_legajo(id_legajo):
     return Foto.query.join(Muestra).filter(Muestra.legajo_id == id_legajo).all()
+
+def listar_fotos_por_fecha(legajo_id, fecha):
+    return Foto.query.join(Muestra).filter(
+        Muestra.legajo_id == legajo_id,
+        Foto.fecha == fecha
+    ).all()

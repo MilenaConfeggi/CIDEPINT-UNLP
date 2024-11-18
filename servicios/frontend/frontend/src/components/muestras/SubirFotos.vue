@@ -39,7 +39,12 @@
             <i class="fas fa-trash-alt"></i>
           </button>
         </div>
-        <button type="button" class="btn btn-secondary mb-3" @click="addFoto">Subir otra foto</button>
+        <div class="mb-3">
+          <button type="button" class="btn btn-secondary" @click="addFoto">Subir otra foto</button>
+        </div>
+        <div class="mb-3">
+          <button type="submit" class="btn btn-success custom-button" :disabled="isUploading">Subir</button>
+        </div>
         <div v-if="isUploading" class="mb-3 text-center">
           <div class="spinner-border" role="status">
             <span class="sr-only">Cargando...</span>
@@ -52,7 +57,6 @@
         <div v-if="successMessage" class="alert alert-success" role="alert">
           {{ successMessage }}
         </div>
-        <button type="submit" class="btn btn-success custom-button" :disabled="isUploading">Subir</button>
       </form>
     </div>
   </div>
@@ -88,7 +92,7 @@ export default {
         const response = await fetch(`${import.meta.env.VITE_API_URL}/muestras/${this.legajoId}`);
         const data = await response.json();
         if (response.ok) {
-          this.muestras = data;
+          this.muestras = data.filter(muestra => !muestra.terminada); // Filtrar muestras terminadas
         } else {
           this.error = data.message || 'Error al obtener las muestras';
         }
@@ -140,7 +144,7 @@ export default {
           const data = await response.json();
 
           if (!response.ok) {
-            throw new Error(data.error || 'Error al enviar los datos');
+            throw new Error(data.message || 'Error al enviar los datos');
           }
 
           this.successMessage = data.message || 'Fotos subidas con éxito';

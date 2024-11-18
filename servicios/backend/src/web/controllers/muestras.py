@@ -36,7 +36,8 @@ def cargar_muestra(id_legajo):
                 return jsonify({"message": f"La identificación {elem['iden_cliente']} está siendo ingresada más de una vez en este lote. Modificalo y vuelve a intentar"}), 400
             if not servicioMuestras.validar_longitud(muestra):
                 return jsonify({"message": "La identificación del cliente no puede superar los 100 caracteres"}), 400
-            if not servicioMuestras.validar_fecha(muestra):
+            print("fecha ingreso", elem['fecha_ingreso'])
+            if not servicioMuestras.validar_fecha(elem['fecha_ingreso']):
                 return jsonify({"message": "La fecha de ingreso no puede ser mayor a la fecha actual"}), 400
             muestras.append(muestra)
         for muestra in muestras:
@@ -77,11 +78,16 @@ def cargar_fotos(legajo_id):
             'fecha': fecha,
             'muestra_id': muestra_id
         }
-        foto = fotoSchema.load(foto_data)
+        try:
+            foto = fotoSchema.load(foto_data)
+        except ValidationError as err:
+                return jsonify({"message": f"Error en la fecha  {fecha}"}), 400
+        if( not servicioMuestras.validar_fecha(foto.get('fecha'))):
+            return jsonify({"message": "La fecha de la foto no puede ser mayor a la fecha actual"}), 400
         servicioMuestras.crear_foto(foto, muestra_id)
         
         # Guardar el archivo en el servidor
-        folder_path = os.path.join(UPLOAD_FOLDER, "muestras", str(legajo_id))
+        folder_path = os.path.join(UPLOAD_FOLDER, "muestras", str(muestra_id))
         os.makedirs(folder_path, exist_ok=True)
         archivo.save(os.path.join(folder_path, filename))
 

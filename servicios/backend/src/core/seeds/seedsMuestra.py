@@ -17,17 +17,20 @@ def seed_muestras():
         {
             'fecha_ingreso': datetime(2024, 1, 1),
             'iden_cliente': 'Muestra 1',
-            'legajo_id': legajo_provisional.id
+            'legajo_id': legajo_provisional.id,
+            "terminada": False
         },
         {
             'fecha_ingreso': datetime(2024, 2, 1),
             'iden_cliente': 'Muestra 2',
-            'legajo_id': legajo_provisional.id
+            'legajo_id': legajo_provisional.id,
+            "terminada": False
         },
         {
             'fecha_ingreso': datetime(2024, 3, 1),
             'iden_cliente': 'Muestra 3',
-            'legajo_id': legajo_provisional.id
+            'legajo_id': legajo_provisional.id,
+            "terminada": False
         }
     ]
 

@@ -15,6 +15,7 @@ def crear_muestra(data, legajo_id):
         nro_muestra=nro_muestra,
         fecha_ingreso=data.get('fecha_ingreso'),
         iden_cliente=data.get('iden_cliente'),
+        terminada= False,
         legajo_id=legajo_id
     )
     db.session.add(nueva_muestra)
@@ -24,6 +25,12 @@ def crear_muestra(data, legajo_id):
 
 def listar_muestras(id_legajo):
     return Muestra.query.filter_by(legajo_id=id_legajo).all()
+
+def terminar_muestra(id_muestra):
+    muestra = Muestra.query.get(id_muestra)
+    muestra.terminada = True
+    db.session.commit()
+    return muestra
 
 def validar_identificacion_cliente(data, legajo_id):
     muestra = Muestra.query.filter_by(iden_cliente=data.get('iden_cliente'), legajo_id=legajo_id).first()

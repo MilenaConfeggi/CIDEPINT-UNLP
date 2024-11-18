@@ -13,7 +13,11 @@
             <h5 class="card-title">Número de muestra: {{ muestra.nro_muestra }}</h5>
             <p class="card-text">Iden cliente: {{ muestra.iden_cliente }}</p>
             <p class="card-text">Fecha de ingreso: {{ muestra.fecha_ingreso }}</p>
-            <button @click="mostrarFotos(muestra.id)" class="btn btn-primary">Ver fotos</button>
+            <div class="d-flex align-items-center">
+              <button @click="mostrarFotos(muestra.id)" class="btn btn-primary">Ver fotos</button>
+              <button v-if="!muestra.terminada" @click="confirmarTerminarMuestra(muestra.id)" class="btn btn-danger ml-2">Terminar</button>
+              <p v-else class="text-danger mb-0 ml-2">Terminada</p>
+            </div>
           </div>
         </div>
       </div>
@@ -37,6 +41,7 @@ import { ref, onMounted, watch } from 'vue';
 import { useMuestrasStore } from '@/stores/muestras';
 import { storeToRefs } from 'pinia';
 import ListadoFotosIden from './ListadoFotosIden.vue';
+import axios from 'axios';
 
 export default {
   components: {
@@ -69,13 +74,30 @@ export default {
       muestraSeleccionada.value = null;
     };
 
+    const confirmarTerminarMuestra = (muestraId) => {
+      if (confirm("¿Estás seguro de que deseas terminar esta muestra?")) {
+        terminarMuestra(muestraId);
+      }
+    };
+
+    const terminarMuestra = async (muestraId) => {
+      try {
+        const response = await axios.post(`${import.meta.env.VITE_API_URL}/muestras/terminar_muestra/${muestraId}`);
+        if (response.status === 200) {
+          fetchMuestras(); // Refrescar la lista de muestras después de terminar una muestra
+        }
+      } catch (error) {
+        console.error('Error al terminar la muestra:', error);
+      }
+    };
+
     onMounted(() => {
       fetchMuestras();
     });
 
     watch(() => props.legajoId, fetchMuestras);
 
-    return { muestras, error, mostrarFotos, cerrarListadoFotos, mostrarListadoFotos, muestraSeleccionada };
+    return { muestras, error, mostrarFotos, cerrarListadoFotos, mostrarListadoFotos, muestraSeleccionada, confirmarTerminarMuestra };
   }
 };
 </script>
@@ -139,5 +161,21 @@ export default {
   border: none;
   font-size: 24px;
   cursor: pointer;
+}
+
+.d-flex {
+  display: flex;
+}
+
+.align-items-center {
+  align-items: center;
+}
+
+.ml-2 {
+  margin-left: 0.5rem;
+}
+
+.mb-0 {
+  margin-bottom: 0;
 }
 </style>

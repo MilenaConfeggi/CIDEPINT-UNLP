@@ -46,7 +46,11 @@ def cargar_muestra(id_legajo):
         return jsonify({"message": "Ha ocurrido un error inesperado, revise que muestras se han cargado antes de volver a intentarlo"}), 400
     except Exception as e:
         return jsonify({"message": "Ha ocurrido un error inesperado, revise que muestras se han cargado antes de volver a intentarlo"}), 500
-    
+
+@bp.post("/terminar_muestra/<int:id_muestra>")
+def terminar_muestra(id_muestra):
+    muestra = servicioMuestras.terminar_muestra(id_muestra)
+    return jsonify({"message": "La muestra se terminó con exito"}), 200
 
 @bp.get("/fotos/<int:id_muestra>")
 def listar_fotos(id_muestra):

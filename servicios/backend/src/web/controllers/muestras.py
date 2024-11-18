@@ -71,18 +71,16 @@ def cargar_fotos(legajo_id):
 
     try:
         muestra_id = int(muestra_id)
+        filename = secure_filename(archivo.filename).replace(" ", "_")  # Reemplazar espacios con guion bajo
         foto_data = {
-            'nombre_archivo': archivo.filename,
+            'nombre_archivo': filename,
             'fecha': fecha,
             'muestra_id': muestra_id
         }
-        print(foto_data)
         foto = fotoSchema.load(foto_data)
-        print(foto)
         servicioMuestras.crear_foto(foto, muestra_id)
         
         # Guardar el archivo en el servidor
-        filename = secure_filename(archivo.filename)
         folder_path = os.path.join(UPLOAD_FOLDER, "muestras", str(legajo_id))
         os.makedirs(folder_path, exist_ok=True)
         archivo.save(os.path.join(folder_path, filename))

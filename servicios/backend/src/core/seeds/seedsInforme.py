@@ -1,4 +1,4 @@
-from servicios.backend.src.core.services.servicioInforme import crear_documento, crear_estado, crear_tipo_documento
+from servicios.backend.src.core.services.servicioDocumento import crear_documento, crear_estado, crear_tipo_documento
 
 def seeds_informe():
     seed_estados()

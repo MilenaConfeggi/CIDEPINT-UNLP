@@ -1,6 +1,7 @@
 from models.base import db
 from models.documentos.documento import Documento
 from models.documentos.estado import Estado
+from models.documentos.tipo_documento import Tipo_Documento
 from datetime import datetime
 
 def crear_estado(nombre):
@@ -11,12 +12,21 @@ def crear_estado(nombre):
     db.session.commit()
     return nuevo_estado
 
+def crear_tipo_documento(nombre):
+    nuevo_tipo = Tipo_Documento(
+        nombre= nombre
+    )
+    db.session.add(nuevo_tipo)
+    db.session.commit()
+    return nuevo_tipo
+
 def crear_documento(data):
     nuevo_documento = Documento(
         nombre_documento=data.get('nombre_documento'),
         fecha_creacion=datetime.now(),
         estado_id=data.get('estado_id'),
-        legajo_id= data.get('legajo_id')
+        legajo_id= data.get('legajo_id'),
+        tipo_documento_id= data.get('tipo_id')
     )
     db.session.add(nuevo_documento)
     db.session.commit()

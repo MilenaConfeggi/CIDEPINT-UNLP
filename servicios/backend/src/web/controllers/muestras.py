@@ -1,5 +1,5 @@
 from servicios.backend.src.core.services import servicioMuestras, servicioMail
-from flask import Blueprint, jsonify, abort, request, send_from_directory
+from flask import Blueprint, jsonify, abort, request, send_file, send_from_directory
 from servicios.backend.src.web.schemas.muestras import muestrasSchema, muestraSchema, fotosSchema, fotoSchema
 import os
 from werkzeug.utils import secure_filename
@@ -125,3 +125,11 @@ def listar_fotos_por_fecha(id_legajo, fecha):
     fotos = servicioMuestras.listar_fotos_por_fecha(id_legajo, fecha)
     data = fotosSchema.dump(fotos, many=True)
     return jsonify(data), 200
+
+@bp.get("/descargar_fotos/<int:id_muestra>/<filename>")
+def descargar_foto(id_muestra, filename):
+    folder_path = os.path.normpath(os.path.join(UPLOAD_FOLDER, "muestras", str(id_muestra)))
+    file_path = os.path.normpath(os.path.join(folder_path, filename))
+    if not os.path.exists(file_path):
+        abort(404, description="Resource not found")
+    return send_file(file_path, as_attachment=True)

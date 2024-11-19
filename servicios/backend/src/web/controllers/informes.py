@@ -1,5 +1,5 @@
 from marshmallow import ValidationError
-from servicios.backend.src.core.services import servicioDocumento
+from servicios.backend.src.core.services import servicioDocumento, servicioInforme
 from flask import Blueprint, request, jsonify
 import os
 from werkzeug.utils import secure_filename
@@ -14,6 +14,9 @@ def allowed_file(filename):
 
 @bp.post("/cargar_documentacion/<int:id_legajo>")
 def cargar_documentacion(id_legajo):
+    if(servicioInforme.buscar_documentacion_por_legajo(id_legajo)):
+        return jsonify({"error": "Ya existe documentación para este legajo"}), 400
+    
     if 'archivo' not in request.files:
         return jsonify({"error": "Debes seleccionar un archivo"}), 400
 

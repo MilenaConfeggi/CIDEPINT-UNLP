@@ -2,6 +2,7 @@ from flask import Flask, render_template
 from servicios.backend.src.core.config import config
 from servicios.backend.src.core.seeds import seedsMuestra
 from servicios.backend.src.core.seeds import seedsMails
+from servicios.backend.src.core.seeds import seedsInforme
 from models import db
 from servicios.backend.src.web.controllers.mails import bp as mails_bp
 from servicios.backend.src.web.controllers.muestras import bp as muestras_bp
@@ -39,6 +40,8 @@ def create_app(env="development", static_folder=""):
         print("Muestras creadas!")
         seedsMails.seeds_mails()
         print("Mails creados!")
+        seedsInforme.seeds_informe()
+        print("Documentos creados!")
 
     return app
     

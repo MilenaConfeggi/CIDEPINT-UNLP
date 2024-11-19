@@ -4,10 +4,10 @@ from flask_wtf import CSRFProtect
 from flask_session import Session
 from administracion.src.core import database
 from administracion.src.core.config import config
-from administracion.src.web.controllers.routes import register_routes
-from administracion.src.web.handlers.handlers import register_handlers
+from administracion.src.web.controllers.rutas import registrar_rutas
+from administracion.src.web.handlers.handlers import registrar_handlers
 from administracion.src.core.bcrypt import bcrypt
-
+from models.base import db
 
 def create_app(env="development", static_folder="../../static"):
     app = Flask(__name__, static_folder=static_folder)
@@ -17,10 +17,10 @@ def create_app(env="development", static_folder="../../static"):
     sess = Session(app)
 
     bcrypt.init_app(app)
-    database.init_app(app)
+    db.init_app(app)
 
-    app = register_routes(app)
-    app = register_handlers(app)
+    app = registrar_rutas(app)
+    app = registrar_handlers(app)
     
     bcrypt.init_app(app)
     @app.cli.command(name="reset-db")

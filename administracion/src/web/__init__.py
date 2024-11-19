@@ -2,11 +2,11 @@ from os import getenv, urandom
 from flask import Flask, render_template, session
 from flask_wtf import CSRFProtect
 from flask_session import Session
-from src.core import database
-from src.core.config import config
-from src.web.controllers.routes import register_routes
-from src.web.handlers.handlers import register_handlers
-from src.core.bcrypt import bcrypt
+from core import database
+from core.config import config
+from web.controllers.routes import register_routes
+from web.handlers.handlers import register_handlers
+from core.bcrypt import bcrypt
 
 
 def create_app(env="development", static_folder="../../static"):
@@ -26,5 +26,6 @@ def create_app(env="development", static_folder="../../static"):
     @app.cli.command(name="reset-db")
     def reset_db():
         database.reset()
+        print('Database reseted')
     
     return app

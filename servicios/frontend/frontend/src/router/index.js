@@ -28,6 +28,12 @@ const router = createRouter({
       component: () => import("../views/MuestrasCarpetasView.vue"),
       props: true,
     },
+    {
+      path: "/informes/:legajoId",
+      name: "informes",
+      component: () => import("../views/InformesView.vue"),
+      props: true,
+    }
   ],
 })
 

@@ -8,6 +8,7 @@ class Bien(db.Model):
     anio = db.Column(db.Integer, nullable=False)
     institucion = db.Column(db.String(50), nullable=False)
     descripcion = db.Column(db.String(200), nullable=False)
+    motivo_baja = db.Column(db.String(200), nullable=True)
 
     #archivos = db.relationship('Archivo', back_populates='bienes')
     #id_area = db.Column(db.Integer, db.ForeignKey("areas.id"), nullable=False)

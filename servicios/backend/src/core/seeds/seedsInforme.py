@@ -59,33 +59,22 @@ def seed_tipo():
 def seed_documentos():
     documentos_data = [
         {
-            'nombre_documento': 'documento1',
+            'nombre_documento': 'documento1.pdf',
             'estado_id': 1,
             'legajo_id': 1,
             "tipo_id": 1
         },
         {
-            'nombre_documento': 'documento2',
+            'nombre_documento': 'documento2.pdf',
             'estado_id': 2,
             'legajo_id': 1,
             "tipo_id": 1
         },
+
         {
-            'nombre_documento': 'documento3',
+            'nombre_documento': 'documento3.pdf',
             'estado_id': 3,
-            'legajo_id': 1,
-            "tipo_id": 1
-        },
-        {
-            'nombre_documento': 'documento4',
-            'estado_id': 4,
-            'legajo_id': 1,
-            "tipo_id": 1
-        },
-        {
-            'nombre_documento': 'documento5',
-            'estado_id': 2,
-            'legajo_id': 1,
+            'legajo_id': 2,
             "tipo_id": 1
         }
     ]

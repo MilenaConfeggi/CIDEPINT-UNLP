@@ -1,8 +1,10 @@
 from marshmallow import ValidationError
 from servicios.backend.src.core.services import servicioDocumento, servicioInforme
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, abort, request, jsonify, send_from_directory
 import os
 from werkzeug.utils import secure_filename
+from models.base import db
+from models.documentos.documento import Documento
 
 bp = Blueprint("informes", __name__, url_prefix="/informes")
 UPLOAD_FOLDER = os.path.abspath("documentos")
@@ -49,3 +51,14 @@ def cargar_documentacion(id_legajo):
     except Exception as e:
         print(e)  # Imprime el error para depuración
         return jsonify({"message": "Ha ocurrido un error inesperado"}), 500
+    
+@bp.get("/ver_documento/<int:id_legajo>")
+def ver_documento(id_legajo):
+    folder_path = os.path.normpath(os.path.join(UPLOAD_FOLDER, "informes", str(id_legajo)))
+    filename = servicioInforme.buscar_documentacion_por_legajo(id_legajo).nombre_documento
+    if not filename:
+        return jsonify({"error": "No hay documentacion para este legajo"}), 404
+    file_path = os.path.normpath(os.path.join(folder_path, filename))
+    if not os.path.exists(file_path):
+        abort(404, description="Resource not found")
+    return send_from_directory(folder_path, filename)

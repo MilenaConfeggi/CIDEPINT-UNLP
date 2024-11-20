@@ -74,7 +74,7 @@ def seed_documentos():
         {
             'nombre_documento': 'documento3.pdf',
             'estado_id': 3,
-            'legajo_id': 2,
+            'legajo_id': 1,       
             "tipo_id": 1
         }
     ]

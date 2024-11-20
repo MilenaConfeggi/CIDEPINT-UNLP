@@ -3,12 +3,21 @@
     <h1 class="text-center mb-4">Vista de prueba para informes</h1>
     <button class="btn btn-primary" @click="mostrarFormularioSubir">Subir Documentación</button>
     <button class="btn btn-secondary" @click="verDocumentacion">Ver Documentación</button>
+    <button class="btn btn-success" @click="mostrarFormularioSubirInforme">Subir Informe</button>
 
     <!-- Modal de SubirDocumentacion -->
     <div v-if="mostrarSubirDocumentacion" class="modal-overlay" @click="cerrarFormularioSubir">
       <div class="modal-content" @click.stop>
         <button class="close-button" @click="cerrarFormularioSubir">&times;</button>
         <SubirDocumentacion :legajo-id="legajoId" />
+      </div>
+    </div>
+
+    <!-- Modal de SubirInforme -->
+    <div v-if="mostrarSubirInforme" class="modal-overlay" @click="cerrarFormularioSubirInforme">
+      <div class="modal-content" @click.stop>
+        <button class="close-button" @click="cerrarFormularioSubirInforme">&times;</button>
+        <SubirInforme :legajo-id="legajoId" />
       </div>
     </div>
   </div>
@@ -18,12 +27,14 @@
 import { ref } from 'vue';
 import { useRoute } from 'vue-router';
 import SubirDocumentacion from '../components/informes/SubirDocumentacion.vue';
+import SubirInforme from '../components/informes/SubirInforme.vue';
 
 const route = useRoute();
 const legajoId = Number(route.params.legajoId);
 
 // Propiedades reactivas para controlar la visibilidad de las ventanas modales
 const mostrarSubirDocumentacion = ref(false);
+const mostrarSubirInforme = ref(false);
 
 // Función para mostrar el modal de subir documentación
 const mostrarFormularioSubir = () => {
@@ -33,6 +44,16 @@ const mostrarFormularioSubir = () => {
 // Función para cerrar el modal de subir documentación
 const cerrarFormularioSubir = () => {
   mostrarSubirDocumentacion.value = false;
+};
+
+// Función para mostrar el modal de subir informe
+const mostrarFormularioSubirInforme = () => {
+  mostrarSubirInforme.value = true;
+};
+
+// Función para cerrar el modal de subir informe
+const cerrarFormularioSubirInforme = () => {
+  mostrarSubirInforme.value = false;
 };
 
 // Función para abrir el documento en una nueva pestaña

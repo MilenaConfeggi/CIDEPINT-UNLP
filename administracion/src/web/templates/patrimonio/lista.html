@@ -5,7 +5,7 @@
         <h3 class="mb-4 text-lg font-semibold text-gray-600">Búsqueda</h3>
             <hr />
             <form class="mb-4 flex flex-wrap justify-between items-end" method="get" action="{{ url_for('patrimonio.index') }}">
-                <div class="grid gap-6 mb-8 md:grid-cols-2 xl:grid-cols-4">
+                <div class="grid gap-6 mb-8 md:grid-cols-2 xl:grid-cols-5">
                     <label class="block text-sm">
                         <span class="text-gray-700">Titulo</span>
                         <input
@@ -38,6 +38,18 @@
                           <option>$25,000</option>
                         </select>
                     </label>
+                    <label class="block text-sm">
+                        <span class="text-gray-700">
+                          Estado
+                        </span>
+                        <select
+                            name="baja"
+                            class="block w-full mt-1 text-sm form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple"
+                        >
+                          <option>Activos</option>
+                          <option {% if request.args.get('baja') == 'De baja' %} selected {% endif %}>De baja</option>
+                        </select>
+                    </label>
                     <div class="block text-m flex items-center">
                         <button type="submit" class="px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 flex flex-wrap bg-blue-600 border border-transparent rounded-lg active:bg-blue-600 hover:bg-blue-700 focus:outline-none focus:shadow-outline-blue">
                             Buscar
@@ -58,8 +70,8 @@
                 </div>
                 <div class="flex flex-wrap items-end mb-1">
                     <!-- Enlace para agregar nuevo registro -->
-                    <a href="{{ url_for('patrimonio.index') }}"
-                       class="px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-green-600 border border-transparent rounded-lg active:bg-purple-600 hover:bg-green-700 focus:outline-none focus:shadow-outline-purple">
+                    <a href="{{ url_for('patrimonio.nuevo_bien') }}"
+                       class="px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-green-600 border border-transparent rounded-lg active:bg-green-600 hover:bg-green-700 focus:outline-none focus:shadow-outline-green">
                         Agregar Bien
                     </a>
                 </div>
@@ -126,23 +138,26 @@
                             ></path>
                         </svg>
                         </button>
-                        <button data-id="{{ bien.id }}"
-                        class="open-modal-btn flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-black-600 rounded-lg focus:outline-none focus:shadow-outline-gray"
-                        aria-label="Borrar"
-                        >
-                        <svg
-                            class="w-5 h-5"
-                            aria-hidden="true"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                        >
-                            <path
-                            fill-rule="evenodd"
-                            d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                            clip-rule="evenodd"
-                            ></path>
-                        </svg>
-                        </button>
+                        {% if bien.motivo_baja %}
+                        {% else %}
+                            <button data-id="{{ bien.id }}"
+                            class="open-modal-btn flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-black-600 rounded-lg focus:outline-none focus:shadow-outline-gray"
+                            aria-label="Borrar"
+                            >
+                            <svg
+                                class="w-5 h-5"
+                                aria-hidden="true"
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                            >
+                                <path
+                                fill-rule="evenodd"
+                                d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                                clip-rule="evenodd"
+                                ></path>
+                            </svg>
+                            </button>
+                        {% endif %}
                     </div>
                     </td>
                 </tr>
@@ -163,8 +178,8 @@
                 <li>
                 <a
                     class="px-3 py-1 rounded-md rounded-l-lg focus:outline-none focus:shadow-outline-purple"
-                    aria-label="Previous"
-                    href="{{ url_for('patrimonio.index', page=bienes.prev_num) }}"
+                    aria-label="Anterior"
+                    href="{{ url_for('patrimonio.index', page=bienes.prev_num, titulo=request.args.get('titulo', ''), numero_inventario=request.args.get('numero_inventario', ''), area=request.args.get('area', 'Todas'), baja=request.args.get('baja', 'Activos')) }}"
                 >
                     <svg
                     class="w-4 h-4 fill-current"
@@ -183,7 +198,7 @@
                     {% if page %}
                         {% if page != bienes.page %}
                             <li>
-                                <a href="{{ url_for('patrimonio.index', page=page) }}" class="px-3 py-1 text-gray transition-colors duration-150">
+                                <a href="{{ url_for('patrimonio.index', page=page, titulo=request.args.get('titulo', ''), numero_inventario=request.args.get('numero_inventario', ''), area=request.args.get('area', 'Todas'), baja=request.args.get('baja', 'Activos')) }}" class="px-3 py-1 text-gray transition-colors duration-150">
                                     {{ page }}
                                 </a>
                             </li>
@@ -206,7 +221,7 @@
                 <a
                     class="px-3 py-1 rounded-md rounded-r-lg focus:outline-none focus:shadow-outline-purple"
                     aria-label="Next"
-                    href="{{ url_for('patrimonio.index', page=bienes.next_num) }}"
+                    href="{{ url_for('patrimonio.index', page=bienes.next_num, titulo=request.args.get('titulo', ''), numero_inventario=request.args.get('numero_inventario', ''), area=request.args.get('area', 'Todas'), baja=request.args.get('baja', 'Activos')) }}"
                 >
                     <svg
                     class="w-4 h-4 fill-current"
@@ -226,18 +241,22 @@
         </span>
         </div>
     </div>
-    <form id="modals">
+    <form id="modals" method="POST" action="{{ url_for('patrimonio.dar_de_baja_bien') }}">
+        {{ form.hidden_tag() }}
             <div class="modal hidden" data-id="1" aria-labelledby="modal-title" role="dialog" aria-modal="true">
                 <div class="fixed inset-0 bg-gray-500/75 transition-opacity" aria-hidden="true"></div>
                     <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
                         <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
                             <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
                                 <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
-                                    <h3 class="text-base font-semibold text-gray-900" id="modal-title">Modal for Item 1</h3>
-                                        <p class="text-sm text-gray-500">Details for...</p>
+                                    <h3 class="text-base font-semibold text-gray-900" id="modal-title">¿Dar de baja?</h3>
+                                        <input type="hidden" name="bien_id" value="" />
+                                        <label for="motivo_baja" class="text-sm text-gray-500">Mótivo de baja</label>
+                                        {{ form.motivo_baja(rows="3", class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6", placeholder='Ingrese motivo de baja') }}
                                 </div>
                                 <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                                <button type="button" class="close-modal px-3 py-2 text-white bg-red-600 rounded hover:bg-red-500 sm:ml-3 sm:w-auto">Close</button>
+                                <button type="submit" class="px-3 py-2 text-white bg-green-600 rounded hover:bg-green-500 sm:ml-3 sm:w-auto">Confirmar</button>
+                                <button type="button" class="close-modal px-3 py-2 text-white bg-red-600 rounded hover:bg-red-500 sm:ml-3 sm:w-auto">Cancelar</button>
                             </div>
                         </div>
                     </div>
@@ -254,8 +273,8 @@ document.addEventListener('DOMContentLoaded', () => {
   
     // Función para abrir el modal correspondiente
     const openModal = (id) => {
-        console.log(id);
       const modal = document.querySelector(`.modal`);
+      document.querySelector('input[name="bien_id"]').value = id;
       modal.classList.remove('hidden'); // Muestra el modal
     };
   

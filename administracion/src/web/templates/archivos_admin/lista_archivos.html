@@ -1,0 +1,62 @@
+{% extends 'layout.html' %}
+{% block title %}Archivos{% endblock %}
+{% block content %}
+<div>
+    <div class="mx-auto max-w-2xl px-4 py-4 sm:px-6 sm:py-4 lg:max-w-7xl lg:px-8">
+      <h2 class="sr-only">Archivos</h2>
+      <div class="mb-4 flex flex-wrap justify-between items-end">
+        <a href="{{url_for('archivos.index')}}"
+          class="inline-flex items-center px-3 py-4 rounded-md text-black-500 hover:bg-black-50">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-6 w-6">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h18">
+              </path>
+          </svg>
+          <span class="ml-1 font-bold text-lg">Volver</span>
+        </a>
+        <h3 class="mb-4 text-lg font-semibold text-gray-600">{{ carpeta.nombre }}</h3>
+      </div>
+      <hr />
+      <div class="grid pt-4 grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 xl:gap-x-8">
+        {% for archivo in archivos %}
+            <a href="{{ url_for('archivos.descargar_archivo', id_carpeta=carpeta.id, id_archivo= archivo.id) }}" class="group">
+              {% if archivo.nombre.endswith('.jpg') or archivo.nombre.endswith('.jpeg') or archivo.nombre.endswith('.png') or archivo.nombre.endswith('.gif') %}
+                  <svg class="px-7 aspect-square w-full rounded-lg bg-gray-200 object-cover group-hover:opacity-75 xl:aspect-[7/7]"
+                     aria-hidden="true"
+                     fill="currentColor"
+                     viewBox="0 0 512 512">
+                    <path d="M448 80c8.8 0 16 7.2 16 16l0 319.8-5-6.5-136-176c-4.5-5.9-11.6-9.3-19-9.3s-14.4 3.4-19 9.3L202 340.7l-30.5-42.7C167 291.7 159.8 288 152 288s-15 3.7-19.5 10.1l-80 112L48 416.3l0-.3L48 96c0-8.8 7.2-16 16-16l384 0zM64 32C28.7 32 0 60.7 0 96L0 416c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-320c0-35.3-28.7-64-64-64L64 32zm80 192a48 48 0 1 0 0-96 48 48 0 1 0 0 96z"/>
+                  </svg>
+                {% else %}
+                  <svg class="px-7 aspect-square w-full rounded-lg bg-gray-200 object-cover group-hover:opacity-75 xl:aspect-[7/7]"
+                     aria-hidden="true"
+                     fill="currentColor"
+                     viewBox="0 0 384 512">
+                    <path fill-rule="evenodd"
+                        d="M320 464c8.8 0 16-7.2 16-16l0-288-80 0c-17.7 0-32-14.3-32-32l0-80L64 48c-8.8 0-16 7.2-16 16l0 384c0 8.8 7.2 16 16 16l256 0zM0 64C0 28.7 28.7 0 64 0L229.5 0c17 0 33.3 6.7 45.3 18.7l90.5 90.5c12 12 18.7 28.3 18.7 45.3L384 448c0 35.3-28.7 64-64 64L64 512c-35.3 0-64-28.7-64-64L0 64z"
+                        clip-rule="evenodd"></path>
+                  </svg>
+                {% endif %}
+                <p class="mt-1 text-md font-medium text-gray-900 break-words">{{ archivo.nombre }}</p>
+            </a>
+        {% endfor %}
+        <form method="POST" enctype="multipart/form-data" action="{{ url_for('archivos.subir_archivo', id_carpeta=carpeta.id) }}"> 
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <label for="archivo" class="group cursor-pointer">
+            <svg class="px-4 aspect-square w-full rounded-lg bg-gray-200 object-cover group-hover:opacity-75 xl:aspect-[7/7]"
+              aria-hidden="true"
+              fill="currentColor"
+              viewBox="0 0 448 512"
+              >
+              <path
+            fill-rule="evenodd"
+            d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"
+            clip-rule="evenodd"
+              ></path>
+            </svg>
+            <p class="mt-1 text-md font-medium text-gray-900 break-words">Subir archivo</p>
+          </label>
+          <input id="archivo" name="archivo" type="file" class="hidden" onchange="this.form.submit()">
+        </form>
+    </div>
+  </div>
+{% endblock %}  

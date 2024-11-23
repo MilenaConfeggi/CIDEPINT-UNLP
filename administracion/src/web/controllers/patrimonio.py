@@ -60,7 +60,7 @@ def crear_bien():
         first_error_field = next(iter(form.errors))
         first_error_message = form.errors[first_error_field][0]  # Primer error del campo
         # Mostrar el error
-        flash(f"El campo {getattr(form, first_error_field).label.text} {first_error_message}", 'danger')
+        flash(f"El campo {getattr(form, first_error_field).label.text} {first_error_message}", 'error')
         return render_template("patrimonio/formulario_nuevo.html", form=form)
 
 
@@ -81,5 +81,5 @@ def dar_de_baja_bien():
         first_error_field = next(iter(form.errors))
         first_error_message = form.errors[first_error_field][0]  # Primer error del campo
         # Mostrar el error
-        flash(f"El campo {getattr(form, first_error_field).label.text} {first_error_message}", 'danger')
+        flash(f"El campo {getattr(form, first_error_field).label.text} {first_error_message}", 'error')
         return render_template("patrimonio/formulario_nuevo.html", form=form)

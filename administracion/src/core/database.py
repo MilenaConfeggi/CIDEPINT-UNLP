@@ -1,4 +1,5 @@
 from models import db
+from models.archivos_admin.carpeta import Carpeta
 from models.patrimonio.bien import Bien
 
 def reset():
@@ -115,4 +116,74 @@ def seed():
     )
 
     db.session.add_all([bien_1,bien_2,bien_3,bien_4, bien_5, bien_6, bien_7, bien_8, bien_9, bien_10, bien_11, bien_12, bien_13])
+
+    carpeta_1 = Carpeta(
+        nombre="Formularios",
+    )
+    carpeta_2 = Carpeta(
+        nombre="Informes",
+    )
+
+    carpeta_3 = Carpeta(
+        nombre="Proyectos",
+    )
+
+    carpeta_4 = Carpeta(
+        nombre="Contratos",
+    )
+
+    carpeta_5 = Carpeta(
+        nombre="Facturas",
+    )
+
+    carpeta_6 = Carpeta(
+        nombre="Recibos",
+    )
+
+    carpeta_7 = Carpeta(
+        nombre="Correspondencia",
+    )
+
+    carpeta_8 = Carpeta(
+        nombre="Actas",
+    )
+
+    carpeta_9 = Carpeta(
+        nombre="Memorandos",
+    )
+
+    carpeta_10 = Carpeta(
+        nombre="Reglamentos",
+    )
+
+    carpeta_11 = Carpeta(
+        nombre="Normativas",
+    )
+
+    carpeta_12 = Carpeta(
+        nombre="Manuales",
+    )
+
+    carpeta_13 = Carpeta(
+        nombre="Procedimientos",
+    )
+
+    carpeta_14 = Carpeta(
+        nombre="Políticas",
+    )
+
+    carpeta_15 = Carpeta(
+        nombre="Planos",
+    )
+
+    carpeta_16 = Carpeta(
+        nombre="Especificaciones",
+    )
+
+    carpeta_17 = Carpeta(
+        nombre="Presupuestos",
+    )
+
+    db.session.add_all([carpeta_1, carpeta_2, carpeta_3, carpeta_4, carpeta_5, carpeta_6, carpeta_7, carpeta_8, carpeta_9, carpeta_10, carpeta_11, carpeta_12, carpeta_13, carpeta_14, carpeta_15, carpeta_16, carpeta_17])
+
     db.session.commit()

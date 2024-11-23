@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+{% block title %}
+    Pagina de Creacion de Fondo
+{% endblock %}
+{% block content %}
+    <form action="{{ url_for('contable.crear_fondo') }}" method="post">
+        <label for="nombre">Nombre</label>
+        <input type="text" name="nombre" id="nombre" required>
+        <label for="monto">Monto</label>
+        <input type="number" name="monto" id="monto" required>
+        <input type="submit" value="Crear">
+    </form>
+    <a href="{{ url_for('contable.index') }}">Volver</a>
+{% endblock %}

@@ -4,3 +4,4 @@ class Fondo(db.Model):
     __tablename__ = 'fondo'
     titulo = db.Column(db.String(100), primary_key=True)
     saldo = db.Column(db.Float)
+    borrado = db.Column(db.Boolean(), default=False)

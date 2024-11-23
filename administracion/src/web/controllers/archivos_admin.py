@@ -80,3 +80,14 @@ def descargar_archivo(id_carpeta, id_archivo):
         return redirect(url_for('archivos.ver_carpeta',id_carpeta=id_carpeta))
 
     return send_from_directory(directorio, archivo.nombre)
+
+
+@bp.post("/eliminar_archivo/<int:id_carpeta>")
+def eliminar_archivo(id_carpeta):
+    data = request.form
+    print(f'Id del archivo: {data.get('id_archivo')}')
+    if servicio_archivos.eliminar_archivo(id_archivo=data.get('id_archivo')):
+        flash('Archivo eliminado correctamente', 'success')
+    else:
+        flash('Error al eliminar el archivo', 'error')
+    return redirect(url_for('archivos.ver_carpeta',id_carpeta=id_carpeta))

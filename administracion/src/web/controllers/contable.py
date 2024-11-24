@@ -6,7 +6,8 @@ bp = Blueprint("contable",__name__,url_prefix="/contable")
 
 @bp.get("/")
 def index():
-    return render_template("contable/contable.html")
+    fondos = fondo.listar_fondos()
+    return render_template("contable/contable.html",fondos = fondos)
 
 @bp.get("/fondos")
 def get_crear_fondo():

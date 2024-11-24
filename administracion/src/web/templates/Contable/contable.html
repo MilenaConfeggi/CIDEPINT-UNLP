@@ -9,4 +9,32 @@
 class="px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-green-600 border border-transparent rounded-lg active:bg-green-600 hover:bg-green-700 focus:outline-none focus:shadow-outline-green">
 Crear un nuevo Fondo</a>
 </div>
+
+<div class="w-full overflow-x-auto">
+    <table class="w-full whitespace-no-wrap">
+        <thead>
+        <tr
+            class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b bg-gray-50"
+        >
+            <th class="px-4 py-3">Titulo</th>
+            <th class="px-4 py-3">Saldo</th>
+        </tr>
+        </thead>
+        <tbody
+        class="bg-white divide-y"
+        >
+        {% for fondo in fondos %}
+            <tr class="text-gray-700">
+                <td class="px-4 py-3">
+                <div class="flex items-center text-sm">
+                    <div>
+                        <p class="font-semibold">{{ fondo.titulo }}</p>
+                    </div>
+                </div>
+                </td>
+                <td class="px-4 py-3 text-sm">
+                {{ fondo.saldo }}
+                </td>
+            </tr>
+        {% endfor %}
 {% endblock %}

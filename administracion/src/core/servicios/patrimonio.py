@@ -1,5 +1,10 @@
+import os
+from werkzeug.utils import secure_filename
 from models.base import db
 from models.patrimonio.bien import Bien
+from models.archivos_admin.archivo import Archivo
+from flask import current_app
+from administracion.src.core.servicios import archivos_admin as servicio_archivos
 
 def listar_bienes():
 
@@ -59,3 +64,30 @@ def dar_de_baja_bien(
     db.session.commit()
     
     return bien
+
+
+def conseguir_directorio(id_bien):
+    bien = conseguir_bien_de_id(id_bien)
+    return os.path.join(current_app.root_path,'archivos',bien.titulo)
+
+
+def guardar_archivos_de_bien(id_bien, archivos):
+
+    for archivo in archivos:
+        nombre = secure_filename(archivo.filename)
+        directorio = conseguir_directorio(id_bien)
+
+        if not os.path.exists(directorio):
+            os.makedirs(directorio)
+
+        nombre = servicio_archivos.generar_nombre_unico(directorio, nombre)
+        filepath = os.path.join(directorio, nombre)
+        archivo.save(filepath)
+
+        bien = conseguir_bien_de_id(id_bien)
+
+        nuevo_archivo = Archivo(nombre=nombre, bien=bien, filepath=filepath)
+
+        db.session.add(nuevo_archivo)
+
+    db.session.commit()

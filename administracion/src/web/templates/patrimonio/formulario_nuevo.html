@@ -16,7 +16,7 @@
 {% extends 'layout.html' %}
 {% block title %}Nuevo Bien{% endblock %}
 {% block content %}
-    <form class="px-4" method="POST" action="{{ url_for('patrimonio.crear_bien') }}">
+    <form id="upload-form" class="px-4" method="POST" enctype="multipart/form-data" action="{{ url_for('patrimonio.crear_bien') }}">
         {{ form.hidden_tag() }}
 
         <div class="space-y-12">
@@ -76,41 +76,98 @@
                         {{ form.descripcion(rows="3", class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6", placeholder='Ingrese descripción') }}
                     </div>
                 </div>
-    
+                
             <div class="col-span-full">
-                <label for="photo" class="block text-sm/6 font-medium text-gray-900">Photo</label>
-                <div class="mt-2 flex items-center gap-x-3">
-                <svg class="size-12 text-gray-300" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon">
-                    <path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0 0 21.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 0 0 3.065 7.097A9.716 9.716 0 0 0 12 21.75a9.716 9.716 0 0 0 6.685-2.653Zm-12.54-1.285A7.486 7.486 0 0 1 12 15a7.486 7.486 0 0 1 5.855 2.812A8.224 8.224 0 0 1 12 20.25a8.224 8.224 0 0 1-5.855-2.438ZM15.75 9a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" clip-rule="evenodd" />
-                </svg>
-                <button type="button" class="rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">Change</button>
-                </div>
-            </div>
-    
-            <div class="col-span-full">
-                <label for="cover-photo" class="block text-sm/6 font-medium text-gray-900">Cover photo</label>
-                <div class="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10">
-                <div class="text-center">
-                    <svg class="mx-auto size-12 text-gray-300" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon">
-                    <path fill-rule="evenodd" d="M1.5 6a2.25 2.25 0 0 1 2.25-2.25h16.5A2.25 2.25 0 0 1 22.5 6v12a2.25 2.25 0 0 1-2.25 2.25H3.75A2.25 2.25 0 0 1 1.5 18V6ZM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0 0 21 18v-1.94l-2.69-2.689a1.5 1.5 0 0 0-2.12 0l-.88.879.97.97a.75.75 0 1 1-1.06 1.06l-5.16-5.159a1.5 1.5 0 0 0-2.12 0L3 16.061Zm10.125-7.81a1.125 1.125 0 1 1 2.25 0 1.125 1.125 0 0 1-2.25 0Z" clip-rule="evenodd" />
-                    </svg>
-                    <div class="mt-4 flex text-sm/6 text-gray-600">
-                    <label for="file-upload" class="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500">
-                        <span>Upload a file</span>
-                        <input id="file-upload" name="file-upload" type="file" class="sr-only">
+                {{ form.archivos_adjuntos.label }}
+                <div class="flex items-center justify-center w-full">
+                    <label for="dropzone-file" id="dropzone" class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50">
+                        <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                            <svg class="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" aria-hidden="true" fill="none" viewBox="0 0 20 16">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
+                            </svg>
+                            <p class="mb-2 text-sm text-gray-500 dark:text-gray-400"><span class="font-semibold">Click to upload</span> or drag and drop</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">SVG, PNG, JPG or GIF (MAX. 800x400px)</p>
+                        </div>
+                        {{ form.archivos_adjuntos(class="hidden", id="dropzone-file", multiple=True) }}
                     </label>
-                    <p class="pl-1">or drag and drop</p>
-                    </div>
-                    <p class="text-xs/5 text-gray-600">PNG, JPG, GIF up to 10MB</p>
                 </div>
-                </div>
-            </div>
             </div>
         </div>
-    
+        <div id="file-list" class="mt-4">
+            <!-- Lista de archivos seleccionados -->
+        </div>
         <div class="mt-6 flex items-center justify-end gap-x-6">
-        <a href="{{ url_for('patrimonio.index') }}" type="button" class="text-sm/6 font-semibold text-gray-900">Cancelar</a>
-        <button type="submit" class="rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600">Registrar</button>
+            <a href="{{ url_for('patrimonio.index') }}" type="button" class="text-sm/6 font-semibold text-gray-900">Cancelar</a>
+            <button type="submit" class="rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600">Registrar</button>
         </div>
     </form>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const dropzone = document.getElementById('dropzone');
+            const fileInput = document.getElementById('dropzone-file');
+            const fileListContainer = document.getElementById('file-list');
+    
+            // Mantén una referencia a los archivos seleccionados
+            let fileArray = [];
+    
+            // Actualiza la vista previa de los archivos seleccionados
+            function updateFileList() {
+                fileListContainer.innerHTML = ''; // Limpiamos la lista
+                fileArray.forEach((file, index) => {
+                    const fileItem = document.createElement('div');
+                    fileItem.className = 'flex items-center justify-between border p-2 mb-2 bg-gray-100 rounded';
+                    fileItem.innerHTML = `
+                        <span>${file.name}</span>
+                        <button class="text-red-500 remove-file" data-index="${index}">X</button>
+                    `;
+                    fileListContainer.appendChild(fileItem);
+                });
+    
+                // Actualizar eventos para eliminar archivos
+                document.querySelectorAll('.remove-file').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const index = e.target.getAttribute('data-index');
+                        fileArray.splice(index, 1); // Eliminar de la lista
+                        updateFileList(); // Actualizar la vista
+                    });
+                });
+    
+                // Sincroniza los archivos con el input real
+                syncInputFiles();
+            }
+    
+            // Sincroniza el input de archivos con la lista en memoria
+            function syncInputFiles() {
+                const dataTransfer = new DataTransfer(); // Crear una instancia para archivos virtuales
+                fileArray.forEach(file => dataTransfer.items.add(file)); // Añadir archivos
+                fileInput.files = dataTransfer.files; // Actualizar los archivos del input
+            }
+    
+            // Manejador para arrastrar y soltar
+            dropzone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropzone.classList.add('border-blue-500');
+            });
+    
+            dropzone.addEventListener('dragleave', () => {
+                dropzone.classList.remove('border-blue-500');
+            });
+    
+            dropzone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropzone.classList.remove('border-blue-500');
+                const files = Array.from(e.dataTransfer.files);
+                fileArray = fileArray.concat(files); // Agregar nuevos archivos sin reemplazar
+                updateFileList(); // Actualizamos la vista
+            });
+    
+    
+            // Manejador para seleccionar archivos desde el explorador
+            fileInput.addEventListener('change', (e) => {
+                const files = Array.from(fileInput.files);
+                fileArray = fileArray.concat(files); // Agregar nuevos archivos a la lista
+                updateFileList();
+            });
+        });
+    </script>
 {% endblock %}

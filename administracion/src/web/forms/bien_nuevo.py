@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SelectField, TextAreaField, IntegerField, ValidationError
+from wtforms import StringField, SelectField, TextAreaField, IntegerField, ValidationError, MultipleFileField
 from wtforms.validators import DataRequired, Length, Optional, NumberRange
 import re
 
@@ -29,6 +29,9 @@ class FormularioNuevoBien(FlaskForm):
                        render_kw={"aria-label": "Descripción"}
                        )
     
+    archivos_adjuntos = MultipleFileField('Archivos adjuntos', validators=[Optional()], 
+                                          render_kw={"aria-label": "Archivos adjuntos"})
+
     area = SelectField('Area',coerce=int, validators=[Optional()], render_kw={"aria-label": "Area"})
     
     def __init__(self, *args, **kwargs):

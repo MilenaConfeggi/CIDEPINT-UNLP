@@ -54,10 +54,6 @@ def conseguir_directorio(id_carpeta):
     return os.path.join(current_app.root_path,'archivos',carpeta.nombre)
 
 
-def conseguir_directorio_flask(id_carpeta):
-    carpeta = conseguir_carpeta_de_id(id_carpeta)
-    return os.path.join('archivos',carpeta.nombre)
-
 
 def guardar_archivo_en_carpeta(id_carpeta, archivo):
 
@@ -73,9 +69,9 @@ def guardar_archivo_en_carpeta(id_carpeta, archivo):
 
     carpeta = conseguir_carpeta_de_id(id_carpeta)
     # Guardar en la base de datos
-    new_file = Archivo(nombre=nombre, carpeta=carpeta, filepath=filepath)
+    nuevo_archivo = Archivo(nombre=nombre, carpeta=carpeta, filepath=filepath)
 
-    db.session.add(new_file)
+    db.session.add(nuevo_archivo)
     db.session.commit()
 
 

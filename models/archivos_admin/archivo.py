@@ -7,7 +7,7 @@ class Archivo(db.Model):
     filepath = db.Column(db.String(255), nullable=False)  # Ruta o URL del archivo
 
     id_bien = db.Column(db.Integer, db.ForeignKey("bienes.id"), nullable=True)
-    bienes = db.relationship('Bien', back_populates='archivos')
+    bien = db.relationship('Bien', back_populates='archivos')
 
     id_carpeta = db.Column(db.Integer, db.ForeignKey("carpetas.id"), nullable=True)
     carpeta = db.relationship('Carpeta', back_populates='archivos')

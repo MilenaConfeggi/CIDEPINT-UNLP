@@ -4,5 +4,9 @@
 {% endblock %}
 {% block content %}
 <h1>Contable </h1>
-<a href="{{url_for('contable.get_crear_fondo')}}">Crear un nuevo Fondo</a>
+<div class="flex flex-wrap items-end mb-1">
+<a href="{{url_for('contable.get_crear_fondo')}}" 
+class="px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-green-600 border border-transparent rounded-lg active:bg-green-600 hover:bg-green-700 focus:outline-none focus:shadow-outline-green">
+Crear un nuevo Fondo</a>
+</div>
 {% endblock %}

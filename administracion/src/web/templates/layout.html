@@ -11,9 +11,19 @@
   <body>
     {% include "navbar.html" %}
     <div>
+      {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <p class="flash flash-{{ category }}">
+                        {{ message }}
+                    </p>
+                {% endfor %}
+            {% endif %}
+            {% endwith %}
       {% block content %}{% endblock %}
     </div>
     <footer>
     </footer>
   </body>
 </html>
+<link rel="stylesheet" href="{{ url_for('static', filename='flash.css') }}">

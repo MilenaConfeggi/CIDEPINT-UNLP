@@ -54,12 +54,18 @@ def filtrar_bienes(titulo, numero_inventario, area, baja, page, per_page):
     return query.order_by(Bien.titulo.asc()).paginate(page=page,per_page=per_page,error_out=False)
 
 
-def dar_de_baja_bien(
-    id_bien,
-    motivo_baja,
-):
+def dar_de_baja_bien(id_bien,motivo_baja):
     bien = conseguir_bien_de_id(id_bien)
     bien.motivo_baja=motivo_baja
+    
+    db.session.commit()
+    
+    return bien
+
+
+def restaurar_bien(id_bien):
+    bien = conseguir_bien_de_id(id_bien)
+    bien.motivo_baja=None
     
     db.session.commit()
     

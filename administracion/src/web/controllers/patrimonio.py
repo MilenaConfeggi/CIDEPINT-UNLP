@@ -88,7 +88,13 @@ def dar_de_baja_bien():
         # Mostrar el error
         flash(f"El campo {getattr(form, first_error_field).label.text} {first_error_message}", 'error')
         return render_template("patrimonio/formulario_nuevo.html", form=form)
-    
+
+
+@bp.post("/restaurar")
+def restaurar_bien():
+    servicio_patrimonio.restaurar_bien(id_bien=request.form.get('id_bien'))
+    flash('Bien restaurado correctamente', 'success')
+    return redirect (url_for("patrimonio.index"))
 
 @bp.get("/descargar/<int:id_bien>/<int:id_archivo>")
 def descargar_archivo(id_bien, id_archivo):

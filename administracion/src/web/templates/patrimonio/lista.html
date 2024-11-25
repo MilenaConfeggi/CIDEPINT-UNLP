@@ -139,6 +139,23 @@
                             </svg>
                         </a>
                         {% if bien.motivo_baja %}
+                            <button data-id="{{ bien.id }}"
+                            class="open-modal-restaurar-btn flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-black-600 rounded-lg focus:outline-none focus:shadow-outline-gray"
+                            aria-label="Restaurar">
+                            <svg
+                                class="w-5 h-5"
+                                aria-hidden="true"
+                                fill="currentColor"
+                                viewBox="0 0 512 512"
+                            >
+                                <path
+                                fill-rule="evenodd"
+                                d="M105.1 202.6c7.7-21.8 20.2-42.3 37.8-59.8c62.5-62.5 163.8-62.5 226.3 0L386.3 160 352 160c-17.7 0-32 14.3-32 32s14.3 32 32 32l111.5 0c0 0 0 0 0 0l.4 0c17.7 0 32-14.3 32-32l0-112c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 35.2L414.4 97.6c-87.5-87.5-229.3-87.5-316.8 0C73.2 122 55.6 150.7 44.8 181.4c-5.9 16.7 2.9 34.9 19.5 40.8s34.9-2.9 40.8-19.5zM39 289.3c-5 1.5-9.8 4.2-13.7 8.2c-4 4-6.7 8.8-8.1 14c-.3 1.2-.6 2.5-.8 3.8c-.3 1.7-.4 3.4-.4 5.1L16 432c0 17.7 14.3 32 32 32s32-14.3 32-32l0-35.1 17.6 17.5c0 0 0 0 0 0c87.5 87.4 229.3 87.4 316.7 0c24.4-24.4 42.1-53.1 52.9-83.8c5.9-16.7-2.9-34.9-19.5-40.8s-34.9 2.9-40.8 19.5c-7.7 21.8-20.2 42.3-37.8 59.8c-62.5 62.5-163.8 62.5-226.3 0l-.1-.1L125.6 352l34.4 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L48.4 288c-1.6 0-3.2 .1-4.8 .3s-3.1 .5-4.6 1z"
+                                d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                                clip-rule="evenodd"
+                                ></path>
+                            </svg>
+                            </button>
                         {% else %}
                             <button data-id="{{ bien.id }}"
                             class="open-modal-btn flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-black-600 rounded-lg focus:outline-none focus:shadow-outline-gray"
@@ -243,14 +260,14 @@
     </div>
     <form id="modals" method="POST" action="{{ url_for('patrimonio.dar_de_baja_bien') }}">
         {{ form.hidden_tag() }}
-            <div class="modal hidden" data-id="1" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+            <div class="modal hidden" id="modal-borrar" data-id="1" aria-labelledby="modal-title" role="dialog" aria-modal="true">
                 <div class="fixed inset-0 bg-gray-500/75 transition-opacity" aria-hidden="true"></div>
                     <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
                         <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
                             <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
                                 <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
                                     <h3 class="text-base font-semibold text-gray-900" id="modal-title">¿Dar de baja?</h3>
-                                        <input type="hidden" name="id_bien" value="" />
+                                        <input type="hidden" id="id_bien_borrar" name="id_bien" value="" />
                                         <label for="motivo_baja" class="text-sm text-gray-500">Mótivo de baja</label>
                                         {{ form.motivo_baja(rows="3", class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6", placeholder='Ingrese motivo de baja') }}
                                 </div>
@@ -263,42 +280,72 @@
                 </div>
             </div>
     </form>
+    <form id="modal-restore" method="POST" action="{{ url_for('patrimonio.restaurar_bien') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="modal hidden" id="modal-restaurar" data-id="1" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+                <div class="fixed inset-0 bg-gray-500/75 transition-opacity" aria-hidden="true"></div>
+                    <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+                        <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                            <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+                                <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                                    <h3 class="text-base font-semibold text-gray-900" id="modal-title">¿Restaurar bien?</h3>
+                                        <input type="hidden" id="id_bien_restaurar" name="id_bien" value="" />
+                                </div>
+                                <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                                <button type="submit" class="px-3 py-2 text-white bg-green-600 rounded hover:bg-green-500 sm:ml-3 sm:w-auto">Confirmar</button>
+                                <button type="button" class="close-modal-restaurar px-3 py-2 text-white bg-red-600 rounded hover:bg-red-500 sm:ml-3 sm:w-auto">Cancelar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </form>
 <script>
     // Manejo de modales dinámicos
 document.addEventListener('DOMContentLoaded', () => {
     // Selecciona todos los botones para abrir modales
     const openModalButtons = document.querySelectorAll('.open-modal-btn');
-    // Selecciona todos los botones para cerrar modales
-    const closeModalButtons = document.querySelectorAll('.close-modal');
-  
+   
     // Función para abrir el modal correspondiente
     const openModal = (id) => {
-      const modal = document.querySelector(`.modal`);
-      document.querySelector('input[name="id_bien"]').value = id;
+      const modal = document.querySelector(`#modal-borrar`);
+      document.querySelector('#id_bien_borrar').value = id;
       modal.classList.remove('hidden'); // Muestra el modal
     };
-  
-    // Función para cerrar el modal correspondiente
-    const closeModal = (id) => {
-      const modal = document.querySelector(`.modal`);
-      modal.classList.add('hidden'); // Oculta el modal
-    };
-  
+    
     // Asocia evento de clic a los botones de abrir modal
     openModalButtons.forEach((button) => {
-      button.addEventListener('click', () => {
-        const id = button.getAttribute('data-id');
-        openModal(id);
-      });
+        button.addEventListener('click', () => {
+          const id = button.getAttribute('data-id');
+          openModal(id);
+        });
     });
-  
-    // Asocia evento de clic a los botones de cerrar modal
-    closeModalButtons.forEach((button) => {
-      button.addEventListener('click', () => {
-        const modal = button.closest('.modal');
-        const id = modal.getAttribute('data-id');
-        closeModal(id);
-      });
+
+    const openModalRestaurarButtons = document.querySelectorAll('.open-modal-restaurar-btn');
+   
+    // Función para abrir el modal correspondiente
+    const openModalRestaurar = (id) => {
+      const modal = document.querySelector(`#modal-restaurar`);
+      document.querySelector('#id_bien_restaurar').value = id;
+      modal.classList.remove('hidden'); // Muestra el modal
+    };
+    
+    // Asocia evento de clic a los botones de abrir modal
+    openModalRestaurarButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+          const id = button.getAttribute('data-id');
+          openModalRestaurar(id);
+        });
+    });
+    
+    document.querySelector('.close-modal').addEventListener('click', () => {
+        const modal = document.querySelector(`#modal-borrar`);
+        modal.classList.add('hidden');
+    });
+    
+    document.querySelector('.close-modal-restaurar').addEventListener('click', () => {
+        const modal = document.querySelector(`#modal-restaurar`);
+        modal.classList.add('hidden');
     });
   
     // Cierra el modal al hacer clic fuera del contenido

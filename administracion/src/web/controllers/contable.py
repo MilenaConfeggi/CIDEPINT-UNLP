@@ -1,6 +1,8 @@
 from administracion.src.core.fondos import fondo
+from administracion.src.core.ingresos import ingreso as ingresoDB
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from administracion.src.web.forms.fondo_nuevo import FormularioNuevoFondo
+from administracion.src.web.forms.ingreso_nuevo import FormularioNuevoIngreso
 
 bp = Blueprint("contable",__name__,url_prefix="/contable")
 
@@ -34,3 +36,34 @@ def crear_fondo():
         flash(f"El campo {getattr(form, first_error_field).label.text} {first_error_message}", 'danger')
         return render_template("contable/crear_fondo.html", form=form)
 
+
+@bp.get("/fondos/<string:fondo_id>")
+def mostrar_fondo(fondo_id):
+    form = FormularioNuevoIngreso()
+    fond = fondo.conseguir_fondo_de_id(fondo_id)
+    if not fond:
+        return redirect(url_for('contable.index'))
+    ingresos = ingresoDB.get_ingresos_del_fondo(fondo_id)
+    #ingresos = ingresoDB.listar_ingresos()
+    #print(ingresos[1].receptor_id)
+    return render_template("contable/detalle_fondo.html", fondo=fond,ingresos=ingresos,form=form)
+@bp.post("/ingreso/<string:fondo_id>")
+def crear_ingreso(fondo_id):
+    fond = fondo.conseguir_fondo_de_id(fondo_id)
+    if not fond:
+        return redirect(url_for('contable.index'))
+    form = FormularioNuevoIngreso(request.form)
+    if form.validate_on_submit():
+        data = request.form.to_dict()
+        data["receptor_id"] = fondo_id
+        csrf_token = data.pop("csrf_token", None)
+        ingresoDB.create_ingreso(**data)
+        fond.saldo += float(data["monto"])
+        fondo.modificar_fondo(fondo_id, saldo=fond.saldo)
+        flash("Ingreso creado correctamente", "success")
+        return redirect(url_for("contable.mostrar_fondo",fondo_id=fondo_id))
+    else:
+        # Obtener el primer campo con error
+        first_error_field = next(iter(form.errors))
+        first_error_message = form.errors[first_error_field][0]
+    return redirect(url_for("contable.mostrar_fondo",fondo_id=fondo_id))

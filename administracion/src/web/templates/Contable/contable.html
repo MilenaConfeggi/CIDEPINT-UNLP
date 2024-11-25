@@ -18,6 +18,7 @@ Crear un nuevo Fondo</a>
         >
             <th class="px-4 py-3">Titulo</th>
             <th class="px-4 py-3">Saldo</th>
+            <th class="px-4 py-3">Acciones</th>
         </tr>
         </thead>
         <tbody
@@ -34,6 +35,9 @@ Crear un nuevo Fondo</a>
                 </td>
                 <td class="px-4 py-3 text-sm">
                 {{ fondo.saldo }}
+                </td>
+                <td class="px-4 py-3 text-sm">
+                <a href="{{ url_for('contable.mostrar_fondo', fondo_id=fondo.titulo) }}" class="text-indigo-600 hover:text-indigo-900">Ver</a>
                 </td>
             </tr>
         {% endfor %}

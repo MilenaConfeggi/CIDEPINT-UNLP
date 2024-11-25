@@ -1,6 +1,6 @@
 from models import db
 from models.patrimonio.bien import Bien
-
+from models.Fondo.fondo import Fondo as fondoDB
 def reset():
     """
     Resetea la base de datos
@@ -113,6 +113,9 @@ def seed():
         institucion='Museo de Fotografía',
         descripcion='Fotografía en blanco y negro',
     )
-
-    db.session.add_all([bien_1,bien_2,bien_3,bien_4, bien_5, bien_6, bien_7, bien_8, bien_9, bien_10, bien_11, bien_12, bien_13])
+    fondo_1 = fondoDB(
+        titulo='UNLP',
+        saldo=10000
+    )
+    db.session.add_all([bien_1,bien_2,bien_3,bien_4, bien_5, bien_6, bien_7, bien_8, bien_9, bien_10, bien_11, bien_12, bien_13,fondo_1])
     db.session.commit()

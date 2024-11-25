@@ -98,3 +98,12 @@ def eliminar_carpeta(id_carpeta):
         db.session.commit()
         return True
     return False
+
+
+def chequear_nombre_carpeta_existente(nombre):
+    carpeta = Carpeta.query.filter(
+        Carpeta.nombre == nombre
+    ).first()
+    if carpeta:
+        return True
+    return False

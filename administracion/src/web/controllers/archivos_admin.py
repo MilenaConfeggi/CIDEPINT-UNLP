@@ -36,7 +36,10 @@ def agregar_carpeta():
     form = FormularioNuevaCarpeta(request.form)
     if form.validate_on_submit():
         data = request.form
-        
+
+        if servicio_archivos.chequear_nombre_carpeta_existente(data.get('nombre')):
+            flash('Ya existe una carpeta con ese nombre', 'error')
+            return render_template("archivos_admin/nueva_carpeta.html", form=form)
         carpeta = servicio_archivos.crear_carpeta(
                 nombre=data.get('nombre'),
                 usuarios_lee=data.get('usuarios_lee'),

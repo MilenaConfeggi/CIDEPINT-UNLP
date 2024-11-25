@@ -16,6 +16,7 @@ class Carpeta(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(255), nullable=False)  # Nombre del archivo
     archivos = db.relationship('Archivo', back_populates='carpeta')
+    fecha_ingreso = db.Column(db.Date, default=db.func.now())
 
     #usuarios_lee = db.relationship('Usuario', secondary='usuarios_lee_carpetas', back_populates='carpetas_lee')
     #usuarios_edita = db.relationship('Usuario', secondary='usuarios_edita_carpetas', back_populates='carpetas_edita')

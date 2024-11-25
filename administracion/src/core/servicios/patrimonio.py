@@ -91,3 +91,25 @@ def guardar_archivos_de_bien(id_bien, archivos):
         db.session.add(nuevo_archivo)
 
     db.session.commit()
+
+
+def editar_bien(
+    id_bien,
+    titulo,
+    numero_inventario,
+    anio,
+    institucion,
+    descripcion,
+):
+    
+    bien = conseguir_bien_de_id(id_bien)
+    
+    bien.titulo = titulo
+    bien.numero_inventario = numero_inventario
+    bien.anio = anio
+    bien.institucion = institucion
+    bien.descripcion = descripcion
+
+    db.session.commit()
+    
+    return bien

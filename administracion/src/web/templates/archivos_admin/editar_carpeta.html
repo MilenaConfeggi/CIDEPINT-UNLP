@@ -1,5 +1,5 @@
 {% extends 'layout.html' %}
-{% block title %}Nuevo Bien{% endblock %}
+{% block title %}Editar carpeta{% endblock %}
 {% block content %}
     <form class="px-4" method="POST" action="{{ url_for('archivos.actualizar_carpeta', id_carpeta=id_carpeta) }}">
         {{ form.hidden_tag() }}

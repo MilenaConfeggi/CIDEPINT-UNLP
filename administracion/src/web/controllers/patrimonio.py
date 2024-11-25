@@ -129,3 +129,47 @@ def eliminar_archivo(id_bien):
     else:
         flash('Error al eliminar el archivo', 'error')
     return redirect(url_for('patrimonio.mostrar_bien',id_bien=id_bien))
+
+
+@bp.get("/editar/<int:id_bien>")
+def editar_bien(id_bien):
+    bien = servicio_patrimonio.conseguir_bien_de_id(id_bien)
+
+    if not bien:
+        flash("Bien no encontrado", 'error')
+        return redirect(url_for('patrimonio.index'))
+    
+    form = FormularioNuevoBien(obj=bien)
+
+    return render_template("patrimonio/formulario_editar.html", form=form, id_bien=id_bien)
+
+
+@bp.post("/editar/<int:id_bien>")
+def actualizar_bien(id_bien):
+    form = FormularioNuevoBien()
+    if form.validate_on_submit():
+        data = request.form
+        bien = servicio_patrimonio.conseguir_bien_de_id(id_bien)
+
+        if not bien:
+            flash("Bien no encontrado", 'error')
+            return redirect(url_for('patrimonio.index'))
+        
+        bien = servicio_patrimonio.editar_bien(
+                id_bien=id_bien,
+                titulo=data.get('titulo'),
+                numero_inventario=data.get('numero_inventario'),
+                anio=data.get('anio'),
+                institucion=data.get('institucion'),
+                descripcion=data.get('descripcion'),
+            )
+
+        flash('Bien actualizado correctamente', 'success')
+        return redirect (url_for("patrimonio.mostrar_bien",id_bien=bien.id))
+    else:
+        # Obtener el primer campo con error
+        first_error_field = next(iter(form.errors))
+        first_error_message = form.errors[first_error_field][0]  # Primer error del campo
+        # Mostrar el error
+        flash(f"El campo {getattr(form, first_error_field).label.text} {first_error_message}", 'error')
+        return render_template("patrimonio/formulario_editar.html", form=form, id_bien=id_bien)

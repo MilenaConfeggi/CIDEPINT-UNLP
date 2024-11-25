@@ -18,7 +18,7 @@ class FormularioNuevoBien(FlaskForm):
                                                   render_kw={"aria-label": "Numero de inventario"}
                                                   )
     anio = IntegerField('Año', validators=[DataRequired(message="es requerido"), 
-                                           NumberRange(min=1900, max=2500, message="debe estar entre 1900 y 2500")],
+                                           NumberRange(min=1, max=2500, message="debe estar entre 1 y 2500")],
                                          render_kw={"aria-label": "Año"})
     institucion = StringField('Institución', validators=[DataRequired(message="es requerido"), 
                                              Length(max=50,message="no puede exceder los 50 caracteres")],

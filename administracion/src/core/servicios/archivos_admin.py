@@ -1,6 +1,7 @@
 import os
 from werkzeug.utils import secure_filename
 from flask import current_app
+from sqlalchemy import extract
 from models.base import db
 from models.archivos_admin.archivo import Archivo
 from models.archivos_admin.carpeta import Carpeta
@@ -11,9 +12,10 @@ def listar_archivos_de_carpeta(id_carpeta):
     return query.order_by(Archivo.nombre.asc()).all()
 
 
-def listar_carpetas():
-
-    return Carpeta.query.order_by(Carpeta.nombre.asc()).all()
+def listar_carpetas(anio):
+    return Carpeta.query.filter(
+        extract('year', Carpeta.fecha_ingreso) == anio
+    ).order_by(Carpeta.nombre.asc()).all()
 
 
 def crear_carpeta(
@@ -90,7 +92,39 @@ def eliminar_carpeta(id_carpeta):
     
     carpeta = Carpeta.query.get(id_carpeta)
     if carpeta:
+        for archivo in carpeta.archivos:
+            eliminar_archivo(archivo.id)
+        directorio = conseguir_directorio(id_carpeta)
+        if os.path.exists(directorio) and os.path.isdir(directorio):
+            os.rmdir(directorio)
         db.session.delete(carpeta)
         db.session.commit()
         return True
     return False
+
+
+def chequear_nombre_carpeta_existente(nombre):
+    carpeta = Carpeta.query.filter(
+        Carpeta.nombre == nombre
+    ).first()
+    if carpeta:
+        return True
+    return False
+
+
+def editar_carpeta(
+    id_carpeta,
+    nombre,
+    usuarios_lee,
+    usuarios_edita,
+):
+    
+    carpeta = conseguir_carpeta_de_id(id_carpeta)
+    
+    carpeta.nombre = nombre
+    #carpeta.usuarios_lee = usuarios_lee
+    #carpeta.usuarios_edita = usuarios_edita
+
+    db.session.commit()
+    
+    return carpeta

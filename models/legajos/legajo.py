@@ -11,5 +11,11 @@ class Legajo(db.Model):
     motivo_cancelacion = db.Column(db.String(100), nullable=True)
     #parte_del_proceso_cancelado = 
     
-    cliente = db.relationship('Cliente', back_populates='legajo')
+    cliente = db.relationship('Cliente', back_populates='legajo', uselist=False)
     
+    resultado_encuesta = db.relationship('ResultadoEncuesta', back_populates='legajo')
+    mail = db.relationship('Mail', back_populates='legajo')
+    muestras = db.relationship('Muestra', back_populates='legajo')
+    presupuesto_cidepint = db.relationship('Presupuesto', back_populates='legajo')
+    documento_id = db.Column(db.Integer, db.ForeignKey('documento.id'), nullable=True)
+    documento = db.relationship('Documento', back_populates='legajos')

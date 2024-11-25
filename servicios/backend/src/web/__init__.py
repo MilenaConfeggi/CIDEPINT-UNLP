@@ -2,6 +2,8 @@ from flask import Flask, render_template
 from servicios.backend.src.core.config import config
 from servicios.backend.src.core.seeds import seedsMuestra
 from servicios.backend.src.core.seeds import seedsMails
+from servicios.backend.src.core.seeds import seedsCliente
+from servicios.backend.src.core.seeds import seedsLegajo
 from models import db
 from servicios.backend.src.web.controllers.mails import bp as mails_bp
 from servicios.backend.src.web.controllers.muestras import bp as muestras_bp
@@ -35,10 +37,14 @@ def create_app(env="development", static_folder=""):
         """
         Comando para crear los seeds de la base de datos
         """
-        seedsMuestra.seeds_muestras()
-        print("Muestras creadas!")
-        seedsMails.seeds_mails()
-        print("Mails creados!")
+        #seedsMuestra.seeds_muestras()
+        #print("Muestras creadas!")
+        #seedsMails.seeds_mails()
+        #print("Mails creados!")
+        #seedsCliente.seeds_clientes()
+        #print("Clientes creados!")
+        seedsLegajo.seeds_legajos()
+        print("Legajos creados!")
 
     return app
     

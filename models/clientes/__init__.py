@@ -11,3 +11,6 @@ def get_cliente(id):
 
 def list_clientes():
     return db.session.query(Cliente).all()
+
+def find_cliente_by_mail(mail):
+    return db.session.query(Cliente).filter_by(email=mail).first()

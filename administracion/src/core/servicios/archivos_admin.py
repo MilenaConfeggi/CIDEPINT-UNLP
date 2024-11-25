@@ -114,3 +114,21 @@ def chequear_nombre_carpeta_existente(nombre):
     if carpeta:
         return True
     return False
+
+
+def editar_carpeta(
+    id_carpeta,
+    nombre,
+    usuarios_lee,
+    usuarios_edita,
+):
+    
+    carpeta = conseguir_carpeta_de_id(id_carpeta)
+    
+    carpeta.nombre = nombre
+    #carpeta.usuarios_lee = usuarios_lee
+    #carpeta.usuarios_edita = usuarios_edita
+
+    db.session.commit()
+    
+    return carpeta

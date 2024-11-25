@@ -111,3 +111,47 @@ def eliminar_carpeta():
     else:
         flash('Error al eliminar la carpeta', 'error')
     return redirect(url_for('archivos.index'))
+
+
+@bp.get("/carpeta/editar/<int:id_carpeta>")
+def editar_carpeta(id_carpeta):
+    carpeta = servicio_archivos.conseguir_carpeta_de_id(id_carpeta)
+
+    if not carpeta:
+        flash("Carpeta no encontrada", 'error')
+        return redirect(url_for('archivos.index'))
+    
+    form = FormularioNuevaCarpeta(obj=carpeta)
+
+    return render_template("archivos_admin/editar_carpeta.html",form=form,id_carpeta=id_carpeta)
+
+
+@bp.post("/carpeta/editar/<int:id_carpeta>")
+def actualizar_carpeta(id_carpeta):
+    form = FormularioNuevaCarpeta(request.form)
+    if form.validate_on_submit():
+        data = request.form
+        carpeta = servicio_archivos.conseguir_carpeta_de_id(id_carpeta)
+        if not carpeta:
+            flash("Carpeta no encontrada", 'error')
+            return redirect(url_for('archivos.index'))
+        if carpeta.nombre != data.get('nombre'):
+            if servicio_archivos.chequear_nombre_carpeta_existente(data.get('nombre')):
+                flash('Ya existe una carpeta con ese nombre', 'error')
+                return render_template("archivos_admin/editar_carpeta.html", form=form,id_carpeta=id_carpeta)
+        
+        carpeta = servicio_archivos.editar_carpeta(
+                id_carpeta=id_carpeta,
+                nombre=data.get('nombre'),
+                usuarios_lee=data.get('usuarios_lee'),
+                usuarios_edita=data.get('usuarios_edita'),
+            )
+        flash('Carpeta editada correctamente', 'success')
+        return redirect (url_for("archivos.ver_carpeta", id_carpeta=carpeta.id))
+    else:
+        # Obtener el primer campo con error
+        first_error_field = next(iter(form.errors))
+        first_error_message = form.errors[first_error_field][0]  # Primer error del campo
+        # Mostrar el error
+        flash(f"El campo {getattr(form, first_error_field).label.text} {first_error_message}", 'error')
+        return render_template("archivos_admin/editar_carpeta.html", form=form,id_carpeta=id_carpeta)

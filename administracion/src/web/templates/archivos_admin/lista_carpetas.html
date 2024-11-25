@@ -12,6 +12,14 @@
             ></path>
         </svg>
       </li>
+      <li class="flex flex-wrap" id="editar">
+        Editar
+        <svg class="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" clip-rule="evenodd"
+            d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"
+            ></path>
+        </svg>
+      </li>
     </ul>
   </div>
   <form method="POST" action="{{ url_for('archivos.eliminar_carpeta') }}">
@@ -70,7 +78,7 @@
             </a>
         {% endfor %}
         {% if request.args.get('anio',anios[0]|string) == anios[0]|string %}
-          <a href="{{url_for('archivos.nueva_carpeta')}}" class="group">
+          <a href="{{url_for('archivos.nueva_carpeta')}}">
               <svg class="px-4 aspect-square w-full rounded-lg object-cover group-hover:opacity-75 xl:aspect-[7/7]"
                       aria-hidden="true"
                       fill="currentColor"
@@ -99,7 +107,7 @@
         event.preventDefault(); // Evita el menú contextual predeterminado
   
         const { clientX: mouseX, clientY: mouseY } = event;
-        console.log(mouseX, mouseY);
+        
         // Ajustar posición del menú
         contextMenu.style.top = `${mouseY}px`;
         contextMenu.style.left = `${mouseX}px`;
@@ -131,6 +139,16 @@
       document.querySelector('input[name="id_carpeta"]').value = selectedFolderId;
       modal.classList.remove('hidden');
     });
+
+    document.getElementById('editar').addEventListener('click', () => {
+        if (selectedFolderId) {
+            const url = "{{ url_for('archivos.editar_carpeta', id_carpeta=0) }}".replace('0', selectedFolderId);
+            window.location.href = url;
+        } else {
+            alert('No folder selected');
+        }
+    });
+  
   
     document.querySelector('.close-modal').addEventListener('click', () => {
       const modal = document.querySelector(`.modal`);
@@ -144,17 +162,21 @@
       item.addEventListener('touchstart', (event) => {
         touchTimeout = setTimeout(() => {
           event.preventDefault(); // Evita el menú contextual predeterminado
-  
+    
           const touch = event.touches[0];
-          const { clientX: mouseX, clientY: mouseY } = touch;
-          console.log(mouseX, mouseY);
+          const { clientX, clientY } = touch;
+    
+          // Calcular posición absoluta
+          const mouseX = clientX + window.pageXOffset;
+          const mouseY = clientY + window.pageYOffset;
+    
           // Ajustar posición del menú
           contextMenu.style.top = `${mouseY}px`;
           contextMenu.style.left = `${mouseX}px`;
-  
+    
           // Mostrar el menú
           contextMenu.classList.remove("hidden");
-  
+    
           // Guardar el ID del archivo seleccionado
           selectedFileId = item.getAttribute('data-id');
         }, 500); // Tiempo de espera para considerar una pulsación larga
@@ -162,6 +184,7 @@
   
       item.addEventListener('touchend', () => {
         clearTimeout(touchTimeout);
+        event.preventDefault();
       });
     });
   </script>
@@ -172,7 +195,7 @@
       background: #fff;
       border: 1px solid #ccc;
       box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-      border-radius: 4px;
+      border-radius: 8px;
       padding: 10px;
     }
     

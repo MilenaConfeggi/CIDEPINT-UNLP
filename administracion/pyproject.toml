@@ -9,12 +9,13 @@ packages = [{include = "web", from = "src"}]
 [tool.poetry.dependencies]
 python = "^3.12"
 flask = "^3.0.3"
-psycopg2-binary = "^2.9.10"
 flask-session = "^0.8.0"
 flask-bcrypt = "^1.0.1"
 flask-sqlalchemy = "^3.1.1"
 python-dotenv = "^1.0.1"
 flask-wtf = "^1.2.2"
+pymysql = "^1.1.1"
+cryptography = "^43.0.3"
 
 
 [build-system]

@@ -22,10 +22,10 @@ class ProductionConfig(Config):
 class DevelopmentConfig(Config):
     DB_USER = getenv("DB_USER", "postgres")
     DB_PASSWORD = getenv("DB_PASSWORD")
-    DB_HOST = getenv("HOST", "localhost")
+    DB_HOST = getenv("DB_HOST", "localhost")
     DB_PORT = getenv("PORT", "5432")
     DB_NAME = getenv("DB_NAME", "grupo18")
-    SQLALCHEMY_DATABASE_URI = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}?client_encoding=utf8"
+    SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
     SECRET_KEY = getenv("SECRET_KEY", urandom(24).hex())
     SESSION_TYPE = "filesystem"
 

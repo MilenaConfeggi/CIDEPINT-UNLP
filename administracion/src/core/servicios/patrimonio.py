@@ -11,9 +11,9 @@ def listar_bienes():
     return Bien.query.all()
 
 
-def conseguir_bien_de_id(bien_id):
+def conseguir_bien_de_id(id_bien):
 
-    return Bien.query.get(bien_id)
+    return Bien.query.get(id_bien)
 
 
 def crear_bien(
@@ -55,10 +55,10 @@ def filtrar_bienes(titulo, numero_inventario, area, baja, page, per_page):
 
 
 def dar_de_baja_bien(
-    bien_id,
+    id_bien,
     motivo_baja,
 ):
-    bien = conseguir_bien_de_id(bien_id)
+    bien = conseguir_bien_de_id(id_bien)
     bien.motivo_baja=motivo_baja
     
     db.session.commit()

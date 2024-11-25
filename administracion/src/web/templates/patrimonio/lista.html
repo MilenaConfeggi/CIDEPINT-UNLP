@@ -108,7 +108,7 @@
                     </td>
                     <td class="px-4 py-3">
                     <div class="flex items-center space-x-4 text-sm">
-                        <a href="{{ url_for('patrimonio.mostrar_bien', bien_id=bien.id) }}"
+                        <a href="{{ url_for('patrimonio.mostrar_bien', id_bien=bien.id) }}"
                         class="flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-black-600 rounded-lg focus:outline-none focus:shadow-outline-gray"
                         aria-label="Ver"
                         >
@@ -250,7 +250,7 @@
                             <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
                                 <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
                                     <h3 class="text-base font-semibold text-gray-900" id="modal-title">¿Dar de baja?</h3>
-                                        <input type="hidden" name="bien_id" value="" />
+                                        <input type="hidden" name="id_bien" value="" />
                                         <label for="motivo_baja" class="text-sm text-gray-500">Mótivo de baja</label>
                                         {{ form.motivo_baja(rows="3", class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6", placeholder='Ingrese motivo de baja') }}
                                 </div>
@@ -274,7 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Función para abrir el modal correspondiente
     const openModal = (id) => {
       const modal = document.querySelector(`.modal`);
-      document.querySelector('input[name="bien_id"]').value = id;
+      document.querySelector('input[name="id_bien"]').value = id;
       modal.classList.remove('hidden'); // Muestra el modal
     };
   

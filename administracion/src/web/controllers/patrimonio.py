@@ -25,9 +25,9 @@ def index():
     return render_template("patrimonio/lista.html",bienes=bienes, form=form)
 
 
-@bp.get("/<int:bien_id>")
-def mostrar_bien(bien_id):
-    bien = servicio_patrimonio.conseguir_bien_de_id(bien_id)
+@bp.get("/<int:id_bien>")
+def mostrar_bien(id_bien):
+    bien = servicio_patrimonio.conseguir_bien_de_id(id_bien)
     if not bien:
         return redirect(url_for('patrimonio.index'))
 
@@ -75,9 +75,8 @@ def dar_de_baja_bien():
     form = FormularioBajaBien(request.form)
     if form.validate_on_submit():
         data = request.form
-        print(f'Id del bien: {data.get('bien_id')}')
         servicio_patrimonio.dar_de_baja_bien(
-                bien_id=data.get('bien_id'),
+                id_bien=data.get('id_bien'),
                 motivo_baja=data.get('motivo_baja'),
             )
         flash('Bien dado de baja correctamente', 'success')
@@ -99,6 +98,34 @@ def descargar_archivo(id_bien, id_archivo):
     filepath = os.path.join(directorio, archivo.nombre)
     if not os.path.exists(filepath):
         flash("Archivo no encontrado", "error")
-        return redirect(url_for('patrimonio.mostrar_bien',bien_id=id_bien))
+        return redirect(url_for('patrimonio.mostrar_bien',id_bien=id_bien))
 
-    return send_from_directory(directorio, archivo.nombre)
+    return send_from_directory(directorio, archivo.nombre, as_attachment=True)
+
+
+@bp.post("/carpeta/subir/<int:id_bien>")
+def subir_archivo(id_bien: int):
+    
+    if 'archivo' in request.files and request.files['archivo'].filename != '':
+        archivo = [request.files['archivo']]
+
+        servicio_patrimonio.guardar_archivos_de_bien(id_bien, archivo)
+        
+        flash("Archivo subido correctamente", "success")
+    else:
+        flash(
+            "Error en la subida del archivo, por favor intenta de nuevo",
+            "error",
+        )
+    return redirect(url_for('patrimonio.mostrar_bien',id_bien=id_bien))
+
+
+@bp.post("/eliminar_archivo/<int:id_bien>")
+def eliminar_archivo(id_bien):
+    data = request.form
+    print(f'Id del archivo: {data.get('id_archivo')}')
+    if servicio_archivos.eliminar_archivo(id_archivo=data.get('id_archivo')):
+        flash('Archivo eliminado correctamente', 'success')
+    else:
+        flash('Error al eliminar el archivo', 'error')
+    return redirect(url_for('patrimonio.mostrar_bien',id_bien=id_bien))

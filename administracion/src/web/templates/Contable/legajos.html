@@ -1,0 +1,86 @@
+{% extends "layout.html" %}
+{% block title %}
+    Pagina de Cotable
+{% endblock %}
+{% block content %}
+<h1>Contable </h1>
+<div class="flex flex-wrap items-end mb-1">
+<a href="{{url_for('contable.get_crear_fondo')}}" 
+class="px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-green-600 border border-transparent rounded-lg active:bg-green-600 hover:bg-green-700 focus:outline-none focus:shadow-outline-green">
+Crear un nuevo Fondo</a>
+</div>
+
+<div class="w-full overflow-x-auto">
+    <table class="w-full whitespace-no-wrap">
+        <thead>
+        <tr
+            class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b bg-gray-50"
+        >
+        <th class="px-4 py">Número de legajo</th>
+        <th class="px-4 py-3">Cliente</th>
+        <th class="px-4 py-3">Presupuesto (PDF)</th>
+        <th class="px-4 py-3">Orden de compra (PDF)</th>
+        <th class="px-4 py-3">Orden de facturación (PDF)</th>
+        <th class="px-4 py-3">Factura (PDF)</th>
+        <th class="px-4 py-3">Documento asociado (PDF, opcional)</th>
+        <th class="px-4 py-3">Recibo</th>
+        <th class="px-4 py-3">Distribución/es</th>
+        </tr>
+        </thead>
+        <tbody
+        class="bg-white divide-y"
+        >
+        {% for legajo in legajos %}
+            <tr class="text-gray-700">
+                <td class="px-4 py-3">
+                <div class="flex items-center text-sm">
+                    <div>
+                        <p class="font-semibold">{{ legajo.nro_legajo }}</p>
+                    </div>
+                </div>
+                </td>
+                <td class="px-4 py-3 text-sm">
+                    Cliente
+                </td>
+                <td class="px-4 py-3 text-sm">
+                    Presupuesto PDf
+                </td>
+                <td class="px-4 py-3 text-sm">
+                    Orden de compra PDF
+                </td>
+                <td class="px-4 py-3 text-sm">
+                    Orden de facturación PDF
+                </td>
+                <td class="px-4 py-3 text-sm">
+                    Factura PDF
+                </td>
+                <td class="px-4 py-3 text-sm">
+                    Documento asociado PDF
+                </td>
+                <td class="px-4 py-3 text-sm">
+                    Recibo
+                </td>
+                <td class="px-4 py-3 text-sm">
+                    Distribución/es
+                </td>
+            </tr>
+            <!--    __tablename__ = 'legajo'
+    id = db.Column(db.Integer, primary_key=True)
+    nro_legajo = db.Column(db.String(100))
+    fecha_entrada = db.Column(db.DateTime)
+    objetivo = db.Column(db.String(100))
+    es_juridico = db.Column(db.Boolean)
+    necesita_facturacion = db.Column(db.Boolean)
+    motivo_cancelacion = db.Column(db.String(100), nullable=True)
+    #parte_del_proceso_cancelado = 
+    
+    cliente = db.relationship('Cliente', back_populates='legajo', uselist=False)
+    
+    resultado_encuesta = db.relationship('ResultadoEncuesta', back_populates='legajo')
+    mail = db.relationship('Mail', back_populates='legajo')
+    muestras = db.relationship('Muestra', back_populates='legajo')
+    presupuesto_cidepint = db.relationship('Presupuesto', back_populates='legajo')
+    documento_id = db.Column(db.Integer, db.ForeignKey('documento.id'), nullable=True)
+    documento = db.relationship('Documento', back_populates='legajos')-->
+        {% endfor %}
+{% endblock %}

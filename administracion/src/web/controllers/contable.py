@@ -3,11 +3,14 @@ from administracion.src.core.ingresos import ingreso as ingresoDB
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from administracion.src.web.forms.fondo_nuevo import FormularioNuevoFondo
 from administracion.src.web.forms.ingreso_nuevo import FormularioNuevoIngreso
-
+from models import legajos as legajoDB
 bp = Blueprint("contable",__name__,url_prefix="/contable")
 
 @bp.get("/")
 def index():
+    return render_template("contable/home.html")
+@bp.get("/fondo")
+def index_fondo():
     fondos = fondo.listar_fondos()
     return render_template("contable/contable.html",fondos = fondos)
 
@@ -67,3 +70,8 @@ def crear_ingreso(fondo_id):
         first_error_field = next(iter(form.errors))
         first_error_message = form.errors[first_error_field][0]
     return redirect(url_for("contable.mostrar_fondo",fondo_id=fondo_id))
+
+@bp.get("/legajos")
+def get_legajos():
+    data = legajoDB.list_legajos()
+    return render_template("contable/legajos.html",legajos = data)

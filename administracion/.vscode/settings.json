@@ -1,0 +1,15 @@
+{
+    "files.exclude": {
+        "**/.git": false,
+        "**/.svn": false,
+        "**/.hg": false,
+        "**/CVS": false,
+        "**/.DS_Store": false,
+        "**/Thumbs.db": false,
+        "src\\web\\controllers\\personal/__pycache__": true,
+        "**/__pycache__": true,
+        "src\\web\\controllers\\personal/*.*": false,
+        "__pycache__": true
+    },
+    "explorerExclude.backup": {}
+}

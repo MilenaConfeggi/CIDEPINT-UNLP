@@ -1,0 +1,20 @@
+{% extends "layout.html" %}
+{% block title %}
+    Listar Áreas
+{% endblock %}
+{% block content %}
+
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-8">Áreas Creadas</h1>
+    <div class="bg-white shadow-md rounded-lg p-6">
+        <ul>
+            {% for area in areas %}
+                <li class="mb-2">
+                    <a href="{{ url_for('area.modificar_area', id=area.id) }}" class="text-blue-500">{{ area.nombre }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+{% endblock %}

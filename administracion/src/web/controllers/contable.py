@@ -88,8 +88,8 @@ def crear_distribucion(id):
     form = FormularioNuevaDistribucion(request.form)
     if form.validate_on_submit():
         data = request.form.to_dict()
+        #Validaciones
         print(data)
-        return True
         csrf_token = data.pop("csrf_token", None)
         data["legajo_id"] = id
         distribucionDB.create_distribucion(**data)
@@ -99,3 +99,10 @@ def crear_distribucion(id):
         # Obtener el primer campo con error
         first_error_field = next(iter(form.errors))
         first_error_message = form.errors[first_error_field][0]
+        return render_template("contable/crear_distribucion.html", form = form)
+    
+@bp.get("/distribuciones/<int:id>")
+def get_distribuciones(id):
+    data = distribucionDB.list_distribuciones_by_legajo(id)
+    legajo = legajoDB.get_legajo(id)
+    return render_template("contable/listar_distribuciones.html",distribuciones = data, legajo = legajo)

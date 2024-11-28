@@ -1,0 +1,48 @@
+{% extends 'layout.html' %}
+{% block title %}Distribuciones del Legajo{% endblock %}
+{% block content %}
+<div class="px-4">
+    <div class="px-4 sm:px-0">
+        <h3 class="text-base/7 font-semibold text-gray-900">Distribuciones del legajo {{ legajo.nro_legajo }}</h3>
+    </div>
+</div>
+
+<div class="mt-6">
+    <a href="{{ url_for('contable.get_crear_distribucion', id=legajo.id) }}"
+       class="rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+        Crear Nueva Distribución
+    </a>
+</div>
+
+<h3 class="mt-8">Distribuciones Pasadas</h3>
+<div class="w-full overflow-x-auto mt-4">
+    {% if distribuciones %}
+    <table class="w-full whitespace-no-wrap">
+        <thead>
+        <tr class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b bg-gray-50">
+            <th class="px-4 py-3">ID</th>
+            <th class="px-4 py-3">Porc. Área</th>
+            <th class="px-4 py-3">Porc. Empleados</th>
+            <th class="px-4 py-3">Porc. Comisiones</th>
+            <th class="px-4 py-3">Monto Distribuir</th>
+            <th class="px-4 py-3">Costos</th>
+        </tr>
+        </thead>
+        <tbody class="bg-white divide-y">
+        {% for distribucion in distribuciones %}
+            <tr class="text-gray-700">
+                <td class="px-4 py-3 text-sm">{{ distribucion.id }}</td>
+                <td class="px-4 py-3 text-sm">{{ distribucion.porcentaje_area }}%</td>
+                <td class="px-4 py-3 text-sm">{{ distribucion.porcentaje_empleados }}%</td>
+                <td class="px-4 py-3 text-sm">{{ distribucion.porcentaje_comisiones }}%</td>
+                <td class="px-4 py-3 text-sm">${{ distribucion.monto_a_distribuir }}</td>
+                <td class="px-4 py-3 text-sm">${{ distribucion.costos }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="text-gray-600 mt-4">No hay distribuciones registradas para este legajo.</p>
+    {% endif %}
+</div>
+{% endblock %}

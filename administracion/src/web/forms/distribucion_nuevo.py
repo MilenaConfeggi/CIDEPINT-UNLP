@@ -49,23 +49,11 @@ class FormularioNuevaDistribucion(FlaskForm):
                         render_kw={"aria-label": "Costos"}
                         )
     
-    legajo_id = IntegerField('Legajo ID', 
-                             validators=[
-                                 DataRequired(message="es requerido"),
-                                 NumberRange(min=1, message="Debe ser un ID válido")
-                             ],
-                             render_kw={"aria-label": "Legajo ID"}
-                             )
+    #ganancias_de_id = SelectField('Area de Ganancias', coerce=int, validators=[Optional()], render_kw={"aria-label": "Area de Ganancias"})
     
-    ganancias_de_id = SelectField('Area de Ganancias', 
-                                  coerce=int, 
-                                  validators=[Optional()], 
-                                  render_kw={"aria-label": "Area de Ganancias"})
+    #costos_de_id = SelectField('Area de Costos', coerce=int, validators=[Optional()], render_kw={"aria-label": "Area de Costos"})
     
-    costos_de_id = SelectField('Area de Costos', 
-                               coerce=int, 
-                               validators=[Optional()], 
-                               render_kw={"aria-label": "Area de Costos"})
+    # Seleccionar Empleados
     
     def __init__(self, *args, **kwargs):
         super(FormularioNuevaDistribucion, self).__init__(*args, **kwargs)

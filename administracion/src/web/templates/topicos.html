@@ -6,6 +6,11 @@
 
 <div class="container mx-auto px-4 py-8">
     <h1 class="text-3xl font-bold mb-8">Seleccionar Tópico</h1>
+    <div class="bg-white p-6">
+        <a href="{{ url_for('auth.logout') }}" class="block text-center">
+            <h2 class="text-xl font-semibold mb-2 text-red-500">Log Out</h2>
+        </a>
+    </div>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div class="bg-white shadow-md rounded-lg p-6">
             <a href="{{ url_for('personal.index') }}" class="block text-center">

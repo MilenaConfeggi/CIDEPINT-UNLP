@@ -1,4 +1,4 @@
-from src.core.database import db
+from administracion.src.core.database import db
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 class Archivo(db.Model):

@@ -1,7 +1,7 @@
 from flask import flash, redirect, render_template, request, send_file, url_for, Blueprint, session
-from src.core.models.personal import User
-from src.core.models.area import Area
-from src.core.models.archivo import Archivo
+from models.personal.personal import User
+from models.personal.area import Area
+from models.personal.archivo import Archivo
 from io import BytesIO
 from sqlalchemy import or_
 from werkzeug.utils import secure_filename
@@ -15,17 +15,17 @@ import pandas as pd
 from flask import send_file
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
-from src.web.controllers.roles import role_required  # Importa el decorador
+from administracion.src.web.controllers.roles import role_required  # Importa el decorador
 from sqlalchemy import or_, cast
 from sqlalchemy.types import String
 from sqlalchemy import or_, cast
 from sqlalchemy.types import String
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import current_user
-from src.core.models.personal import User
-from src.core.models.area import Area
+from models.personal.personal import User
+from models.personal.area import Area
 
-from src.web.controllers.roles import role_required
+from administracion.src.web.controllers.roles import role_required
 
 personal_bp = Blueprint("personal", __name__, url_prefix="/personal")
 
@@ -124,13 +124,14 @@ def registrar_usuario():
 
 
 @personal_bp.route('/empleados', methods=['GET'])
-@role_required('Administrador', 'Colaborador')  
+@role_required('Administrador', 'Colaborador')
 def ver_empleados():
     busqueda = request.args.get('busqueda', None)
     ordenar_por = request.args.get('ordenar_por', 'nombre')
     orden = request.args.get('orden', 'asc')
+    mostrar_inhabilitados = request.args.get('mostrar_inhabilitados', '0') == '1'
     
-    query = User.query.filter_by(habilitado=True)
+    query = User.query
     
     if busqueda:
         query = query.filter(or_(
@@ -142,6 +143,9 @@ def ver_empleados():
             cast(User.cargo, String).ilike(f'%{busqueda}%')
         ))
     
+    if not mostrar_inhabilitados:
+        query = query.filter_by(habilitado=True)
+    
     if orden == 'asc':
         query = query.order_by(cast(getattr(User, ordenar_por), String).asc())
     else:
@@ -149,7 +153,7 @@ def ver_empleados():
     
     empleados = query.all()
     
-    return render_template('personal/ver_empleados.html', empleados=empleados, busqueda=busqueda, ordenar_por=ordenar_por, orden=orden)
+    return render_template('personal/ver_empleados.html', empleados=empleados, busqueda=busqueda, ordenar_por=ordenar_por, orden=orden, mostrar_inhabilitados=mostrar_inhabilitados)
 
 @personal_bp.route('/empleados/descargar', methods=['GET'])
 @role_required('Administrador', 'Colaborador')  
@@ -264,7 +268,10 @@ def ver_perfil(id):
         user.telefono = request.form['telefono']
         user.domicilio = request.form['domicilio']
         user.observaciones = request.form['observaciones']
-        user.area_id = request.form['area_id']
+        
+        # Solo permitir modificar el área si el usuario no es 'Personal'
+        if current_user.rol != 'Personal':
+            user.area_id = request.form['area_id']
         
         if request.form['password']:
             user.password = request.form['password']
@@ -297,7 +304,7 @@ def ver_perfil(id):
         {'name': 'nombre', 'label': 'Nombre', 'type': 'text', 'value': user.nombre},
         {'name': 'apellido', 'label': 'Apellido', 'type': 'text', 'value': user.apellido},
         {'name': 'dni', 'label': 'DNI', 'type': 'text', 'value': user.dni},
-        {'name': 'area_id', 'label': 'Área', 'type': 'select', 'value': user.area_id, 'options': [(area.id, area.nombre) for area in areas]},
+        {'name': 'area_id', 'label': 'Área', 'type': 'select', 'value': user.area_id, 'options': [(area.nombre) for area in areas], 'disabled': current_user.rol == 'Personal'},
         {'name': 'dependencia', 'label': 'Dependencia', 'type': 'select', 'value': user.dependencia, 'options': dependencias},
         {'name': 'cargo', 'label': 'Cargo', 'type': 'select', 'value': user.cargo, 'options': cargos},
         {'name': 'subdivision_cargo', 'label': 'Subdivisión del Cargo', 'type': 'select', 'value': user.subdivision_cargo, 'options': subdivisiones_cargo.get(user.cargo, [])},
@@ -307,9 +314,11 @@ def ver_perfil(id):
         {'name': 'observaciones', 'label': 'Observaciones', 'type': 'textarea', 'value': user.observaciones},
     ]
     
+    
     return render_template('personal/ver_perfil.html', user=user, saldo_area=saldo_area, archivos=archivos, campos=campos)
 
 @personal_bp.route('/archivo/eliminar/<int:id>', methods=['POST'])
+@role_required('Administrador', 'Colaborador', 'Personal') 
 def eliminar_archivo(id):
     archivo = Archivo.query.get_or_404(id)
     archivo.delete()
@@ -318,11 +327,13 @@ def eliminar_archivo(id):
     return redirect(url_for('personal.ver_perfil', id=archivo.user_id))
 
 @personal_bp.route('/archivo/descargar/<int:id>', methods=['GET'])
+@role_required('Administrador', 'Colaborador', 'Personal') 
 def descargar_archivo(id):
     archivo = Archivo.query.get_or_404(id)    
     return send_file(archivo.ruta, as_attachment=True)
 
 @personal_bp.route('/usuario/inhabilitar/<int:id>', methods=['POST'])
+@role_required('Administrador', 'Colaborador') 
 def inhabilitar_usuario(id):
     user = User.query.get_or_404(id)
     current_user = User.query.get(session['user_id'])  # Asumiendo que el ID del usuario actual está en la sesión

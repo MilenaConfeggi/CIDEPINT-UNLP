@@ -3,17 +3,17 @@ from flask import Flask
 from flask_wtf import CSRFProtect
 from flask_session import Session
 from flask_login import LoginManager
-from src.core.database import db, init_app as init_db
-from src.core.config import config
-from src.web.controllers.routes import register_routes
-from src.web.handlers.handlers import register_handlers
-from src.core.bcrypt import bcrypt
-from src.web.controllers.personal.area_controller import area_bp
-from src.web.controllers.personal.personal_controller import personal_bp
-from src.web.controllers.personal.ausencia_controller import ausencia_bp
-from src.web.controllers.auth_controller import auth_bp
-from src.core.models.area import Area
-from src.core.models.personal import User
+from administracion.src.core.database import db, init_app as init_db
+from administracion.src.core.config import config
+from administracion.src.web.controllers.routes import register_routes
+from administracion.src.web.handlers.handlers import register_handlers
+from administracion.src.core.bcrypt import bcrypt
+from administracion.src.web.controllers.personal.area_controller import area_bp
+from administracion.src.web.controllers.personal.personal_controller import personal_bp
+from administracion.src.web.controllers.personal.ausencia_controller import ausencia_bp
+from administracion.src.web.controllers.auth_controller import auth_bp
+from models.personal.area import Area
+from models.personal.personal import User
 from datetime import datetime
 
 def create_app(env="development", static_folder="../../static"):
@@ -36,7 +36,7 @@ def create_app(env="development", static_folder="../../static"):
     # Initialize Flask-Login
     login_manager = LoginManager()
     login_manager.init_app(app)
-    login_manager.login_view = 'personal.login'  # Cambia esto según tu ruta de login
+    login_manager.login_view = 'auth.login'  # Cambia esto según tu ruta de login
 
     @login_manager.user_loader
     def load_user(user_id):

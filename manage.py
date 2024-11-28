@@ -2,7 +2,6 @@
 import os
 import sys
 from flask.cli import FlaskGroup
-from servicios.backend.src.web import create_app as create_servicios_app
 
 def main():
     if len(sys.argv) < 2:
@@ -10,10 +9,10 @@ def main():
         sys.exit(1)
 
     app_name = sys.argv[1]
-    print(app_name)
     flask_args = sys.argv[2:]
 
     if app_name == "servicios":
+        from servicios.backend.src.web import create_app as create_servicios_app
         os.environ.setdefault("FLASK_APP", "servicios.backend.src.web:create_app()")
         create_app = create_servicios_app
     elif app_name == "administracion":

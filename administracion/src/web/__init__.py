@@ -15,6 +15,11 @@ from src.web.controllers.auth_controller import auth_bp
 from src.core.models.area import Area
 from src.core.models.personal import User
 from datetime import datetime
+from core import database
+from core.config import config
+from web.controllers.routes import register_routes
+from web.handlers.handlers import register_handlers
+from core.bcrypt import bcrypt
 
 def create_app(env="development", static_folder="../../static"):
     app = Flask(__name__, static_folder=static_folder)

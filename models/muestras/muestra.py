@@ -9,3 +9,4 @@ class Muestra(db.Model):
     terminada = db.Column(db.Boolean, nullable=False)
 
     legajo_id = db.Column(db.Integer, db.ForeignKey('legajo.id'), nullable=False)
+    legajo = db.relationship('Legajo', back_populates='muestras')

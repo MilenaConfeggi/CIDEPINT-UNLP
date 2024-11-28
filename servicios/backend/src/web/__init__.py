@@ -2,6 +2,8 @@ from flask import Flask, render_template
 from servicios.backend.src.core.config import config
 from servicios.backend.src.core.seeds import seedsMuestra
 from servicios.backend.src.core.seeds import seedsMails
+from servicios.backend.src.core.seeds import seedsCliente
+from servicios.backend.src.core.seeds import seedsLegajo
 from servicios.backend.src.core.seeds import seedsInforme
 from models import db
 from servicios.backend.src.web.controllers.mails import bp as mails_bp

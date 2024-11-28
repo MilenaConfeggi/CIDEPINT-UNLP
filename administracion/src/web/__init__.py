@@ -26,6 +26,11 @@ def create_app(env="development", static_folder="../../static"):
     @app.cli.command(name="reset-db")
     def reset_db():
         database.reset()
+        print('Database reseted')
+    
+    @app.cli.command(name="seed")
+    def seed_db():
+        database.seed()
     
     @app.cli.command(name="seed")
     def seed_db():

@@ -1,0 +1,79 @@
+{% extends 'layout.html' %}
+{% block title %}Nueva Distribución{% endblock %}
+{% block content %}
+    <form class="px-4" method="POST" action="{{ url_for('contable.crear_distribucion', id = 1) }}">
+        {{ form.hidden_tag() }}
+
+        <h2 class="text-lg font-bold mb-4">Crear Nueva Distribución</h2>
+
+        <div class="mb-4">
+            <label for="porcentaje_area" class="block text-sm font-medium text-gray-700">Porcentaje Área</label>
+            {{ form.porcentaje_area(class_='block w-full border border-gray-300 rounded py-2 px-3', placeholder="Ingrese el porcentaje del área") }}
+            {% for error in form.porcentaje_area.errors %}
+                <p class="text-red-500 text-sm">{{ error }}</p>
+            {% endfor %}
+        </div>
+
+        <div class="mb-4">
+            <label for="porcentaje_empleados" class="block text-sm font-medium text-gray-700">Porcentaje Empleados</label>
+            {{ form.porcentaje_empleados(class_='block w-full border border-gray-300 rounded py-2 px-3', placeholder="Ingrese el porcentaje de empleados") }}
+            {% for error in form.porcentaje_empleados.errors %}
+                <p class="text-red-500 text-sm">{{ error }}</p>
+            {% endfor %}
+        </div>
+
+        <div class="mb-4">
+            <label for="porcentaje_comisiones" class="block text-sm font-medium text-gray-700">Porcentaje Comisiones</label>
+            {{ form.porcentaje_comisiones(class_='block w-full border border-gray-300 rounded py-2 px-3', placeholder="Ingrese el porcentaje de comisiones") }}
+            {% for error in form.porcentaje_comisiones.errors %}
+                <p class="text-red-500 text-sm">{{ error }}</p>
+            {% endfor %}
+        </div>
+
+        <div class="mb-4">
+            <label for="monto_a_distribuir" class="block text-sm font-medium text-gray-700">Monto a Distribuir</label>
+            {{ form.monto_a_distribuir(class_='block w-full border border-gray-300 rounded py-2 px-3', placeholder="Ingrese el monto a distribuir") }}
+            {% for error in form.monto_a_distribuir.errors %}
+                <p class="text-red-500 text-sm">{{ error }}</p>
+            {% endfor %}
+        </div>
+
+        <div class="mb-4">
+            <label for="costos" class="block text-sm font-medium text-gray-700">Costos</label>
+            {{ form.costos(class_='block w-full border border-gray-300 rounded py-2 px-3', placeholder="Ingrese los costos") }}
+            {% for error in form.costos.errors %}
+                <p class="text-red-500 text-sm">{{ error }}</p>
+            {% endfor %}
+        </div>
+
+        <div class="mb-4">
+            <label for="legajo_id" class="block text-sm font-medium text-gray-700">Legajo ID</label>
+            {{ form.legajo_id(class_='block w-full border border-gray-300 rounded py-2 px-3', placeholder="Ingrese el ID del legajo") }}
+            {% for error in form.legajo_id.errors %}
+                <p class="text-red-500 text-sm">{{ error }}</p>
+            {% endfor %}
+        </div>
+
+        <div class="mb-4">
+            <label for="ganancias_de_id" class="block text-sm font-medium text-gray-700">Área de Ganancias</label>
+            {{ form.ganancias_de_id(class_='block w-full border border-gray-300 rounded py-2 px-3') }}
+            {% for error in form.ganancias_de_id.errors %}
+                <p class="text-red-500 text-sm">{{ error }}</p>
+            {% endfor %}
+        </div>
+
+        <div class="mb-4">
+            <label for="costos_de_id" class="block text-sm font-medium text-gray-700">Área de Costos</label>
+            {{ form.costos_de_id(class_='block w-full border border-gray-300 rounded py-2 px-3') }}
+            {% for error in form.costos_de_id.errors %}
+                <p class="text-red-500 text-sm">{{ error }}</p>
+            {% endfor %}
+        </div>
+
+        <div class="mt-6">
+            <button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded hover:bg-indigo-700">
+                Guardar Distribución
+            </button>
+        </div>
+    </form>
+{% endblock %}

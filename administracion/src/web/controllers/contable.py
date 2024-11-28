@@ -1,8 +1,10 @@
 from administracion.src.core.fondos import fondo
 from administracion.src.core.ingresos import ingreso as ingresoDB
+from models import distribucion as distribucionDB
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from administracion.src.web.forms.fondo_nuevo import FormularioNuevoFondo
 from administracion.src.web.forms.ingreso_nuevo import FormularioNuevoIngreso
+from administracion.src.web.forms.distribucion_nuevo import FormularioNuevaDistribucion
 from models import legajos as legajoDB
 bp = Blueprint("contable",__name__,url_prefix="/contable")
 
@@ -75,3 +77,25 @@ def crear_ingreso(fondo_id):
 def get_legajos():
     data = legajoDB.list_legajos()
     return render_template("contable/legajos.html",legajos = data)
+
+@bp.get("/distribuciones/crear/<int:id>")
+def get_crear_distribucion(id):
+    form = FormularioNuevaDistribucion()
+    return render_template("contable/crear_distribucion.html", form = form)
+
+@bp.post("/distribuciones/crear/<int:id>")
+def crear_distribucion(id):
+    form = FormularioNuevaDistribucion(request.form)
+    if form.validate_on_submit():
+        data = request.form.to_dict()
+        print(data)
+        return True
+        csrf_token = data.pop("csrf_token", None)
+        data["legajo_id"] = id
+        distribucionDB.create_distribucion(**data)
+        flash("Distribución creada correctamente","success")
+        return redirect(url_for("contable.get_legajos"))
+    else:
+        # Obtener el primer campo con error
+        first_error_field = next(iter(form.errors))
+        first_error_message = form.errors[first_error_field][0]

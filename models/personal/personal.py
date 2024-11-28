@@ -3,10 +3,12 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import validates
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
-from src.core.database import db
+from administracion.src.core.database import db
 from datetime import datetime
 
 class User(UserMixin, db.Model):
+    __tablename__ = 'user'
+    
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password_hash = db.Column(db.String(200), nullable=False)
@@ -25,8 +27,9 @@ class User(UserMixin, db.Model):
     observaciones = db.Column(db.Text, nullable=True)
     habilitado = db.Column(db.Boolean, default=True)
     rol = db.Column(db.String(20), nullable=False, default='Personal')
-    primer_login = db.Column(db.Boolean, default=True)  # Nuevo campo
+    primer_login = db.Column(db.Boolean, default=True)
     archivos = db.relationship('Archivo', backref='user', lazy=True)
+    ausencias = db.relationship('Ausencia', back_populates='empleado')
 
     @validates('area_id')
     def validate_area(self, key, value):
@@ -84,8 +87,7 @@ class User(UserMixin, db.Model):
         self.observaciones = observaciones
         self.habilitado = habilitado
         self.rol = rol
-        self.primer_login = True  # Inicializar como True
-
+        self.primer_login = True
 
     def __repr__(self) -> str:
         return f"User {self.username}"

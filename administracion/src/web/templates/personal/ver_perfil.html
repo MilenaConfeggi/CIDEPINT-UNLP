@@ -5,6 +5,12 @@
 {% block content %}
 
 <div class="container mx-auto px-4">
+  <a
+  href="{{ url_for('personal.ver_empleados') }}"
+  class="text-white bg-gray-500 hover:bg-gray-600 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-gray-400 dark:hover:bg-gray-500 dark:focus:ring-gray-600"
+>
+  Volver
+</a>
   <h1 class="text-2xl font-bold mb-4">Perfil de Usuario</h1>
   
   <form action="{{ url_for('personal.ver_perfil', id=user.id) }}" method="POST" enctype="multipart/form-data" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
@@ -72,10 +78,12 @@
     {% endfor %}
   </ul>
 
+  {% if current_user.id != user.id %}
   <form action="{{ url_for('personal.inhabilitar_usuario', id=user.id) }}" method="POST" class="mt-4">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded">Inhabilitar Usuario</button>
   </form>
+  {% endif %}
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

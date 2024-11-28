@@ -7,10 +7,8 @@ def role_required(*roles):
         @wraps(f)
         def decorated_function(*args, **kwargs):
             if not current_user.is_authenticated:
-                flash('Por favor, inicia sesión para acceder a esta página.', 'error')
                 return redirect(url_for('auth.login'))
             if current_user.rol not in roles:
-                flash('No tienes permiso para acceder a esta página.', 'error')
                 return redirect(url_for('auth.dashboard'))
             return f(*args, **kwargs)
         return decorated_function

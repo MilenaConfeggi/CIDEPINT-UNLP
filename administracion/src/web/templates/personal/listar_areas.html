@@ -9,11 +9,22 @@
     <div class="bg-white shadow-md rounded-lg p-6">
         <ul>
             {% for area in areas %}
-                <li class="mb-2">
-                    <a href="{{ url_for('area.modificar_area', id=area.id) }}" class="text-blue-500">{{ area.nombre }}</a>
+                <li class="mb-2 flex items-center justify-between">
+                    <span class="text-gray-700">{{ area.nombre }}</span>
+                    <a href="{{ url_for('area.modificar_area', id=area.id) }}" class="text-blue-500 hover:underline">
+                        Modificar
+                    </a>
                 </li>
             {% endfor %}
         </ul>
+    </div>
+    <div class="mt-4">
+        <a
+            href="{{ url_for('personal.index') }}"
+            class="text-white bg-gray-500 hover:bg-gray-600 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-gray-400 dark:hover:bg-gray-500 dark:focus:ring-gray-600"
+        >
+            Volver
+        </a>
     </div>
 </div>
 

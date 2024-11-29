@@ -10,4 +10,4 @@ class Usuario(db.Model):
     fecha_modificacion = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
 
     rol_id = db.Column(db.Integer, db.ForeignKey("rol.id"), nullable=False)
-    rol = db.relationship("Rol", back_populates="users")
+    rol = db.relationship("Rol", back_populates="usuario")

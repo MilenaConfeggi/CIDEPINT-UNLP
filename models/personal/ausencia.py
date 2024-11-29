@@ -6,11 +6,11 @@ class Ausencia(db.Model):
     __tablename__ = 'ausencia'
     
     id = db.Column(db.Integer, primary_key=True)
-    empleado_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    empleado_id = db.Column(db.Integer, db.ForeignKey('empleado.id'), nullable=False)  # Corrected foreign key reference
     fecha_desde = db.Column(db.Date, nullable=False)
     fecha_hasta = db.Column(db.Date, nullable=False)
     motivo = db.Column(db.String(200), nullable=False)
-    empleado = db.relationship('User', back_populates='ausencias')
+    empleado = db.relationship('Empleado', back_populates='ausencias')
 
     def __init__(self, empleado_id, fecha_desde, fecha_hasta, motivo):
         self.empleado_id = empleado_id

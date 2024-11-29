@@ -14,6 +14,7 @@ from administracion.src.web.controllers.personal.ausencia_controller import ause
 from administracion.src.web.controllers.auth_controller import auth_bp
 from models.personal.area import Area
 from models.personal.personal import User
+from models.personal.empleado import Empleado
 from datetime import datetime
 
 def create_app(env="development", static_folder="../../static"):
@@ -52,7 +53,6 @@ def create_app(env="development", static_folder="../../static"):
     app.register_blueprint(ausencia_bp)
     app.register_blueprint(auth_bp)
 
-
     @app.cli.command(name="reset-db")
     def reset_db():
         with app.app_context():
@@ -77,7 +77,14 @@ def create_app(env="development", static_folder="../../static"):
             if not admin_user:
                 admin_user = User(
                     username='admin',
-                    password='admin',
+                    password='admin'
+                )
+                db.session.add(admin_user)
+                db.session.commit()
+                
+                # Crear empleado asociado al usuario administrador
+                admin_empleado = Empleado(
+                    user_id=admin_user.id,
                     email='admin@example.com',
                     area_id=default_area.id,  # Asigna el área creada
                     dni='00000000',
@@ -93,11 +100,10 @@ def create_app(env="development", static_folder="../../static"):
                     habilitado=True,
                     rol='Administrador'
                 )
-                db.session.add(admin_user)
+                db.session.add(admin_empleado)
                 db.session.commit()
                 print("Usuario administrador creado con éxito.")
             else:
                 print("Usuario administrador ya existe.")
-
 
     return app

@@ -17,5 +17,4 @@ class Legajo(db.Model):
     mail = db.relationship('Mail', back_populates='legajo')
     muestras = db.relationship('Muestra', back_populates='legajo')
     presupuesto_cidepint = db.relationship('Presupuesto', back_populates='legajo')
-    documento_id = db.Column(db.Integer, db.ForeignKey('documento.id'), nullable=True)
-    documento = db.relationship('Documento', back_populates='legajos')
+    documento = db.relationship('Documento', back_populates='legajo')

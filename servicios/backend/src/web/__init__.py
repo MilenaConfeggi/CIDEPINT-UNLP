@@ -6,6 +6,7 @@ from models import db
 from servicios.backend.src.web.controllers.mails import bp as mails_bp
 from servicios.backend.src.web.controllers.muestras import bp as muestras_bp
 from servicios.backend.src.web.controllers.informes import bp as informes_bp
+from servicios.backend.src.core.seeds import seedsLegajo 
 from flask_cors import CORS
 
 def create_app(env="development", static_folder=""):
@@ -41,8 +42,8 @@ def create_app(env="development", static_folder=""):
         #print("Muestras creadas!")
         #seedsMails.seeds_mails()
         #print("Mails creados!")
-        seedsInforme.seeds_informe()
-        print("Documentos creados!")
+        #seedsInforme.seeds_informe()
+        #print("Documentos creados!")
         #seedsCliente.seeds_clientes()
         #print("Clientes creados!")
         seedsLegajo.seeds_legajos()

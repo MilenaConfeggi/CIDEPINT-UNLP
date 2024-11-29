@@ -3,10 +3,10 @@ from flask import Flask
 from flask_wtf import CSRFProtect
 from flask_session import Session
 from flask_login import LoginManager
-from administracion.src.core.database import db, init_app as init_db
+from administracion.src.core.database import db
 from administracion.src.core.config import config
-from administracion.src.web.controllers.routes import register_routes
-from administracion.src.web.handlers.handlers import register_handlers
+from administracion.src.web.controllers.rutas import registrar_rutas
+from administracion.src.web.handlers.handlers import registrar_handlers
 from administracion.src.core.bcrypt import bcrypt
 from administracion.src.web.controllers.personal.area_controller import area_bp
 from administracion.src.web.controllers.personal.personal_controller import personal_bp
@@ -15,7 +15,7 @@ from administracion.src.web.controllers.auth_controller import auth_bp
 from models.personal.area import Area
 from models.personal.personal import User
 from datetime import datetime
-
+from administracion.src.core import database
 def create_app(env="development", static_folder="../../static"):
     app = Flask(__name__, static_folder=static_folder)
     app.config.from_object(config[env])
@@ -31,7 +31,7 @@ def create_app(env="development", static_folder="../../static"):
     bcrypt.init_app(app)
     
     # Initialize database
-    init_db(app)
+    db.init_app(app)
 
     # Initialize Flask-Login
     login_manager = LoginManager()
@@ -43,8 +43,8 @@ def create_app(env="development", static_folder="../../static"):
         return User.query.get(int(user_id))
 
     # Register routes and handlers
-    app = register_routes(app)
-    app = register_handlers(app)
+    app = registrar_rutas(app)
+    app = registrar_handlers(app)
 
     # Register blueprints
     app.register_blueprint(area_bp)
@@ -58,6 +58,10 @@ def create_app(env="development", static_folder="../../static"):
         with app.app_context():
             db.drop_all()
             db.create_all()
+    @app.cli.command(name="seeds-db")
+    def seed_db():
+        database.seed()
+        
     
     @app.cli.command(name="create-admin")
     def create_admin():

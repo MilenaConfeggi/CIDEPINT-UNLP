@@ -1,4 +1,4 @@
-from os import urandom
+from os import urandom, getenv
 
 class Config(object):
     TESTING = False

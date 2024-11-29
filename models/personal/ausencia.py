@@ -1,6 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-from administracion.src.core.database import db
+from models.base import db
 
 class Ausencia(db.Model):
     __tablename__ = 'ausencia'

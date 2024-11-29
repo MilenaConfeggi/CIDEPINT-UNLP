@@ -3,7 +3,7 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import validates
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
-from administracion.src.core.database import db
+from models.base import db
 from datetime import datetime
 
 class User(UserMixin, db.Model):

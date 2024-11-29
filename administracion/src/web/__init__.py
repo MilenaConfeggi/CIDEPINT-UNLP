@@ -3,7 +3,7 @@ from flask import Flask
 from flask_wtf import CSRFProtect
 from flask_session import Session
 from flask_login import LoginManager
-from administracion.src.core.database import db
+from models.base import db
 from administracion.src.core.config import config
 from administracion.src.web.controllers.rutas import registrar_rutas
 from administracion.src.web.handlers.handlers import registrar_handlers
@@ -16,6 +16,8 @@ from models.personal.area import Area
 from models.personal.personal import User
 from datetime import datetime
 from administracion.src.core import database
+
+
 def create_app(env="development", static_folder="../../static"):
     app = Flask(__name__, static_folder=static_folder)
     app.config.from_object(config[env])
@@ -58,6 +60,8 @@ def create_app(env="development", static_folder="../../static"):
         with app.app_context():
             db.drop_all()
             db.create_all()
+    
+
     @app.cli.command(name="seeds-db")
     def seed_db():
         database.seed()

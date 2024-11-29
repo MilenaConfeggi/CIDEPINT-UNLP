@@ -1,6 +1,7 @@
-from models import db
+from models.base import db
 from models.patrimonio.bien import Bien
 from models.Fondo.fondo import Fondo as fondoDB
+
 def reset():
     """
     Resetea la base de datos

@@ -3,7 +3,6 @@ from models.personal.personal import User
 from models.personal.area import Area
 from models.personal.archivo import Archivo
 from io import BytesIO
-from sqlalchemy import or_
 from werkzeug.utils import secure_filename
 import os
 from reportlab.lib.pagesizes import letter
@@ -12,20 +11,8 @@ from flask import send_file
 from sqlalchemy import or_, cast
 from sqlalchemy.types import String
 import pandas as pd
-from flask import send_file
-from reportlab.lib.pagesizes import letter
-from reportlab.pdfgen import canvas
 from administracion.src.web.controllers.roles import role_required  # Importa el decorador
-from sqlalchemy import or_, cast
-from sqlalchemy.types import String
-from sqlalchemy import or_, cast
-from sqlalchemy.types import String
-from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import current_user
-from models.personal.personal import User
-from models.personal.area import Area
-
-from administracion.src.web.controllers.roles import role_required
 
 personal_bp = Blueprint("personal", __name__, url_prefix="/personal")
 

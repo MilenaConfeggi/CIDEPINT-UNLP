@@ -21,7 +21,6 @@ from administracion.src.core import database
 def create_app(env="development", static_folder="../../static"):
     app = Flask(__name__, static_folder=static_folder)
     app.config.from_object(config[env])
-    app.config["SECRET_KEY"] = getenv("SECRET_KEY", urandom(24).hex())
     
     # Initialize CSRF protection
     csrf = CSRFProtect(app)
@@ -57,9 +56,7 @@ def create_app(env="development", static_folder="../../static"):
 
     @app.cli.command(name="reset-db")
     def reset_db():
-        with app.app_context():
-            db.drop_all()
-            db.create_all()
+        database.reset()
     
 
     @app.cli.command(name="seeds-db")

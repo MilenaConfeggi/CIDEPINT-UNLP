@@ -6,7 +6,9 @@ def reset():
     """
     Resetea la base de datos
     """
+    print("Eliminando base de datos en casacada")
     db.drop_all()
+    print("Creando base nuevamente")
     db.create_all()
 
 def seed():

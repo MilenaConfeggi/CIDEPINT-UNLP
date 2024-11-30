@@ -53,11 +53,15 @@ def eliminar_area(id):
     # Verificar si hay usuarios asociados a esta área
     usuarios_asociados = User.query.filter_by(area_id=id).count()
     if usuarios_asociados > 0:
-        flash('No se puede eliminar el área porque hay usuarios asociados a ella.', 'error')    
+        flash('No se puede eliminar el área porque hay usuarios asociados a ella.', 'error')
+        return redirect(url_for('area.modificar_area', id=id))  # Permanecer en la misma página
+    
     success, message = area.delete()
     if success:
         return redirect(url_for('area.listar_areas'))
     else:
         flash(message, 'error')
+        return redirect(url_for('area.modificar_area', id=id))  # Permanecer en la misma página
+    
     
    

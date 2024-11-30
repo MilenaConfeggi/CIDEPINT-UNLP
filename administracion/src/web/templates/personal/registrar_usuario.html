@@ -5,12 +5,10 @@
 {% block content %}
 
 <div class="container mx-auto px-4 py-8">
-  <a
-  href="{{ url_for('personal.index') }}"
-  class=" text-white bg-gray-500 hover:bg-gray-600 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-gray-400 dark:hover:bg-gray-500 dark:focus:ring-gray-600 mb-4"
->
-  Volver
-</a>
+  <button onclick="history.back()" class="text-white bg-gray-500 hover:bg-gray-600 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-gray-400 dark:hover:bg-gray-500 dark:focus:ring-gray-600 mt-4 mb-4">
+    Volver
+  </button>
+
   <h1 class="text-2xl font-bold my-4">Registrar Usuario</h1>
   
   <form action="{{ url_for('personal.registrar_usuario') }}" method="POST" class="bg-white shadow-md rounded-lg px-8 pt-6 pb-8 mb-4">

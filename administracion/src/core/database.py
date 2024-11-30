@@ -1,15 +1,28 @@
 from models.base import db
 from models.patrimonio.bien import Bien
 from models.Fondo.fondo import Fondo as fondoDB
-
+from sqlalchemy import MetaData
 def reset():
     """
     Resetea la base de datos
     """
     print("Eliminando base de datos en casacada")
+    meta = MetaData()
+    meta.reflect(bind=db.engine)
+    
+    # Drop foreign key constraints
+    with db.engine.connect() as conn:
+        for table in reversed(meta.sorted_tables):
+            for fk in table.foreign_keys:
+                conn.execute(db.text(f'ALTER TABLE {table.name} DROP FOREIGN KEY {fk.constraint.name}'))
+    # Drop all tables
     db.drop_all()
+    
+    db.session.commit()
+    
     print("Creando base nuevamente")
     db.create_all()
+    db.session.commit()
 
 def seed():
     bien_1 = Bien(

@@ -1,4 +1,5 @@
 from models.base import db
+from .foto import Foto
 
 class Muestra(db.Model):
     __tablename__ = 'muestra'

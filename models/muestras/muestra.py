@@ -10,3 +10,5 @@ class Muestra(db.Model):
 
     legajo_id = db.Column(db.Integer, db.ForeignKey('legajo.id'), nullable=False)
     legajo = db.relationship('Legajo', back_populates='muestras')
+
+    fotos = db.relationship('Foto', back_populates='muestra')

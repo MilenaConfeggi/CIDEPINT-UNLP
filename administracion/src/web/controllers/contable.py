@@ -6,9 +6,11 @@ from administracion.src.web.forms.fondo_nuevo import FormularioNuevoFondo
 from administracion.src.web.forms.ingreso_nuevo import FormularioNuevoIngreso
 from administracion.src.web.forms.distribucion_nuevo import FormularioNuevaDistribucion
 from models import legajos as legajoDB
+from administracion.src.web.controllers.roles import role_required
 bp = Blueprint("contable",__name__,url_prefix="/contable")
 
 @bp.get("/")
+@role_required('Administrador', 'Colaborador')
 def index():
     return render_template("contable/home.html")
 @bp.get("/fondo")

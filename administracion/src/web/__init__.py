@@ -12,7 +12,8 @@ from administracion.src.web.controllers.personal.area_controller import area_bp
 from administracion.src.web.controllers.personal.personal_controller import personal_bp
 from administracion.src.web.controllers.personal.ausencia_controller import ausencia_bp
 from administracion.src.web.controllers.auth_controller import auth_bp
-from models.personal.area import Area
+from models.personal.area import Area 
+from sqlalchemy.sql import text
 from models.personal.personal import User
 from datetime import datetime
 from administracion.src.core import database
@@ -55,9 +56,26 @@ def create_app(env="development", static_folder="../../static"):
 
     @app.cli.command(name="reset-db")
     def reset_db():
-        with app.app_context():
-            db.drop_all()
-            db.create_all()
+     """Reset the database (drop and recreate tables)."""
+    with app.app_context():
+        try:
+            # Conexión directa al motor
+            with db.engine.connect() as connection:
+                # Desactivar restricciones de claves foráneas
+                connection.execute(text("SET FOREIGN_KEY_CHECKS = 0;"))
+                
+                # Eliminar todas las tablas
+                db.drop_all()
+                
+                # Reactivar restricciones de claves foráneas
+                connection.execute("SET FOREIGN_KEY_CHECKS = 1;")
+                
+                # Crear todas las tablas nuevamente
+                db.create_all()
+            
+            print("Database has been reset successfully.")
+        except Exception as e:
+            print(f"Error resetting database: {e}")
     @app.cli.command(name="seeds-db")
     def seed_db():
         database.seed()

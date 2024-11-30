@@ -1,4 +1,4 @@
-from administracion.src.web import create_app
+from src.web import create_app
 
 app = create_app()
 

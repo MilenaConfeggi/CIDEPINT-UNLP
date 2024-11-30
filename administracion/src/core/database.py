@@ -1,11 +1,14 @@
-from models import db
+from models.base import db
 from models.patrimonio.bien import Bien
 from models.Fondo.fondo import Fondo as fondoDB
+
 def reset():
     """
     Resetea la base de datos
     """
+    print("Eliminando base de datos en casacada")
     db.drop_all()
+    print("Creando base nuevamente")
     db.create_all()
 
 def seed():

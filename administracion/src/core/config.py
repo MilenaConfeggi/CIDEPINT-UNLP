@@ -1,4 +1,4 @@
-from os import urandom, getenv
+from os import urandom
 
 class Config(object):
     TESTING = False
@@ -15,13 +15,8 @@ class ProductionConfig(Config):
     }
 
 class DevelopmentConfig(Config):
-    DB_USER = getenv("DB_USER", "postgres")
-    DB_PASSWORD = getenv("DB_PASSWORD")
-    DB_HOST = getenv("DB_HOST", "localhost")
-    DB_PORT = getenv("PORT", "5432")
-    DB_NAME = getenv("DB_NAME", "grupo18")
-    SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-    SECRET_KEY = getenv("SECRET_KEY", urandom(24).hex())
+    SQLALCHEMY_DATABASE_URI = "mysql+pymysql://root:root123@127.0.0.1:3306/cidepint"
+    SECRET_KEY = urandom(24).hex()
     SESSION_TYPE = "filesystem"
 
 class TestingConfig(Config):

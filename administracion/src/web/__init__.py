@@ -3,7 +3,7 @@ from flask import Flask
 from flask_wtf import CSRFProtect
 from flask_session import Session
 from flask_login import LoginManager
-from administracion.src.core.database import db
+from models.base import db
 from administracion.src.core.config import config
 from administracion.src.web.controllers.rutas import registrar_rutas
 from administracion.src.web.handlers.handlers import registrar_handlers
@@ -15,12 +15,14 @@ from administracion.src.web.controllers.auth_controller import auth_bp
 from models.personal.area import Area 
 from sqlalchemy.sql import text
 from models.personal.personal import User
+from models.personal.empleado import Empleado
 from datetime import datetime
 from administracion.src.core import database
+
+
 def create_app(env="development", static_folder="../../static"):
     app = Flask(__name__, static_folder=static_folder)
     app.config.from_object(config[env])
-    app.config["SECRET_KEY"] = getenv("SECRET_KEY", urandom(24).hex())
     
     # Initialize CSRF protection
     csrf = CSRFProtect(app)
@@ -53,29 +55,11 @@ def create_app(env="development", static_folder="../../static"):
     app.register_blueprint(ausencia_bp)
     app.register_blueprint(auth_bp)
 
-
     @app.cli.command(name="reset-db")
     def reset_db():
-     """Reset the database (drop and recreate tables)."""
-    with app.app_context():
-        try:
-            # Conexión directa al motor
-            with db.engine.connect() as connection:
-                # Desactivar restricciones de claves foráneas
-                connection.execute(text("SET FOREIGN_KEY_CHECKS = 0;"))
-                
-                # Eliminar todas las tablas
-                db.drop_all()
-                
-                # Reactivar restricciones de claves foráneas
-                connection.execute("SET FOREIGN_KEY_CHECKS = 1;")
-                
-                # Crear todas las tablas nuevamente
-                db.create_all()
-            
-            print("Database has been reset successfully.")
-        except Exception as e:
-            print(f"Error resetting database: {e}")
+        database.reset()
+    
+
     @app.cli.command(name="seeds-db")
     def seed_db():
         database.seed()
@@ -99,7 +83,14 @@ def create_app(env="development", static_folder="../../static"):
             if not admin_user:
                 admin_user = User(
                     username='admin',
-                    password='admin',
+                    password='admin'
+                )
+                db.session.add(admin_user)
+                db.session.commit()
+                
+                # Crear empleado asociado al usuario administrador
+                admin_empleado = Empleado(
+                    user_id=admin_user.id,
                     email='admin@example.com',
                     area_id=default_area.id,  # Asigna el área creada
                     dni='00000000',
@@ -115,11 +106,10 @@ def create_app(env="development", static_folder="../../static"):
                     habilitado=True,
                     rol='Administrador'
                 )
-                db.session.add(admin_user)
+                db.session.add(admin_empleado)
                 db.session.commit()
                 print("Usuario administrador creado con éxito.")
             else:
                 print("Usuario administrador ya existe.")
-
 
     return app

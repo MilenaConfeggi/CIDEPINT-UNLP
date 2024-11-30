@@ -1,4 +1,4 @@
-from administracion.src.core.database import db
+from models.base import db
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 class Area(db.Model):

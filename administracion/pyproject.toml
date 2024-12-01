@@ -20,6 +20,8 @@ reportlab = "^4.2.5"
 pymysql = "^1.1.1"
 cryptography = "^43.0.3"
 flask-login = "^0.6.3"
+marshmallow = "^3.23.1"
+flask-cors = "^5.0.0"
 
 
 [build-system]

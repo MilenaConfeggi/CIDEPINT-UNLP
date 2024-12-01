@@ -4,7 +4,7 @@
 {% endblock %}
 {% block content %}
 
-<div class="h-screen w-full flex justify-center items-center flex-col">
+<div class="h-full w-full flex justify-center items-center flex-col">
     <form
         action="{{ url_for('area.modificar_area', id=area.id) }}"
         method="POST"
@@ -61,28 +61,11 @@
         </button>
     </form>
 
-    <button onclick="history.back()" class="text-white bg-gray-500 hover:bg-gray-600 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-gray-400 dark:hover:bg-gray-500 dark:focus:ring-gray-600 mt-4">
-      Volver
-    </button>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    // Mostrar alertas basadas en los mensajes flash
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          Swal.fire({
-            title: "{{ '¡Éxito!' if category == 'success' else '¡Error!' }}",
-            text: "{{ message }}",
-            icon: "{{ category }}",
-            confirmButtonText: 'Aceptar'
-          });
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
-
     // Manejar la confirmación de eliminación
     document.getElementById('eliminar-area-btn').addEventListener('click', function() {
       Swal.fire({

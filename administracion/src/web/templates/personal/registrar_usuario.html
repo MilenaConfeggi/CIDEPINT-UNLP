@@ -5,15 +5,12 @@
 {% block content %}
 
 <div class="container mx-auto px-4 py-8">
-  <button onclick="history.back()" class="text-white bg-gray-500 hover:bg-gray-600 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-gray-400 dark:hover:bg-gray-500 dark:focus:ring-gray-600 mt-4 mb-4">
-    Volver
-  </button>
 
   <h1 class="text-2xl font-bold my-4">Registrar Usuario</h1>
   
   <form action="{{ url_for('personal.registrar_usuario') }}" method="POST" class="bg-white shadow-md rounded-lg px-8 pt-6 pb-8 mb-4">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    
+
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {% for campo in campos %}
         <div>
@@ -35,13 +32,18 @@
             >
               {% if campo.name == 'subdivision_cargo' %}
                 <!-- Las opciones se llenarán dinámicamente con JavaScript -->
-              {% else %}
+              {% elif campo.name == 'rol' %}
                 {% for option in campo.options %}
-                  {% if campo.name == 'area_id' %}
-                    <option value="{{ option[0] }}">{{ option[1] }}</option>
-                  {% else %}
-                    <option value="{{ option }}">{{ option }}</option>
-                  {% endif %}
+                  <option value="{{ option }}">{{ option }}</option>
+                {% endfor %}
+              {% elif campo.name == 'area_id' %}
+                {% for option in campo.options %}
+                  <option value="{{ option[0] }}" {% if loop.first %}selected{% endif %}>{{ option[1] }}</option>
+                {% endfor %}
+              {% else %}
+                <option value="">Seleccione un {{ campo.label | lower }}</option>
+                {% for option in campo.options %}
+                  <option value="{{ option }}">{{ option }}</option>
                 {% endfor %}
               {% endif %}
             </select>
@@ -58,6 +60,18 @@
         </div>
       {% endfor %}
     </div>
+
+    <div id="subdivision_cargo_container" class="hidden">
+      <label for="subdivision_cargo" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Subdivisión del Cargo</label>
+      <select
+        id="subdivision_cargo"
+        name="subdivision_cargo"
+        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+      >
+        <option value="">Seleccione una subdivisión del cargo</option>
+      </select>
+    </div>
+
     <div class="flex items-center justify-between mt-6">
       <button
         type="submit"
@@ -73,6 +87,7 @@
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     const cargoSelect = document.getElementById('cargo');
+    const subdivisionCargoContainer = document.getElementById('subdivision_cargo_container');
     const subdivisionCargoSelect = document.getElementById('subdivision_cargo');
 
     const subdivisiones = {
@@ -85,38 +100,25 @@
     function updateSubdivisionCargoOptions() {
       const selectedCargo = cargoSelect.value;
       const options = subdivisiones[selectedCargo] || [];
-      subdivisionCargoSelect.innerHTML = '';
+      subdivisionCargoSelect.innerHTML = '<option value="">Seleccione una subdivisión del cargo</option>';
 
-      options.forEach(function(option) {
-        const optionElement = document.createElement('option');
-        optionElement.value = option;
-        optionElement.textContent = option;
-        subdivisionCargoSelect.appendChild(optionElement);
-      });
+      if (selectedCargo) {
+        options.forEach(function(option) {
+          const optionElement = document.createElement('option');
+          optionElement.value = option;
+          optionElement.textContent = option;
+          subdivisionCargoSelect.appendChild(optionElement);
+        });
+        subdivisionCargoContainer.classList.remove('hidden');
+      } else {
+        subdivisionCargoContainer.classList.add('hidden');
+      }
     }
 
     cargoSelect.addEventListener('change', updateSubdivisionCargoOptions);
 
     // Inicializar las opciones de subdivisión de cargo al cargar la página
     updateSubdivisionCargoOptions();
-  });
-</script>
-
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // Mostrar alertas basadas en los mensajes flash
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          Swal.fire({
-            title: "{{ '¡Éxito!' if category == 'success' else '¡Error!' }}",
-            text: "{{ message }}",
-            icon: "{{ category }}",
-            confirmButtonText: 'Aceptar'
-          });
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
   });
 </script>
 

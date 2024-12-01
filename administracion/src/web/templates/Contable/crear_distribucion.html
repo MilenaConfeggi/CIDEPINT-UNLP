@@ -46,6 +46,12 @@
             {% endfor %}
         </div>
 
+        <label for="ganancias_de_id" class="block text-sm font-medium text-gray-700">Área de Ganancias</label>
+        {{ form.ganancias_de_id(class='block w-full border border-gray-300 rounded py-2 px-3') }}
+        {% for error in form.ganancias_de_id.errors %}
+            <p class="text-red-500 text-sm">{{ error }}</p>
+        {% endfor %}
+        </div>
         
         <div class="mt-6">
             <button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded hover:bg-indigo-700">

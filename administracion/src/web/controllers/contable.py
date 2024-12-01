@@ -7,7 +7,6 @@ from administracion.src.web.forms.ingreso_nuevo import FormularioNuevoIngreso
 from administracion.src.web.forms.distribucion_nuevo import FormularioNuevaDistribucion
 from models import legajos as legajoDB
 from administracion.src.web.controllers.roles import role_required
-from administracion.src.core.Area import area as areaDB
 bp = Blueprint("contable",__name__,url_prefix="/contable")
 
 @bp.get("/")
@@ -84,8 +83,7 @@ def get_legajos():
 @bp.get("/distribuciones/crear/<int:id>")
 def get_crear_distribucion(id):
     form = FormularioNuevaDistribucion()
-    areas = areaDB.list_areas()
-    return render_template("contable/crear_distribucion.html", form = form,areas = areas)
+    return render_template("contable/crear_distribucion.html", form = form )
 
 @bp.post("/distribuciones/crear/<int:id>")
 def crear_distribucion(id):

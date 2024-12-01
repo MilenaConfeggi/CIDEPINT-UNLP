@@ -16,9 +16,9 @@ class Empleado(db.Model):
     dni = db.Column(db.String(20), unique=True, nullable=False)
     nombre = db.Column(db.String(80), nullable=False)
     apellido = db.Column(db.String(80), nullable=False)
-    dependencia = db.Column(db.String(50), nullable=False)
-    cargo = db.Column(db.String(50), nullable=False)
-    subdivision_cargo = db.Column(db.String(50), nullable=False)
+    dependencia = db.Column(db.String(50), nullable=True)
+    cargo = db.Column(db.String(50), nullable=True)
+    subdivision_cargo = db.Column(db.String(50), nullable=True)
     telefono = db.Column(db.String(20), nullable=True)
     domicilio = db.Column(db.String(200), nullable=True)
     fecha_nacimiento = db.Column(db.Date, nullable=True)
@@ -38,14 +38,14 @@ class Empleado(db.Model):
     @validates('dependencia')
     def validate_dependencia(self, key, value):
         allowed_dependencias = ['UNLP', 'CIC', 'CONICET']
-        if value not in allowed_dependencias:
+        if value and value not in allowed_dependencias:
             raise ValueError(f"Dependencia '{value}' no es válida. Debe ser una de {allowed_dependencias}.")
         return value
 
     @validates('cargo')
     def validate_cargo(self, key, value):
         allowed_cargos = ['Investigador', 'CPA', 'Administrativo', 'Técnico']
-        if value not in allowed_cargos:
+        if value and value not in allowed_cargos:
             raise ValueError(f"Cargo '{value}' no es válido. Debe ser uno de {allowed_cargos}.")
         return value
 
@@ -57,7 +57,7 @@ class Empleado(db.Model):
             'Técnico': ['Profesional', 'Asociado', 'Asistente', 'Auxiliar'],
             'Administrativo': ['ART 9', 'Ley 10430']
         }
-        if self.cargo not in allowed_subdivisiones or value not in allowed_subdivisiones[self.cargo]:
+        if self.cargo and (self.cargo not in allowed_subdivisiones or value not in allowed_subdivisiones[self.cargo]):
             raise ValueError(f"Subdivisión de cargo '{value}' no es válida para el cargo '{self.cargo}'.")
         return value
 
@@ -68,7 +68,7 @@ class Empleado(db.Model):
             raise ValueError(f"Rol '{value}' no es válido. Debe ser uno de {allowed_roles}.")
         return value
 
-    def __init__(self, user_id, email, area_id, dni, nombre, apellido, dependencia, cargo, subdivision_cargo, telefono=None, domicilio=None, fecha_nacimiento=None, observaciones=None, habilitado=True, rol='Personal'):
+    def __init__(self, user_id, email, area_id, dni, nombre, apellido, dependencia=None, cargo=None, subdivision_cargo=None, telefono=None, domicilio=None, fecha_nacimiento=None, observaciones=None, habilitado=True, rol='Personal'):
         self.user_id = user_id
         self.email = email
         self.area_id = area_id

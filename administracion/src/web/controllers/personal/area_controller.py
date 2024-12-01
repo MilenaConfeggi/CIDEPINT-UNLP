@@ -1,6 +1,8 @@
 from flask import flash, redirect, render_template, request, url_for, Blueprint, session
 from models.personal.area import Area
 from models.personal.personal import User
+from models.personal.empleado import Empleado
+
 
 from administracion.src.web.controllers.roles import role_required  # Importa el decorador
 
@@ -50,8 +52,8 @@ def modificar_area(id):
 def eliminar_area(id):
     area = Area.query.get_or_404(id)
     
-    # Verificar si hay usuarios asociados a esta área
-    usuarios_asociados = User.query.filter_by(area_id=id).count()
+    # Verificar si hay usuarios asociados a esta área a través de Empleado
+    usuarios_asociados = User.query.join(Empleado).filter(Empleado.area_id == id).count()
     if usuarios_asociados > 0:
         flash('No se puede eliminar el área porque hay usuarios asociados a ella.', 'error')
         return redirect(url_for('area.modificar_area', id=id))  # Permanecer en la misma página

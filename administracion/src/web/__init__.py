@@ -112,4 +112,51 @@ def create_app(env="development", static_folder="../../static"):
             else:
                 print("Usuario administrador ya existe.")
 
+    @app.cli.command(name="create-inhabilitado")
+    def create_inhabilitado():
+        with app.app_context():
+            # Asegúrate de que el área por defecto existe
+            default_area = Area.query.get(1)
+            if not default_area:
+                default_area = Area(nombre='Default Area', saldo=0)
+                db.session.add(default_area)
+                db.session.commit()
+                print("Área por defecto creada con éxito.")
+            else:
+                print("Área por defecto ya existe.")
+            
+            # Crear usuario inhabilitado si no existe
+            inhabilitado_user = User.query.filter_by(username='inhabilitado').first()
+            if not inhabilitado_user:
+                inhabilitado_user = User(
+                    username='inhabilitado',
+                    password='inhabilitado'
+                )
+                db.session.add(inhabilitado_user)
+                db.session.commit()
+                
+                # Crear empleado asociado al usuario inhabilitado
+                inhabilitado_empleado = Empleado(
+                    user_id=inhabilitado_user.id,
+                    email='inhabilitado@example.com',
+                    area_id=default_area.id,  # Asigna el área creada
+                    dni='11111111',
+                    nombre='Inhabilitado',
+                    apellido='User',
+                    dependencia='UNLP',
+                    cargo='Administrativo',  # Cambiado a un valor permitido
+                    subdivision_cargo='Ley 10430',
+                    telefono='987654321',
+                    domicilio='Inhabilitado Address',
+                    fecha_nacimiento=datetime.strptime('1980-01-01', '%Y-%m-%d'),
+                    observaciones='Usuario inhabilitado por defecto',
+                    habilitado=False,
+                    rol='Personal'
+                )
+                db.session.add(inhabilitado_empleado)
+                db.session.commit()
+                print("Usuario inhabilitado creado con éxito.")
+            else:
+                print("Usuario inhabilitado ya existe.")
+
     return app

@@ -9,6 +9,7 @@ from servicios.backend.src.web.controllers.mails import bp as mails_bp
 from servicios.backend.src.web.controllers.muestras import bp as muestras_bp
 from servicios.backend.src.web.controllers.informes import bp as informes_bp
 from servicios.backend.src.web.controllers.usuarios import bp as usuarios_bp
+from servicios.backend.src.web.controllers.auth import bp as auth_bp
 from flask_cors import CORS
 from flask_session import Session
 from flask_bcrypt import Bcrypt
@@ -33,6 +34,7 @@ def create_app(env="development", static_folder=""):
     app.register_blueprint(muestras_bp)
     app.register_blueprint(informes_bp)
     app.register_blueprint(usuarios_bp)
+    app.register_blueprint(auth_bp)
 
     @app.cli.command(name="reset-db")
     def reset_db():

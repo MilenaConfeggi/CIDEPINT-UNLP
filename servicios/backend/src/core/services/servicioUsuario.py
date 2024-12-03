@@ -65,7 +65,7 @@ def obtener_permisos(user):
     return flat_permisos
 
 
-def tiene_permiso(session, permiso):
+def tiene_permiso(permiso):
     user_mail = session.get("user")
     usuario = obtener_usuario_por_mail(user_mail)
     if usuario.system_admin == True:

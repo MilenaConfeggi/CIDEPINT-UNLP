@@ -7,6 +7,7 @@ class Usuario(db.Model):
     mail = db.Column(db.String(50), nullable=False)
     contra = db.Column(db.String(100), nullable=False)
     system_admin = db.Column(db.Boolean, default=False, nullable=False)
+    esta_borrado = db.Column(db.Boolean, default=False, nullable=False)
     fecha_creacion = db.Column(db.DateTime, default=datetime.now, nullable=False)
     fecha_modificacion = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
 

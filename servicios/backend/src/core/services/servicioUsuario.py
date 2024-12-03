@@ -9,6 +9,8 @@ from flask import session
 from flask import request
 
 def crear_usuario(data):
+    if Usuario.query.filter_by(mail=data.get('mail'), esta_borrado=False):
+        raise ValueError("Ya existe un usuario con ese mail")
     nuevo_usuario = Usuario(
         mail=data.get('mail'),
         contra=data.get('contra'),
@@ -27,16 +29,18 @@ def crear_rol(data):
     return nuevo_rol
 
 def listar_usuarios():
-    usuarios = Usuario.query.all()
+    usuarios = Usuario.query.filter_by(esta_borrado=False).all()
     return usuarios
 
 def eliminar_usuario(id_usuario):
     usuario = Usuario.query.get(id_usuario)
-    db.session.delete(usuario)
+    if usuario is none:
+        raise ValueError("No se encontró el usuario seleccionado")
+    usuario.esta_borrado = True
     db.session.commit()
 
 def obtener_usuario_por_mail(email):
-    usuario = Usuario.query.filter_by(mail=email).first()
+    usuario = Usuario.query.filter_by(mail=email, esta_borrado=False).first()
     return usuario
 
 def check_user(usermail, password):

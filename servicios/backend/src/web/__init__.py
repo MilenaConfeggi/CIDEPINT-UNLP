@@ -10,11 +10,20 @@ from servicios.backend.src.web.controllers.muestras import bp as muestras_bp
 from servicios.backend.src.web.controllers.informes import bp as informes_bp
 from servicios.backend.src.web.controllers.usuarios import bp as usuarios_bp
 from flask_cors import CORS
+from flask_session import Session
+from flask_bcrypt import Bcrypt
+
+session = Session()
+bcrypt = Bcrypt()
+
 
 def create_app(env="development", static_folder=""):
     app = Flask(__name__)
     app.config.from_object(config[env])
     db.init_app(app)
+    session.init_app(app)
+    bcrypt.init_app(app)
+
     CORS(app)
     @app.route("/")
     def home():

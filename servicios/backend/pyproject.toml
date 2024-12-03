@@ -17,6 +17,10 @@ flask-cors = "^5.0.0"
 flask-wtf = "^1.2.2"
 flask-sqlalchemy = "^3.1.1"
 cryptography = "^44.0.0"
+flask-session = "^0.8.0"
+flask-bcrypt = "^1.0.1"
+bcrypt = "^4.2.1"
+jsonify = "^0.5"
 
 
 [tool.poetry.group.dev.dependencies]

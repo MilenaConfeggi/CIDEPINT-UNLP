@@ -3,6 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="{{ url_for('static', filename='css/tailwind.css') }}" rel="stylesheet">
     <title>
       {% block title %}{% endblock %}
     </title>
@@ -48,3 +50,4 @@
     </footer>
   </body>
 </html>
+<link rel="stylesheet" href="{{ url_for('static', filename='flash.css') }}">

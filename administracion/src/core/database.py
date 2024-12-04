@@ -1,14 +1,29 @@
-from models import db
+from models.base import db
 from models.archivos_admin.carpeta import Carpeta
 from models.patrimonio.bien import Bien
-
+from models.Fondo.fondo import Fondo as fondoDB
+from sqlalchemy import MetaData
 def reset():
     """
     Resetea la base de datos
     """
-
+    print("Eliminando base de datos en casacada")
+    meta = MetaData()
+    meta.reflect(bind=db.engine)
+    
+    # Drop foreign key constraints
+    with db.engine.connect() as conn:
+        for table in reversed(meta.sorted_tables):
+            for fk in table.foreign_keys:
+                conn.execute(db.text(f'ALTER TABLE {table.name} DROP FOREIGN KEY {fk.constraint.name}'))
+    # Drop all tables
     db.drop_all()
+    
+    db.session.commit()
+    
+    print("Creando base nuevamente")
     db.create_all()
+    db.session.commit()
 
 def seed():
     bien_1 = Bien(
@@ -114,8 +129,11 @@ def seed():
         institucion='Museo de Fotografía',
         descripcion='Fotografía en blanco y negro',
     )
-
-    db.session.add_all([bien_1,bien_2,bien_3,bien_4, bien_5, bien_6, bien_7, bien_8, bien_9, bien_10, bien_11, bien_12, bien_13])
+    fondo_1 = fondoDB(
+        titulo='UNLP',
+        saldo=10000
+    )
+    db.session.add_all([bien_1,bien_2,bien_3,bien_4, bien_5, bien_6, bien_7, bien_8, bien_9, bien_10, bien_11, bien_12, bien_13,fondo_1])
 
     carpeta_1 = Carpeta(
         nombre="Formularios",

@@ -1,0 +1,113 @@
+{% extends "layout.html" %}
+{% block title %}
+    Cambiar Contraseña
+{% endblock %}
+{% block content %}
+
+<h1 class="text-2xl font-bold mb-4">Cambiar Contraseña</h1>
+
+<form action="{{ url_for('auth.cambiar_contrasena') }}" method="POST" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  
+  <div class="mb-4">
+    <label for="nueva_contrasena" class="block text-gray-700 text-sm font-bold mb-2">Nueva Contraseña:</label>
+    <input type="password" name="nueva_contrasena" id="nueva_contrasena" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
+  </div>
+  
+  <div class="mb-4">
+    <label for="confirmar_contrasena" class="block text-gray-700 text-sm font-bold mb-2">Confirmar Contraseña:</label>
+    <input type="password" name="confirmar_contrasena" id="confirmar_contrasena" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
+  </div>
+
+  {% if not empleado.dependencia %}
+  <div class="mb-4">
+    <label for="dependencia" class="block text-gray-700 text-sm font-bold mb-2">Dependencia:</label>
+    <select name="dependencia" id="dependencia" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
+      <option value="">Seleccione una dependencia</option>
+      <option value="UNLP">UNLP</option>
+      <option value="CIC">CIC</option>
+      <option value="CONICET">CONICET</option>
+    </select>
+  </div>
+  {% endif %}
+
+  {% if not empleado.cargo %}
+  <div class="mb-4">
+    <label for="cargo" class="block text-gray-700 text-sm font-bold mb-2">Cargo:</label>
+    <select name="cargo" id="cargo" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
+      <option value="">Seleccione un cargo</option>
+      <option value="Investigador">Investigador</option>
+      <option value="CPA">CPA</option>
+      <option value="Administrativo">Administrativo</option>
+      <option value="Técnico">Técnico</option>
+    </select>
+  </div>
+  {% endif %}
+
+  {% if not empleado.subdivision_cargo %}
+  <div class="mb-4">
+    <label for="subdivision_cargo" class="block text-gray-700 text-sm font-bold mb-2">Subdivisión del Cargo:</label>
+    <select name="subdivision_cargo" id="subdivision_cargo" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
+      <option value="">Seleccione una subdivisión del cargo</option>
+    </select>
+  </div>
+  {% endif %}
+
+  <div class="mb-4">
+    <label for="telefono" class="block text-gray-700 text-sm font-bold mb-2">Teléfono:</label>
+    <input type="text" name="telefono" id="telefono" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+  </div>
+
+  <div class="mb-4">
+    <label for="domicilio" class="block text-gray-700 text-sm font-bold mb-2">Domicilio:</label>
+    <input type="text" name="domicilio" id="domicilio" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+  </div>
+
+  <div class="mb-4">
+    <label for="fecha_nacimiento" class="block text-gray-700 text-sm font-bold mb-2">Fecha de Nacimiento:</label>
+    <input type="date" name="fecha_nacimiento" id="fecha_nacimiento" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+  </div>
+
+  <div class="mb-4">
+    <label for="observaciones" class="block text-gray-700 text-sm font-bold mb-2">Observaciones:</label>
+    <textarea name="observaciones" id="observaciones" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"></textarea>
+  </div>
+  
+  <div class="flex items-center justify-between">
+    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Cambiar Contraseña</button>
+  </div>
+</form>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const cargoSelect = document.getElementById('cargo');
+    const subdivisionCargoSelect = document.getElementById('subdivision_cargo');
+
+    const subdivisiones = {
+      'Investigador': ['Asistente', 'Adjunto', 'Independiente', 'Principal', 'Superior'],
+      'CPA': ['Profesional Principal', 'Profesional Adjunto', 'Profesional Asistente'],
+      'Técnico': ['Profesional', 'Asociado', 'Asistente', 'Auxiliar'],
+      'Administrativo': ['ART 9', 'Ley 10430']
+    };
+
+    function updateSubdivisionCargoOptions() {
+      const selectedCargo = cargoSelect.value;
+      const options = subdivisiones[selectedCargo] || [];
+      subdivisionCargoSelect.innerHTML = '<option value="">Seleccione una subdivisión del cargo</option>';
+
+      options.forEach(function(option) {
+        const optionElement = document.createElement('option');
+        optionElement.value = option;
+        optionElement.textContent = option;
+        subdivisionCargoSelect.appendChild(optionElement);
+      });
+    }
+
+    cargoSelect.addEventListener('change', updateSubdivisionCargoOptions);
+
+    // Inicializar las opciones de subdivisión de cargo al cargar la página
+    updateSubdivisionCargoOptions();
+  });
+</script>
+
+{% endblock %}

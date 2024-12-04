@@ -6,6 +6,8 @@ from models.presupuestos.ensayo_stan import EnsayoStan
 from models.presupuestos.presupuesto_stan import PresupuestoStan
 from models.presupuestos.presupuesto import Presupuesto
 
+# El que lo haga cambie todo, esto lo hice para probar cosas
+
 def crearTodo():
     crearMedioDePago("Efectivo")
     crearEnsayo("Ensayo 1")

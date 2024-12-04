@@ -16,5 +16,5 @@ class Distribucion(db.Model):
     ganancias_de_id = db.Column(db.Integer, db.ForeignKey('area.id'))
     ganancias_de = db.relationship('Area',foreign_keys=[ganancias_de_id])
 
-    #costos_de_id = db.Column(db.Integer, db.ForeignKey('area.id'))
-    #costos_de = db.relationship('Area', foreign_keys=[costos_de_id]) #por defeto cidepint
+    costos_de_id = db.Column(db.Integer, db.ForeignKey('area.id'))
+    costos_de = db.relationship('Area', foreign_keys=[costos_de_id]) #por defeto cidepint

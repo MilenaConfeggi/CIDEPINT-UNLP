@@ -51,7 +51,7 @@ class FormularioNuevaDistribucion(FlaskForm):
     
     ganancias_de_id = SelectField('Area de Ganancias', coerce=int, validators=[Optional()], render_kw={"aria-label": "Area de Ganancias"})
     
-    #costos_de_id = SelectField('Area de Costos', coerce=int, validators=[Optional()], render_kw={"aria-label": "Area de Costos"})
+    costos_de_id = SelectField('Area de Costos', coerce=int, validators=[Optional()], render_kw={"aria-label": "Area de Costos"})
     
     # Seleccionar Empleados
     
@@ -59,4 +59,4 @@ class FormularioNuevaDistribucion(FlaskForm):
         super(FormularioNuevaDistribucion, self).__init__(*args, **kwargs)
         # Poblamos las opciones de los SelectField con datos simulados (esto debería conectarse a la base de datos)
         self.ganancias_de_id.choices = [(area.id, f"{area.nombre}") for area in areaDB.list_areas()]
-        #self.costos_de_id.choices = [(area['id'], f"{area['nombre']}") for area in [{'id': 3, 'nombre': 'Logística'}, {'id': 4, 'nombre': 'Compras'}]]
+        self.costos_de_id.choices = [(area.id, f"{area.nombre}") for area in areaDB.list_areas()]

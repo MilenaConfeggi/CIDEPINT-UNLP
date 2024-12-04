@@ -7,6 +7,7 @@ from administracion.src.web.forms.ingreso_nuevo import FormularioNuevoIngreso
 from administracion.src.web.forms.distribucion_nuevo import FormularioNuevaDistribucion
 from models import legajos as legajoDB
 from administracion.src.web.controllers.roles import role_required
+from administracion.src.core import Area as areaDB
 bp = Blueprint("contable",__name__,url_prefix="/contable")
 
 @bp.get("/")
@@ -91,10 +92,23 @@ def crear_distribucion(id):
     if form.validate_on_submit():
         data = request.form.to_dict()
         #Validaciones
-        print(data)
         csrf_token = data.pop("csrf_token", None)
         data["legajo_id"] = id
+        #Crea la distribucion
         distribucionDB.create_distribucion(**data)
+        #Sumo lo indicado al saldo de las areas
+        area_ganancias = int(data["ganancias_de_id"])
+        area_costos = int(data["costos_de_id"])
+        porcentaje_area = float(data["porcentaje_area"]) * 0.01
+        porcentaje_empleados = float(data["porcentaje_empleados"])* 0.01
+        porcentaje_comisiones = float(data["porcentaje_comisiones"])* 0.01
+        monto_a_distribuir = float(data["monto_a_distribuir"])
+        costos = float(data["costos"])
+        areaDB.sumar_saldo_area(area_costos, costos)
+        monto_modificado = (monto_a_distribuir * (1 - porcentaje_comisiones))-costos
+        areaDB.sumar_saldo_area(area_ganancias, (monto_modificado * porcentaje_area)*(1-porcentaje_empleados))
+        #areaDB.sumar_saldo_area(1, monto_modificado * (1 - porcentaje_area)) Sumar a cidepint
+        #Redirige a la lista de distribuciones
         flash("Distribución creada correctamente","success")
         return redirect(url_for("contable.get_legajos"))
     else:

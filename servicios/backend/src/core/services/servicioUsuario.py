@@ -9,7 +9,7 @@ from flask import session
 from flask import request
 
 def crear_usuario(data):
-    if Usuario.query.filter_by(mail=data.get('mail'), esta_borrado=False):
+    if Usuario.query.filter_by(mail=data.get('mail'), esta_borrado=False).first():
         raise ValueError("Ya existe un usuario con ese mail")
     nuevo_usuario = Usuario(
         mail=data.get('mail'),
@@ -47,7 +47,9 @@ def check_user(usermail, password):
     """
     Si el usuario existe y las contraseñas coinciden devuelve el usuario, sino devuelve None
     """
+    print(usermail)
     usuario = obtener_usuario_por_mail(usermail)
+    print(usuario)
     if (not usuario) or (
         not (
             usuario.contra and bcrypt.check_password_hash(usuario.contra, password)

@@ -25,7 +25,7 @@ def create_app(env="development", static_folder=""):
     session.init_app(app)
     bcrypt.init_app(app)
 
-    CORS(app)
+    CORS(app, supports_credentials=True)
     @app.route("/")
     def home():
         return "SLAY"

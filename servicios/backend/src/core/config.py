@@ -15,6 +15,9 @@ class DevelopmentConfig(Config):
     DB_HOST = getenv("DB_HOST")
     SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}"
     print(PORT, DB_NAME, DB_USER, DB_PASSWORD, DB_HOST)
+    SESSION_COOKIE_SECURE = True    # Requiere HTTPS en producción
+    SESSION_COOKIE_SAMESITE = 'None'  # Para permitir cookies cross-origin
+
 
 config = {
     "development": DevelopmentConfig,

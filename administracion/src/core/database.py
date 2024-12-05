@@ -1,5 +1,8 @@
 from models import db
 from models.patrimonio.bien import Bien
+from models.compras.proveedor import Proveedor
+from models.compras.compra import Compra, estado_compra
+from datetime import datetime
 
 def reset():
     """
@@ -113,6 +116,24 @@ def seed():
         institucion='Museo de Fotografía',
         descripcion='Fotografía en blanco y negro',
     )
+
+    proveedor_1 = Proveedor(
+        razon_social = "mio",
+        contacto = "123"
+    )
+
+    db.session.add(proveedor_1)
+
+    compra_1 = Compra(
+        fecha = datetime.now(),
+        numero_factura = "jamon",
+        importe = 89,
+        descripcion = "es un jamon",
+        estado = estado_compra.PENDIENTE,      
+        proveedor = proveedor_1
+    )
+
+    db.session.add(compra_1)
 
     db.session.add_all([bien_1,bien_2,bien_3,bien_4, bien_5, bien_6, bien_7, bien_8, bien_9, bien_10, bien_11, bien_12, bien_13])
     db.session.commit()

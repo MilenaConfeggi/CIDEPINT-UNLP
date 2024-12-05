@@ -1,0 +1,10 @@
+{% extends 'layout.html' %}
+{% block title%} Compras {% endblock %}
+{% block content%}
+    <h1>Compras</h1>
+    {% for compra in compras %}
+        <h1>{{ compra.id }}</h1>
+        <p>{{ compra.fecha }}</p>
+        <p>{{ compra.proveedor.razon_social }}</p>
+    {% endfor %}
+{% endblock %}

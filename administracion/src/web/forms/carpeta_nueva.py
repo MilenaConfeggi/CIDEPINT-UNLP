@@ -1,7 +1,16 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SelectMultipleField, TextAreaField, IntegerField, ValidationError
+from wtforms import StringField, SelectMultipleField, FieldList, FormField, TextAreaField, IntegerField, ValidationError, HiddenField, SelectField
 from wtforms.validators import DataRequired, Length, Optional, NumberRange
 import re
+from administracion.src.core.servicios import personal as servicio_personal
+
+class FormularioPermiso(FlaskForm):
+    user_id = SelectField('Usuario', choices=[], coerce=int, validators=[DataRequired()])
+    permiso = SelectField('Permiso', choices=[('ver', 'Ver'), ('editar', 'Editar')], validators=[DataRequired()])
+
+    def __init__(self, *args, **kwargs):
+        super(FormularioPermiso, self).__init__(*args, **kwargs)
+        self.user_id.choices = [(usuario.id, f"{usuario.empleado.nombre} {usuario.empleado.apellido} - {usuario.empleado.email}") for usuario in servicio_personal.listar_usuarios_personal()]
 
 class FormularioNuevaCarpeta(FlaskForm):
         
@@ -10,9 +19,7 @@ class FormularioNuevaCarpeta(FlaskForm):
                        render_kw={"aria-label": "Titulo"}
                        )
     
-    usuarios = SelectMultipleField('Usuarios',coerce=int, validators=[Optional()], render_kw={"aria-label": "Usuarios"})
-    
+    permisos = FieldList(FormField(FormularioPermiso), min_entries=0)
+
     def __init__(self, *args, **kwargs):
         super(FormularioNuevaCarpeta, self).__init__(*args, **kwargs)
-        self.usuarios.choices = [(usuario['id'], f"{usuario['nombre']}") for usuario in [{'id': 1, 'nombre' : 'Roberto Carlos'}, {'id': 2, 'nombre' : 'Juan Gabriel'}, {'id': 3, 'nombre' : 'Luis Miguel'}]]
-        #self.usuarios.choices = [(usuario.id, f"{usuario.nombre} {usuario.apellido}") for usuario in servicio_usuarios.listar_usuarios_empleados()]

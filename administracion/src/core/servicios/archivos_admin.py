@@ -4,7 +4,8 @@ from flask import current_app
 from sqlalchemy import extract
 from models.base import db
 from models.archivos_admin.archivo import Archivo
-from models.archivos_admin.carpeta import Carpeta
+from models.archivos_admin.carpeta import Carpeta, usuarios_leen_carpeta
+from flask_login import current_user
 
 def listar_archivos_de_carpeta(id_carpeta):
     query = Archivo.query.filter(Archivo.id_carpeta == id_carpeta)
@@ -13,20 +14,26 @@ def listar_archivos_de_carpeta(id_carpeta):
 
 
 def listar_carpetas(anio):
-    return Carpeta.query.filter(
-        extract('year', Carpeta.fecha_ingreso) == anio
-    ).order_by(Carpeta.nombre.asc()).all()
+    if current_user.empleado.rol != 'Personal':
+        return Carpeta.query.filter(
+            extract('year', Carpeta.fecha_ingreso) == anio
+        ).order_by(Carpeta.nombre.asc()).all()
+    else:
+        return Carpeta.query.join(usuarios_leen_carpeta).filter(
+            extract('year', Carpeta.fecha_ingreso) == anio,
+            usuarios_leen_carpeta.c.id_user == current_user.id
+        ).order_by(Carpeta.nombre.asc()).all()
 
 
 def crear_carpeta(
     nombre,
-    usuarios_lee,
-    usuarios_edita,
+    usuarios_leen,
+    usuarios_editan,
 ):
     nueva_carpeta = Carpeta(
             nombre=nombre,
-            #usuarios_edita=usuarios_edita,
-            #usuarios_lee=usuarios_lee,
+            usuarios_editan=usuarios_editan,
+            usuarios_leen=usuarios_leen,
             )
     
     db.session.add(nueva_carpeta)
@@ -115,15 +122,15 @@ def chequear_nombre_carpeta_existente(nombre):
 def editar_carpeta(
     id_carpeta,
     nombre,
-    usuarios_lee,
-    usuarios_edita,
+    usuarios_leen,
+    usuarios_editan,
 ):
     
     carpeta = conseguir_carpeta_de_id(id_carpeta)
     
     carpeta.nombre = nombre
-    #carpeta.usuarios_lee = usuarios_lee
-    #carpeta.usuarios_edita = usuarios_edita
+    carpeta.usuarios_leen = usuarios_leen
+    carpeta.usuarios_editan = usuarios_editan
 
     db.session.commit()
     

@@ -70,6 +70,6 @@ def cambiar_contrasena():
         empleado.primer_login = False
         db.session.commit()
         flash('Datos actualizados con éxito!', 'success')
-        return redirect(url_for('auth.dashboard'))
+        return redirect(url_for('home'))
     
     return render_template('cambiar_contrasena.html', empleado=current_user.empleado)

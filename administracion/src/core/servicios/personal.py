@@ -4,6 +4,7 @@ from flask import current_app
 from sqlalchemy import extract
 from models.base import db
 from models.personal.empleado import Empleado
+from models.personal.personal import User
 from models.personal.area import Area
 from models.archivos_admin.archivo import Archivo
 from administracion.src.core.servicios import archivos_admin as servicio_archivos
@@ -14,6 +15,10 @@ def conseguir_empleado_de_id(id_empleado):
 
 def conseguir_area_de_id(id_area):
     return Area.query.get(id_area)
+
+
+def conseguir_usuario_de_id(id_usuario):
+    return User.query.get(id_usuario)
 
 
 def conseguir_directorio(id_empleado):
@@ -57,3 +62,6 @@ def conseguir_archivos_de_empleado(id_empleado):
 
 def listar_areas():
     return Area.query.all()
+
+def listar_usuarios_personal():
+    return User.query.join(Empleado).filter(Empleado.rol == 'Personal').all()

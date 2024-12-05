@@ -31,7 +31,7 @@ class Empleado(db.Model):
     distribuciones_asociadas = db.relationship(
         "Empleado_Distribucion", back_populates="empleado"
     )
-
+    saldo = db.Column(db.Float, default=0.0)
     @validates('area_id')
     def validate_area(self, key, value):
         if not value:

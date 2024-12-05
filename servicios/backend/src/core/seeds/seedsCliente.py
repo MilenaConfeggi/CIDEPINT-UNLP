@@ -18,6 +18,8 @@ def seeds_clientes():
             'codigo_postal': '00000',
             'piso': 'Piso 1',
             'depto': 'Depto 1',
+            'legajo_id': 33,
+            'nombre': 'Cliente 1'
         },
         {
             'email': 'cliente2@mail.com',
@@ -33,6 +35,8 @@ def seeds_clientes():
             'codigo_postal': '00000',
             'piso': 'Piso 2',
             'depto': 'Depto 2',
+            'legajo_id': 34,
+            'nombre': 'Cliente 2',
         },
         {
             'email': 'cliente3@mail.com',
@@ -48,6 +52,8 @@ def seeds_clientes():
             'codigo_postal': '00000',
             'piso': 'Piso 3',
             'depto': 'Depto 3',
+            'legajo_id': 35,
+            'nombre': 'Cliente 3'
         }
     ]
 

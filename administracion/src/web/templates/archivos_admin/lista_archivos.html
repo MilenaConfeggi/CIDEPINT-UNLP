@@ -1,0 +1,205 @@
+{% extends 'layout.html' %}
+{% block title %}Archivos{% endblock %}
+{% block content %}
+<div>
+  <div id="context-menu" class="hidden">
+    <ul>
+      <li class="flex flex-wrap" id="eliminar">
+        Eliminar
+        <svg
+            class="w-5 h-5"
+            aria-hidden="true"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+        >
+            <path
+            fill-rule="evenodd"
+            d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+            clip-rule="evenodd"
+            ></path>
+        </svg>
+      </li>
+    </ul>
+  </div>
+  <form method="POST" action="{{ url_for('archivos.eliminar_archivo', id_carpeta=carpeta.id) }}">
+    <div class="modal hidden" data-id="1" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+      <div class="fixed inset-0 bg-gray-500/75 transition-opacity" aria-hidden="true"></div>
+          <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+              <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                  <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+                      <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                          <h3 class="text-base font-semibold text-gray-900" id="modal-title">¿Eliminar archivo?</h3>
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="id_archivo" value="" />
+                      </div>
+                      <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                        <button type="submit" class="mt-3 mx-2 mb-2 inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-red-500 sm:mt-0 sm:w-auto">Confirmar</button>
+                        <button type="button" class="close-modal mx-2 mb-2 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm hover:bg-gray-50 sm:ml-3 sm:w-auto">Cancelar</button>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </form>
+  <div class="mx-auto content max-w-2xl px-4 py-4 sm:px-6 sm:py-4 lg:max-w-7xl lg:px-8">
+    <h2 class="sr-only">Archivos</h2>
+    <div class="mb-4 flex flex-wrap justify-between items-end">
+      <a href="{{url_for('archivos.index', anio=anio)}}"
+        class="inline-flex items-center px-3 py-4 rounded-md text-black-500 hover:bg-black-50">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-6 w-6">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h18">
+            </path>
+        </svg>
+        <span class="ml-1 font-bold text-lg">Volver</span>
+      </a>
+      <h3 class="mb-4 text-lg font-semibold text-gray-600">{{ carpeta.nombre }}</h3>
+    </div>
+    <hr />
+    <div class="grid pt-4 grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 xl:gap-x-8">
+      {% for archivo in archivos %}
+        <a data-id="{{ archivo.id }}" class="group" href="{{ url_for('archivos.descargar_archivo', id_carpeta=carpeta.id, id_archivo= archivo.id) }}" target="_blank">
+          {% if archivo.nombre.endswith('.jpg') or archivo.nombre.endswith('.jpeg') or archivo.nombre.endswith('.png') or archivo.nombre.endswith('.gif') %}
+              <svg class="px-7 aspect-square w-full rounded-lg bg-gray-200 object-cover group-hover:opacity-75 xl:aspect-[7/7]"
+                  aria-hidden="true"
+                  fill="currentColor"
+                  viewBox="0 0 512 512">
+                <path d="M448 80c8.8 0 16 7.2 16 16l0 319.8-5-6.5-136-176c-4.5-5.9-11.6-9.3-19-9.3s-14.4 3.4-19 9.3L202 340.7l-30.5-42.7C167 291.7 159.8 288 152 288s-15 3.7-19.5 10.1l-80 112L48 416.3l0-.3L48 96c0-8.8 7.2-16 16-16l384 0zM64 32C28.7 32 0 60.7 0 96L0 416c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-320c0-35.3-28.7-64-64-64L64 32zm80 192a48 48 0 1 0 0-96 48 48 0 1 0 0 96z"/>
+              </svg>
+            {% else %}
+              <svg class="px-7 aspect-square w-full rounded-lg bg-gray-200 object-cover group-hover:opacity-75 xl:aspect-[7/7]"
+                  aria-hidden="true"
+                  fill="currentColor"
+                  viewBox="0 0 384 512">
+                <path fill-rule="evenodd"
+                    d="M320 464c8.8 0 16-7.2 16-16l0-288-80 0c-17.7 0-32-14.3-32-32l0-80L64 48c-8.8 0-16 7.2-16 16l0 384c0 8.8 7.2 16 16 16l256 0zM0 64C0 28.7 28.7 0 64 0L229.5 0c17 0 33.3 6.7 45.3 18.7l90.5 90.5c12 12 18.7 28.3 18.7 45.3L384 448c0 35.3-28.7 64-64 64L64 512c-35.3 0-64-28.7-64-64L0 64z"
+                    clip-rule="evenodd"></path>
+              </svg>
+            {% endif %}
+            <p class="mt-1 text-md font-medium text-gray-900 break-words">{{ archivo.nombre }}</p>
+        </a>
+      {% endfor %}
+      <form method="POST" enctype="multipart/form-data" action="{{ url_for('archivos.subir_archivo', id_carpeta=carpeta.id) }}"> 
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <label for="archivo" class="cursor-pointer">
+          <svg class="px-4 aspect-square w-full rounded-lg bg-gray-200 object-cover group-hover:opacity-75 xl:aspect-[7/7]"
+            aria-hidden="true"
+            fill="currentColor"
+            viewBox="0 0 448 512"
+            >
+            <path
+          fill-rule="evenodd"
+          d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"
+          clip-rule="evenodd"
+            ></path>
+          </svg>
+          <p class="mt-1 text-md font-medium text-gray-900 break-words">Subir archivo</p>
+        </label>
+        <input id="archivo" name="archivo" type="file" class="hidden" onchange="this.form.submit()">
+      </form>
+  </div>
+</div>
+<script>
+  // script.js
+  const contextMenu = document.getElementById("context-menu");
+  let selectedFileId = null;
+
+  // Función para mostrar el menú contextual
+  document.querySelectorAll('.group').forEach(item => {
+    item.addEventListener('contextmenu', (event) => {
+      event.preventDefault(); // Evita el menú contextual predeterminado
+
+      const { clientX: mouseX, clientY: mouseY } = event;
+
+      // Ajustar posición del menú
+      contextMenu.style.top = `${mouseY}px`;
+      contextMenu.style.left = `${mouseX}px`;
+
+      // Mostrar el menú
+      contextMenu.classList.remove("hidden");
+
+      // Guardar el ID del archivo seleccionado
+      selectedFileId = item.getAttribute('data-id');
+    });
+  });
+
+  // Ocultar el menú al hacer clic en cualquier lugar
+  document.addEventListener("click", () => {
+    contextMenu.classList.add("hidden");
+  });
+
+  // Prevenir que el clic derecho fuera del contenido abra el menú contextual del navegador
+  document.addEventListener("contextmenu", (event) => {
+    if (!event.target.closest('.group')) {
+      event.preventDefault();
+      contextMenu.classList.add("hidden");
+    }
+  });
+
+  // Añadir funcionalidad a las opciones del menú contextual
+  document.getElementById('eliminar').addEventListener('click', () => {
+    const modal = document.querySelector(`.modal`);
+    document.querySelector('input[name="id_archivo"]').value = selectedFileId;
+    modal.classList.remove('hidden');
+  });
+
+  document.querySelector('.close-modal').addEventListener('click', () => {
+    const modal = document.querySelector(`.modal`);
+    modal.classList.add('hidden');
+  });
+
+  // Mostrar el menú contextual al mantener presionado en dispositivos táctiles
+  document.querySelectorAll('.group').forEach(item => {
+    let touchTimeout;
+
+    item.addEventListener('touchstart', (event) => {
+      touchTimeout = setTimeout(() => {
+        event.preventDefault(); // Evita el menú contextual predeterminado
+
+        const touch = event.touches[0];
+        const { clientX: mouseX, clientY: mouseY } = touch;
+
+        // Ajustar posición del menú
+        contextMenu.style.top = `${mouseY}px`;
+        contextMenu.style.left = `${mouseX}px`;
+
+        // Mostrar el menú
+        contextMenu.classList.remove("hidden");
+
+        // Guardar el ID del archivo seleccionado
+        selectedFileId = item.getAttribute('data-id');
+      }, 500); // Tiempo de espera para considerar una pulsación larga
+    });
+
+    item.addEventListener('touchend', () => {
+      clearTimeout(touchTimeout);
+      event.preventDefault();
+    });
+  });
+</script>
+<style>
+  #context-menu {
+    position: absolute;
+    z-index: 1000;
+    background: #fff;
+    border: 1px solid #ccc;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    padding: 10px;
+  }
+  
+  #context-menu ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  
+  #context-menu ul li {
+    padding: 8px 12px;
+    cursor: pointer;
+  }
+  
+  #context-menu ul li:hover {
+    background-color: #f0f0f0;
+  }
+</style>
+{% endblock %}  

@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+{% block title %}
+    Calendario de Ausencias
+{% endblock %}
+{% block content %}
+
+<div class="container mx-auto px-4">
+
+  <h1 class="text-2xl font-bold mb-4">Calendario de Ausencias</h1>
+  
+  {% if ausencias %}
+    <table class="min-w-full bg-white">
+      <thead>
+        <tr>
+          <th class="py-2 px-4 border-b">Nombre del Empleado</th>
+          <th class="py-2 px-4 border-b">DNI</th>
+          <th class="py-2 px-4 border-b">Período de Ausencia</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ausencia in ausencias %}
+          <tr>
+            <td class="py-2 px-4 border-b text-center">{{ ausencia.empleado.nombre }} {{ ausencia.empleado.apellido }}</td>
+            <td class="py-2 px-4 border-b text-center">{{ ausencia.empleado.dni }}</td>
+            <td class="py-2 px-4 border-b text-center">{{ ausencia.fecha_desde.strftime('%d-%m-%y') }} hasta {{ ausencia.fecha_hasta.strftime('%d-%m-%y') }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="text-center text-gray-500">No hay ausencias registradas actualmente</p>
+  {% endif %}
+</div>
+
+{% endblock %}

@@ -1,5 +1,6 @@
 from models.base import db
-
+from .tipo_documento import Tipo_Documento
+from .estado import Estado
 class Documento(db.Model):
     __tablename__ = 'documento'
     id = db.Column(db.Integer, primary_key=True)
@@ -9,7 +10,10 @@ class Documento(db.Model):
     estado_id = db.Column(db.Integer, db.ForeignKey('estado.id'), nullable=True) #nullable=True porque el documento puede no tener estado (presupuesto conicet)
     estado = db.relationship('Estado', backref=db.backref('documento', uselist=False))
     legajo_id = db.Column(db.Integer, db.ForeignKey('legajo.id'), nullable=False)
-    legajo = db.relationship('Legajo', backref=db.backref('documento', uselist=False))
+    legajo = db.relationship('Legajo', back_populates='documento', uselist=False)
     #Agrego el tipo de documento (presupuesto, informe, certificado, etc)
-    tipo_documento_id = db.Column(db.Integer, db.ForeignKey('tipo_documento.id'), nullable=False)
-    tipo_documento = db.relationship('Tipo_Documento', backref=db.backref('documento', uselist=False))
+    tipo_documento_id = db.Column(db.Integer, db.ForeignKey('tipo_documento.id'))
+    tipo_documento = db.relationship('Tipo_Documento')
+    #    receptor = db.relationship("Fondo")
+    #receptor_id = db.Column(db.String(100), db.ForeignKey("fondo.titulo"))
+    

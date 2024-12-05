@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+{% block title %}
+    Registrar Ausencia
+{% endblock %}
+{% block content %}
+
+<div class="container mx-auto px-4">
+  <h1 class="text-2xl font-bold mb-4">Registrar Ausencia</h1>
+  
+  <form action="{{ url_for('ausencia.registrar_ausencia') }}" method="POST" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <div class="mb-4">
+      <label for="empleado_id" class="block text-gray-700 text-sm font-bold mb-2">Empleado:</label>
+      <select id="empleado_id" name="empleado_id" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+        {% for empleado in empleados %}
+          <option value="{{ empleado.id }}">{{ empleado.nombre }} {{ empleado.apellido }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="mb-4">
+      <label for="fecha_desde" class="block text-gray-700 text-sm font-bold mb-2">Fecha Desde:</label>
+      <input type="date" id="fecha_desde" name="fecha_desde" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
+    </div>
+    <div class="mb-4">
+      <label for="fecha_hasta" class="block text-gray-700 text-sm font-bold mb-2">Fecha Hasta:</label>
+      <input type="date" id="fecha_hasta" name="fecha_hasta" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
+    </div>
+    <div class="mb-4">
+      <label for="motivo" class="block text-gray-700 text-sm font-bold mb-2">Motivo:</label>
+      <textarea id="motivo" name="motivo" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required></textarea>
+    </div>
+    <div class="flex items-center justify-between">
+      <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Registrar Ausencia</button>
+    </div>
+  </form>
+</div>
+
+<script>
+  document.getElementById('fecha_desde').addEventListener('change', function() {
+    var fechaDesde = this.value;
+    document.getElementById('fecha_hasta').setAttribute('min', fechaDesde);
+  });
+</script>
+
+{% endblock %}

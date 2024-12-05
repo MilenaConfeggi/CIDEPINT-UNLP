@@ -1,4 +1,5 @@
 from models.base import db
+from .foto import Foto
 
 class Muestra(db.Model):
     __tablename__ = 'muestra'
@@ -9,3 +10,6 @@ class Muestra(db.Model):
     terminada = db.Column(db.Boolean, nullable=False)
 
     legajo_id = db.Column(db.Integer, db.ForeignKey('legajo.id'), nullable=False)
+    legajo = db.relationship('Legajo', back_populates='muestras')
+
+    fotos = db.relationship('Foto', back_populates='muestra')

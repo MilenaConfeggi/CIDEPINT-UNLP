@@ -1,6 +1,7 @@
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import validates
 from datetime import datetime
+from models.compras.compra_empleado import compra_empleado
 from models.base import db
 
 class Empleado(db.Model):
@@ -27,6 +28,8 @@ class Empleado(db.Model):
     primer_login = db.Column(db.Boolean, default=True)
     archivos = db.relationship('Archivo', back_populates='empleado')
     ausencias = db.relationship('Ausencia', back_populates='empleado')
+    compras = db.relationship('Compra', secondary=compra_empleado ,back_populates='empleados')
+    solicitudes = db.relationship('Compra', back_populates='solicitante', cascade='all, delete-orphan')
 
     @validates('area_id')
     def validate_area(self, key, value):

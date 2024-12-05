@@ -22,15 +22,12 @@ class Compra(db.Model):
     estado = db.Column(db.Enum(estado_compra), nullable=False)
     id_proveedor = db.Column(db.Integer, db.ForeignKey("proveedores.id"), nullable=False)
     proveedor = db.relationship('Proveedor', back_populates='compras')
-    #fondos
-    #fondos = db.relationship('Fondo', secondary=compra_fondo, back_populates='compras')
 
-    #empleados
-    #empleados = db.relationship('Empleado', secondary=compra_empleado ,back_populates='compras')
+    fondos = db.relationship('Fondo', secondary=compra_fondo, back_populates='compras')
 
-    #areas
-    #areas = db.relationship('Area', secondary=compra_area, back_populates='compras')
+    empleados = db.relationship('Empleado', secondary=compra_empleado ,back_populates='compras')
 
-    #solicitante
-    #id_empleado = db.Column(db.Integer, db.ForeignKey("empleados.id"), nullable=False)
-    #empleado = db.relationship('Empleado', back_populates='compras')
+    areas = db.relationship('Area', secondary=compra_area, back_populates='compras')
+
+    id_empleado = db.Column(db.Integer, db.ForeignKey("empleado.id"), nullable=False)
+    solicitante = db.relationship('Empleado', back_populates='solicitudes')

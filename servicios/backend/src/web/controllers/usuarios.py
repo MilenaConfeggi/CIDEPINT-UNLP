@@ -2,12 +2,15 @@ from servicios.backend.src.core.config import Config
 from flask import jsonify, abort, Blueprint, request
 from servicios.backend.src.core.services import servicioUsuario
 from servicios.backend.src.web.schemas.usuarios import usuariosSchema
-from servicios.backend.src.web.helpers.auth import is_authenticated, check_permission
+from servicios.backend.src.web.helpers.auth import check_permission
+from flask_jwt_extended import jwt_required
 
 bp = Blueprint('usuarios', __name__, url_prefix='/usuarios')
 
 @bp.get("/")
+@jwt_required()
 def listar_usuarios():
+    #print(request.headers.get('Authorization')) 
     usuarios = servicioUsuario.listar_usuarios()
     data = usuariosSchema.dump(usuarios, many=True)
     return jsonify(data), 200

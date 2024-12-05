@@ -5,7 +5,7 @@ from models.usuarios.rol_permiso import RolPermiso
 from models.usuarios.usuario import Usuario
 from datetime import datetime
 from web import bcrypt
-from flask import session
+from flask_jwt_extended import get_jwt_identity
 from flask import request
 
 def crear_usuario(data):
@@ -70,9 +70,10 @@ def obtener_permisos(user):
     flat_permisos = tuple(item for sublist in a for item in sublist)
     return flat_permisos
 
-
 def tiene_permiso(permiso):
-    user_mail = session.get("user")
+    user_mail = get_jwt_identity()
+    print("BOQUITAAAAAAAAA")
+    print(user_mail)
     usuario = obtener_usuario_por_mail(user_mail)
     if usuario.system_admin == True:
         return True

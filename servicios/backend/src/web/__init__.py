@@ -11,10 +11,12 @@ from servicios.backend.src.web.controllers.informes import bp as informes_bp
 from servicios.backend.src.web.controllers.usuarios import bp as usuarios_bp
 from servicios.backend.src.web.controllers.auth import bp as auth_bp
 from flask_cors import CORS
-from flask_session import Session
+from flask_jwt_extended import (
+    JWTManager, create_access_token, jwt_required, get_jwt_identity
+)
 from flask_bcrypt import Bcrypt
 
-session = Session()
+jwt = JWTManager()
 bcrypt = Bcrypt()
 
 
@@ -22,10 +24,11 @@ def create_app(env="development", static_folder=""):
     app = Flask(__name__)
     app.config.from_object(config[env])
     db.init_app(app)
-    session.init_app(app)
+    jwt.init_app(app)
     bcrypt.init_app(app)
 
-    CORS(app, supports_credentials=True)
+    CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
+
     @app.route("/")
     def home():
         return "SLAY"

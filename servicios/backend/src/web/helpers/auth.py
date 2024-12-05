@@ -1,8 +1,6 @@
-from flask import session
 from servicios.backend.src.core.services import servicioUsuario
+from flask_jwt_extended import jwt_required
 
-def is_authenticated():
-    return session.get("mail") is not None
-
-def check_permission(permission):
+@jwt_required()
+def check_permission(permiso):
     return servicioUsuario.tiene_permiso(permiso)

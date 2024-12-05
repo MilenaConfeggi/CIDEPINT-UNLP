@@ -61,14 +61,43 @@
                     {
                     method: "GET", // Cambiar el método a GET
                     credentials: 'include',
+                    headers: {
+                      "Access-Control-Allow-Origin": "${import.meta.env.VITE_API_URL}"
+                    }
                     }
                 );
                 const data = await response.json();
+                const token = data.access_token;
+                // Guardar el token en localStorage
+                localStorage.setItem('jwt', token);
                 console.log("Respuesta del servidor:", data);
+                return token;
             } catch (error) {
             console.error("Error al enviar los datos:", error);
         }
   },
+  // Función para obtener datos protegidos usando el token
+  async getProtectedData(){
+    const token = localStorage.getItem('jwt').lastIndexOf();
+
+    try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/usuarios/`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error('No autorizado o sesión expirada');
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        throw error;
+    }
+}
 },
   };
   </script>

@@ -2,7 +2,12 @@ from models.base import db
 from models.archivos_admin.carpeta import Carpeta
 from models.patrimonio.bien import Bien
 from models.Fondo.fondo import Fondo as fondoDB
+from models.personal.area import Area
+from models.personal.empleado import Empleado
+from models.personal.personal import User
 from sqlalchemy import MetaData
+from datetime import datetime
+
 def reset():
     """
     Resetea la base de datos
@@ -203,5 +208,61 @@ def seed():
     )
 
     db.session.add_all([carpeta_1, carpeta_2, carpeta_3, carpeta_4, carpeta_5, carpeta_6, carpeta_7, carpeta_8, carpeta_9, carpeta_10, carpeta_11, carpeta_12, carpeta_13, carpeta_14, carpeta_15, carpeta_16, carpeta_17])
+
+    
+    default_area = Area(nombre='Default Area', saldo=0)
+    db.session.add(default_area)
+
+    admin_user = User(
+        username='admin',
+        password='admin'
+    )
+    db.session.add(admin_user)
+                
+    
+    admin_empleado = Empleado(
+        user=admin_user,
+        email='admin@example.com',
+        area=default_area,  # Asigna el área creada
+        dni='00000000',
+        nombre='Admin',
+        apellido='User',
+        dependencia='UNLP',
+        cargo='Administrativo',
+        subdivision_cargo='Ley 10430',
+        telefono='123456789',
+        domicilio='Admin Address',
+        fecha_nacimiento=datetime.strptime('1970-01-01', '%Y-%m-%d'),
+        observaciones='Usuario administrador por defecto',
+        habilitado=True,
+        rol='Administrador'
+    )
+    db.session.add(admin_empleado)
+            
+            
+    inhabilitado_user = User(
+        username='inhabilitado',
+        password='inhabilitado'
+    )
+    db.session.add(inhabilitado_user)
+                
+    inhabilitado_empleado = Empleado(
+        user=inhabilitado_user,
+        email='inhabilitado@example.com',
+        area=default_area,  # Asigna el área creada
+        dni='11111111',
+        nombre='Inhabilitado',
+        apellido='User',
+        dependencia='UNLP',
+        cargo='Administrativo',  # Cambiado a un valor permitido
+        subdivision_cargo='Ley 10430',
+        telefono='987654321',
+        domicilio='Inhabilitado Address',
+        fecha_nacimiento=datetime.strptime('1980-01-01', '%Y-%m-%d'),
+        observaciones='Usuario inhabilitado por defecto',
+        habilitado=False,
+        rol='Personal'
+    )
+    db.session.add(inhabilitado_empleado)
 
     db.session.commit()

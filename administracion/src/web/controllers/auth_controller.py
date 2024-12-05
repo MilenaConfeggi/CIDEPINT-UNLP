@@ -19,7 +19,7 @@ def login():
             login_user(user)
             if user.empleado.primer_login:
                 return redirect(url_for('auth.cambiar_contrasena'))
-            return redirect(url_for('auth.dashboard'))  # Cambia 'dashboard' por la ruta que desees
+            return redirect(url_for('home'))  # Cambia 'dashboard' por la ruta que desees
         else:
             flash('Nombre de usuario o contraseña incorrectos', 'error')
     return render_template('login.html')
@@ -30,11 +30,6 @@ def logout():
     logout_user()
     flash('Has cerrado sesión', 'success')
     return redirect(url_for('auth.login'))
-
-@auth_bp.route('/dashboard')
-@login_required
-def dashboard():
-    return render_template('topicos.html')
 
 @auth_bp.route('/cambiar_contrasena', methods=['GET', 'POST'])
 @login_required

@@ -1,7 +1,7 @@
 from flask import flash, redirect, render_template, request, send_file, url_for, Blueprint, session
 from models.personal.personal import User
 from models.personal.area import Area
-from models.personal.archivo import Archivo
+from administracion.src.core.servicios import personal as servicio_personal
 from io import BytesIO
 from werkzeug.utils import secure_filename
 import os
@@ -218,12 +218,6 @@ def descargar_empleados():
     
     return redirect(url_for('personal.ver_empleados'))
 
-UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'uploads')
-ALLOWED_EXTENSIONS = {'pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'}
-
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
 @personal_bp.route('/perfil/<int:id>', methods=['GET', 'POST'])
 @role_required('Administrador', 'Colaborador', 'Personal') 
 def ver_perfil(id):
@@ -240,26 +234,9 @@ def ver_perfil(id):
         if form_type == 'upload_file':
             if 'archivo' in request.files:
                 archivo = request.files['archivo']
-                tipo = request.form.get('tipo')
-                if not tipo:
-                    flash('Debe indicar el tipo de archivo', 'error')
-                    return redirect(url_for('personal.ver_perfil', id=user.id))
-                if archivo and allowed_file(archivo.filename):
-                    filename = secure_filename(archivo.filename)
-                    ruta = os.path.join(UPLOAD_FOLDER, filename)
-                    archivo.save(ruta)
-                    
-                    nuevo_archivo = Archivo(
-                        empleado_id=user.empleado.id,
-                        nombre=filename,
-                        tipo=tipo,
-                        ruta=ruta
-                    )
-                    nuevo_archivo.save()
+                if archivo:
+                    servicio_personal.guardar_archivo(user.empleado.id, archivo, tipo=request.form.get('tipo'))
                     flash('Archivo subido con éxito', 'success')
-                    return redirect(url_for('personal.ver_perfil', id=user.id))
-                else:
-                    flash('Formato de archivo no permitido', 'error')
                     return redirect(url_for('personal.ver_perfil', id=user.id))
         
         elif form_type == 'update_profile':
@@ -309,7 +286,7 @@ def ver_perfil(id):
     
     area = Area.query.filter_by(id=user.empleado.area_id).first()
     saldo_area = area.saldo if area else 'N/A'
-    archivos = Archivo.query.filter_by(empleado_id=user.empleado.id).all()
+    archivos = servicio_personal.conseguir_archivos_de_empleado(user.empleado.id)
     
     # Obtener la lista de áreas y otros valores necesarios para los select options
     areas = Area.query.all()
@@ -343,11 +320,9 @@ def ver_perfil(id):
 @personal_bp.route('/archivo/eliminar/<int:id>', methods=['POST'])
 @role_required('Administrador', 'Colaborador', 'Personal') 
 def eliminar_archivo(id):
-    archivo = Archivo.query.get_or_404(id)
-    archivo.delete()
-    os.remove(archivo.ruta)
+    servicio_personal.eliminar_archivo(id)
     flash('Archivo eliminado con éxito', 'success')
-    return redirect(url_for('personal.ver_perfil', id=archivo.empleado_id))
+    return redirect(url_for('personal.ver_perfil', id=current_user.id))
 
 @personal_bp.route('/archivo/descargar/<int:id>', methods=['GET'])
 @role_required('Administrador', 'Colaborador', 'Personal') 

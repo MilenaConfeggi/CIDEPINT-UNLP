@@ -1,8 +1,7 @@
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import validates
-from administracion.src.core.database import db
 from datetime import datetime
-from .personal import User  # Importar la clase User
+from models.base import db
 
 class Empleado(db.Model):
     __tablename__ = 'empleado'
@@ -68,10 +67,10 @@ class Empleado(db.Model):
             raise ValueError(f"Rol '{value}' no es válido. Debe ser uno de {allowed_roles}.")
         return value
 
-    def __init__(self, user_id, email, area_id, dni, nombre, apellido, dependencia=None, cargo=None, subdivision_cargo=None, telefono=None, domicilio=None, fecha_nacimiento=None, observaciones=None, habilitado=True, rol='Personal'):
-        self.user_id = user_id
+    def __init__(self, user, email, area, dni, nombre, apellido, dependencia=None, cargo=None, subdivision_cargo=None, telefono=None, domicilio=None, fecha_nacimiento=None, observaciones=None, habilitado=True, rol='Personal'):
+        self.user = user
         self.email = email
-        self.area_id = area_id
+        self.area = area
         self.dni = dni
         self.nombre = nombre
         self.apellido = apellido

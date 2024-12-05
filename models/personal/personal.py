@@ -1,7 +1,7 @@
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
-from administracion.src.core.database import db
+from models.base import db
 
 class User(UserMixin, db.Model):
     __tablename__ = 'user'

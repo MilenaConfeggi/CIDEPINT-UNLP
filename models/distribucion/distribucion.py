@@ -18,3 +18,7 @@ class Distribucion(db.Model):
 
     costos_de_id = db.Column(db.Integer, db.ForeignKey('area.id'))
     costos_de = db.relationship('Area', foreign_keys=[costos_de_id]) #por defeto cidepint
+
+    empleados_asociados = db.relationship(
+        "Empleado_Distribucion", back_populates="distribucion"
+    )

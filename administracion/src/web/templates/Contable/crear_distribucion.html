@@ -60,6 +60,15 @@
                 <p class="text-red-500 text-sm">{{ error }}</p>
             {% endfor %}
         </div>
+        <label for="empleados_seleccionados">Seleccionar Empleados</label>
+        <div>
+            {% for subfield in form.empleados_seleccionados %}
+                <div>
+                    <input type="checkbox" id="{{ subfield.id }}" name="{{ subfield.name }}" value="{{ subfield.data }}" {% if subfield.checked %}checked{% endif %}>
+                    <label for="{{ subfield.id }}">{{ subfield.label.text }}</label>
+                </div>
+            {% endfor %}
+        </div>
         <div class="mt-6">
             <button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded hover:bg-indigo-700">
                 Guardar Distribución

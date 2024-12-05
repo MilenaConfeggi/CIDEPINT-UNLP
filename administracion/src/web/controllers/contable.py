@@ -8,6 +8,10 @@ from administracion.src.web.forms.distribucion_nuevo import FormularioNuevaDistr
 from models import legajos as legajoDB
 from administracion.src.web.controllers.roles import role_required
 from administracion.src.core import Area as areaDB
+#import bd
+from models.base import db
+from models.personal.empleado import Empleado
+from models.empleado_distribucion.empleado_distribucion import Empleado_Distribucion
 bp = Blueprint("contable",__name__,url_prefix="/contable")
 
 @bp.get("/")
@@ -94,8 +98,21 @@ def crear_distribucion(id):
         #Validaciones
         csrf_token = data.pop("csrf_token", None)
         data["legajo_id"] = id
+        emp = data.pop("empleados_seleccionados", None)
         #Crea la distribucion
-        distribucionDB.create_distribucion(**data)
+        nueva_distribucion = distribucionDB.create_distribucion(**data)
+        #Relaciona los empleados
+        empleados_ids = form.empleados_seleccionados.data
+        for empleado_id in empleados_ids:
+            empleado = db.session.query(Empleado).get(empleado_id) 
+            if empleado:
+                empleado_distribucion = Empleado_Distribucion(
+                    empleado_id=empleado.id,
+                    distribucion_id=nueva_distribucion.id
+                )
+                db.session.add(empleado_distribucion)
+
+                db.session.commit()
         #Sumo lo indicado al saldo de las areas
         area_ganancias = int(data["ganancias_de_id"])
         area_costos = int(data["costos_de_id"])

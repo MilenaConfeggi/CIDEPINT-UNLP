@@ -6,6 +6,8 @@ class Area(db.Model):
     nombre = db.Column(db.String(80), unique=True, nullable=False)
     saldo = db.Column(db.Float, nullable=False)
 
+    bienes = db.relationship('Bien', back_populates='area')
+    
     def __init__(self, nombre, saldo):
         self.nombre = nombre
         self.saldo = saldo

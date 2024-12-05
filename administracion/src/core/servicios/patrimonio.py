@@ -22,6 +22,7 @@ def crear_bien(
     anio,
     institucion,
     descripcion,
+    area
 ):
     nuevo_bien = Bien(
             titulo=titulo,
@@ -29,6 +30,7 @@ def crear_bien(
             anio=anio,
             institucion=institucion,
             descripcion=descripcion,
+            area=area
             )
     
     db.session.add(nuevo_bien)
@@ -44,8 +46,9 @@ def filtrar_bienes(titulo, numero_inventario, area, baja, page, per_page):
         query = query.filter(Bien.titulo.ilike(f"{titulo}%"))
     if numero_inventario:
         query = query.filter(Bien.numero_inventario.ilike(f"{numero_inventario}%"))
-    #if area:
-        #query = query.filter(Bien.area_id == area)
+    if area:
+        if area != 'Todas':
+            query = query.filter(Bien.id_area == area)
     if baja == 'Activos':
         query = query.filter(Bien.motivo_baja == None)
     else:
@@ -106,6 +109,7 @@ def editar_bien(
     anio,
     institucion,
     descripcion,
+    area
 ):
     
     bien = conseguir_bien_de_id(id_bien)
@@ -115,6 +119,7 @@ def editar_bien(
     bien.anio = anio
     bien.institucion = institucion
     bien.descripcion = descripcion
+    bien.area = area
 
     db.session.commit()
     

@@ -13,5 +13,5 @@ class Archivo(db.Model):
     id_carpeta = db.Column(db.Integer, db.ForeignKey("carpetas.id"), nullable=True)
     carpeta = db.relationship('Carpeta', back_populates='archivos')
 
-    empleado_id = db.Column(db.Integer, db.ForeignKey('empleado.id'), nullable=False)
+    empleado_id = db.Column(db.Integer, db.ForeignKey('empleado.id'), nullable=True)
     empleado = db.relationship('Empleado', back_populates='archivos')

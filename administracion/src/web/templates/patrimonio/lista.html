@@ -33,9 +33,9 @@
                             class="block w-full mt-1 text-sm form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple"
                         >
                           <option>Todas</option>
-                          <option>$5,000</option>
-                          <option>$10,000</option>
-                          <option>$25,000</option>
+                          {% for area in areas %}
+                            <option {% if request.args.get('area') == area.id|string %} selected {% endif %} value="{{area.id}}">{{ area.nombre }}</option>
+                          {% endfor %}
                         </select>
                     </label>
                     <label class="block text-sm">
@@ -101,7 +101,7 @@
                     </div>
                     </td>
                     <td class="px-4 py-3 text-sm">
-                    {{ bien.area }}
+                    {{ bien.area.nombre }}
                     </td>
                     <td class="px-4 py-3 text-sm">
                     {{ bien.numero_inventario }}

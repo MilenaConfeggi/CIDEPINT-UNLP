@@ -2,6 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SelectField, TextAreaField, IntegerField, ValidationError, MultipleFileField
 from wtforms.validators import DataRequired, Length, Optional, NumberRange
 import re
+from administracion.src.core.servicios import personal as servicio_personal
 
 class FormularioNuevoBien(FlaskForm):
     def validar_solo_numeros(self, field):
@@ -36,5 +37,4 @@ class FormularioNuevoBien(FlaskForm):
     
     def __init__(self, *args, **kwargs):
         super(FormularioNuevoBien, self).__init__(*args, **kwargs)
-        self.area.choices = [(area['id'], f"{area['nombre']}") for area in [{'id': 1, 'nombre' : 'Servicios'}]]
-        #self.area.choices = [(area.id, f"{area.nombre}") for area in servicio_area.listar_areas()]
+        self.area.choices = [(area.id, f"{area.nombre}") for area in servicio_personal.listar_areas()]

@@ -4,6 +4,7 @@ from administracion.src.core.servicios import archivos_admin as servicio_archivo
 from flask import Blueprint, render_template, request, redirect, url_for, flash, send_from_directory
 from administracion.src.web.forms.bien_nuevo import FormularioNuevoBien
 from administracion.src.web.forms.bien_baja import FormularioBajaBien
+from administracion.src.core.servicios import personal as servicio_personal
 
 bp = Blueprint("patrimonio",__name__,url_prefix="/patrimonio")
 
@@ -19,10 +20,12 @@ def index():
     bienes = servicio_patrimonio.filtrar_bienes(
         titulo, numero_inventario, area, baja, page, per_page
     )
+    
+    areas = servicio_personal.listar_areas()
 
     form = FormularioBajaBien()
 
-    return render_template("patrimonio/lista.html",bienes=bienes, form=form)
+    return render_template("patrimonio/lista.html",bienes=bienes, form=form, areas=areas)
 
 
 @bp.get("/<int:id_bien>")
@@ -47,13 +50,14 @@ def crear_bien():
     form = FormularioNuevoBien()
     if form.validate_on_submit():
         data = request.form
-        
+
         bien = servicio_patrimonio.crear_bien(
                 titulo=data.get('titulo'),
                 numero_inventario=data.get('numero_inventario'),
                 anio=data.get('anio'),
                 institucion=data.get('institucion'),
                 descripcion=data.get('descripcion'),
+                area=servicio_personal.conseguir_area_de_id(data.get('area')),
             )
 
         if form.archivos_adjuntos.data:
@@ -168,6 +172,7 @@ def actualizar_bien(id_bien):
                 anio=data.get('anio'),
                 institucion=data.get('institucion'),
                 descripcion=data.get('descripcion'),
+                area=servicio_personal.conseguir_area_de_id(data.get('area')),
             )
 
         flash('Bien actualizado correctamente', 'success')

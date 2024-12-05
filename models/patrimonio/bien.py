@@ -11,5 +11,5 @@ class Bien(db.Model):
     motivo_baja = db.Column(db.String(200), nullable=True)
     
     archivos = db.relationship('Archivo', back_populates='bien')
-    #id_area = db.Column(db.Integer, db.ForeignKey("areas.id"), nullable=False)
-    #area = db.relationship('Area', back_populates='bienes')
+    id_area = db.Column(db.Integer, db.ForeignKey("area.id"), nullable=False)
+    area = db.relationship('Area', back_populates='bienes')

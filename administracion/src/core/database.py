@@ -31,12 +31,16 @@ def reset():
     db.session.commit()
 
 def seed():
+    default_area = Area(nombre='Default Area', saldo=0)
+    db.session.add(default_area)
+
     bien_1 = Bien(
             titulo='Vasija',
             numero_inventario='001',
             anio=2020,
             institucion='Museo de Historia Natural',
             descripcion='Descubierta 10 anios atrás',
+            area=default_area
         )
     
     bien_2 = Bien(
@@ -45,6 +49,7 @@ def seed():
         anio=1900,
         institucion='CONICET',
         descripcion='Muy buen estado',
+        area=default_area
         )
 
     bien_3 = Bien(
@@ -53,6 +58,7 @@ def seed():
         anio=2001,
         institucion='CIDEPINT',
         descripcion='Está bien feo',
+        area=default_area
         )
     
     bien_4 = Bien(
@@ -61,6 +67,7 @@ def seed():
         anio=1980,
         institucion='Museo de Arte Moderno',
         descripcion='Escultura abstracta',
+        area=default_area
     )
 
     bien_5 = Bien(
@@ -69,6 +76,7 @@ def seed():
         anio=1750,
         institucion='Museo del Prado',
         descripcion='Pintura renacentista',
+        area=default_area
     )
 
     bien_6 = Bien(
@@ -77,6 +85,7 @@ def seed():
         anio=1600,
         institucion='Biblioteca Nacional',
         descripcion='Libro antiguo',
+        area=default_area
     )
 
     bien_7 = Bien(
@@ -85,6 +94,7 @@ def seed():
         anio=500,
         institucion='Museo Numismático',
         descripcion='Moneda de la antigua Roma',
+        area=default_area
     )
 
     bien_8 = Bien(
@@ -93,6 +103,7 @@ def seed():
         anio=1492,
         institucion='Archivo General de Indias',
         descripcion='Mapa del descubrimiento de América',
+        area=default_area
     )
 
     bien_9 = Bien(
@@ -101,6 +112,7 @@ def seed():
         anio=300,
         institucion='Museo Arqueológico',
         descripcion='Vasija de la cultura precolombina',
+        area=default_area
     )
 
     bien_10 = Bien(
@@ -109,6 +121,7 @@ def seed():
         anio=1800,
         institucion='Museo de Joyas',
         descripcion='Joya de la realeza',
+        area=default_area
     )
 
     bien_11 = Bien(
@@ -117,6 +130,7 @@ def seed():
         anio=1700,
         institucion='Museo de Música',
         descripcion='Violín antiguo',
+        area=default_area
     )
 
     bien_12 = Bien(
@@ -125,6 +139,7 @@ def seed():
         anio=1900,
         institucion='Museo del Tiempo',
         descripcion='Reloj de bolsillo',
+        area=default_area
     )
 
     bien_13 = Bien(
@@ -133,6 +148,7 @@ def seed():
         anio=1950,
         institucion='Museo de Fotografía',
         descripcion='Fotografía en blanco y negro',
+        area=default_area
     )
     fondo_1 = fondoDB(
         titulo='UNLP',
@@ -208,10 +224,6 @@ def seed():
     )
 
     db.session.add_all([carpeta_1, carpeta_2, carpeta_3, carpeta_4, carpeta_5, carpeta_6, carpeta_7, carpeta_8, carpeta_9, carpeta_10, carpeta_11, carpeta_12, carpeta_13, carpeta_14, carpeta_15, carpeta_16, carpeta_17])
-
-    
-    default_area = Area(nombre='Default Area', saldo=0)
-    db.session.add(default_area)
 
     admin_user = User(
         username='admin',

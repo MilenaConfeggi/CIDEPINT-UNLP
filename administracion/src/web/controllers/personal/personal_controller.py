@@ -32,7 +32,7 @@ def registrar_usuario():
         username = request.form['username']
         password = request.form['password']
         email = request.form['email']
-        area_id = request.form['area_id']
+        area = servicio_personal.conseguir_area_de_id(request.form['area_id'])
         dni = request.form['dni']
         nombre = request.form['nombre']
         apellido = request.form['apellido']
@@ -58,30 +58,26 @@ def registrar_usuario():
             username=username,
             password=password
         )
-        success, message = nuevo_usuario.save()
-        if success:
             # Crear empleado asociado al usuario
-            nuevo_empleado = Empleado(
-                user_id=nuevo_usuario.id,
-                email=email,
-                area_id=area_id,
-                dni=dni,
-                nombre=nombre,
-                apellido=apellido,
-                dependencia=dependencia,
-                cargo=cargo,
-                subdivision_cargo=subdivision_cargo,
-                telefono=telefono,
-                domicilio=domicilio,
-                fecha_nacimiento=fecha_nacimiento,
-                observaciones=observaciones,
-                rol=rol
-            )
-            success, message = nuevo_empleado.save()
-            if success:
-                flash('Usuario registrado con éxito', 'success')
-            else:
-                flash(message, 'error')
+        nuevo_empleado = Empleado(
+            user=nuevo_usuario,
+            email=email,
+            area=area,
+            dni=dni,
+            nombre=nombre,
+            apellido=apellido,
+            dependencia=dependencia,
+            cargo=cargo,
+            subdivision_cargo=subdivision_cargo,
+            telefono=telefono,
+            domicilio=domicilio,
+            fecha_nacimiento=fecha_nacimiento,
+            observaciones=observaciones,
+            rol=rol
+        )
+        success, message = nuevo_empleado.save()
+        if success:
+            flash('Usuario registrado con éxito', 'success')
         else:
             flash(message, 'error')
         return redirect(url_for('personal.registrar_usuario'))

@@ -5,10 +5,12 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from administracion.src.web.forms.bien_nuevo import FormularioNuevoBien
 from administracion.src.web.forms.bien_baja import FormularioBajaBien
 from administracion.src.core.servicios import personal as servicio_personal
+from administracion.src.web.controllers.roles import role_required
 
 bp = Blueprint("patrimonio",__name__,url_prefix="/patrimonio")
 
 @bp.get("/")
+@role_required('Administrador', 'Colaborador', 'Personal') 
 def index():
     titulo = request.args.get("titulo")
     numero_inventario = request.args.get("numero_inventario")
@@ -29,6 +31,7 @@ def index():
 
 
 @bp.get("/<int:id_bien>")
+@role_required('Administrador', 'Colaborador', 'Personal')
 def mostrar_bien(id_bien):
     bien = servicio_patrimonio.conseguir_bien_de_id(id_bien)
     if not bien:
@@ -40,12 +43,14 @@ def mostrar_bien(id_bien):
 
 
 @bp.get("/nuevo")
+@role_required('Administrador', 'Colaborador') 
 def nuevo_bien():
     form = FormularioNuevoBien()
 
     return render_template("patrimonio/formulario_nuevo.html", form=form)
 
 @bp.post("/nuevo")
+@role_required('Administrador', 'Colaborador') 
 def crear_bien():
     form = FormularioNuevoBien()
     if form.validate_on_submit():
@@ -75,6 +80,7 @@ def crear_bien():
 
 
 @bp.post("/dar_de_baja")
+@role_required('Administrador', 'Colaborador') 
 def dar_de_baja_bien():
     form = FormularioBajaBien(request.form)
     if form.validate_on_submit():
@@ -95,12 +101,14 @@ def dar_de_baja_bien():
 
 
 @bp.post("/restaurar")
+@role_required('Administrador', 'Colaborador') 
 def restaurar_bien():
     servicio_patrimonio.restaurar_bien(id_bien=request.form.get('id_bien'))
     flash('Bien restaurado correctamente', 'success')
     return redirect (url_for("patrimonio.index"))
 
 @bp.get("/descargar/<int:id_bien>/<int:id_archivo>")
+@role_required('Administrador', 'Colaborador', 'Personal') 
 def descargar_archivo(id_bien, id_archivo):
     directorio = servicio_patrimonio.conseguir_directorio(id_bien)
     archivo = servicio_archivos.conseguir_archivo_de_id(id_archivo)
@@ -114,6 +122,7 @@ def descargar_archivo(id_bien, id_archivo):
 
 
 @bp.post("/carpeta/subir/<int:id_bien>")
+@role_required('Administrador', 'Colaborador') 
 def subir_archivo(id_bien: int):
     
     if 'archivo' in request.files and request.files['archivo'].filename != '':
@@ -131,6 +140,7 @@ def subir_archivo(id_bien: int):
 
 
 @bp.post("/eliminar_archivo/<int:id_bien>")
+@role_required('Administrador', 'Colaborador') 
 def eliminar_archivo(id_bien):
     data = request.form
     print(f'Id del archivo: {data.get('id_archivo')}')
@@ -142,6 +152,7 @@ def eliminar_archivo(id_bien):
 
 
 @bp.get("/editar/<int:id_bien>")
+@role_required('Administrador', 'Colaborador') 
 def editar_bien(id_bien):
     bien = servicio_patrimonio.conseguir_bien_de_id(id_bien)
 
@@ -155,6 +166,7 @@ def editar_bien(id_bien):
 
 
 @bp.post("/editar/<int:id_bien>")
+@role_required('Administrador', 'Colaborador') 
 def actualizar_bien(id_bien):
     form = FormularioNuevoBien()
     if form.validate_on_submit():

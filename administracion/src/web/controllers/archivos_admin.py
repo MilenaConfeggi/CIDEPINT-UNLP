@@ -3,10 +3,12 @@ import os
 from administracion.src.core.servicios import archivos_admin as servicio_archivos
 from flask import Blueprint, render_template, request, redirect, url_for, flash, send_from_directory
 from administracion.src.web.forms.carpeta_nueva import FormularioNuevaCarpeta
+from administracion.src.web.controllers.roles import role_required
 
 bp = Blueprint("archivos",__name__,url_prefix="/archivos")
 
 @bp.get("/")
+@role_required('Administrador', 'Colaborador', 'Personal') 
 def index():
     anio_actual = datetime.now().year
     anio = request.args.get("anio", anio_actual)
@@ -18,6 +20,7 @@ def index():
 
 
 @bp.get("/carpeta/<int:id_carpeta>")
+@role_required('Administrador', 'Colaborador', 'Personal') 
 def ver_carpeta(id_carpeta):
     archivos = servicio_archivos.listar_archivos_de_carpeta(id_carpeta)
     carpeta = servicio_archivos.conseguir_carpeta_de_id(id_carpeta)
@@ -31,6 +34,7 @@ def ver_carpeta(id_carpeta):
 
 
 @bp.get("/carpeta/agregar")
+@role_required('Administrador', 'Colaborador') 
 def nueva_carpeta():
     form = FormularioNuevaCarpeta()
 
@@ -38,6 +42,7 @@ def nueva_carpeta():
 
 
 @bp.post("/carpeta/agregar")
+@role_required('Administrador', 'Colaborador')
 def agregar_carpeta():
     form = FormularioNuevaCarpeta(request.form)
     if form.validate_on_submit():
@@ -63,6 +68,7 @@ def agregar_carpeta():
 
 
 @bp.post("/carpeta/subir/<int:id_carpeta>")
+@role_required('Administrador', 'Colaborador', 'Personal')
 def subir_archivo(id_carpeta: int):
     
     if 'archivo' in request.files and request.files['archivo'].filename != '':
@@ -79,6 +85,7 @@ def subir_archivo(id_carpeta: int):
     return redirect(url_for('archivos.ver_carpeta',id_carpeta=id_carpeta))
 
 @bp.get("/descargar/<int:id_carpeta>/<int:id_archivo>")
+@role_required('Administrador', 'Colaborador', 'Personal')
 def descargar_archivo(id_carpeta, id_archivo):
     directorio = servicio_archivos.conseguir_directorio(id_carpeta)
     archivo = servicio_archivos.conseguir_archivo_de_id(id_archivo)
@@ -92,6 +99,7 @@ def descargar_archivo(id_carpeta, id_archivo):
 
 
 @bp.post("/eliminar_archivo/<int:id_carpeta>")
+@role_required('Administrador', 'Colaborador', 'Personal')
 def eliminar_archivo(id_carpeta):
     data = request.form
     print(f'Id del archivo: {data.get('id_archivo')}')
@@ -103,6 +111,7 @@ def eliminar_archivo(id_carpeta):
 
 
 @bp.post("/eliminar_carpeta")
+@role_required('Administrador', 'Colaborador') 
 def eliminar_carpeta():
     data = request.form
     print(f'Id de la carpeta: {data.get('id_carpeta')}')
@@ -114,6 +123,7 @@ def eliminar_carpeta():
 
 
 @bp.get("/carpeta/editar/<int:id_carpeta>")
+@role_required('Administrador', 'Colaborador') 
 def editar_carpeta(id_carpeta):
     carpeta = servicio_archivos.conseguir_carpeta_de_id(id_carpeta)
 
@@ -127,6 +137,7 @@ def editar_carpeta(id_carpeta):
 
 
 @bp.post("/carpeta/editar/<int:id_carpeta>")
+@role_required('Administrador', 'Colaborador') 
 def actualizar_carpeta(id_carpeta):
     form = FormularioNuevaCarpeta(request.form)
     if form.validate_on_submit():

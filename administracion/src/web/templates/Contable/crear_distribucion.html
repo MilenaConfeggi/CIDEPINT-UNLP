@@ -47,7 +47,7 @@
         </div>
         <div class="mb-4">
         <label for="ganancias_de_id" class="block text-sm font-medium text-gray-700">Área de Ganancias</label>
-        {{ form.ganancias_de_id(class='block w-full border border-gray-300 rounded py-2 px-3') }}
+        {{ form.ganancias_de_id(class='block w-full border border-gray-300 rounded py-2 px-3', id="ganancias-de-id") }}
         {% for error in form.ganancias_de_id.errors %}
             <p class="text-red-500 text-sm">{{ error }}</p>
         {% endfor %}
@@ -61,10 +61,10 @@
             {% endfor %}
         </div>
         <label for="empleados_seleccionados">Seleccionar Empleados</label>
-        <div>
+        <div id="empleados-seleccionados">
             {% for subfield in form.empleados_seleccionados %}
                 <div>
-                    <input type="checkbox" id="{{ subfield.id }}" name="{{ subfield.name }}" value="{{ subfield.data }}" {% if subfield.checked %}checked{% endif %}>
+                    <input type="checkbox" id="empleado-{{ subfield.id }}" name="{{ subfield.name }}" value="{{ subfield.data }}" {% if subfield.checked %}checked{% endif %}>
                     <label for="{{ subfield.id }}">{{ subfield.label.text }}</label>
                 </div>
             {% endfor %}
@@ -75,4 +75,27 @@
             </button>
         </div>
     </form>
+
+<script>
+    let empleadosPorArea = {{ empleados_por_area | tojson }};
+    document.addEventListener('DOMContentLoaded', function () {
+    
+    const areaSelect = document.getElementById('ganancias-de-id');
+    const empleadosCheckboxes = document.querySelectorAll('#empleados-seleccionados input[type="checkbox"]');
+    empleadosCheckboxes.forEach(checkbox => {
+        checkbox.checked = false;
+    });
+    areaSelect.addEventListener('change', function () {
+        const areaId = areaSelect.value;
+        empleadosCheckboxes.forEach(checkbox => {
+            checkbox.checked = false;
+        });
+        if (!empleadosPorArea[areaId]) return;
+
+        empleadosCheckboxes.forEach(checkbox => {
+            checkbox.checked = empleadosPorArea[areaId].includes(parseInt(checkbox.value));
+        });
+    });
+});
+</script>
 {% endblock %}

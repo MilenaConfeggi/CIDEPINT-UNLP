@@ -8,6 +8,7 @@ from administracion.src.web.forms.distribucion_nuevo import FormularioNuevaDistr
 from models import legajos as legajoDB
 from administracion.src.web.controllers.roles import role_required
 from administracion.src.core import Area as areaDB
+from administracion.src.core import Empleado as empleadoDB
 #import bd
 from models.base import db
 from models.personal.empleado import Empleado
@@ -88,7 +89,16 @@ def get_legajos():
 @bp.get("/distribuciones/crear/<int:id>")
 def get_crear_distribucion(id):
     form = FormularioNuevaDistribucion()
-    return render_template("contable/crear_distribucion.html", form = form )
+    empleados = empleadoDB.list_empleados()
+    
+    # Relación empleados-areas (simulada aquí, pero ajusta según tu base de datos)
+    empleados_por_area = {}
+    for empleado in empleados:
+        empleados_por_area.setdefault(empleado.area_id, []).append(empleado.id)
+        print(empleado.area_id)
+        print(empleado.id)
+        print("hola")
+    return render_template("contable/crear_distribucion.html", form = form,empleados_por_area=empleados_por_area, )
 
 @bp.post("/distribuciones/crear/<int:id>")
 def crear_distribucion(id):

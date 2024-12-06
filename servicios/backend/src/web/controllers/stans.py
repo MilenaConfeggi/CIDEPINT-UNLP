@@ -13,7 +13,6 @@ def listar_stans():
 @bp.post("/subir_stan")
 def cargar_stan():
     data = request.get_json()
-    print(data)
 
     if data['ensayos'] == []:
         return jsonify({"message": "No se han cargado ensayos"}), 400
@@ -33,3 +32,20 @@ def listar_ensayos():
     ensayos = servicioPresupuesto.listar_ensayos()
     data = EnsayosSchema.dump(ensayos)
     return jsonify(data), 200
+
+@bp.get("/modificar_stan/<int:id>")
+def modificar_stan(id):
+    stan = servicioPresupuesto.buscar_stan(id)
+    if stan is None:
+        return jsonify({"message": "El stan no existe"}), 400
+    data = stanSchema.dump(stan)
+    return jsonify(data), 200
+
+@bp.post("/editar_stan/<int:id>")
+def editar_stan(id):
+    data = request.get_json()
+    stan = servicioPresupuesto.buscar_stan(id)
+    if stan is None:
+        return jsonify({"message": "El stan no existe"}), 400
+    servicioPresupuesto.modificar_precio_stan(id, data)
+    return jsonify({"message": "Stan modificado correctamente"}), 200

@@ -1,13 +1,21 @@
 <template>
   <main>
     <button class="stans-button" @click="mostrarFormularioSubir">Cargar STAN</button>
-    <ListadoStans />
+    <ListadoStans @modificar-stan="mostrarFormularioModificar" />
 
     <!-- Modal de SubirStan -->
     <div v-if="mostrarSubirStan" class="modal-overlay" @click="cerrarFormularioSubir">
       <div class="modal-content" @click.stop>
         <button class="close-button" @click="cerrarFormularioSubir">&times;</button>
         <SubirStan />
+      </div>
+    </div>
+
+    <!-- Modal de ModificarStan -->
+    <div v-if="mostrarModificarStan" class="modal-overlay" @click="cerrarFormularioModificar">
+      <div class="modal-content" @click.stop>
+        <button class="close-button" @click="cerrarFormularioModificar">&times;</button>
+        <ModificarStan :id="stanId" />
       </div>
     </div>
   </main>
@@ -17,8 +25,11 @@
 import { ref } from 'vue';
 import ListadoStans from '../components/stans/ListadoStans.vue';
 import SubirStan from '../components/stans/SubirStan.vue';
+import ModificarStan from '../components/stans/ModificarStan.vue';
 
 const mostrarSubirStan = ref(false);
+const mostrarModificarStan = ref(false);
+const stanId = ref(null);
 
 const mostrarFormularioSubir = () => {
   mostrarSubirStan.value = true;
@@ -26,6 +37,15 @@ const mostrarFormularioSubir = () => {
 
 const cerrarFormularioSubir = () => {
   mostrarSubirStan.value = false;
+};
+
+const mostrarFormularioModificar = (id) => {
+  stanId.value = id;
+  mostrarModificarStan.value = true;
+};
+
+const cerrarFormularioModificar = () => {
+  mostrarModificarStan.value = false;
 };
 </script>
 
@@ -43,7 +63,6 @@ main {
   cursor: pointer;
   font-size: 16px;
   transition: background-color 0.3s ease;
-  margin-right: 10px; /* Añadir margen entre los botones */
 }
 
 .stans-button:hover {

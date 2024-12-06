@@ -5,19 +5,29 @@ from models.presupuestos.ensayo import Ensayo
 from models.presupuestos.ensayo_stan import EnsayoStan
 from models.presupuestos.presupuesto_stan import PresupuestoStan
 from models.presupuestos.presupuesto import Presupuesto
+import re
 
 
 def crear_stan(data):
     stan = STAN(
-        numero=data.get('numero'),
+        numero= "STAN " + data.get('numero'),
         precio_pesos=data.get('precio_pesos'),
         precio_dolares=data.get('precio_dolares'),
         precio_por_muestra=data.get('precio_por_muestra'),
     )
 
+    if validar_numero_stan(stan.numero) == False:
+        return None
+    
     db.session.add(stan)
     db.session.commit()
     return stan
+
+def validar_numero_stan(numero):
+    stan = STAN.query.filter_by(numero=numero).first()
+    if stan is not None:
+        return False
+    return True
 
 def crear_ensayo(nombre):
     ensayos = listar_ensayos()
@@ -42,7 +52,14 @@ def crear_ensayo_stan(ensayo_id, stan_id):
     db.session.commit()
 
 def listar_stans():
-    return STAN.query.all()
+
+    def extract_number(stan):
+        match = re.search(r'\d+', stan.numero)
+        return int(match.group()) if match else float('inf')
+
+    stans = STAN.query.all()
+    stans.sort(key=extract_number)
+    return stans
 
 def listar_ensayos():
     return Ensayo.query.all()

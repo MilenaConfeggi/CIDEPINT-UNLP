@@ -1,6 +1,6 @@
 <template>
   <main>
-    <button class="stans-button" @click="mostrarFormularioSubir">Cargar Stan</button>
+    <button class="stans-button" @click="mostrarFormularioSubir">Cargar STAN</button>
     <ListadoStans />
 
     <!-- Modal de SubirStan -->

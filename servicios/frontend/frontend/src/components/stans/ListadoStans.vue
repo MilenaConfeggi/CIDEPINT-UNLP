@@ -1,7 +1,7 @@
 <template>
     <div class="container mt-4">
       <hr class="line">
-      <h1 class="text-center mb-4">Listado de Stans</h1>
+      <h1 class="text-center mb-4">Listado de STAN</h1>
       <hr class="line">
       <table class="table table-hover table-bordered">
         <thead class="thead-dark">

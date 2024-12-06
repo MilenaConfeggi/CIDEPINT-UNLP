@@ -1,7 +1,7 @@
 <template>
     <div class="container mt-4">
       <hr class="line">
-      <h1 class="text-center mb-4">Subir Stan</h1>
+      <h1 class="text-center mb-4">Subir STAN</h1>
       <hr class="line">
       <form @submit.prevent="submitForm" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 form-container">
         <div class="mb-4">
@@ -38,6 +38,12 @@
             </div>
           </div>
         </div>
+        <div v-if="error" class="alert alert-danger mb-4" role="alert">
+          {{ error }}
+        </div>
+        <div v-if="successMessage" class="alert alert-success mb-4" role="alert">
+          {{ successMessage }}
+        </div>
         <div class="flex items-center justify-between">
           <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Subir Stan</button>
         </div>
@@ -59,6 +65,8 @@
   const ensayosExistentes = ref([]);
   const selectedEnsayos = ref([]);
   const mostrarEnsayos = ref(false);
+  const error = ref(null);
+  const successMessage = ref(null);
   
   const fetchEnsayos = async () => {
     try {
@@ -73,6 +81,9 @@
   };
   
   const submitForm = async () => {
+    error.value = null;
+    successMessage.value = null;
+  
     const ensayosArray = ensayos.value.split(',').map(ensayo => ensayo.trim()).filter(ensayo => ensayo);
     const data = {
       ...stan.value,
@@ -88,15 +99,15 @@
         body: JSON.stringify(data),
       });
   
+      const result = await response.json();
+  
       if (!response.ok) {
-        throw new Error('Error al subir el stan');
+        throw new Error(result.message || 'Error al subir el stan');
       }
   
-      const result = await response.json();
-      alert(result.message);
-    } catch (error) {
-      console.error('Error al subir el stan:', error);
-      alert('Error al subir el stan');
+      successMessage.value = result.message;
+    } catch (err) {
+      error.value = err.message;
     }
   };
   
@@ -157,5 +168,23 @@
   
   button:hover {
     background-color: #218838; 
+  }
+  
+  .alert {
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+  }
+  
+  .alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+  }
+  
+  .alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
   }
   </style>

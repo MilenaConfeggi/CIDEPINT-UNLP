@@ -14,7 +14,14 @@ def listar_stans():
 def cargar_stan():
     data = request.get_json()
     print(data)
+
+    if data['ensayos'] == []:
+        return jsonify({"message": "No se han cargado ensayos"}), 400
+    
     stan = servicioPresupuesto.crear_stan(data)
+    if stan is None:
+        return jsonify({"message": "El stan ya existe"}), 400
+    
     for ensayo in data['ensayos']:
         print(ensayo)
         ensayo = servicioPresupuesto.crear_ensayo(ensayo)

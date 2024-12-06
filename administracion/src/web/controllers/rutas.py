@@ -23,6 +23,6 @@ def registrar_rutas(app):
 
     @app.route("/home")
     def home():
-        return render_template("topicos.html")
+        return render_template("topicos.html", topico=True)
 
     return app

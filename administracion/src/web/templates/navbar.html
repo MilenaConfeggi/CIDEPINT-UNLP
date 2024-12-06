@@ -14,13 +14,15 @@
           </svg>
         </button>
       </div>
-      <div class="hidden lg:flex lg:gap-x-12">
-        <a href="{{ url_for('patrimonio.index') }}" class="text-sm/6 font-semibold text-gray-900">Patrimonio</a>
-        <a href="{{url_for('personal.index')}}" class="text-sm/6 font-semibold text-gray-900">Personal</a>
-        <a href="{{url_for('contable.index')}}" class="text-sm/6 font-semibold text-gray-900">Contable</a>
-        <a href="#" class="text-sm/6 font-semibold text-gray-900">Compras</a>
-        <a href="{{ url_for('archivos.index') }}" class="text-sm/6 font-semibold text-gray-900">Archivos</a>
-      </div>
+      {% if not topico %}
+        <div class="hidden lg:flex lg:gap-x-12">
+          <a href="{{ url_for('patrimonio.index') }}" class="text-sm/6 font-semibold text-gray-900">Patrimonio</a>
+          <a href="{{url_for('personal.index')}}" class="text-sm/6 font-semibold text-gray-900">Personal</a>
+          <a href="{{url_for('contable.index')}}" class="text-sm/6 font-semibold text-gray-900">Contable</a>
+          <a href="#" class="text-sm/6 font-semibold text-gray-900">Compras</a>
+          <a href="{{ url_for('archivos.index') }}" class="text-sm/6 font-semibold text-gray-900">Archivos</a>
+        </div>
+      {% endif %}
       <div class="hidden lg:flex lg:flex-1 lg:justify-end">
         <a href="{{ url_for('auth.logout') }}" class="text-sm/6 font-semibold text-red-500">
           Cerrar sesión

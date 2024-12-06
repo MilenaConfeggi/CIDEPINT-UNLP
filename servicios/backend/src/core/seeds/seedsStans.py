@@ -31,7 +31,7 @@ def seed_stan():
     ]
 
     for data in stan_data:
-        crear_stan(data['numero'], data['precio_pesos'], data['precio_dolares'], data['precio_por_muestra'])
+        crear_stan(data)
 
 def seed_ensayos():
     ensayos_data = [

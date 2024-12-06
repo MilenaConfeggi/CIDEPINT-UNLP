@@ -13,22 +13,25 @@ def seed_stan():
         {
             'numero': 'STAN 1',
             'precio_pesos': 1000,
-            'precio_dolares': 100
+            'precio_dolares': 100,
+            "precio_por_muestra": True
         },
         {
             'numero': 'STAN 2',
             'precio_pesos': 2000,
-            'precio_dolares': 200
+            'precio_dolares': 200,
+            "precio_por_muestra": False
         },
         {
             'numero': 'STAN 3',
             'precio_pesos': 3000,
-            'precio_dolares': 300
+            'precio_dolares': 300,
+            "precio_por_muestra": True
         }
     ]
 
     for data in stan_data:
-        crear_stan(data['numero'], data['precio_pesos'], data['precio_dolares'])
+        crear_stan(data['numero'], data['precio_pesos'], data['precio_dolares'], data['precio_por_muestra'])
 
 def seed_ensayos():
     ensayos_data = [

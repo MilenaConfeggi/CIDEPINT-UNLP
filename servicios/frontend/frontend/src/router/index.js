@@ -33,6 +33,12 @@ const router = createRouter({
       name: "informes",
       component: () => import("../views/InformesView.vue"),
       props: true,
+    },
+    {
+      path: "/stans",
+      name: "stans",
+      component: () => import("../views/StansView.vue"),
+      props: true,
     }
   ],
 })

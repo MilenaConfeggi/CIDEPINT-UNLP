@@ -7,11 +7,12 @@ from models.presupuestos.presupuesto_stan import PresupuestoStan
 from models.presupuestos.presupuesto import Presupuesto
 
 
-def crear_stan(numero, precio_pesos, precio_dolares):
+def crear_stan(numero, precio_pesos, precio_dolares, precio_por_muestra):
     stan = STAN(
         numero=numero,
         precio_pesos=precio_pesos,
-        precio_dolares=precio_dolares
+        precio_dolares=precio_dolares,
+        precio_por_muestra=precio_por_muestra
     )
 
     db.session.add(stan)
@@ -33,3 +34,10 @@ def crear_ensayo_stan(ensayo_id, stan_id):
 
     db.session.add(ensayo_stan)
     db.session.commit()
+
+def listar_stans():
+    return STAN.query.all()
+
+def listar_ensayos_para_stan(id_stan):
+    ensayos = db.session.query(Ensayo).join(EnsayoStan).filter(EnsayoStan.stan_id == id_stan).all()
+    return ensayos

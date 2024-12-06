@@ -4,6 +4,7 @@ from servicios.backend.src.core.seeds import seedsMuestra
 from servicios.backend.src.core.seeds import seedsMails
 from servicios.backend.src.core.seeds import seedsInforme
 from servicios.backend.src.core.seeds import seedsUsuario
+from servicios.backend.src.core.seeds import seedsStans
 from models import db
 from servicios.backend.src.web.controllers.mails import bp as mails_bp
 from servicios.backend.src.web.controllers.muestras import bp as muestras_bp
@@ -58,6 +59,8 @@ def create_app(env="development", static_folder=""):
         print("Mails creados!")
         seedsInforme.seeds_informe()
         print("Documentos creados!")
+        seedsStans.seed_stans()
+        print("Stans y ensayos creados!")
         seedsUsuario.seeds_usuarios()
         print("Usuarios creados!")
 

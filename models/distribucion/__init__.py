@@ -4,10 +4,10 @@ from models.distribucion.distribucion import Distribucion
 
 def create_distribucion(**kwargs):
     # Comprobamos si ya existe una distribución con el mismo id (puedes ajustar la condición según sea necesario)
-
-    db.session.add(Distribucion(**kwargs))
+    dist = Distribucion(**kwargs)
+    db.session.add(dist)
     db.session.commit()
-    return True
+    return dist
 
 
 def get_distribucion(id):

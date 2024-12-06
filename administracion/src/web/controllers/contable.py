@@ -6,9 +6,17 @@ from administracion.src.web.forms.fondo_nuevo import FormularioNuevoFondo
 from administracion.src.web.forms.ingreso_nuevo import FormularioNuevoIngreso
 from administracion.src.web.forms.distribucion_nuevo import FormularioNuevaDistribucion
 from models import legajos as legajoDB
+from administracion.src.web.controllers.roles import role_required
+from administracion.src.core import Area as areaDB
+from administracion.src.core import Empleado as empleadoDB
+#import bd
+from models.base import db
+from models.personal.empleado import Empleado
+from models.empleado_distribucion.empleado_distribucion import Empleado_Distribucion
 bp = Blueprint("contable",__name__,url_prefix="/contable")
 
 @bp.get("/")
+@role_required('Administrador', 'Colaborador')
 def index():
     return render_template("contable/home.html")
 @bp.get("/fondo")
@@ -81,7 +89,16 @@ def get_legajos():
 @bp.get("/distribuciones/crear/<int:id>")
 def get_crear_distribucion(id):
     form = FormularioNuevaDistribucion()
-    return render_template("contable/crear_distribucion.html", form = form)
+    empleados = empleadoDB.list_empleados()
+    
+    # Relación empleados-areas (simulada aquí, pero ajusta según tu base de datos)
+    empleados_por_area = {}
+    for empleado in empleados:
+        empleados_por_area.setdefault(empleado.area_id, []).append(empleado.id)
+        print(empleado.area_id)
+        print(empleado.id)
+        print("hola")
+    return render_template("contable/crear_distribucion.html", form = form,empleados_por_area=empleados_por_area, )
 
 @bp.post("/distribuciones/crear/<int:id>")
 def crear_distribucion(id):
@@ -89,10 +106,38 @@ def crear_distribucion(id):
     if form.validate_on_submit():
         data = request.form.to_dict()
         #Validaciones
-        print(data)
         csrf_token = data.pop("csrf_token", None)
         data["legajo_id"] = id
-        distribucionDB.create_distribucion(**data)
+        emp = data.pop("empleados_seleccionados", None)
+        #Crea la distribucion
+        nueva_distribucion = distribucionDB.create_distribucion(**data)
+        #Sumo lo indicado al saldo de las areas
+        area_ganancias = int(data["ganancias_de_id"])
+        area_costos = int(data["costos_de_id"])
+        porcentaje_area = float(data["porcentaje_area"]) * 0.01
+        porcentaje_empleados = float(data["porcentaje_empleados"])* 0.01
+        porcentaje_comisiones = float(data["porcentaje_comisiones"])* 0.01
+        monto_a_distribuir = float(data["monto_a_distribuir"])
+        costos = float(data["costos"])
+        areaDB.sumar_saldo_area(area_costos, costos)
+        monto_modificado = (monto_a_distribuir * (1 - porcentaje_comisiones))-costos
+        areaDB.sumar_saldo_area(area_ganancias, (monto_modificado * porcentaje_area)*(1-porcentaje_empleados))
+        monto_empleado = (monto_modificado * porcentaje_area)*(porcentaje_empleados) / len(emp)
+        # Relacion con los empleados
+        empleados_ids = form.empleados_seleccionados.data
+        for empleado_id in empleados_ids:
+            empleado = db.session.query(Empleado).get(empleado_id) 
+            if empleado:
+                empleado.saldo += monto_empleado
+                empleado_distribucion = Empleado_Distribucion(
+                    empleado_id=empleado.id,
+                    distribucion_id=nueva_distribucion.id
+                )
+                db.session.add(empleado_distribucion)
+
+                db.session.commit()
+        #areaDB.sumar_saldo_area(1, monto_modificado * (1 - porcentaje_area)) Sumar a cidepint
+        #Redirige a la lista de distribuciones
         flash("Distribución creada correctamente","success")
         return redirect(url_for("contable.get_legajos"))
     else:

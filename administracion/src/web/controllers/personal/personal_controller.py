@@ -80,7 +80,7 @@ def registrar_usuario():
             flash('Usuario registrado con éxito', 'success')
         else:
             flash(message, 'error')
-        return redirect(url_for('personal.registrar_usuario'))
+        return redirect(url_for('personal.ver_empleados'))
     
     # Recuperar las áreas de la base de datos
     areas = Area.query.all()

@@ -26,7 +26,7 @@ def registrar_ausencia():
         )
         nueva_ausencia.save()
         flash('Ausencia registrada con éxito', 'success')
-        return redirect(url_for('ausencia.registrar_ausencia'))
+        return redirect(url_for('ausencia.ver_calendario'))
     
     empleados = Empleado.query.all()
     return render_template('personal/registrar_ausencia.html', empleados=empleados)
@@ -37,23 +37,29 @@ def ver_calendario():
     # Obtener el mes y año actuales
     hoy = datetime.today()
     mes = request.args.get('mes', hoy.month, type=int)
-    año = request.args.get('año', hoy.year, type=int)
+    anio = request.args.get('anio', hoy.year, type=int)
     
     # Calcular el primer y último día del mes
-    primer_dia = datetime(año, mes, 1)
-    if mes == 12:
-        ultimo_dia = datetime(año + 1, 1, 1) - timedelta(days=1)
-    else:
-        ultimo_dia = datetime(año, mes + 1, 1) - timedelta(days=1)
+    primer_dia = datetime(anio, mes, 1)
+
+    # Calcula el primer día de la semana
+    dia_empezar = primer_dia - timedelta(days=primer_dia.weekday())
+
+    # Calcula el último día del mes
+    mes_siguiente = (primer_dia.replace(day=28) + timedelta(days=4)).replace(day=1)
+    ultimo_dia = mes_siguiente - timedelta(days=1)
+
+    # Genera todos los días del mes
+    dias = []
+    dia_actual = dia_empezar
+    while dia_actual <= ultimo_dia:
+        dias.append(dia_actual)
+        dia_actual += timedelta(days=1)
     
-    # Obtener la fecha actual
-    fecha_actual = hoy.date()
-    
-    # Obtener las ausencias del mes, ordenadas por fecha de inicio y cuya fecha_hasta no haya pasado de la fecha actual
+    # Obtener las ausencias del mes, ordenadas por fecha de inicio
     ausencias = Ausencia.query.filter(
         Ausencia.fecha_desde <= ultimo_dia,
         Ausencia.fecha_hasta >= primer_dia,
-        Ausencia.fecha_hasta >= fecha_actual
     ).order_by(Ausencia.fecha_desde).all()
     
-    return render_template('personal/ver_calendario.html', ausencias=ausencias, mes=mes, año=año)
+    return render_template('personal/ver_calendario_real.html', ausencias=ausencias, dias=dias, primer_dia=primer_dia, ultimo_dia=ultimo_dia, mes=mes, anio=anio)

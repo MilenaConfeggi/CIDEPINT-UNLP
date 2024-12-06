@@ -1,7 +1,7 @@
 from flask import flash, redirect, render_template, request, send_file, url_for, Blueprint, session
 from models.personal.personal import User
 from models.personal.area import Area
-from models.personal.archivo import Archivo
+from administracion.src.core.servicios import personal as servicio_personal
 from io import BytesIO
 from werkzeug.utils import secure_filename
 import os
@@ -13,6 +13,9 @@ from sqlalchemy.types import String
 import pandas as pd
 from administracion.src.web.controllers.roles import role_required
 from flask_login import current_user
+from models.personal.personal import User
+from models.personal.empleado import Empleado
+
 
 personal_bp = Blueprint("personal", __name__, url_prefix="/personal")
 
@@ -29,21 +32,23 @@ def registrar_usuario():
         username = request.form['username']
         password = request.form['password']
         email = request.form['email']
-        area_id = request.form['area_id']
+        area = servicio_personal.conseguir_area_de_id(request.form['area_id'])
         dni = request.form['dni']
         nombre = request.form['nombre']
         apellido = request.form['apellido']
-        dependencia = request.form['dependencia']
-        cargo = request.form['cargo']
-        subdivision_cargo = request.form['subdivision_cargo']
-        telefono = request.form.get('telefono')
-        domicilio = request.form.get('domicilio')
-        fecha_nacimiento = request.form.get('fecha_nacimiento')
-        observaciones = request.form.get('observaciones')
+        dependencia = request.form.get('dependencia') or None
+        cargo = request.form.get('cargo') or None
+        subdivision_cargo = request.form.get('subdivision_cargo') or None
+        telefono = request.form.get('telefono') or None
+        domicilio = request.form.get('domicilio') or None
+        fecha_nacimiento = request.form.get('fecha_nacimiento') or None
+        observaciones = request.form.get('observaciones') or None
         rol = request.form['rol']
         
         # Verificar si el usuario ya existe
-        existing_user = User.query.filter(or_(User.username == username, User.email == email)).first()
+        existing_user = User.query.join(Empleado).filter(
+            or_(User.username == username, Empleado.email == email)
+        ).first()
         if existing_user:
             flash('El usuario, correo electrónico o DNI ya existe', 'error')
             return redirect(url_for('personal.registrar_usuario'))
@@ -53,30 +58,26 @@ def registrar_usuario():
             username=username,
             password=password
         )
-        success, message = nuevo_usuario.save()
-        if success:
             # Crear empleado asociado al usuario
-            nuevo_empleado = Empleado(
-                user_id=nuevo_usuario.id,
-                email=email,
-                area_id=area_id,
-                dni=dni,
-                nombre=nombre,
-                apellido=apellido,
-                dependencia=dependencia,
-                cargo=cargo,
-                subdivision_cargo=subdivision_cargo,
-                telefono=telefono,
-                domicilio=domicilio,
-                fecha_nacimiento=fecha_nacimiento,
-                observaciones=observaciones,
-                rol=rol
-            )
-            success, message = nuevo_empleado.save()
-            if success:
-                flash('Usuario registrado con éxito', 'success')
-            else:
-                flash(message, 'error')
+        nuevo_empleado = Empleado(
+            user=nuevo_usuario,
+            email=email,
+            area=area,
+            dni=dni,
+            nombre=nombre,
+            apellido=apellido,
+            dependencia=dependencia,
+            cargo=cargo,
+            subdivision_cargo=subdivision_cargo,
+            telefono=telefono,
+            domicilio=domicilio,
+            fecha_nacimiento=fecha_nacimiento,
+            observaciones=observaciones,
+            rol=rol
+        )
+        success, message = nuevo_empleado.save()
+        if success:
+            flash('Usuario registrado con éxito', 'success')
         else:
             flash(message, 'error')
         return redirect(url_for('personal.registrar_usuario'))
@@ -100,9 +101,9 @@ def registrar_usuario():
         {'name': 'dni', 'label': 'DNI', 'type': 'text', 'required': True},
         {'name': 'nombre', 'label': 'Nombre', 'type': 'text', 'required': True},
         {'name': 'apellido', 'label': 'Apellido', 'type': 'text', 'required': True},
-        {'name': 'dependencia', 'label': 'Dependencia', 'type': 'select', 'required': True, 'options': ['UNLP', 'CIC', 'CONICET']},
-        {'name': 'cargo', 'label': 'Cargo', 'type': 'select', 'required': True, 'options': ['Investigador', 'CPA', 'Administrativo', 'Técnico']},
-        {'name': 'subdivision_cargo', 'label': 'Subdivisión del Cargo', 'type': 'select', 'required': True, 'options': {
+        {'name': 'dependencia', 'label': 'Dependencia', 'type': 'select', 'required': False, 'options': ['UNLP', 'CIC', 'CONICET']},
+        {'name': 'cargo', 'label': 'Cargo', 'type': 'select', 'required': False, 'options': ['Investigador', 'CPA', 'Administrativo', 'Técnico']},
+        {'name': 'subdivision_cargo', 'label': 'Subdivisión del Cargo', 'type': 'select', 'required': False, 'options': {
             'Investigador': ['Asistente', 'Adjunto', 'Independiente', 'Principal', 'Superior'],
             'CPA': ['Profesional Principal', 'Profesional Adjunto', 'Profesional Asistente'],
             'Técnico': ['Profesional', 'Asociado', 'Asistente', 'Auxiliar'],
@@ -132,7 +133,7 @@ def ver_empleados():
             Empleado.nombre.ilike(f'%{busqueda}%'),
             Empleado.apellido.ilike(f'%{busqueda}%'),
             cast(Empleado.dni, String).ilike(f'%{busqueda}%'),
-            cast(Empleado.area, String).ilike(f'%{busqueda}%'),
+            cast(Empleado.area_id, String).ilike(f'%{busqueda}%'),
             cast(Empleado.dependencia, String).ilike(f'%{busqueda}%'),
             cast(Empleado.cargo, String).ilike(f'%{busqueda}%')
         ))
@@ -213,12 +214,6 @@ def descargar_empleados():
     
     return redirect(url_for('personal.ver_empleados'))
 
-UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'uploads')
-ALLOWED_EXTENSIONS = {'pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'}
-
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
 @personal_bp.route('/perfil/<int:id>', methods=['GET', 'POST'])
 @role_required('Administrador', 'Colaborador', 'Personal') 
 def ver_perfil(id):
@@ -230,56 +225,64 @@ def ver_perfil(id):
         return redirect(url_for('personal.ver_perfil', id=current_user.id))
     
     if request.method == 'POST':
-        if 'archivo' in request.files:
-            archivo = request.files['archivo']
-            tipo = request.form.get('tipo')
-            if not tipo:
-                flash('Debe indicar el tipo de archivo', 'error')
+        form_type = request.form.get('form_type')
+        
+        if form_type == 'upload_file':
+            if 'archivo' in request.files:
+                archivo = request.files['archivo']
+                if archivo:
+                    servicio_personal.guardar_archivo(user.empleado.id, archivo, tipo=request.form.get('tipo'))
+                    flash('Archivo subido con éxito', 'success')
+                    return redirect(url_for('personal.ver_perfil', id=user.id))
+        
+        elif form_type == 'update_profile':
+            # Validar campos obligatorios
+            username = request.form.get('username')
+            email = request.form.get('email')
+            nombre = request.form.get('nombre')
+            apellido = request.form.get('apellido')
+            dni = request.form.get('dni')
+            
+            if not username or not email or not nombre or not apellido or not dni:
+                flash('Todos los campos obligatorios deben ser completados.', 'error')
                 return redirect(url_for('personal.ver_perfil', id=user.id))
-            if archivo and allowed_file(archivo.filename):
-                filename = secure_filename(archivo.filename)
-                ruta = os.path.join(UPLOAD_FOLDER, filename)
-                archivo.save(ruta)
-                
-                nuevo_archivo = Archivo(
-                    empleado_id=user.empleado.id,
-                    nombre=filename,
-                    tipo=tipo,
-                    ruta=ruta
-                )
-                nuevo_archivo.save()
-                flash('Archivo subido con éxito', 'success')
-                return redirect(url_for('personal.ver_perfil', id=user.id))
-        
-        user.username = request.form.get('username')
-        user.email = request.form.get('email')
-        user.empleado.nombre = request.form.get('nombre')
-        user.empleado.apellido = request.form.get('apellido')
-        user.empleado.dni = request.form.get('dni')
-        user.empleado.dependencia = request.form.get('dependencia')
-        user.empleado.cargo = request.form.get('cargo')
-        user.empleado.fecha_nacimiento = request.form.get('fecha_nacimiento')
-        user.empleado.telefono = request.form.get('telefono')
-        user.empleado.domicilio = request.form.get('domicilio')
-        user.empleado.observaciones = request.form.get('observaciones')
-        
-        # Solo permitir modificar el área si el usuario no es 'Personal'
-        if current_user.empleado.rol != 'Personal':
-            user.empleado.area_id = request.form.get('area_id')
-        
-        if request.form.get('password'):
-            user.set_password(request.form.get('password'))
-        
-        success, message = user.update()
-        if success:
-            flash('Perfil actualizado con éxito', 'success')
-        else:
-            flash(message, 'error')
-        return redirect(url_for('personal.ver_perfil', id=user.id))
+            
+            user.username = username
+            user.empleado.email = email
+            user.empleado.nombre = nombre
+            user.empleado.apellido = apellido
+            user.empleado.dni = dni
+            user.empleado.dependencia = request.form.get('dependencia')
+            user.empleado.cargo = request.form.get('cargo')
+            user.empleado.fecha_nacimiento = request.form.get('fecha_nacimiento') or None
+            user.empleado.telefono = request.form.get('telefono') or None
+            user.empleado.domicilio = request.form.get('domicilio') or None
+            user.empleado.observaciones = request.form.get('observaciones') or None
+            
+            # Solo permitir modificar el área si el usuario es 'Administrador'
+            if current_user.empleado.rol == 'Administrador':
+                area_nombre = request.form.get('area_id')
+                area = Area.query.filter_by(nombre=area_nombre).first()
+                if area:
+                    user.empleado.area_id = area.id
+                else:
+                    flash('Área no encontrada', 'error')
+                    return redirect(url_for('personal.ver_perfil', id=user.id))
+            
+            # Permitir modificar la contraseña solo si el usuario actual es el dueño del perfil
+            if current_user.id == user.id and request.form.get('password'):
+                user.set_password(request.form.get('password'))
+            
+            success, message = user.update()
+            if success:
+                flash('Perfil actualizado con éxito', 'success')
+            else:
+                flash(message, 'error')
+            return redirect(url_for('personal.ver_perfil', id=user.id))
     
     area = Area.query.filter_by(id=user.empleado.area_id).first()
     saldo_area = area.saldo if area else 'N/A'
-    archivos = Archivo.query.filter_by(empleado_id=user.empleado.id).all()
+    archivos = servicio_personal.conseguir_archivos_de_empleado(user.empleado.id)
     
     # Obtener la lista de áreas y otros valores necesarios para los select options
     areas = Area.query.all()
@@ -293,19 +296,19 @@ def ver_perfil(id):
     }
     
     campos = [
-        {'name': 'username', 'label': 'Nombre de Usuario', 'type': 'text', 'value': user.username},
-        {'name': 'email', 'label': 'Correo Electrónico', 'type': 'email', 'value': user.empleado.email},
-        {'name': 'nombre', 'label': 'Nombre', 'type': 'text', 'value': user.empleado.nombre},
-        {'name': 'apellido', 'label': 'Apellido', 'type': 'text', 'value': user.empleado.apellido},
-        {'name': 'dni', 'label': 'DNI', 'type': 'text', 'value': user.empleado.dni},
-        {'name': 'area_id', 'label': 'Área', 'type': 'select', 'value': user.empleado.area_id, 'options': [(area.id, area.nombre) for area in areas], 'disabled': current_user.empleado.rol == 'Personal'},
-        {'name': 'dependencia', 'label': 'Dependencia', 'type': 'select', 'value': user.empleado.dependencia, 'options': dependencias},
-        {'name': 'cargo', 'label': 'Cargo', 'type': 'select', 'value': user.empleado.cargo, 'options': cargos},
-        {'name': 'subdivision_cargo', 'label': 'Subdivisión del Cargo', 'type': 'select', 'value': user.empleado.subdivision_cargo, 'options': subdivisiones_cargo.get(user.empleado.cargo, [])},
-        {'name': 'fecha_nacimiento', 'label': 'Fecha de Nacimiento', 'type': 'date', 'value': user.empleado.fecha_nacimiento},
-        {'name': 'telefono', 'label': 'Teléfono', 'type': 'text', 'value': user.empleado.telefono},
-        {'name': 'domicilio', 'label': 'Domicilio', 'type': 'text', 'value': user.empleado.domicilio},
-        {'name': 'observaciones', 'label': 'Observaciones', 'type': 'textarea', 'value': user.empleado.observaciones},
+        {'name': 'username', 'label': 'Nombre de Usuario', 'type': 'text', 'value': user.username or ''},
+        {'name': 'email', 'label': 'Correo Electrónico', 'type': 'email', 'value': user.empleado.email or ''},
+        {'name': 'nombre', 'label': 'Nombre', 'type': 'text', 'value': user.empleado.nombre or ''},
+        {'name': 'apellido', 'label': 'Apellido', 'type': 'text', 'value': user.empleado.apellido or ''},
+        {'name': 'dni', 'label': 'DNI', 'type': 'text', 'value': user.empleado.dni or ''},
+        {'name': 'area_id', 'label': 'Área', 'type': 'select', 'value': user.empleado.area_id or '', 'options': [area.nombre for area in areas], 'disabled': current_user.empleado.rol != 'Administrador'},
+        {'name': 'dependencia', 'label': 'Dependencia', 'type': 'select', 'value': user.empleado.dependencia or '', 'options': dependencias},
+        {'name': 'cargo', 'label': 'Cargo', 'type': 'select', 'value': user.empleado.cargo or '', 'options': cargos},
+        {'name': 'subdivision_cargo', 'label': 'Subdivisión del Cargo', 'type': 'select', 'value': user.empleado.subdivision_cargo or '', 'options': subdivisiones_cargo.get(user.empleado.cargo, [])},
+        {'name': 'fecha_nacimiento', 'label': 'Fecha de Nacimiento', 'type': 'date', 'value': user.empleado.fecha_nacimiento or ''},
+        {'name': 'telefono', 'label': 'Teléfono', 'type': 'text', 'value': user.empleado.telefono or ''},
+        {'name': 'domicilio', 'label': 'Domicilio', 'type': 'text', 'value': user.empleado.domicilio or ''},
+        {'name': 'observaciones', 'label': 'Observaciones', 'type': 'textarea', 'value': user.empleado.observaciones or ''},
     ]
     
     return render_template('personal/ver_perfil.html', user=user, saldo_area=saldo_area, archivos=archivos, campos=campos)
@@ -313,11 +316,9 @@ def ver_perfil(id):
 @personal_bp.route('/archivo/eliminar/<int:id>', methods=['POST'])
 @role_required('Administrador', 'Colaborador', 'Personal') 
 def eliminar_archivo(id):
-    archivo = Archivo.query.get_or_404(id)
-    archivo.delete()
-    os.remove(archivo.ruta)
+    servicio_personal.eliminar_archivo(id)
     flash('Archivo eliminado con éxito', 'success')
-    return redirect(url_for('personal.ver_perfil', id=archivo.empleado_id))
+    return redirect(url_for('personal.ver_perfil', id=current_user.id))
 
 @personal_bp.route('/archivo/descargar/<int:id>', methods=['GET'])
 @role_required('Administrador', 'Colaborador', 'Personal') 

@@ -3,7 +3,6 @@
     Pagina de Creacion de Fondo
 {% endblock %}
 {% block content %}
-    <a href="{{ url_for('contable.index') }}">Volver</a>
 
     <form class="px-4" method="POST" action="{{ url_for('contable.crear_fondo') }}">
         {{ form.hidden_tag() }}

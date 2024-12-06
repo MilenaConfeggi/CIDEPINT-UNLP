@@ -47,7 +47,7 @@
                     
                         <ul>
                         {% for empleado in distribucion.empleados_asociados %}
-                            <li>{{ empleado.empleado.saldo }}</li>
+                            <li>{{ empleado.empleado.nombre }} {{ empleado.empleado.apellido }}</li>
                         {% endfor %}
                         </ul>
                     {% else %}

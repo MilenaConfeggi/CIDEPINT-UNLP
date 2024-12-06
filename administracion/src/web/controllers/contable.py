@@ -95,9 +95,6 @@ def get_crear_distribucion(id):
     empleados_por_area = {}
     for empleado in empleados:
         empleados_por_area.setdefault(empleado.area_id, []).append(empleado.id)
-        print(empleado.area_id)
-        print(empleado.id)
-        print("hola")
     return render_template("contable/crear_distribucion.html", form = form,empleados_por_area=empleados_por_area, )
 
 @bp.post("/distribuciones/crear/<int:id>")
@@ -122,9 +119,9 @@ def crear_distribucion(id):
         areaDB.sumar_saldo_area(area_costos, costos)
         monto_modificado = (monto_a_distribuir * (1 - porcentaje_comisiones))-costos
         areaDB.sumar_saldo_area(area_ganancias, (monto_modificado * porcentaje_area)*(1-porcentaje_empleados))
-        monto_empleado = (monto_modificado * porcentaje_area)*(porcentaje_empleados) / len(emp)
         # Relacion con los empleados
         empleados_ids = form.empleados_seleccionados.data
+        monto_empleado = ((monto_modificado * porcentaje_area)*(porcentaje_empleados)) / len(empleados_ids)
         for empleado_id in empleados_ids:
             empleado = db.session.query(Empleado).get(empleado_id) 
             if empleado:

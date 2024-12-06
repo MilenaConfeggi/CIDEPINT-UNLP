@@ -39,7 +39,7 @@ const router = createRouter({
       name: "stans",
       component: () => import("../views/StansView.vue"),
       props: true,
-    }
+    },
   ],
 })
 

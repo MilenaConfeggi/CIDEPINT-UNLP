@@ -7,6 +7,8 @@ from models.presupuestos.presupuesto_stan import PresupuestoStan
 from models.presupuestos.presupuesto import Presupuesto
 import re
 
+def buscar_stan(id):
+    return STAN.query.get(id)
 
 def crear_stan(data):
     stan = STAN(
@@ -67,3 +69,9 @@ def listar_ensayos():
 def listar_ensayos_para_stan(id_stan):
     ensayos = db.session.query(Ensayo).join(EnsayoStan).filter(EnsayoStan.stan_id == id_stan).all()
     return ensayos
+
+def modificar_precio_stan(id_stan, data):
+    stan = STAN.query.get(id_stan)
+    stan.precio_pesos = data.get('precio_pesos')
+    stan.precio_dolares = data.get('precio_dolares')
+    db.session.commit()

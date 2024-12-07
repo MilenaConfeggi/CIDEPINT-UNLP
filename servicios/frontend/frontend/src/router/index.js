@@ -39,6 +39,11 @@ const router = createRouter({
       name: "stans",
       component: () => import("../views/StansView.vue"),
       props: true,
+    },
+    {
+      path: "/interareas",
+      name: "interareas",
+      component: () => import("../views/InterareasView.vue"),
     }
   ],
 })

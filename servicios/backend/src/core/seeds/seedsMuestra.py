@@ -34,8 +34,11 @@ def seed_muestras():
         }
     ]
 
+    muestras_creadas = []
     for data in muestras_data:
-        crear_muestra(data, data['legajo_id'])
+        muestra = crear_muestra(data, data['legajo_id'])
+        muestras_creadas.append(muestra)
+    return muestras_creadas
 
 def seed_fotos():
     fotos_data = [

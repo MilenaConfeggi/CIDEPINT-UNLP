@@ -5,6 +5,7 @@ from servicios.backend.src.core.seeds import seedsMails
 from servicios.backend.src.core.seeds import seedsInforme
 from servicios.backend.src.core.seeds import seedsUsuario
 from servicios.backend.src.core.seeds import seedsStans
+from servicios.backend.src.core.seeds import seedsInterarea
 from models import db
 from servicios.backend.src.web.controllers.mails import bp as mails_bp
 from servicios.backend.src.web.controllers.muestras import bp as muestras_bp
@@ -12,6 +13,7 @@ from servicios.backend.src.web.controllers.informes import bp as informes_bp
 from servicios.backend.src.web.controllers.usuarios import bp as usuarios_bp
 from servicios.backend.src.web.controllers.auth import bp as auth_bp
 from servicios.backend.src.web.controllers.stans import bp as stans_bp
+from servicios.backend.src.web.controllers.interarea import bp as interarea_bp
 from flask_cors import CORS
 from flask_session import Session
 from flask_bcrypt import Bcrypt
@@ -38,6 +40,7 @@ def create_app(env="development", static_folder=""):
     app.register_blueprint(usuarios_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(stans_bp)
+    app.register_blueprint(interarea_bp)
 
     @app.cli.command(name="reset-db")
     def reset_db():
@@ -63,8 +66,10 @@ def create_app(env="development", static_folder=""):
         print("Documentos creados!")
         seedsStans.seed_stans()
         print("Stans y ensayos creados!")
-        seedsUsuario.seeds_usuarios()
-        print("Usuarios creados!")
+        seedsInterarea.seeds_interarea()
+        print("Interareas creadas!")
+        #seedsUsuario.seeds_usuarios()
+        #print("Usuarios creados!")
 
     return app
     

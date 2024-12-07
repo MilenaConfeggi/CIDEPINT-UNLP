@@ -4,6 +4,8 @@ from models.usuarios.rol import Rol
 from models.base import db
 from web import bcrypt
 
+"""
+
 def seeds_usuarios():
     seed_usuarios()
 
@@ -29,3 +31,5 @@ def seed_usuarios():
     db.session.add(usuario2)
     db.session.add(usuario3)
     db.session.commit()
+
+"""

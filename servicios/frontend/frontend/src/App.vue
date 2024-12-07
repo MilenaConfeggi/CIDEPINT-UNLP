@@ -12,6 +12,7 @@ import { RouterLink, RouterView } from 'vue-router'
         <RouterLink to="/muestras/1">Muestras</RouterLink> 
         <RouterLink to="/informes/1">Informes</RouterLink>
         <RouterLink to="/stans">Stans</RouterLink>
+        <RouterLink to="/interareas">Interareas</RouterLink>
       </div>
     </nav>
     <main>

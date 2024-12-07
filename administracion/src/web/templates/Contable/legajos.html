@@ -49,7 +49,13 @@ Crear un nuevo Fondo</a>
                     Orden de compra PDF
                 </td>
                 <td class="px-4 py-3 text-sm">
-                    Orden de facturación PDF
+                    <form method="POST" enctype="multipart/form-data" action="{{ url_for('contable.upload') }}">
+                        {{ forms[legajo.id].hidden_tag() }}
+                        <div class="flex items-center gap-2">
+                            {{ forms[legajo.id].file(class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border file:border-gray-300 file:text-sm file:font-semibold file:bg-white file:text-gray-700 hover:file:bg-gray-100") }}
+                            {{ forms[legajo.id].submit(class="bg-blue-600 text-white text-sm px-4 py-2 rounded hover:bg-blue-500") }}
+                        </div>
+                    </form>
                 </td>
                 <td class="px-4 py-3 text-sm">
                     Factura PDF

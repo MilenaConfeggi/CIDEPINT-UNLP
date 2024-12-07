@@ -110,7 +110,10 @@
       item.addEventListener('contextmenu', (event) => {
         event.preventDefault(); // Evita el menú contextual predeterminado
   
-        const { clientX: mouseX, clientY: mouseY } = event;
+        const { clientX: clientX, clientY: clientY } = event;
+        
+        const mouseX = clientX + window.pageXOffset;
+        const mouseY = clientY + window.pageYOffset;
         
         // Ajustar posición del menú
         contextMenu.style.top = `${mouseY}px`;

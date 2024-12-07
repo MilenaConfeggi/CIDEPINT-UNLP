@@ -2,7 +2,7 @@ from flask import flash, redirect, render_template, request, url_for, Blueprint,
 from models.personal.ausencia import Ausencia
 from models.personal.personal import User
 from models.personal.empleado import Empleado
-
+from administracion.src.core.servicios import personal as servicio_personal
 from datetime import datetime, timedelta
 from administracion.src.web.controllers.roles import role_required  # Importa el decorador
 
@@ -62,4 +62,15 @@ def ver_calendario():
         Ausencia.fecha_hasta >= primer_dia,
     ).order_by(Ausencia.fecha_desde).all()
     
-    return render_template('personal/ver_calendario_real.html', ausencias=ausencias, dias=dias, primer_dia=primer_dia, ultimo_dia=ultimo_dia, mes=mes, anio=anio)
+    return render_template('personal/ver_calendario.html', ausencias=ausencias, dias=dias, primer_dia=primer_dia, ultimo_dia=ultimo_dia, mes=mes, anio=anio)
+
+@ausencia_bp.post('/eliminar')
+@role_required('Administrador', 'Colaborador')
+def eliminar_ausencia():
+    id_ausencia = request.form['id_ausencia']
+    
+    if servicio_personal.eliminar_ausencia(id_ausencia=id_ausencia):
+        flash('Ausencia eliminada correctamente', 'success')
+    else:
+        flash('Error al eliminar la ausencia', 'error')
+    return redirect(url_for('ausencia.ver_calendario'))

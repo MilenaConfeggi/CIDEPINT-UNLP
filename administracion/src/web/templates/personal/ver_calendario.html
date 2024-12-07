@@ -3,7 +3,7 @@
     Calendario de Ausencias
 {% endblock %}
 {% block content %}
-    <div class="container mx-auto mt-10">
+    <div class="container mx-auto px-4 pb-4">
         <div id="context-menu" class="hidden">
             <ul>
                 <li class="flex flex-wrap" id="eliminar">
@@ -40,7 +40,15 @@
                   </div>
               </div>
           </form>
-    <div class="wrapper bg-white rounded shadow w-full overflow-x-auto">
+          <a href="{{url_for('personal.index')}}"
+            class="inline-flex items-center px-3 py-4 rounded-md text-black-500 hover:bg-black-50">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-6 w-6">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h18">
+                </path>
+            </svg>
+            <span class="ml-1 font-bold text-lg">Volver</span>
+          </a>
+    <div class="wrapper bg-white rounded shadow overflow-x-auto w-full">
         <header class="flex items-center justify-between border-b border-gray-200 px-6 py-4 lg:flex-none">
             <h1 class="text-base font-semibold leading-6 text-gray-900">
               <time>{{ primer_dia.strftime('%B')|replace('January', 'Enero')|replace('February', 'Febrero')|replace('March', 'Marzo')|replace('April', 'Abril')|replace('May', 'Mayo')|replace('June', 'Junio')|replace('July', 'Julio')|replace('August', 'Agosto')|replace('September', 'Septiembre')|replace('October', 'Octubre')|replace('November', 'Noviembre')|replace('December', 'Diciembre') }} {{ anio }}</time>

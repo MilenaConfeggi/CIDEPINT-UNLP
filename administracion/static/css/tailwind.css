@@ -1472,6 +1472,11 @@ input:checked + .toggle-bg {
   margin-bottom: 1rem;
 }
 
+.mx-4 {
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+
 .mb-1 {
   margin-bottom: 0.25rem;
 }
@@ -1694,12 +1699,12 @@ input:checked + .toggle-bg {
   width: 100vw;
 }
 
-.min-w-0 {
-  min-width: 0px;
+.w-96 {
+  width: 24rem;
 }
 
-.min-w-full {
-  min-width: 100%;
+.min-w-0 {
+  min-width: 0px;
 }
 
 .max-w-2xl {
@@ -2305,6 +2310,16 @@ input:checked + .toggle-bg {
 .py-8 {
   padding-top: 2rem;
   padding-bottom: 2rem;
+}
+
+.px-10 {
+  padding-left: 2.5rem;
+  padding-right: 2.5rem;
+}
+
+.px-20 {
+  padding-left: 5rem;
+  padding-right: 5rem;
 }
 
 .pb-12 {
@@ -3193,11 +3208,6 @@ input:checked + .toggle-bg {
     padding-bottom: 1.5rem;
   }
 
-  .sm\:px-1 {
-    padding-left: 0.25rem;
-    padding-right: 0.25rem;
-  }
-
   .sm\:pb-4 {
     padding-bottom: 1rem;
   }
@@ -3253,6 +3263,11 @@ input:checked + .toggle-bg {
 }
 
 @media (min-width: 1024px) {
+  .lg\:mx-5 {
+    margin-left: 1.25rem;
+    margin-right: 1.25rem;
+  }
+
   .lg\:flex {
     display: flex;
   }
@@ -3297,9 +3312,19 @@ input:checked + .toggle-bg {
 }
 
 @media (min-width: 1280px) {
+  .xl\:mx-40 {
+    margin-left: 10rem;
+    margin-right: 10rem;
+  }
+
   .xl\:mx-60 {
     margin-left: 15rem;
     margin-right: 15rem;
+  }
+
+  .xl\:mx-20 {
+    margin-left: 5rem;
+    margin-right: 5rem;
   }
 
   .xl\:aspect-\[7\/7\] {

@@ -19,7 +19,7 @@ def registrar_ausencia():
         
         # Crear nueva ausencia
         nueva_ausencia = Ausencia(
-            empleado_id=empleado_id,
+            empleado=servicio_personal.conseguir_empleado_de_id(empleado_id),
             fecha_desde=datetime.strptime(fecha_desde, '%Y-%m-%d'),
             fecha_hasta=datetime.strptime(fecha_hasta, '%Y-%m-%d'),
             motivo=motivo

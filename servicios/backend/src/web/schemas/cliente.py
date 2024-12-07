@@ -16,6 +16,7 @@ class ClienteSchema(Schema):
     piso = fields.String(required=True)
     depto = fields.String(required=True)
     legajo_id = fields.Integer(required=True)
+    nombre = fields.String(required=True)
 
 cliente_schema = ClienteSchema()
 clientes_schema = ClienteSchema(many=True)

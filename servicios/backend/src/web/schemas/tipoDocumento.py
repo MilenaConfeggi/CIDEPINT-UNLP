@@ -5,3 +5,4 @@ class TipoDocumentoSchema(Schema):
     nombre = fields.String(required=True)
 
 tipo_documento_schema = TipoDocumentoSchema()
+tipos_documentos_schema = TipoDocumentoSchema(many=True)

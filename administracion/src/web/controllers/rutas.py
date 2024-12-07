@@ -1,3 +1,4 @@
+from administracion.src.web.controllers.roles import role_required
 from flask import render_template, redirect, url_for
 from administracion.src.web.controllers.patrimonio import bp as patrimonio_bp
 from administracion.src.web.controllers.archivos_admin import bp as archivos_bp
@@ -22,6 +23,7 @@ def registrar_rutas(app):
         return redirect(url_for('auth.login'))
 
     @app.route("/home")
+    @role_required('Administrador', 'Colaborador', 'Personal')
     def home():
         return render_template("topicos.html", topico=True)
 

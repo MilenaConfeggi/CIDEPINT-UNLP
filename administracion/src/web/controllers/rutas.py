@@ -1,5 +1,6 @@
 from administracion.src.web.controllers.roles import role_required
 from flask import render_template, redirect, url_for
+from flask_login import current_user
 from administracion.src.web.controllers.patrimonio import bp as patrimonio_bp
 from administracion.src.web.controllers.archivos_admin import bp as archivos_bp
 from administracion.src.web.controllers.contable import bp as contable_bp
@@ -20,7 +21,11 @@ def registrar_rutas(app):
     
     @app.route("/")
     def landing_page():
-        return redirect(url_for('auth.login'))
+        if not current_user.is_authenticated:
+            return redirect(url_for('auth.login'))
+        else:
+            return redirect(url_for('home'))
+        
 
     @app.route("/home")
     @role_required('Administrador', 'Colaborador', 'Personal')

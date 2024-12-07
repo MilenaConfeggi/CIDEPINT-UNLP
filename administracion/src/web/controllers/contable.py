@@ -103,8 +103,9 @@ def get_legajos():
 
     for legajo in legajos:
         documentos = {doc.tipo_documento.nombre: doc for doc in legajo.documento}
-        if documentos.get("orden_facturacion"):
-            print(documentos["orden_facturacion"].id)
+        print(documentos)
+        if documentos.get("Presupuesto CIDEPINT"):
+            print(documentos["Presupuesto CIDEPINT"].id)
         resultado.append({
             "id": legajo.id,
             "nro_legajo": legajo.nro_legajo,

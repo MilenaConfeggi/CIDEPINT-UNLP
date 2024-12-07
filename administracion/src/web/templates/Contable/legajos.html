@@ -43,7 +43,14 @@ Crear un nuevo Fondo</a>
                     Cliente
                 </td>
                 <td class="px-4 py-3 text-sm">
-                    Presupuesto PDf
+                    {% if legajo.documentos['Presupuesto CIDEPINT'] %}
+                    <a href="{{ url_for('contable.download', documento_id=legajo.documentos['Presupuesto CIDEPINT'].id) }}" 
+                       class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500">
+                        Descargar
+                    </a>
+                    {% else %}
+                    No disponible
+                    {% endif %}
                 </td>
                 <td class="px-4 py-3 text-sm">
                     Orden de compra PDF

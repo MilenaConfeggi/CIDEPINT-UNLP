@@ -26,6 +26,9 @@
             <th class="px-4 py-3">Porc. Comisiones</th>
             <th class="px-4 py-3">Monto Distribuir</th>
             <th class="px-4 py-3">Costos</th>
+            <th class="px-4 py-3">Area de Ganancias</th>
+            <th class="px-4 py-3">Area de Costos</th>
+            <th class="px-4 py-3">Empleados</th>
         </tr>
         </thead>
         <tbody class="bg-white divide-y">
@@ -37,6 +40,20 @@
                 <td class="px-4 py-3 text-sm">{{ distribucion.porcentaje_comisiones }}%</td>
                 <td class="px-4 py-3 text-sm">${{ distribucion.monto_a_distribuir }}</td>
                 <td class="px-4 py-3 text-sm">${{ distribucion.costos }}</td>
+                <td class="px-4 py-3 text-sm">{{ distribucion.ganancias_de.nombre }}</td>
+                <td class="px-4 py-3 text-sm">{{ distribucion.costos_de.nombre }}</td>
+                <td class="px-4 py-3 text-sm">
+                    {% if distribucion.empleados_asociados %}
+                    
+                        <ul>
+                        {% for empleado in distribucion.empleados_asociados %}
+                            <li>{{ empleado.empleado.saldo }}</li>
+                        {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>No hay empleados asignados</p>
+                    {% endif %}
+                </td>
             </tr>
         {% endfor %}
         </tbody>

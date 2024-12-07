@@ -1,15 +1,18 @@
 from models.base import db
-'''
-class usuarios_lee_carpetas(db.Model):
-    __tablename__ = 'usuarios_lee_carpetas'
-    id_usuario = db.Column(db.Integer, db.ForeignKey('usuarios.id'), primary_key=True)
-    id_carpeta = db.Column(db.Integer, db.ForeignKey('carpetas.id'), primary_key=True)
 
-class usuarios_edita_carpetas(db.Model):
-    __tablename__ = 'usuarios_edita_carpetas'
-    id_usuario = db.Column(db.Integer, db.ForeignKey('usuarios.id'), primary_key=True)
-    id_carpeta = db.Column(db.Integer, db.ForeignKey('carpetas.id'), primary_key=True)
-'''
+usuarios_leen_carpeta = db.Table(
+  "usuarios_leen",
+   db.metadata,
+   db.Column('id_carpeta', db.ForeignKey('carpetas.id'), primary_key=True),
+   db.Column('id_user', db.ForeignKey('user.id'), primary_key=True),
+)
+
+usuarios_editan_carpeta = db.Table(
+  "usuarios_editan",
+   db.metadata,
+   db.Column('id_carpeta', db.ForeignKey('carpetas.id'), primary_key=True),
+   db.Column('id_user', db.ForeignKey('user.id'), primary_key=True),
+)
 
 class Carpeta(db.Model):
     __tablename__ = 'carpetas'
@@ -18,5 +21,5 @@ class Carpeta(db.Model):
     archivos = db.relationship('Archivo', back_populates='carpeta')
     fecha_ingreso = db.Column(db.Date, default=db.func.now())
 
-    #usuarios_lee = db.relationship('Usuario', secondary='usuarios_lee_carpetas', back_populates='carpetas_lee')
-    #usuarios_edita = db.relationship('Usuario', secondary='usuarios_edita_carpetas', back_populates='carpetas_edita')
+    usuarios_leen = db.relationship("User", secondary=usuarios_leen_carpeta, back_populates="carpetas_lee")
+    usuarios_editan = db.relationship('User', secondary=usuarios_editan_carpeta, back_populates='carpetas_edita')

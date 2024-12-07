@@ -28,6 +28,10 @@ class Empleado(db.Model):
     primer_login = db.Column(db.Boolean, default=True)
     archivos = db.relationship('Archivo', back_populates='empleado')
     ausencias = db.relationship('Ausencia', back_populates='empleado')
+    distribuciones_asociadas = db.relationship(
+        "Empleado_Distribucion", back_populates="empleado"
+    )
+    saldo = db.Column(db.Float, default=0.0)    
     compras = db.relationship('Compra', secondary=compra_empleado ,back_populates='empleados')
     solicitudes = db.relationship('Compra', back_populates='solicitante', cascade='all, delete-orphan')
 

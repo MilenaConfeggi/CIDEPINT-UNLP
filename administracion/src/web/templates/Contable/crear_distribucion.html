@@ -45,11 +45,57 @@
                 <p class="text-red-500 text-sm">{{ error }}</p>
             {% endfor %}
         </div>
-
+        <div class="mb-4">
+        <label for="ganancias_de_id" class="block text-sm font-medium text-gray-700">Área de Ganancias</label>
+        {{ form.ganancias_de_id(class='block w-full border border-gray-300 rounded py-2 px-3', id="ganancias-de-id") }}
+        {% for error in form.ganancias_de_id.errors %}
+            <p class="text-red-500 text-sm">{{ error }}</p>
+        {% endfor %}
+        </div>
+        
+        <div class="mb-4">
+            <label for="costos_de_id" class="block text-sm font-medium text-gray-700">Área de Costos</label>
+            {{ form.costos_de_id(class='block w-full border border-gray-300 rounded py-2 px-3') }}
+            {% for error in form.costos_de_id.errors %}
+                <p class="text-red-500 text-sm">{{ error }}</p>
+            {% endfor %}
+        </div>
+        <label for="empleados_seleccionados">Seleccionar Empleados</label>
+        <div id="empleados-seleccionados">
+            {% for subfield in form.empleados_seleccionados %}
+                <div>
+                    <input type="checkbox" id="empleado-{{ subfield.id }}" name="{{ subfield.name }}" value="{{ subfield.data }}" {% if subfield.checked %}checked{% endif %}>
+                    <label for="{{ subfield.id }}">{{ subfield.label.text }}</label>
+                </div>
+            {% endfor %}
+        </div>
         <div class="mt-6">
             <button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded hover:bg-indigo-700">
                 Guardar Distribución
             </button>
         </div>
     </form>
+
+<script>
+    let empleadosPorArea = {{ empleados_por_area | tojson }};
+    document.addEventListener('DOMContentLoaded', function () {
+    
+    const areaSelect = document.getElementById('ganancias-de-id');
+    const empleadosCheckboxes = document.querySelectorAll('#empleados-seleccionados input[type="checkbox"]');
+    empleadosCheckboxes.forEach(checkbox => {
+        checkbox.checked = false;
+    });
+    areaSelect.addEventListener('change', function () {
+        const areaId = areaSelect.value;
+        empleadosCheckboxes.forEach(checkbox => {
+            checkbox.checked = false;
+        });
+        if (!empleadosPorArea[areaId]) return;
+
+        empleadosCheckboxes.forEach(checkbox => {
+            checkbox.checked = empleadosPorArea[areaId].includes(parseInt(checkbox.value));
+        });
+    });
+});
+</script>
 {% endblock %}

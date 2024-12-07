@@ -34,6 +34,9 @@ def logout():
 @auth_bp.route('/cambiar_contrasena', methods=['GET', 'POST'])
 @login_required
 def cambiar_contrasena():
+    if not current_user.empleado.primer_login:
+        flash('Ya has cambiado tu contraseña', 'warning')
+        return redirect(url_for('home'))
     if request.method == 'POST':
         nueva_contrasena = request.form.get('nueva_contrasena')
         confirmar_contrasena = request.form.get('confirmar_contrasena')
@@ -70,6 +73,6 @@ def cambiar_contrasena():
         empleado.primer_login = False
         db.session.commit()
         flash('Datos actualizados con éxito!', 'success')
-        return redirect(url_for('auth.dashboard'))
+        return redirect(url_for('home'))
     
-    return render_template('cambiar_contrasena.html', empleado=current_user.empleado)
+    return render_template('cambiar_contrasena.html', empleado=current_user.empleado, topico=True)

@@ -9,13 +9,8 @@
 
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     <div class="bg-white shadow-md rounded-lg p-6">
-      <a href="{{ url_for('area.crear_area') }}" class="block text-center">
-        <h2 class="text-xl font-semibold mb-2">Crear Área</h2>
-      </a>
-    </div>
-    <div class="bg-white shadow-md rounded-lg p-6">
       <a href="{{ url_for('area.listar_areas') }}" class="block text-center">
-        <h2 class="text-xl font-semibold mb-2">Listar Áreas</h2>
+        <h2 class="text-xl font-semibold mb-2">Áreas</h2>
       </a>
     </div>
     <div class="bg-white shadow-md rounded-lg p-6">
@@ -32,14 +27,6 @@
         class="block text-center"
       >
         <h2 class="text-xl font-semibold mb-2">Ausencias</h2>
-      </a>
-    </div>
-    <div class="bg-white shadow-md rounded-lg p-6">
-      <a
-        href="{{ url_for('personal.ver_perfil', id=current_user.id) }}"
-        class="block text-center"
-      >
-        <h2 class="text-xl font-semibold mb-2">Ver Perfil</h2>
       </a>
     </div>
   </div>

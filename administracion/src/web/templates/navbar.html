@@ -24,7 +24,12 @@
         </div>
       {% endif %}
       <div class="hidden lg:flex lg:flex-1 lg:justify-end">
-        <a href="{{ url_for('auth.logout') }}" class="text-sm/6 font-semibold text-red-500">
+        <a
+        href="{{ url_for('personal.ver_perfil', id=current_user.id) }}"
+        class="text-sm/6 font-semibold text-black">
+        Mi perfil
+        </a>
+        <a href="{{ url_for('auth.logout') }}" class="text-sm/6 font-semibold text-red-500 ml-4">
           Cerrar sesión
         </a>
       </div>
@@ -41,6 +46,7 @@
         <a href="{{ url_for('contable.index') }}" class="block text-sm font-semibold text-gray-900 mb-4">Contable</a>
         <a href="{{ url_for('patrimonio.index') }}" class="block text-sm font-semibold text-gray-900 mb-4">Patrimonio</a>
         <a href="{{ url_for('personal.index') }}" class="block text-sm font-semibold text-gray-900 mb-4">Personal</a>
+        <a href="{{ url_for('personal.ver_perfil', id=current_user.id) }}" class="block text-sm font-semibold text-black mb-4">Mi perfil</a>
         <a href="{{ url_for('auth.logout') }}" class="block text-sm font-semibold text-red-500">Cerrar sesión</a>
       `;
   

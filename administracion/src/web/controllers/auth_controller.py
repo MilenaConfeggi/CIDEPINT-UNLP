@@ -72,4 +72,4 @@ def cambiar_contrasena():
         flash('Datos actualizados con éxito!', 'success')
         return redirect(url_for('home'))
     
-    return render_template('cambiar_contrasena.html', empleado=current_user.empleado)
+    return render_template('cambiar_contrasena.html', empleado=current_user.empleado, topico=True)

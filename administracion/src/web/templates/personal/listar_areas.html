@@ -5,7 +5,12 @@
 {% block content %}
 
 <div class="container mx-auto px-4 py-8 h-full">
-    <h1 class="text-3xl font-bold mb-8">Áreas Creadas</h1>
+    <div class="flex justify-between w-full items-end">
+        <h1 class="text-3xl font-bold mb-8">Áreas Creadas</h1>
+        <a href="{{ url_for('area.crear_area') }}" class="px-4 py-2 sm:px-0 mb-6 text-sm font-medium text-white transition-colors duration-150 bg-green-500 border border-transparent rounded-lg active:bg-green-600 hover:bg-green-700 focus:outline-none focus:shadow-outline-green">
+            Crear Área
+        </a>
+    </div>
     <div class="bg-white shadow-md rounded-lg p-6">
         <ul>
             {% for area in areas %}

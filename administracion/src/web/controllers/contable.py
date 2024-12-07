@@ -18,14 +18,14 @@ bp = Blueprint("contable",__name__,url_prefix="/contable")
 
 
 #
-from models.documentos import listar_tipos_documentos, get_tipo_documento, create_documento, find_documento
+from models.documentos import listar_tipos_documentos, get_tipo_documento, create_documento, find_documento, get_tipo_documento_nombre,get_documento
 from models.documentos import find_estado_by_nombre
 from models.documentos import create_estado
 from flask import current_app as app
 from datetime import datetime
 from pathlib import Path
 import os
-from administracion.src.web.forms.documento_legajo_nuevo import UploadDocumentoForm
+from administracion.src.web.forms.documento_legajo_nuevo import UploadDocumentoForm ,DownloadForm
 @bp.get("/")
 @role_required('Administrador', 'Colaborador')
 def index():
@@ -98,7 +98,21 @@ def get_legajos():
     forms = {}
     for legajo in legajos:
         forms[legajo.id] = UploadDocumentoForm(legajo_id=legajo.id)
-    return render_template("contable/legajos.html",legajos = legajos, forms=forms)
+    
+    resultado = []
+
+    for legajo in legajos:
+        documentos = {doc.tipo_documento.nombre: doc for doc in legajo.documento}
+        if documentos.get("orden_facturacion"):
+            print(documentos["orden_facturacion"].id)
+        resultado.append({
+            "id": legajo.id,
+            "nro_legajo": legajo.nro_legajo,
+            "cliente": legajo.cliente,
+            "documentos": documentos,
+        })
+    form = DownloadForm()
+    return render_template("contable/legajos.html",legajos = resultado, forms=forms,formDescarga = form)
 
 @bp.get("/distribuciones/crear/<int:id>")
 def get_crear_distribucion(id):
@@ -171,7 +185,7 @@ def upload():
     
     if file.filename == '' or not file.filename.endswith('.pdf'):
         return jsonify({"error": "Por favor, selecciona un archivo PDF válido"}), 400
-    td = get_tipo_documento(tipo)
+    td = get_tipo_documento_nombre(tipo)
     if td is None:
         return jsonify({"error": "El tipo de documento no existe"}), 400
     
@@ -188,7 +202,7 @@ def upload():
             'fecha_creacion': datetime.now(),
             'estado_id': 1,
             'legajo_id': legajo_id,
-            'tipo_documento_id': tipo,
+            'tipo_documento_id': td.id,
         }
         if not create_documento(data):
             return jsonify({"error": "No se pudo crear el documento"}), 400
@@ -205,10 +219,10 @@ def upload():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
-@bp.post('/download')
-def download():
-    data = request.get_json()
-    archivo = find_documento(data['params'])
+@bp.get('/download/<int:documento_id>')
+def download(documento_id):
+     # Extraer el ID del documento desde el formulario
+    archivo = get_documento(documento_id)  # Implementa esta función para buscar el documento
     if archivo is None:
         return jsonify({"error": "No se encontro el archivo"}), 404
     tipo = archivo.tipo_documento.nombre

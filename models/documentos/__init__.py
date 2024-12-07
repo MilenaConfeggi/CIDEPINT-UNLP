@@ -23,6 +23,9 @@ def listar_tipos_documentos():
 def get_tipo_documento(id):
     return db.session.query(Tipo_Documento).filter_by(id=id).first()
 
+def get_tipo_documento_nombre(nombre):
+    return db.session.query(Tipo_Documento).filter_by(nombre = nombre).first()
+
 def create_tipo_documento(data):
     if get_tipo_documento(data['id']) is not None:
         return None
@@ -30,6 +33,9 @@ def create_tipo_documento(data):
     db.session.add(tipo_documento)
     db.session.commit()
     return tipo_documento
+
+def get_documento(id):
+    return db.session.query(Documento).filter_by(id=id).first()
 
 def find_documento(data):
     query = Documento.query

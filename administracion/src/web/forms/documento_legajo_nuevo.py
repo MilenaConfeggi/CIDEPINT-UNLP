@@ -5,7 +5,7 @@ from flask_wtf.file import FileField, FileRequired, FileAllowed
 
 class UploadDocumentoForm(FlaskForm):
     legajo_id = HiddenField(validators=[DataRequired()])
-    tipo = HiddenField(default="1", validators=[DataRequired()])
+    tipo = HiddenField(default="orden_facturacion", validators=[DataRequired()])
     file = FileField(
         "Archivo PDF",
         validators=[
@@ -14,3 +14,7 @@ class UploadDocumentoForm(FlaskForm):
         ],
     )
     submit = SubmitField("Subir")
+    
+class DownloadForm(FlaskForm):
+    documento_id = HiddenField("ID del documento")
+    submit = SubmitField("Descargar")

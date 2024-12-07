@@ -23,14 +23,14 @@
         <p>LEG_{{ legajo.id }}</p>
         <StateBadge v-if="legajo.estado" :state="legajo.estado?.nombre" />
         <p>Fecha entrada: {{ formatDate(legajo.fecha_entrada) }}</p>
-        <p>Objetivo: {{ }}</p>
+        <p>Objetivo: {{}}</p>
         <div v-if="legajo.cliente">
           <h6>Cliente</h6>
           <p>{{ legajo.cliente.nombre }}</p>
           <p>CUIT: {{ legajo.cliente.cuit }}</p>
         </div>
 
-        <div v-if="legajo && tipos_documentos?.length ">
+        <div v-if="legajo && tipos_documentos?.length">
           <table class="table">
             <thead>
               <tr>
@@ -52,23 +52,40 @@
                       Acciones
                     </button>
                     <ul class="dropdown-menu">
-                      <template v-if="existeDocumento(documento.nombre)"> 
+                      <template v-if="existeDocumento(documento.nombre)">
                         <li>
                           <button
                             type="button"
                             class="dropdown-item"
                             data-bs-toggle="modal"
                             data-bs-target="#exampleModal"
+                            @click="viewFile( documento.id, documento.nombre)"
                           >
                             Ver documento
                           </button>
                         </li>
                         <li>
-                          <button type="button" class="dropdown-item" @click="downloadDocumento(documento.id, legajo.id)">
+                          <button
+                            type="button"
+                            class="dropdown-item"
+                            @click="downloadDocumento(documento.id, legajo.id)"
+                          >
                             Descargar
                           </button>
                         </li>
-                        <li><a class="dropdown-item" href="#">Editar</a></li>
+                        <li>
+                          <label for="upload-pdf" class="dropdown-item">
+                          Editar
+                          <input
+                            id="upload-pdf"
+                            type="file"
+                            accept="application/pdf"
+                            @change="handleFileUpload($event, documento.id, legajo.id, true)"
+                            class="dropdown-item"
+                            hidden
+                          />
+                        </label>
+                        </li>
                       </template>
                       <li v-else>
                         <label for="upload-pdf" class="dropdown-item">
@@ -99,10 +116,10 @@
       aria-labelledby="exampleModalLabel"
       aria-hidden="true"
     >
-      <div class="modal-dialog">
+      <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
-            <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+            <h1 class="modal-title fs-5" id="exampleModalLabel">{{ actualFile?.nombre_documento }}</h1>
             <button
               type="button"
               class="btn-close"
@@ -110,27 +127,47 @@
               aria-label="Close"
             ></button>
           </div>
-          <div class="modal-body">...</div>
+          <div class="modal-body">
+            <div v-if="fileUrl" style="height: 100vh;"> 
+              <vue-pdf-app :pdf="fileUrl" :page-number="1" ></vue-pdf-app> 
+            </div>
+            <div v-else>
+              <p>No se encontro el archivo</p>
+            </div>
+          </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary">Save changes</button>
+            <button type="button" class="btn btn-primary">Descargar</button>
           </div>
         </div>
       </div>
     </div>
     <div v-if="showToast" class="toast-container position-fixed bottom-0 end-0 p-3">
-        <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
-          <div class="toast-header">
-            <strong class="me-auto">Archivo Cargado</strong>
-            <button type="button" class="btn-close" @click="showToast = false" aria-label="Close"></button>
-          </div>
-          <div class="toast-body">
-            El archivo se cargó correctamente.
-          </div>
+      <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+          <strong class="me-auto">Error</strong>
+          <button
+            type="button"
+            class="btn-close"
+            @click="showToast = false"
+            aria-label="Close"
+          ></button>
         </div>
+        <div class="toast-body">El archivo no se pudo cargar. {{ error }}</div>
       </div>
+    </div>
   </main>
 </template>
+
+<script>
+import VuePdfApp from 'vue3-pdf-app' 
+import 'vue3-pdf-app/dist/icons/main.css'
+export default {
+  components: {
+    VuePdfApp
+  }
+};
+</script>
 
 <script setup>
 import { onMounted } from 'vue'
@@ -139,7 +176,11 @@ import { useLegajosStore } from '../../stores/legajos'
 import { useDocumentosStore } from '../../stores/documentos'
 import { storeToRefs } from 'pinia'
 import { ref } from 'vue'
+import axios from 'axios'
 import StateBadge from '../StateBadge.vue'
+
+
+
 
 const route = useRoute()
 const legajosStore = useLegajosStore()
@@ -149,22 +190,29 @@ const { legajo, loading, error } = storeToRefs(legajosStore)
 const { tipos_documentos } = storeToRefs(documentosStore)
 const showToast = ref(false)
 const fileName = ref(null)
+const fileUrl = ref(null)
+const actualFile = ref(null)
 
 const formatDate = (dateString) => {
   const options = { year: 'numeric', day: '2-digit', month: '2-digit' }
   return new Date(dateString).toLocaleDateString('es-ES', options)
 }
-const handleFileUpload = async (event, id, legajoId) => {
+const handleFileUpload = async (event, id, legajoId, editar=false) => {
   const file = event.target.files[0]
   if (file && file.type === 'application/pdf') {
     try {
-      fileName.value = file.name 
-      const response = await documentosStore.subirArchivo(file, id, legajoId)
+      fileName.value = file.name
+      const response = await documentosStore.subirArchivo(file, id, legajoId, editar)
       console.log(response)
-      showToast.value = true
+      if (response.status === 200) {
+        window.location.reload()
+      }
+      else {
+        throw new Error('No se pudo subir el archivo')
+      }
     } catch (error) {
       console.error('Error al subir el archivo:', error)
-      alert('Ocurrió un error al subir el archivo. Inténtelo nuevamente.')
+      showToast.value = true
     }
   } else {
     alert('Por favor selecciona un archivo PDF.')
@@ -172,18 +220,36 @@ const handleFileUpload = async (event, id, legajoId) => {
 }
 
 const existeDocumento = (nombreDocumento) => {
-      return legajo.value.documento.some(
-        (doc) => doc.tipo_documento.nombre === nombreDocumento
-      );
+  return legajo.value.documento?.some((doc) => doc.tipo_documento.nombre === nombreDocumento)
 }
 
 const downloadDocumento = async (tipo, legajo_id) => {
-  const nombreDocumento = legajo.value.documento.find((doc) => doc.tipo_documento_id === tipo).nombre_documento
-  const response = await documentosStore.download(nombreDocumento, tipo, legajo_id)
+  actualFile.value = legajo.value.documento.find(
+    (doc) => doc.tipo_documento_id === tipo,
+  )
+  const response = await documentosStore.download(actualFile.value.nombre_documento, tipo, legajo_id)
   console.log(response)
 }
 
+const viewFile = async (id, tipo) => {
+  actualFile.value = legajo.value.documento.find(
+    (doc) => doc.tipo_documento_id === id,
+  )
+  try {
+    const response = await axios.get(`http://127.0.0.1:5000/api/documentos/view/${actualFile.value.nombre_documento}`, {
+      params: { tipo },
+      responseType: 'blob',
+    })
 
+    // Crear una URL para visualizar el archivo
+    const blob = new Blob([response.data], { type: response.headers['content-type'] })
+    console.log(response.data)
+    fileUrl.value = URL.createObjectURL(blob)
+  } catch (error) {
+    console.error('Error al obtener el archivo:', error)
+    alert('No se pudo cargar el archivo.')
+  }
+}
 
 onMounted(async () => {
   try {

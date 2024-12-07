@@ -54,6 +54,11 @@ const router = createRouter({
       path: "/legajos/newLegajo",
       name: "newLegajo",
       component: () => import("../components/legajos/LegajoForm.vue"),
+    },
+    {
+      path: "/documentos",
+      name: "documento",
+      component: () => import("../components/documentos/DocumentoListado.vue"),
     }
   ],
 })

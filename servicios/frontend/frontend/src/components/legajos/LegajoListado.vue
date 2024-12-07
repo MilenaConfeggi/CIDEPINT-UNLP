@@ -9,7 +9,6 @@
       />
     </svg>
   </RouterLink>
-  <h1 class="text-3xl font-bold">Listado</h1>
   <p v-if="legajos">{{ legajos.items?.length }} Legajos</p>
   <div class="flex flex-col justify-center items-center">
     <p v-if="loading">Cargando...</p>

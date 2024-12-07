@@ -7,17 +7,19 @@ export const useDocumentosStore = defineStore("documentos", {
         tipos_documentos: [],
         loading: false,
         error: null,
+        doc: null,
     }),
     actions: {
         async getDocumentos() {
             this.loading = true;
             this.error = null;
             try {
-                const response = await axios.get("http://127.0.0.1:5000/api/documentos/tipos_documentos");
+                const response = await axios.get("http://127.0.0.1:5000/api/documentos/");
                 this.documentos = response.data;
+                return response;
             } catch (error) {
                 this.error = error;
-                console.log(error);
+                throw new Error(error);
             } finally {
                 this.loading = false;
             }
@@ -35,23 +37,25 @@ export const useDocumentosStore = defineStore("documentos", {
                 this.loading = false;
             }
         },
-        async subirArchivo(file, tipo, legajoId) {
+        async subirArchivo(file, tipo, legajoId, editar=false) {
             this.loading = true;
             this.error = null;
             try {
                 const formData = new FormData();
                 formData.append("file", file);
                 formData.append("tipo", tipo);
-                formData.append("legajo_id", legajoId);
+                formData.append("legajo_id", legajoId);        
+                formData.append("editar", editar);
                 const response = await axios.post("http://127.0.0.1:5000/api/documentos/upload", formData, {
                     headers: {
                         "Content-Type": "multipart/form-data",
                     },
                 });
                 this.documentos.push(response.data);
+                return response;
             } catch (error) {
                 this.error = error;
-                console.log(error);
+                throw new Error(error);
             } finally {
                 this.loading = false;
             }
@@ -80,6 +84,19 @@ export const useDocumentosStore = defineStore("documentos", {
                 window.URL.revokeObjectURL(url);
 
                 return response.data;
+            } catch (error) {
+                this.error = error;
+                console.log(error);
+            } finally {
+                this.loading = false;
+            }
+        },
+        async getDocumento(id) {
+            this.loading = true;
+            this.error = null;
+            try {
+                const response = await axios.get(`http://127.0.0.1:5000/api/documentos/${id}`);
+                this.doc = response.data;
             } catch (error) {
                 this.error = error;
                 console.log(error);

@@ -1,0 +1,21 @@
+{% extends 'layout.html' %}
+{% block title%} Compras {% endblock %}
+{% block content %}
+<div class="flex justify-center items-center min-h-screen">
+    <div class="text-center">
+        {% if rol == "Administrador" or rol == "Colaborador" %}
+        <form method="get" action="{{ url_for('compra.lista_proveedores') }}">
+            <button type="submit" class="bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-8 rounded-lg text-2xl w-64 h-20 mb-8 transition-all duration-300">
+                Ir a proveedores
+            </button>
+        </form>
+        {% endif %}
+        <form method="get" action="{{ url_for('compra.lista_compras') }}">
+            <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-4 px-8 rounded-lg text-2xl w-64 h-20 transition-all duration-300">
+                Ir a compras
+            </button>
+        </form>
+    </div>
+</div>
+</html>
+{% endblock %}

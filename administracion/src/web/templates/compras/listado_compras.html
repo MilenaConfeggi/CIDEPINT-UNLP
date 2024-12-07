@@ -1,0 +1,206 @@
+{% extends 'layout.html' %}
+{% block title%} Bienes {% endblock %}
+{% block content%}
+    <div class="px-4 py-3 mx-8 mt-2 mb-8 bg-white rounded-lg shadow-md">
+        <h3 class="mb-4 text-lg font-semibold text-gray-600">Búsqueda</h3>
+            <hr />
+            <form class="mb-4 flex flex-wrap justify-between items-end" method="get" action="{{ url_for('compra.lista_compras') }}">
+                <div class="grid gap-6 mb-8 md:grid-cols-2 xl:grid-cols-5">
+                    <div class="me-2 mb-2">
+                        <label for="fecha_menor" class="form-label fw-bold" style="display: block;">Desde</label>
+                        <input type="date"
+                               class="form-control form-control-sm stylish-input"
+                               id="fecha_menor"
+                               name="fecha_menor"
+                               placeholder="Ingrese desde que fecha"
+                               value="{{ request.args.get('fecha_menor', '') }}" />
+                    </div>
+                    <div class="me-2 mb-2">
+                        <label for="fecha_mayor" class="form-label fw-bold" style="display: block;">Hasta</label>
+                        <input type="date"
+                               class="form-control form-control-sm stylish-input"
+                               id="fecha_mayor"
+                               name="fecha_mayor"
+                               placeholder="Ingrese hasta que fecha"
+                               value="{{ request.args.get('fecha_mayor', '') }}" />
+                    </div>
+                    <div class="me-2 mb-2">
+                        <label for="estado" class="form-label fw-bold" style="display: block;">Estado</label>
+                        <select class="form-control form-control-sm stylish-input" id="estado" name="estado">
+                            <option value="">Todos</option>
+                            <option value="CANCELADA" {% if request.args.get('estado') == 'CANCELADA' %}selected{% endif %}>Canceladas</option>
+                        </select>
+                    </div>
+                    <div class="block text-m flex items-center">
+                        <button type="submit" class="px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 flex flex-wrap bg-blue-600 border border-transparent rounded-lg active:bg-blue-600 hover:bg-blue-700 focus:outline-none focus:shadow-outline-blue">
+                            Buscar
+                            <svg
+                                class="w-4 h-4"
+                                aria-hidden="true"
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                            >
+                                <path
+                                fill-rule="evenodd"
+                                d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                                clip-rule="evenodd"
+                                ></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                {% if rol == "Administrador" or rol == "Colaborador" %}
+                    <div class="flex flex-wrap items-end mb-1">
+                        <!-- Enlace para agregar nuevo registro -->
+                        <a href="{{ url_for('compra.agregar_compra') }}"
+                        class="px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-green-600 border border-transparent rounded-lg active:bg-green-600 hover:bg-green-700 focus:outline-none focus:shadow-outline-green">
+                            Agregar compra
+                        </a>
+                    </div>
+                {% endif %}
+            </form>
+        <div class="w-full overflow-x-auto">
+        <table class="w-full whitespace-no-wrap">
+            <thead>
+            <tr
+                class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b bg-gray-50"
+            >
+                <th class="px-4 py-3">Fecha</th>
+                <th class="px-4 py-3">Descripcion</th>
+                <th class="px-4 py-3">Estado</th>
+                <th class="px-4 py-3">Numero de factura</th>
+                <th class="px-4 py-3">Fuente/s de financiamiento</th>
+                <th class="px-4 py-3">Acciones</th>
+            </tr>
+            </thead>
+            <tbody
+            class="bg-white divide-y"
+            >
+            {% for compra in compras %}
+                <tr class="text-gray-700">
+                    <td class="px-4 py-3">
+                    <div class="flex items-center text-sm">
+                        <div>
+                            <p class="font-semibold date-format">{{ compra.fecha }}</p>
+                        </div>
+                    </div>
+                    </td>
+                    <td class="px-4 py-3 text-sm">
+                    {{ compra.descripcion }}
+                    </td>
+                    <td class="px-4 py-3 text-sm">
+                        {{ compra.estado.value }}
+                    </td>
+                    <td class="px-4 py-3 text-sm">
+                        {{ compra.numero_factura }}
+                    </td>
+                    <td class="px-4 py-3 text-sm">
+                        {% for fondo in compra.fondos %}
+                            <li>{{ fondo.titulo }}</li>
+                        {% endfor %}
+                    </td>
+                    <td class="px-4 py-3">
+                        <a href="{{ url_for('compra.ver_compra', id_compra=compra.id) }}" class="text-indigo-600 hover:text-indigo-900">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M10 2C5.58 2 1.73 4.61.29 8.5a1 1 0 000 .99C1.73 15.39 5.58 18 10 18s8.27-2.61 9.71-6.5a1 1 0 000-.99C18.27 4.61 14.42 2 10 2zm0 14c-3.87 0-7.19-2.28-8.48-5.5C2.81 7.28 6.13 5 10 5s7.19 2.28 8.48 5.5C17.19 13.72 13.87 16 10 16zm0-9a3 3 0 100 6 3 3 0 000-6z"/>
+                            </svg>
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+        </div>
+        <div
+        class="grid px-4 py-3 text-xs font-semibold tracking-wide text-gray-500 uppercase border-t bg-gray-50 sm:grid-cols-9"
+        >
+        {% if rol == "Administrador" or rol == "Colaborador" %}
+            <a href="{{ url_for('compra.descargar_compras_excel', fecha_menor=request.args.get('fecha_menor', ''), fecha_mayor=request.args.get('fecha_mayor', ''), estado=request.args.get('estado', '')) }}"
+            class="px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-green-600 border border-transparent rounded-lg active:bg-green-600 hover:bg-green-700 focus:outline-none focus:shadow-outline-green text-center mr-2">
+            Descargar Excel
+            </a>
+            <a href="{{ url_for('compra.descargar_compras_pdf', fecha_menor=request.args.get('fecha_menor', ''), fecha_mayor=request.args.get('fecha_mayor', ''), estado=request.args.get('estado', '')) }}"
+            class="px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-red-600 border border-transparent rounded-lg active:bg-red-600 hover:bg-red-700 focus:outline-none focus:shadow-outline-red text-center mr-2">
+            Descargar PDF
+            </a>
+        {% endif %}
+        <span class="col-span-2"></span>
+        <!-- Pagination -->
+        <span class="flex col-span-4 mt-2 sm:mt-auto sm:justify-end">
+            <nav aria-label="Table navigation">
+            <ul class="inline-flex items-center">
+                <li>
+                <a
+                    class="px-3 py-1 rounded-md rounded-l-lg focus:outline-none focus:shadow-outline-purple"
+                    aria-label="Anterior"
+                    href="{{ url_for('compra.lista_compras', page=compras.prev_num, fecha_menor=request.args.get('fecha_menor', ''), fecha_mayor=request.args.get('fecha_mayor', '')) }}"
+                    >
+                    <svg
+                    class="w-4 h-4 fill-current"
+                    aria-hidden="true"
+                    viewBox="0 0 20 20"
+                    >
+                    <path
+                        d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 01-1.414 1.414l-4-4a1 1 010-1.414l4-4a1 1 011.414 0z"
+                        clip-rule="evenodd"
+                        fill-rule="evenodd"
+                    ></path>
+                    </svg>
+                </a>
+                </li>
+                {% for page in compras.iter_pages() %}
+                    {% if page %}
+                        {% if page != compras.page %}
+                        <li>
+                            <a href="{{ url_for('compra.lista_compras', page=page, fecha_menor=request.args.get('fecha_menor', ''), fecha_mayor=request.args.get('fecha_mayor', '')) }}" class="px-3 py-1 text-gray transition-colors duration-150">
+                                {{ page }}
+                            </a>
+                        </li>
+                        {% else %}
+                            <li>
+                                <p class="px-3 py-1 text-white transition-colors duration-150 bg-blue-600 border border-r-0 border-blue-600 rounded-md focus:outline-none focus:shadow-outline-blue">
+                                    {{ page }}
+                                </p>
+                            </li>
+                        {% endif %}
+                    {% else %}
+                        <li>
+                            <p class="px-3 py-1 text-white transition-colors duration-150">
+                                ..
+                            </p>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+                <li>
+                <a
+                    class="px-3 py-1 rounded-md rounded-r-lg focus:outline-none focus:shadow-outline-purple"
+                    aria-label="Next"
+                    href="{{ url_for('compra.lista_compras', page=compras.next_num, fecha_menor=request.args.get('fecha_menor', ''), fecha_mayor=request.args.get('fecha_mayor', '')) }}"
+                    >
+                    <svg
+                    class="w-4 h-4 fill-current"
+                    aria-hidden="true"
+                    viewBox="0 0 20 20"
+                    >
+                    <path
+                        d="M7.293 14.707a1 1 010-1.414L10.586 10 7.293 6.707a1 1 011.414-1.414l4 4a1 1 010 1.414l-4 4a1 1 01-1.414 0z"
+                        clip-rule="evenodd"
+                        fill-rule="evenodd"
+                    ></path>
+                    </svg>
+                </a>
+                </li>
+            </ul>
+            </nav>
+        </span>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+            document.querySelectorAll('.date-format').forEach(function(element) {
+                const date = new Date(element.textContent);
+                element.textContent = date.toLocaleDateString('es-ES', dateOptions);
+            });
+        });
+    </script>
+{% endblock %}

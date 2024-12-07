@@ -1,0 +1,101 @@
+{% extends 'layout.html' %}
+{% block title%} Compra {% endblock %}
+{% block content%}
+<a href="{{url_for('compra.lista_compras')}}"
+  class="inline-flex items-center px-3 py-4 rounded-md text-black-500 hover:bg-black-50">
+  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-6 w-6">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h18">
+      </path>
+  </svg>
+  <span class="ml-1 font-bold text-lg">Volver</span>
+</a>
+<div class="px-4 py-3 mx-8 mt-2 mb-8 bg-white rounded-lg shadow-md">
+  
+    <div class="px-4 sm:px-0">
+      <h3 class="text-base/7 font-semibold text-gray-900">Compra</h3>
+    </div>
+    <div class="mt-6 border-t border-gray-100">
+      <dl class="divide-y divide-gray-100">
+        <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+            <dt class="text-sm/6 font-medium text-gray-900">Fecha</dt>
+            <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0 date-format">{{ compra.fecha }}</dd>
+          </div>
+        <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+          <dt class="text-sm/6 font-medium text-gray-900">Descripcion</dt>
+          <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{{ compra.descripcion }}</dd>
+        </div>
+        <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+          <dt class="text-sm/6 font-medium text-gray-900">Proveedor</dt>
+          <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{{ compra.proveedor.razon_social }}</dd>
+        </div>
+        <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+          <dt class="text-sm/6 font-medium text-gray-900">Solicitante</dt>
+          <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{{ compra.solicitante.nombre }}</dd>
+        </div>
+        <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+          <dt class="text-sm/6 font-medium text-gray-900">Importe</dt>
+          <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{{ compra.importe }}</dd>
+        </div>
+        {% if compra.observaciones %}
+        <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+          <dt class="text-sm/6 font-medium text-gray-900">Observaciones</dt>
+          <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{{ compra.observaciones }}</dd>
+        </div>
+        {% else %}
+        <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+          <dt class="text-sm/6 font-medium text-gray-900">Observaciones</dt>
+          <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">Sin observaciones</dd>
+        </div>
+        {% endif %}
+        <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+            <dt class="text-sm/6 font-medium text-gray-900">Estado</dt>
+            <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{{ compra.estado.value }}</dd>
+        </div>
+        <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+            <dt class="text-sm/6 font-medium text-gray-900">Numero factura</dt>
+            <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{{ compra.numero_factura }}</dd>
+        </div>
+        {% if compra.estado.value == "Realizada" or compra.estado.value == "Aceptada" %}
+            <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                <dt class="text-sm/6 font-medium text-gray-900">Fuentes de financiamiento</dt>
+                <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
+                    <strong>Fondos:</strong>
+                    <ul>
+                        {% for fondo in compra.fondos %}
+                            <li>{{ fondo.razon_social }}</li>
+                        {% endfor %}
+                    </ul>
+                    <strong>Areas:</strong>
+                    <ul>
+                        {% for area in compra.areas %}
+                            <li>{{ area.nombre }}</li>
+                        {% endfor %}
+                    </ul>
+                    <strong>Empleados:</strong>
+                    <ul>
+                        {% for empleado in compra.empleados %}
+                            <li>{{ empleado.nombre }} {{ empleado.apellido }}</li>
+                        {% endfor %}
+                    </ul>
+                </dd>
+            </div>
+        {% endif %}
+        {% if compra.estado.value == "Cancelada" %}
+            <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                <dt class="text-sm/6 font-medium text-gray-900">Causa de rechazo</dt>
+                <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{{ compra.causa_rechazo }}</dd>
+            </div>
+        {% endif %}
+      </dl>
+    </div>
+  </div>
+  <script>
+      document.addEventListener('DOMContentLoaded', function() {
+          const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+          document.querySelectorAll('.date-format').forEach(function(element) {
+              const date = new Date(element.textContent);
+              element.textContent = date.toLocaleDateString('es-ES', dateOptions);
+          });
+      });
+  </script>
+{% endblock %}

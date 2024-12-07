@@ -288,12 +288,26 @@ def seed():
 
     db.session.add(proveedor_1)
 
+    proveedor_2 = Proveedor(
+        razon_social = "tuyo",
+        contacto = "321"
+    )
+
+    db.session.add(proveedor_2)
+
+    proveedor_3 = Proveedor(
+        razon_social = "nuestro",
+        contacto = "123321"
+    )
+
+    db.session.add(proveedor_3)
+
     compra_1 = Compra(
         fecha = datetime.now(),
         numero_factura = "jamon",
         importe = 89,
         descripcion = "es un jamon",
-        estado = estado_compra.PENDIENTE,      
+        estado = estado_compra.ESPERA,      
         proveedor = proveedor_1,
         solicitante = admin_empleado
     )

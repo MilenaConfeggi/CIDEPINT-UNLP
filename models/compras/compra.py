@@ -5,9 +5,10 @@ from models.compras.compra_empleado import compra_empleado
 from models.compras.compra_area import compra_area
 
 class estado_compra(Enum):
-    RECHAZADA = "Rechazada"
-    ACEPTADA = "Aceptada"
-    PENDIENTE = "Pendiente"
+    REALIZADA = "Realizada"
+    APROBADA = "Aprobada"
+    ESPERA = "Espera"
+    CANCELADA = "Cancelada"
 
 class Compra(db.Model):
     __tablename__ = 'compras'

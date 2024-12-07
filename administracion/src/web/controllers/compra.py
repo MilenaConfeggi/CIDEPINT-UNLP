@@ -251,19 +251,45 @@ def descargar_compras_pdf():
     )
 
 @bp.get("/agregar_compra")
+@role_required('Administrador', 'Colaborador')
 def agregar_compra():
     form = form_agregar_compra()
     return render_template("compras/creacion_compra.html", form=form)
 
 @bp.post("/agregando_compra")
+@role_required('Administrador', 'Colaborador')
 def agregando_compra():
-    return render_template("compras/paso.html")
+
+    form = form_agregar_compra(request.form)
+    if form.validate_on_submit():
+
+        print("FONDOS")
+        print(form.fondos.data)
+        print(form.fondos_detalle.data)
+
+        print("AREAS")
+        print(form.areas.data)
+        print(form.areas_detalle.data)
+
+        flash("correctamente", "success")
+        return redirect(url_for("compra.lista_compras"))
+    else:
+        first_error_field = next(iter(form.errors))
+        first_error_message = form.errors[first_error_field][0]
+        flash(
+            f"Error en el campo {getattr(form, first_error_field).label.text}: {
+              first_error_message}",
+            "danger",
+        )
+        return render_template("compras/creacion_compra.html", form=form)
 
 @bp.get("/editar_compra/<int:id_compra>")
+@role_required('Administrador', 'Colaborador')
 def editar_compra(id_compra):
     return render_template("compras/paso.html")
 
 @bp.post("/editando_compra/<int:id_compra>")
+@role_required('Administrador', 'Colaborador')
 def editando_compra(id_compra):
     return render_template("compras/paso.html")
 

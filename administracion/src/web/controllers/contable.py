@@ -103,9 +103,6 @@ def get_legajos():
 
     for legajo in legajos:
         documentos = {doc.tipo_documento.nombre: doc for doc in legajo.documento}
-        print(documentos)
-        if documentos.get("Presupuesto CIDEPINT"):
-            print(documentos["Presupuesto CIDEPINT"].id)
         resultado.append({
             "id": legajo.id,
             "nro_legajo": legajo.nro_legajo,
@@ -190,36 +187,56 @@ def upload():
     if td is None:
         return jsonify({"error": "El tipo de documento no existe"}), 400
     
+    
     current_file = Path(__file__).resolve()  # Ruta absoluta del archivo actual
-    project_root = current_file.parents[5]  
+    project_root = current_file.parents[4]  
     DOCUMENTS_DIR = project_root / 'documentos'
     
     documentos_path = DOCUMENTS_DIR / td.nombre
     documentos_path.mkdir(parents=True, exist_ok=True)
 
     try:        
+        file_path = documentos_path / file.filename
         data = {
-            'nombre_documento': file.filename,
-            'fecha_creacion': datetime.now(),
-            'estado_id': 1,
             'legajo_id': legajo_id,
             'tipo_documento_id': td.id,
+            'nombre_documento': None
         }
-        if not create_documento(data):
-            return jsonify({"error": "No se pudo crear el documento"}), 400
-        
-        file_path = documentos_path / file.filename
-        counter = 1
-        while file_path.exists():
-            new_filename = f"{file.stem}({counter}){file.suffix}"  
-            file_path = documentos_path / new_filename
-            counter += 1
-        
-        file.save(str(file_path))
-        return jsonify({"message": f"Archivo guardado exitosamente en {file_path}"}), 200
+        old_file = find_documento(data)
+        print(old_file)
+        if old_file:
+            old_documento_path = documentos_path / old_file.nombre_documento
+            print(old_documento_path)
+            if old_documento_path.exists():
+                print(old_documento_path)
+                old_documento_path.unlink()
+                file.save(str(file_path))
+                old_file.nombre_documento = file.filename
+                db.session.commit()
+                return jsonify({"message": f"Archivo guardado exitosamente en {file_path}"}), 200
+            else:
+                return jsonify({"error": "No se encontro el archivo"}), 404
+        else:
+            counter = 1
+            while file_path.exists():
+                file.filename = f"{Path(file.filename).stem}({counter}){Path(file.filename).suffix}"  
+                file_path = documentos_path / file.filename
+                counter += 1
+            
+            data = {
+                'nombre_documento': file.filename,
+                'fecha_creacion': datetime.now(),
+                'estado_id': 1,
+                'legajo_id': legajo_id,
+                'tipo_documento_id': td.id,
+            }
+            if not create_documento(data):
+                return jsonify({"error": "No se pudo crear el documento"}), 400
+
+            file.save(str(file_path))
+            return jsonify({"message": f"Archivo guardado exitosamente en {file_path}"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-    
 @bp.get('/download/<int:documento_id>')
 def download(documento_id):
      # Extraer el ID del documento desde el formulario
@@ -231,7 +248,7 @@ def download(documento_id):
 
     # Ruta base de los documentos
     current_file = Path(__file__).resolve()
-    project_root = current_file.parents[5]
+    project_root = current_file.parents[4]
     documentos_path = project_root / "documentos" / tipo
 
     # Ruta completa del archivo

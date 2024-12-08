@@ -3,6 +3,7 @@ from models.documentos.estado import Estado
 from models.documentos.tipo_documento import Tipo_Documento
 from models.documentos.documento import Documento
 from models.legajos.legajo import Legajo
+from models.legajos import list_legajos
 
 def create_estado(data):
     if find_estado_by_nombre(data['nombre']) is not None:
@@ -13,11 +14,14 @@ def create_estado(data):
     return estado
 
 
-def listar_documentos(page=1, per_page=10, tipo_documento=''):
+def listar_documentos(page=1, per_page=10, tipo_documento=None, empresa=None, fecha=None, area=None):
+    tipo_documento = tipo_documento.strip()
     query = db.session.query(Documento).join(Legajo)
     if tipo_documento:
         query = query.filter_by(tipo_documento_id=tipo_documento)
-    return query.paginate(page=page, per_page=per_page, error_out=False)
+    legajo_query = list_legajos(page=None, per_page=None, empresa=empresa, fecha=fecha, area=area).query
+    result = legajo_query.join(Documento, Legajo.id == Documento.legajo_id)
+    return result.paginate(page=page, per_page=per_page, error_out=False)
 
 def list_estados():
     return db.session.query(Estado).all()

@@ -18,7 +18,6 @@ def listar_legajos():
     per_page = params.get('per_page', 10, int)
     pagination = list_legajos(page=page, per_page=per_page, empresa=empresa, fecha=fecha, area=area)
     result = pagination_legajos_schema.dump(pagination)
-    #data = legajos_schema.dump(list_legajos())
     return jsonify(result), 200
 
 @bp.get('/<string:id>')

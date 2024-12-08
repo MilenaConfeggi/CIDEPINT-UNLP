@@ -5,9 +5,10 @@ import { RouterLink, RouterView } from 'vue-router'
 <template>
   <div>
     <nav class="navbar">
-      <img alt="Vue logo" class="logo" src="@/assets/Logo.png" width="50" height="50" />
+      <RouterLink to="/">
+        <img alt="Vue logo" class="logo" src="@/assets/Logo.png" width="50" height="50" />
+      </RouterLink>
       <div class="nav-links">
-        <RouterLink to="/">Home</RouterLink>
         <RouterLink to="/mails/1">Mails</RouterLink>
         <RouterLink to="/muestras/1">Muestras</RouterLink> 
         <RouterLink to="/informes/1">Informes</RouterLink>

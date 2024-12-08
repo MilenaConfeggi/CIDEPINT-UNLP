@@ -318,7 +318,7 @@ def eliminar_archivo(id):
 @role_required('Administrador', 'Colaborador', 'Personal') 
 def descargar_archivo(id):
     archivo = Archivo.query.get_or_404(id)    
-    return send_file(archivo.ruta, as_attachment=True)
+    return send_file(archivo.filepath, as_attachment=True)
 
 @personal_bp.route('/usuario/inhabilitar/<int:id>', methods=['POST'])
 @role_required('Administrador', 'Colaborador') 

@@ -9,3 +9,5 @@ class Presupuesto(db.Model):
     medio_de_pago_id = db.Column(db.Integer, db.ForeignKey('medio_pago.id'), nullable=False)
 
     stans = db.relationship('STAN', secondary='presupuesto_stan', back_populates='presupuestos')
+    legajo_id = db.Column(db.Integer, db.ForeignKey('legajo.id'))
+    legajo = db.relationship('Legajo', back_populates='presupuesto_cidepint')

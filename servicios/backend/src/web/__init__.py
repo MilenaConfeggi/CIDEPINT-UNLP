@@ -2,7 +2,6 @@ from flask import Flask, render_template
 from servicios.backend.src.core.config import config
 from servicios.backend.src.core.seeds import seedsMuestra
 from servicios.backend.src.core.seeds import seedsMails
-from servicios.backend.src.core.seeds import seedsInforme
 from servicios.backend.src.core.seeds import seedsUsuario
 from servicios.backend.src.core.seeds import seedsStans
 from models import db
@@ -12,6 +11,7 @@ from servicios.backend.src.web.controllers.informes import bp as informes_bp
 from servicios.backend.src.web.controllers.usuarios import bp as usuarios_bp
 from servicios.backend.src.web.controllers.auth import bp as auth_bp
 from servicios.backend.src.web.controllers.stans import bp as stans_bp
+from servicios.backend.src.core.seeds import seedsLegajo 
 from flask_cors import CORS
 from flask_session import Session
 from flask_bcrypt import Bcrypt
@@ -59,8 +59,6 @@ def create_app(env="development", static_folder=""):
         print("Muestras creadas!")
         seedsMails.seeds_mails()
         print("Mails creados!")
-        seedsInforme.seeds_informe()
-        print("Documentos creados!")
         seedsStans.seed_stans()
         print("Stans y ensayos creados!")
         seedsUsuario.seeds_usuarios()

@@ -3,50 +3,253 @@
     Calendario de Ausencias
 {% endblock %}
 {% block content %}
-
-<div class="container mx-auto px-4">
-  <h1 class="text-2xl font-bold mb-4">Calendario de Ausencias</h1>
-  
-  <div class="flex justify-between mb-4">
-    <a href="{{ url_for('ausencia.ver_calendario', mes=mes-1 if mes > 1 else 12, año=año if mes > 1 else año-1) }}" class="bg-blue-500 text-white px-4 py-2 rounded">Mes Anterior</a>
-    <a href="{{ url_for('ausencia.ver_calendario', mes=mes+1 if mes < 12 else 1, año=año if mes < 12 else año+1) }}" class="bg-blue-500 text-white px-4 py-2 rounded">Mes Siguiente</a>
-  </div>
-  
-  <table class="min-w-full bg-white">
-    <thead>
-      <tr>
-        <th class="py-2 px-4 border-b">Domingo</th>
-        <th class="py-2 px-4 border-b">Lunes</th>
-        <th class="py-2 px-4 border-b">Martes</th>
-        <th class="py-2 px-4 border-b">Miércoles</th>
-        <th class="py-2 px-4 border-b">Jueves</th>
-        <th class="py-2 px-4 border-b">Viernes</th>
-        <th class="py-2 px-4 border-b">Sábado</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% set dia = primer_dia %}
-      {% for semana in range(6) %}
-        <tr>
-          {% for dia_semana in range(7) %}
-            <td class="py-2 px-4 border-b align-top">
-              {% if dia.month == mes %}
-                <div class="font-bold">{{ dia.day }}</div>
-                {% for ausencia in calendario[dia] %}
-                  <div class="mt-2">
-                    <p>{{ ausencia.empleado.nombre }} {{ ausencia.empleado.apellido }}</p>
-                    <p>DNI: {{ ausencia.empleado.dni }}</p>
-                    <p>Motivo: {{ ausencia.motivo }}</p>
+    <div class="container mx-auto px-4 pb-4">
+        <div id="context-menu" class="hidden">
+            <ul>
+                <li class="flex flex-wrap" id="eliminar">
+                    Eliminar
+                    <svg class="w-5 h-5"
+                        aria-hidden="true"
+                        fill="currentColor"
+                        viewBox="0 0 20 20">
+                        <path
+                        fill-rule="evenodd"
+                        d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                        clip-rule="evenodd"></path>
+                    </svg>
+                </li>
+            </ul>
+          </div>
+          <form method="POST" action="{{ url_for('ausencia.eliminar_ausencia') }}">
+            <div class="modal hidden" data-id="1" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+              <div class="fixed inset-0 bg-gray-500/75 transition-opacity" aria-hidden="true"></div>
+                  <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+                      <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                          <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+                              <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                                  <h3 class="text-base font-semibold text-gray-900" id="modal-title">¿Eliminar ausencia?</h3>
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <input type="hidden" name="id_ausencia" value="" />
+                              </div>
+                              <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                                <button type="submit" class="mt-3 mx-2 mb-2 inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-red-500 sm:mt-0 sm:w-auto">Confirmar</button>
+                                <button type="button" class="close-modal mx-2 mb-2 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm hover:bg-gray-50 sm:ml-3 sm:w-auto">Cancelar</button>
+                              </div>
+                          </div>
+                      </div>
                   </div>
+              </div>
+          </form>
+          <a href="{{url_for('personal.index')}}"
+            class="inline-flex items-center px-3 py-4 rounded-md text-black-500 hover:bg-black-50">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-6 w-6">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h18">
+                </path>
+            </svg>
+            <span class="ml-1 font-bold text-lg">Volver</span>
+          </a>
+    <div class="wrapper bg-white rounded shadow overflow-x-auto w-full">
+        <header class="flex items-center justify-between border-b border-gray-200 px-6 py-4 lg:flex-none">
+            <h1 class="text-base font-semibold leading-6 text-gray-900">
+              <time>{{ primer_dia.strftime('%B')|replace('January', 'Enero')|replace('February', 'Febrero')|replace('March', 'Marzo')|replace('April', 'Abril')|replace('May', 'Mayo')|replace('June', 'Junio')|replace('July', 'Julio')|replace('August', 'Agosto')|replace('September', 'Septiembre')|replace('October', 'Octubre')|replace('November', 'Noviembre')|replace('December', 'Diciembre') }} {{ anio }}</time>
+            </h1>
+            <div class="flex items-center">
+              <div class="relative flex items-center rounded-md bg-white shadow-sm md:items-stretch">
+                <a href="{{ url_for('ausencia.ver_calendario', 
+                anio=(anio - 1) if mes == 1 else anio, 
+                mes=(12 if mes == 1 else mes - 1)) }}"
+                class="flex h-9 w-12 items-center justify-center rounded-l-md border-y border-l border-gray-300 pr-1 text-gray-400 hover:text-gray-500 focus:relative md:w-9 md:pr-0 md:hover:bg-gray-50">
+                  <span class="sr-only">Mes anterior</span>
+                  <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clip-rule="evenodd" />
+                  </svg>
+                </a>
+                <a href="{{ url_for('ausencia.ver_calendario', 
+                anio=(anio + 1) if mes == 12 else anio, 
+                mes=(1 if mes == 12 else mes + 1)) }}"
+                class="flex h-9 w-12 items-center justify-center rounded-r-md border-y border-r border-gray-300 pl-1 text-gray-400 hover:text-gray-500 focus:relative md:w-9 md:pl-0 md:hover:bg-gray-50">
+                  <span class="sr-only">Mes siguiente</span>
+                  <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
+                  </svg>
+                </a>
+              </div>
+              <div class="ml-6 h-6 w-px bg-gray-300"></div>
+                <a href="{{ url_for('ausencia.registrar_ausencia') }}"
+                class="ml-6 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">
+                    Registrar ausencia 
+                </a>
+            </div>
+          </header>
+        <table class="w-full">
+            <thead>
+                <tr>
+                    {% for day in ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'] %}
+                        <th class="p-2">{{ day[:3] }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% set dia_actual = 0 %}
+                {% for dia in dias %}
+                    {% if loop.index % 7 == 1 %}
+                        <tr>
+                    {% endif %}
+                    <td class="border p-1 h-40 xl:w-40 lg:w-30 md:w-30 sm:w-30 w-30 overflow-auto transition cursor-pointer duration-500 ease hover:bg-gray-300">
+                        <div class="flex flex-col h-40 mx-auto xl:w-40 lg:w-30 md:w-30 sm:w-full w-30 overflow-hidden">
+                            <div class="top h-5 w-full">
+                              <span class="{% if dia.month != mes %} text-gray-400 {% endif %}">{{ dia.day }}</span>
+                            </div>
+                            <div class="bottom flex-grow h-30 py-1 w-full cursor-pointer overflow-y-auto">
+                                {% for ausencia in ausencias %}
+                                    {% if ausencia.fecha_desde.strftime('%Y-%m-%d') <= dia.strftime('%Y-%m-%d') and ausencia.fecha_hasta.strftime('%Y-%m-%d') >= dia.strftime('%Y-%m-%d') %}
+                                        <div data-id="{{ausencia.id}}" class="group bg-green-400 text-white rounded p-1 text-sm mb-1">
+                                            <div>
+                                                {{ ausencia.empleado.nombre }} {{ ausencia.empleado.apellido }} - {{ ausencia.empleado.dni }}
+                                            </div>
+                                            <div>
+                                                {{ ausencia.motivo }}
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </td>
+                    {% if loop.index % 7 == 0 %}
+                        </tr>
+                    {% endif %}
                 {% endfor %}
-              {% endif %}
-              {% set dia = dia + timedelta(days=1) %}
-            </td>
-          {% endfor %}
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
+            </tbody>
+        </table>            
+    </div>
+  </div>
+  <script>
+    // script.js
+    const contextMenu = document.getElementById("context-menu");
+    let selectedAusenciaId = null;
+  
+    // Función para mostrar el menú contextual
+    document.querySelectorAll('.group').forEach(item => {
+      item.addEventListener('contextmenu', (event) => {
+        event.preventDefault(); // Evita el menú contextual predeterminado
+  
+        const { clientX: clientX, clientY: clientY } = event;
+        
+        const mouseX = clientX + window.pageXOffset;
+        const mouseY = clientY + window.pageYOffset;
 
+        // Ajustar posición del menú
+        contextMenu.style.top = `${mouseY}px`;
+        contextMenu.style.left = `${mouseX}px`;
+  
+        // Mostrar el menú
+        contextMenu.classList.remove("hidden");
+  
+        selectedAusenciaId = item.getAttribute('data-id');
+      });
+    });
+  
+    // Ocultar el menú al hacer clic en cualquier lugar
+    document.addEventListener("click", () => {
+      contextMenu.classList.add("hidden");
+    });
+  
+    // Prevenir que el clic derecho fuera del contenido abra el menú contextual del navegador
+    document.addEventListener("contextmenu", (event) => {
+      if (!event.target.closest('.group')) {
+        event.preventDefault();
+        contextMenu.classList.add("hidden");
+      }
+    });
+  
+    // Añadir funcionalidad a las opciones del menú contextual
+    document.getElementById('eliminar').addEventListener('click', () => {
+      const modal = document.querySelector(`.modal`);
+      document.querySelector('input[name="id_ausencia"]').value = selectedAusenciaId;
+      modal.classList.remove('hidden');
+    });
+  
+    document.querySelector('.close-modal').addEventListener('click', () => {
+      const modal = document.querySelector(`.modal`);
+      modal.classList.add('hidden');
+    });
+  
+    // Mostrar el menú contextual al mantener presionado en dispositivos táctiles
+    document.querySelectorAll('.group').forEach(item => {
+      let touchTimeout;
+  
+      item.addEventListener('touchstart', (event) => {
+        touchTimeout = setTimeout(() => {
+          event.preventDefault(); // Evita el menú contextual predeterminado
+  
+          const touch = event.touches[0];
+          const { clientX: clientX, clientY: clientY } = touch;
+            
+            const mouseX = clientX + window.pageXOffset;
+            const mouseY = clientY + window.pageYOffset;
+          // Ajustar posición del menú
+          contextMenu.style.top = `${mouseY}px`;
+          contextMenu.style.left = `${mouseX}px`;
+  
+          // Mostrar el menú
+          contextMenu.classList.remove("hidden");
+  
+          selectedAusenciaId = item.getAttribute('data-id');
+        }, 500); // Tiempo de espera para considerar una pulsación larga
+      });
+  
+      item.addEventListener('touchend', () => {
+        clearTimeout(touchTimeout);
+        event.preventDefault();
+      });
+    });
+  </script>
+  <style>
+    /* width */
+    .bottom::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    /* Track */
+    .bottom::-webkit-scrollbar-track {
+        background: #f1f1f162;
+    }
+
+    /* Handle */
+    .bottom::-webkit-scrollbar-thumb {
+        background: #d4d4d4e1;
+        border-radius: 5px;
+    }
+
+    /* Handle on hover */
+    .bottom::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+    
+    #context-menu {
+        position: absolute;
+        z-index: 1000;
+        background: #fff;
+        border: 1px solid #ccc;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        border-radius: 4px;
+        padding: 10px;
+    }
+        
+    #context-menu ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+        
+    #context-menu ul li {
+        padding: 8px 12px;
+        cursor: pointer;
+    }
+        
+    #context-menu ul li:hover {
+        background-color: #f0f0f0;
+    }
+  </style>
 {% endblock %}

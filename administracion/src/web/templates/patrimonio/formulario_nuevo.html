@@ -1,0 +1,173 @@
+<!--
+  This example requires some changes to your config:
+  
+  ```
+  // tailwind.config.js
+  module.exports = {
+    // ...
+    plugins: [
+      // ...
+      require('@tailwindcss/forms'),
+    ],
+  }
+  ```
+-->
+
+{% extends 'layout.html' %}
+{% block title %}Nuevo Bien{% endblock %}
+{% block content %}
+    <form id="upload-form" class="px-4" method="POST" enctype="multipart/form-data" action="{{ url_for('patrimonio.crear_bien') }}">
+        {{ form.hidden_tag() }}
+
+        <div class="space-y-12">
+        <div class="border-b border-gray-900/10 pb-12">
+            <h2 class="text-base/7 font-semibold text-gray-900">Nuevo bien</h2>
+            <p class="mt-1 text-sm/6 text-gray-600">Ingrese la información del nuevo bien</p>
+    
+            <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                <div class="sm:col-span-4">
+                    <label for="titulo" class="block text-sm/6 font-medium text-gray-900">Título</label>
+                    <div class="mt-2">
+                        <div class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                            {{ form.titulo(class='form-control block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm/6', placeholder='Ingrese título') }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sm:col-span-4">
+                    <label for="area" class="block text-sm/6 font-medium text-gray-900">Area</label>
+                    <div class="mt-2">
+                        <div class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                            {{ form.area(class='block w-full mt-1 text-sm form-select focus:border-black-400 focus:outline-none focus:shadow-outline-black') }}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="sm:col-span-4">
+                    <label for="numero_inventario" class="block text-sm/6 font-medium text-gray-900">Número de inventario</label>
+                    <div class="mt-2">
+                        <div class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                            {{ form.numero_inventario(class='form-control block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm/6', placeholder='Ingrese número de inventario') }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sm:col-span-4">
+                    <label for="anio" class="block text-sm/6 font-medium text-gray-900">Año</label>
+                    <div class="mt-2">
+                        <div class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                            {{ form.anio(class='form-control block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm/6', placeholder='Ingrese año') }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sm:col-span-4">
+                    <label for="institucion" class="block text-sm/6 font-medium text-gray-900">Institución</label>
+                    <div class="mt-2">
+                        <div class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                            {{ form.institucion(class='form-control block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm/6', placeholder='Ingrese institucion') }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-span-full">
+                    <label for="descripcion" class="block text-sm/6 font-medium text-gray-900">Descripción</label>
+                    <div class="mt-2">
+                        {{ form.descripcion(rows="3", class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6", placeholder='Ingrese descripción') }}
+                    </div>
+                </div>
+                
+            <div class="col-span-full">
+                {{ form.archivos_adjuntos.label }}
+                <div class="flex items-center justify-center w-full">
+                    <label for="dropzone-file" id="dropzone" class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50">
+                        <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                            <svg class="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" aria-hidden="true" fill="none" viewBox="0 0 20 16">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
+                            </svg>
+                            <p class="mb-2 text-sm text-gray-500 dark:text-gray-400"><span class="font-semibold">Click para subir</span> o arrastra y soltá</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400"></p>
+                        </div>
+                        {{ form.archivos_adjuntos(class="hidden", id="dropzone-file", multiple=True) }}
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div id="file-list" class="mt-4">
+            <!-- Lista de archivos seleccionados -->
+        </div>
+        <div class="mt-6 flex items-center justify-end gap-x-6">
+            <a href="{{ url_for('patrimonio.index') }}" type="button" class="text-sm/6 font-semibold text-gray-900">Cancelar</a>
+            <button type="submit" class="rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600">Registrar</button>
+        </div>
+    </form>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const dropzone = document.getElementById('dropzone');
+            const fileInput = document.getElementById('dropzone-file');
+            const fileListContainer = document.getElementById('file-list');
+    
+            // Mantén una referencia a los archivos seleccionados
+            let fileArray = [];
+    
+            // Actualiza la vista previa de los archivos seleccionados
+            function updateFileList() {
+                fileListContainer.innerHTML = ''; // Limpiamos la lista
+                fileArray.forEach((file, index) => {
+                    const fileItem = document.createElement('div');
+                    fileItem.className = 'flex items-center justify-between border p-2 mb-2 bg-gray-100 rounded';
+                    fileItem.innerHTML = `
+                        <span>${file.name}</span>
+                        <button class="text-red-500 remove-file" data-index="${index}">X</button>
+                    `;
+                    fileListContainer.appendChild(fileItem);
+                });
+    
+                // Actualizar eventos para eliminar archivos
+                document.querySelectorAll('.remove-file').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const index = e.target.getAttribute('data-index');
+                        fileArray.splice(index, 1); // Eliminar de la lista
+                        updateFileList(); // Actualizar la vista
+                    });
+                });
+    
+                // Sincroniza los archivos con el input real
+                syncInputFiles();
+            }
+    
+            // Sincroniza el input de archivos con la lista en memoria
+            function syncInputFiles() {
+                const dataTransfer = new DataTransfer(); // Crear una instancia para archivos virtuales
+                fileArray.forEach(file => dataTransfer.items.add(file)); // Añadir archivos
+                fileInput.files = dataTransfer.files; // Actualizar los archivos del input
+            }
+    
+            // Manejador para arrastrar y soltar
+            dropzone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropzone.classList.add('border-blue-500');
+            });
+    
+            dropzone.addEventListener('dragleave', () => {
+                dropzone.classList.remove('border-blue-500');
+            });
+    
+            dropzone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropzone.classList.remove('border-blue-500');
+                const files = Array.from(e.dataTransfer.files);
+                fileArray = fileArray.concat(files); // Agregar nuevos archivos sin reemplazar
+                updateFileList(); // Actualizamos la vista
+            });
+    
+    
+            // Manejador para seleccionar archivos desde el explorador
+            fileInput.addEventListener('change', (e) => {
+                const files = Array.from(fileInput.files);
+                fileArray = fileArray.concat(files); // Agregar nuevos archivos a la lista
+                updateFileList();
+            });
+        });
+    </script>
+{% endblock %}

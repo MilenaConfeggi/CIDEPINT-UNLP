@@ -43,7 +43,7 @@ def find_documento(data):
     query = Documento.query
     if data['nombre_documento'] is not None:
         query = query.filter_by(nombre_documento=data['nombre_documento'])
-    query = query.filter_by(estado_id=data['tipo_documento_id'])
+    query = query.filter_by(tipo_documento_id=data['tipo_documento_id'])
     query = query.filter_by(legajo_id=data['legajo_id'])
     return query.first()
 

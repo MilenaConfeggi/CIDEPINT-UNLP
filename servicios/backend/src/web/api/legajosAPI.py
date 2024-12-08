@@ -13,10 +13,10 @@ def listar_legajos():
     params = request.args
     empresa = params.get('empresa', '')
     fecha = params.get('fecha', '')
+    area = params.get('area', '')
     page = params.get('page', 1, int)
     per_page = params.get('per_page', 10, int)
-    pagination = list_legajos(page=page, per_page=per_page, empresa=empresa, fecha=fecha)
-    print(pagination.items)
+    pagination = list_legajos(page=page, per_page=per_page, empresa=empresa, fecha=fecha, area=area)
     result = pagination_legajos_schema.dump(pagination)
     #data = legajos_schema.dump(list_legajos())
     return jsonify(result), 200

@@ -23,7 +23,7 @@
         <p>LEG_{{ legajo.id }}</p>
         <StateBadge v-if="legajo.estado" :state="legajo.estado?.nombre" />
         <p>Fecha entrada: {{ formatDate(legajo.fecha_entrada) }}</p>
-        <p>Objetivo: {{}}</p>
+        <p>Objetivo: {{legajo.objetivo}}</p>
         <div v-if="legajo.cliente">
           <h6>Cliente</h6>
           <p>{{ legajo.cliente.nombre }}</p>

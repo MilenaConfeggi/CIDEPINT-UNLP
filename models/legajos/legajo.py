@@ -25,6 +25,9 @@ class Legajo(db.Model):
     
     documento = db.relationship('Documento', back_populates='legajo')
     
+    area_id = db.Column(db.Integer, db.ForeignKey('area.id'))
+    area = db.relationship('Area', backref=db.backref('legajos', lazy=True))
+    
 @event.listens_for(Legajo, "before_insert")
 def set_custom_id(mapper, connection, target):
     session = Session.object_session(target)

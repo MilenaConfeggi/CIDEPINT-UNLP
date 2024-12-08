@@ -16,6 +16,7 @@ def seeds_legajos():
             'es_juridico': True,
             'necesita_facturacion': True,
             'objetivo': 'Objetivo de legajo',
+            'area_id': 1,
         },
         {
             'fecha_entrada': datetime(2024, 1, 1),
@@ -23,6 +24,7 @@ def seeds_legajos():
             'es_juridico': True,
             'necesita_facturacion': True,
             'objetivo': 'Objetivo de legajo2',
+            'area_id': 2,
 
         },
         {
@@ -31,6 +33,7 @@ def seeds_legajos():
             'es_juridico': False,
             'necesita_facturacion': False,
             'objetivo': 'Objetivo de legajo3',
+            'area_id': 3,
         },
         {
             'fecha_entrada': datetime(2024, 3, 1),
@@ -38,6 +41,7 @@ def seeds_legajos():
             'es_juridico': True,
             'necesita_facturacion': True,
             'objetivo': 'Objetivo de legajo4',
+            'area_id': 1,
         }
     ]
     for data in legajos_data:

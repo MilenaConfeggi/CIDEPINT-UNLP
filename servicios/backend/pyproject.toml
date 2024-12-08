@@ -16,6 +16,7 @@ marshmallow = "^3.23.1"
 flask-cors = "^5.0.0"
 flask-wtf = "^1.2.2"
 cryptography = "^43.0.3"
+flask-login = "^0.6.3"
 
 
 [tool.poetry.group.dev.dependencies]

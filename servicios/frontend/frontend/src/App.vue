@@ -5,7 +5,7 @@ import { RouterLink, RouterView } from 'vue-router'
 <template>
   <div>
     <nav class="navbar">
-      <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="50" height="50" />
+      <img alt="Vue logo" class="logo" src="@/assets/Logo.png" width="50" height="50" />
       <div class="nav-links">
         <RouterLink to="/">Home</RouterLink>
         <RouterLink to="/mails/1">Mails</RouterLink>
@@ -25,7 +25,7 @@ import { RouterLink, RouterView } from 'vue-router'
 .navbar {
   display: flex;
   align-items: center;
-  background-color: #333;
+  background-color: darkred;
   padding: 1rem;
 }
 

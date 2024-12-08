@@ -7,12 +7,14 @@ from servicios.backend.src.core.seeds import seedsLegajo
 from servicios.backend.src.core.seeds import seedsEstados
 from servicios.backend.src.core.seeds import seedsInforme
 from servicios.backend.src.core.seeds import seedsDocumento
+from servicios.backend.src.core.seeds import seedsArea
 from models import db
 from servicios.backend.src.web.controllers.mails import bp as mails_bp
 from servicios.backend.src.web.controllers.muestras import bp as muestras_bp
 from servicios.backend.src.web.controllers.informes import bp as informes_bp
 from servicios.backend.src.web.api.legajosAPI import bp as legajos_api_bp
 from servicios.backend.src.web.api.documentoAPI import bp as documentos_api_bp
+from servicios.backend.src.web.api.areaAPI import bp as area_bp
 from flask_cors import CORS
 
 def create_app(env="development", static_folder=""):
@@ -29,6 +31,7 @@ def create_app(env="development", static_folder=""):
     app.register_blueprint(informes_bp)
     app.register_blueprint(legajos_api_bp)
     app.register_blueprint(documentos_api_bp)
+    app.register_blueprint(area_bp)
 
     @app.cli.command(name="reset-db")
     def reset_db():
@@ -46,6 +49,8 @@ def create_app(env="development", static_folder=""):
         """
         Comando para crear los seeds de la base de datos
         """
+        seedsArea.seeds_areas()
+        print("Areas creados!")
         seedsEstados.seeds_estados()
         print("Estados creados!")
         seedsDocumento.seeds_tipos_documento()

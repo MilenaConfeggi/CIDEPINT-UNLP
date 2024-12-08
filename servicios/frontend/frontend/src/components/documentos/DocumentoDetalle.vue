@@ -2,7 +2,7 @@
   <div v-if="doc">
     <p>Nombre del documento: {{ doc.nombre_documento }}</p>
     <button @click="viewFile(doc.nombre_documento, doc.tipo_documento)">Ver Archivo</button> 
-    <div v-if="fileUrl" class="file-preview">
+  <div v-if="fileUrl" class="file-preview">
       <iframe :src="fileUrl" frameborder="0" width="100%" height="600px"></iframe>
     </div>
   </div>

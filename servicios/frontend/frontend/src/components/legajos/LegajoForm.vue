@@ -37,10 +37,20 @@
         required
       />
     </div>
-    <div class="col-12">
+    <div class="col-md-6">
       <label for="contacto" class="form-label">Contacto</label>
       <input type="text" class="form-control" id="contacto" v-model="form.contacto" required />
       <div class="invalid-feedback">Por favor, introduzca un contacto.</div>
+    </div>
+    <div class="col-md-6">
+      <label for="area" class="form-label">Area</label>
+      <select class="form-select" id="area" v-model="form.area" required>
+        <option selected value="">Seleccione el area...</option>
+        <option v-for="area in areas" :key="area.id" :value="area.id">
+          {{ area.nombre }}
+        </option>
+      </select>
+      <div class="invalid-feedback">Por favor, seleccione un área.</div>
     </div>
     <div class="col-md-6">
       <label for="calle" class="form-label">Calle</label>
@@ -88,16 +98,25 @@
     </div>
     <div class="mb-3">
       <label for="objetivo" class="form-label">Objetivo del OT</label>
-      <textarea class="form-control" id="objetivo" placeholder="Objetivo" required v-model="form.objetivo"></textarea>
+      <textarea
+        class="form-control"
+        id="objetivo"
+        placeholder="Objetivo"
+        required
+        v-model="form.objetivo"
+      ></textarea>
       <div class="invalid-feedback">Please enter a message in the textarea.</div>
     </div>
     <div class="col-12 d-flex justify-content-center">
-      <button type="submit" class="btn btn-primary">Sign in</button>
+      <button type="submit" class="btn btn-primary">Crear legajo</button>
     </div>
   </form>
 </template>
 <script>
 import axios from 'axios'
+import { useAreasStore } from '../../stores/areas'
+import { storeToRefs } from 'pinia'
+
 export default {
   data() {
     return {
@@ -115,11 +134,37 @@ export default {
         objetivo: '',
         es_juridico: false,
         necesita_facturacion: false,
+        nombreCliente: '',
+        area: '',
       },
       wasValidated: false,
     }
   },
+
+  setup() {
+    const areasStore = useAreasStore();
+    const { areas, loading, error } = storeToRefs(areasStore);
+
+    return {
+      areas,
+      loading,
+      error,
+    };
+  },
+  async mounted() {
+    const areasStore = useAreasStore();
+    await areasStore.getAreas();
+  },
   methods: {
+    async loadAreas() {
+      try {
+        const areasStore = useAreasStore()
+        await areasStore.getAreas()
+      } catch (error) {
+        console.error('Error cargando áreas:', error)
+        alert('Hubo un error cargando las áreas. Intente de nuevo más tarde.')
+      }
+    },
     async validateForm() {
       const form = this.$el
       if (form.checkValidity()) {
@@ -127,7 +172,7 @@ export default {
           email: this.form.email,
           cuit: this.form.cuit,
           telefono: this.form.telefono,
-          celular: this.form.celular,
+          celular: this.form.telefono,
           direccion: this.form.direccion,
           contacto: this.form.contacto,
           calle: this.form.calle,
@@ -136,6 +181,7 @@ export default {
           codigo_postal: this.form.codigo_postal,
           piso: this.form.piso,
           depto: this.form.depto,
+          nombre: this.form.nombreCliente,
         }
         const legajo = {
           objetivo: this.form.objetivo,
@@ -143,6 +189,7 @@ export default {
           necesita_facturacion: this.form.necesita_facturacion,
           fecha_entrada: new Date().toISOString().replace('T', ' ').replace('Z', ''),
           nro_legajo: 'LEG' + Math.floor(Math.random() * 1000),
+          area_id: this.form.area,
         }
         const data = {
           legajo: legajo,
@@ -175,6 +222,7 @@ export default {
       this.form.objetivo = ''
       this.form.es_juridico = false
       this.form.necesita_facturacion = false
+      this.form.area = ''
     },
   },
 }

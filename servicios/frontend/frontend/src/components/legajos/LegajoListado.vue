@@ -14,19 +14,19 @@
     <p v-if="loading">Cargando...</p>
     <p v-if="error">{{ error }}</p>
     <div class="input-group mb-3 d-flex flex-row">
-      <label class="input-group-text" for="documento">Documentos</label>
+      <label class="input-group-text" for="documento">Ensayos</label>
       <select v-model="documento" class="form-select" id="documento">
-        <option selected>Choose...</option>
+        <option selected value="">Choose...</option>
         <option value="1">One</option>
         <option value="2">Two</option>
         <option value="3">Three</option>
       </select>
       <label class="input-group-text" for="area">Areas</label>
-      <select v-model="area" class="form-select" id="area">
-        <option selected>Choose...</option>
-        <option value="1">One</option>
-        <option value="2">Two</option>
-        <option value="3">Three</option>
+      <select v-if="areas" v-model="area" class="form-select" id="area">
+        <option selected value="">Choose...</option>
+        <option v-for="area in areas" :key="area.id" :value="area.id">
+          {{ area.nombre }}
+        </option>
       </select>
       <span class="input-group-text">Empresa</span>
 
@@ -38,9 +38,7 @@
       />
       <input type="date" v-model="fecha" @input="validateDates" placeholder="Fecha de inicio" />
     </div>
-    <div v-if="legajos.items?.length">
-      <div>
-      </div>
+    <div v-if="legajos.items?.length && !error">
       <table class="table">
         <thead>
           <tr>
@@ -55,7 +53,7 @@
           <tr v-for="legajo in legajos.items" :key="legajo.id">
             <th scope="row">{{ legajo.id }}</th>
             <td>{{ legajo.cliente?.nombre }}</td>
-            <td>{{ legajo.objetivo }}</td>
+            <td>{{ legajo.area.nombre }}</td>
             <td><StateBadge :state="legajo.estado?.nombre" /></td>
             <td>
               <RouterLink :to="`/legajos/${legajo.id}`" class="hover:underline">
@@ -90,10 +88,12 @@
 import { onMounted, watch } from 'vue'
 import StateBadge from '../StateBadge.vue'
 import { useLegajosStore } from '../../stores/legajos'
+import { useAreasStore } from '../../stores/areas'
 import { storeToRefs } from 'pinia'
 import { ref } from 'vue'
 
 const legajosStore = useLegajosStore()
+const areasStore = useAreasStore()
 const currentPage = ref(1)
 
 var documento = ref('')
@@ -102,6 +102,7 @@ var empresa = ref('')
 var fecha = ref('')
 
 const { legajos, loading, error, totalPages } = storeToRefs(legajosStore)
+const { areas } = storeToRefs(areasStore)
 
 const validateDates = () => {
   if (new Date(this.startDate) > new Date()) {
@@ -115,11 +116,15 @@ const fetchLegajos = async () => {
     //documento: documento.value,
     area: area.value,
     empresa: empresa.value,
-    //fecha: fecha.value,
+    fecha: fecha.value,
     page: currentPage.value,
     per_page: 10,
   }
   await legajosStore.getLegajos(params)
+}
+
+const fetchAreas = async () => {
+  await areasStore.getAreas()
 }
 
 
@@ -137,6 +142,7 @@ const nextPage = () => {
 }
 
 onMounted(() => {
+  fetchAreas()
   fetchLegajos()
 })
 

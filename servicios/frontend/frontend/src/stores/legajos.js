@@ -12,7 +12,7 @@ export const useLegajosStore = defineStore('legajos', {
     }),
     actions: {
         async getLegajos(params) {
-            const { page, per_page, empresa, fecha } = params
+            const { page, per_page, empresa, fecha, area } = params
             this.loading = true
             this.error = null
             try {
@@ -22,7 +22,7 @@ export const useLegajosStore = defineStore('legajos', {
                         per_page,
                         empresa,
                         fecha,
-                        // area,
+                        area,
                     },
                 })
                 this.legajos = response.data

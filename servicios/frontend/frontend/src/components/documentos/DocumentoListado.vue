@@ -62,7 +62,7 @@
         <button @click="nextPage" :disabled="currentPage === totalPages">Siguiente</button>
       </div>
     </div>
-    <div v-else>No hay legajos</div>
+    <div v-else>No hay Documentos</div>
   </div>
   <div
     class="modal fade"

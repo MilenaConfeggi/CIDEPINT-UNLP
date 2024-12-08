@@ -2,6 +2,7 @@ from marshmallow import Schema, fields, validates_schema
 from .cliente import ClienteSchema
 from .estado import EstadoSchema
 from .documento import DocumentoSchema
+from .area import AreaSchema
 
 class LegajoSchema(Schema):
     id = fields.Integer(dump_only=True)
@@ -16,6 +17,7 @@ class LegajoSchema(Schema):
     estado_id = fields.Integer(dump_only=True)
     estado = fields.Nested(EstadoSchema, dump_only=True)
     documento = fields.List(fields.Nested(DocumentoSchema, dump_only=True))
+    area = fields.Nested(AreaSchema, dump_only=True)
 
 legajo_schema = LegajoSchema()
 legajos_schema = LegajoSchema(many=True)

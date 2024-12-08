@@ -3,22 +3,145 @@
     Listar Áreas
 {% endblock %}
 {% block content %}
-
-<div class="container mx-auto px-4 py-8 h-full">
-    <h1 class="text-3xl font-bold mb-8">Áreas Creadas</h1>
-    <div class="bg-white shadow-md rounded-lg p-6">
-        <ul>
-            {% for area in areas %}
-                <li class="mb-2 flex items-center justify-between">
-                    <span class="text-gray-700">{{ area.nombre }}</span>
-                    <a href="{{ url_for('area.modificar_area', id=area.id) }}" class="text-blue-500 hover:underline">
-                        Modificar
-                    </a>
-                </li>
-            {% endfor %}
-        </ul>
+<a href="{{url_for('personal.index')}}"
+    class="inline-flex items-center px-3 py-4 rounded-md text-black-500 hover:bg-black-50">
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-6 w-6">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h18">
+        </path>
+    </svg>
+    <span class="ml-1 font-bold text-lg">Volver</span>
+</a>
+<div class="px-4 py-3 mx-8 mt-2 mb-8 bg-white rounded-lg shadow-md">
+    <div class="flex justify-between w-full items-end">
+        <h1 class="text-3xl font-bold mb-8">Áreas</h1>
+        <a href="{{ url_for('area.crear_area') }}" class="px-4 py-2 mb-6 text-sm font-medium text-white transition-colors duration-150 bg-green-500 border border-transparent rounded-lg active:bg-green-600 hover:bg-green-700 focus:outline-none focus:shadow-outline-green sm:px-4">
+            Crear Área
+        </a>
     </div>
-
+    <div class="w-full overflow-x-auto">
+        <table class="w-full whitespace-no-wrap">
+            <thead>
+            <tr
+                class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b bg-gray-50"
+            >
+                <th class="px-4 py-3">Nombre</th>
+                <th class="px-4 py-3">Saldo</th>
+                <th class="px-4 py-3">Acciones</th>
+            </tr>
+            </thead>
+            <tbody
+            class="bg-white divide-y"
+            >
+            {% for area in areas %}
+                <tr class="text-gray-700">
+                    <td class="px-4 py-3">
+                    <div class="flex items-center text-sm">
+                        <div>
+                            <p class="font-semibold">{{ area.nombre }}</p>
+                        </div>
+                    </div>
+                    </td>
+                    <td class="px-4 py-3 text-sm">
+                    {{ area.saldo }}
+                    </td>
+                    <td class="px-4 py-3">
+                    <div class="flex items-center space-x-4 text-sm">
+                        <a href="{{ url_for('area.modificar_area', id=area.id) }}"
+                        class="flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-black-600 rounded-lg focus:outline-none focus:shadow-outline-gray"
+                        aria-label="Editar"
+                        >
+                            <svg
+                                class="w-5 h-5"
+                                aria-hidden="true"
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                            >
+                                <path
+                                d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"
+                                ></path>
+                            </svg>
+                        </a>
+                    </div>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="grid px-4 py-3 text-xs font-semibold tracking-wide text-gray-500 uppercase border-t bg-gray-50 sm:grid-cols-9">
+        <span class="flex items-center col-span-3">
+            Mostrando {{ areas.first }}-{{ areas.last }} de {{ areas.total }}
+        </span>
+        <span class="col-span-2"></span>
+        <!-- Pagination -->
+        <span class="flex col-span-4 mt-2 sm:mt-auto sm:justify-end">
+            <nav aria-label="Table navigation">
+            <ul class="inline-flex items-center">
+                <li>
+                <a
+                    class="px-3 py-1 rounded-md rounded-l-lg focus:outline-none focus:shadow-outline-purple"
+                    aria-label="Anterior"
+                    href="{{ url_for('area.listar_areas', pagina=areas.prev_num) }}"
+                >
+                    <svg
+                    class="w-4 h-4 fill-current"
+                    aria-hidden="true"
+                    viewBox="0 0 20 20"
+                    >
+                    <path
+                        d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                        clip-rule="evenodd"
+                        fill-rule="evenodd"
+                    ></path>
+                    </svg>
+                </a>
+                </li>
+                {% for page in areas.iter_pages() %}
+                    {% if page %}
+                        {% if page != areas.page %}
+                            <li>
+                                <a href="{{ url_for('area.listar_areas', pagina=page) }}" class="px-3 py-1 text-gray transition-colors duration-150">
+                                    {{ page }}
+                                </a>
+                            </li>
+                        {% else %}
+                            <li>
+                                <p class="px-3 py-1 text-white transition-colors duration-150 bg-blue-600 border border-r-0 border-blue-600 rounded-md focus:outline-none focus:shadow-outline-blue">
+                                    {{ page }}
+                                </p>
+                            </li>
+                        {% endif %}
+                    {% else %}
+                        <li>
+                            <p class="px-3 py-1 text-white transition-colors duration-150">
+                                ..
+                            </p>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+                <li>
+                <a
+                    class="px-3 py-1 rounded-md rounded-r-lg focus:outline-none focus:shadow-outline-purple"
+                    aria-label="Next"
+                    href="{{ url_for('area.listar_areas', pagina=areas.next_num) }}"
+                >
+                    <svg
+                    class="w-4 h-4 fill-current"
+                    aria-hidden="true"
+                    viewBox="0 0 20 20"
+                    >
+                    <path
+                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                        clip-rule="evenodd"
+                        fill-rule="evenodd"
+                    ></path>
+                    </svg>
+                </a>
+                </li>
+            </ul>
+            </nav>
+        </span>
+        </div>
+    </div>
 </div>
 
 {% endblock %}

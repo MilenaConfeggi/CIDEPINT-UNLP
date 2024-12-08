@@ -145,7 +145,6 @@ def eliminar_archivo(id_carpeta):
 @role_required('Administrador', 'Colaborador') 
 def eliminar_carpeta():
     data = request.form
-    print(f'Id de la carpeta: {data.get('id_carpeta')}')
     if servicio_archivos.eliminar_carpeta(id_carpeta=data.get('id_carpeta')):
         flash('Carpeta eliminada correctamente', 'success')
     else:

@@ -12,8 +12,8 @@ class Ausencia(db.Model):
     motivo = db.Column(db.String(200), nullable=False)
     empleado = db.relationship('Empleado', back_populates='ausencias')
 
-    def __init__(self, empleado_id, fecha_desde, fecha_hasta, motivo):
-        self.empleado_id = empleado_id
+    def __init__(self, empleado, fecha_desde, fecha_hasta, motivo):
+        self.empleado = empleado
         self.fecha_desde = fecha_desde
         self.fecha_hasta = fecha_hasta
         self.motivo = motivo

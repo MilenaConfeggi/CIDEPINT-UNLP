@@ -11,7 +11,8 @@ area_bp = Blueprint("area", __name__, url_prefix="/area")
 @area_bp.route('/listar', methods=['GET'])
 @role_required('Administrador', 'Colaborador')
 def listar_areas():
-    areas = Area.query.all()
+    pagina = request.args.get('pagina', 1, type=int)
+    areas = Area.query.paginate(page=pagina,per_page=10,error_out=False)
     return render_template('personal/listar_areas.html', areas=areas)
 
 @area_bp.route('/crear', methods=['GET', 'POST'])
@@ -26,6 +27,7 @@ def crear_area():
         
         if success:
             flash('Área creada con éxito', 'success')
+            return redirect(url_for('area.listar_areas'))
         else:
             flash(message, 'error')    
             

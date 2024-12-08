@@ -15,6 +15,7 @@ from administracion.src.web.controllers.roles import role_required
 from flask_login import current_user
 from models.personal.personal import User
 from models.personal.empleado import Empleado
+from models.archivos_admin.archivo import Archivo
 
 
 personal_bp = Blueprint("personal", __name__, url_prefix="/personal")
@@ -80,7 +81,7 @@ def registrar_usuario():
             flash('Usuario registrado con éxito', 'success')
         else:
             flash(message, 'error')
-        return redirect(url_for('personal.registrar_usuario'))
+        return redirect(url_for('personal.ver_empleados'))
     
     # Recuperar las áreas de la base de datos
     areas = Area.query.all()
@@ -125,17 +126,14 @@ def ver_empleados():
     ordenar_por = request.args.get('ordenar_por', 'nombre')
     orden = request.args.get('orden', 'asc')
     mostrar_inhabilitados = request.args.get('mostrar_inhabilitados', '0') == '1'
+    pagina = request.args.get('pagina', 1, type=int)
     
     query = Empleado.query
     
     if busqueda:
         query = query.filter(or_(
-            Empleado.nombre.ilike(f'%{busqueda}%'),
-            Empleado.apellido.ilike(f'%{busqueda}%'),
-            cast(Empleado.dni, String).ilike(f'%{busqueda}%'),
-            cast(Empleado.area_id, String).ilike(f'%{busqueda}%'),
-            cast(Empleado.dependencia, String).ilike(f'%{busqueda}%'),
-            cast(Empleado.cargo, String).ilike(f'%{busqueda}%')
+            Empleado.nombre.ilike(f'{busqueda}%'),
+            Empleado.apellido.ilike(f'{busqueda}%')
         ))
     
     if not mostrar_inhabilitados:
@@ -145,8 +143,8 @@ def ver_empleados():
         query = query.order_by(cast(getattr(Empleado, ordenar_por), String).asc())
     else:
         query = query.order_by(cast(getattr(Empleado, ordenar_por), String).desc())
-    
-    empleados = query.all()
+
+    empleados = query.paginate(page=pagina,per_page=10,error_out=False)
     
     return render_template('personal/ver_empleados.html', empleados=empleados, busqueda=busqueda, ordenar_por=ordenar_por, orden=orden, mostrar_inhabilitados=mostrar_inhabilitados)
 
@@ -162,12 +160,8 @@ def descargar_empleados():
     
     if busqueda:
         query = query.filter(or_(
-            Empleado.nombre.ilike(f'%{busqueda}%'),
-            Empleado.apellido.ilike(f'%{busqueda}%'),
-            cast(Empleado.dni, String).ilike(f'%{busqueda}%'),
-            cast(Empleado.area, String).ilike(f'%{busqueda}%'),
-            cast(Empleado.dependencia, String).ilike(f'%{busqueda}%'),
-            cast(Empleado.cargo, String).ilike(f'%{busqueda}%')
+            Empleado.nombre.ilike(f'{busqueda}%'),
+            Empleado.apellido.ilike(f'{busqueda}%'),
         ))
     
     if orden == 'asc':
@@ -324,7 +318,7 @@ def eliminar_archivo(id):
 @role_required('Administrador', 'Colaborador', 'Personal') 
 def descargar_archivo(id):
     archivo = Archivo.query.get_or_404(id)    
-    return send_file(archivo.ruta, as_attachment=True)
+    return send_file(archivo.filepath, as_attachment=True)
 
 @personal_bp.route('/usuario/inhabilitar/<int:id>', methods=['POST'])
 @role_required('Administrador', 'Colaborador') 

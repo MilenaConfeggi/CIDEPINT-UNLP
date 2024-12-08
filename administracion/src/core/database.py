@@ -5,7 +5,7 @@ from models.Fondo.fondo import Fondo as fondoDB
 from models.personal.area import Area
 from models.personal.empleado import Empleado
 from models.personal.personal import User
-from models.archivos_admin.carpeta import usuarios_leen_carpeta
+from models.personal.ausencia import Ausencia
 from sqlalchemy import MetaData
 from datetime import datetime
 
@@ -419,4 +419,63 @@ def seed():
     )
 
     db.session.add_all([personal_1,usuario_1,personal_2, usuario_2, personal_3, usuario_3, personal_4, usuario_4, personal_5, usuario_5, personal_6, usuario_6])
+
+    ausencia_1 = Ausencia(
+        empleado=personal_1,
+        fecha_desde=datetime.strptime('2024-12-09', '%Y-%m-%d'),
+        fecha_hasta=datetime.strptime('2024-12-15', '%Y-%m-%d'),
+        motivo='Vacaciones'
+    )
+
+    ausencia_2 = Ausencia(
+        empleado=personal_2,
+        fecha_desde=datetime.strptime('2024-11-01', '%Y-%m-%d'),
+        fecha_hasta=datetime.strptime('2024-11-10', '%Y-%m-%d'),
+        motivo='Enfermedad'
+    )
+
+    ausencia_3 = Ausencia(
+        empleado=personal_3,
+        fecha_desde=datetime.strptime('2024-10-05', '%Y-%m-%d'),
+        fecha_hasta=datetime.strptime('2024-10-12', '%Y-%m-%d'),
+        motivo='Capacitación'
+    )
+
+    ausencia_4 = Ausencia(
+        empleado=personal_4,
+        fecha_desde=datetime.strptime('2024-12-15', '%Y-%m-%d'),
+        fecha_hasta=datetime.strptime('2024-12-20', '%Y-%m-%d'),
+        motivo='Licencia por maternidad'
+    )
+
+    ausencia_5 = Ausencia(
+        empleado=personal_5,
+        fecha_desde=datetime.strptime('2024-08-01', '%Y-%m-%d'),
+        fecha_hasta=datetime.strptime('2024-08-07', '%Y-%m-%d'),
+        motivo='Permiso personal'
+    )
+
+    ausencia_6 = Ausencia(
+        empleado=personal_6,
+        fecha_desde=datetime.strptime('2024-07-10', '%Y-%m-%d'),
+        fecha_hasta=datetime.strptime('2024-07-15', '%Y-%m-%d'),
+        motivo='Vacaciones'
+    )
+
+    ausencia_7 = Ausencia(
+        empleado=personal_1,
+        fecha_desde=datetime.strptime('2024-12-01', '%Y-%m-%d'),
+        fecha_hasta=datetime.strptime('2024-12-05', '%Y-%m-%d'),
+        motivo='Enfermedad'
+    )
+
+    ausencia_8 = Ausencia(
+        empleado=personal_2,
+        fecha_desde=datetime.strptime('2024-12-20', '%Y-%m-%d'),
+        fecha_hasta=datetime.strptime('2024-12-25', '%Y-%m-%d'),
+        motivo='Capacitación'
+    )
+
+    db.session.add_all([ausencia_1, ausencia_2, ausencia_3, ausencia_4, ausencia_5, ausencia_6, ausencia_7, ausencia_8])
+
     db.session.commit()

@@ -59,7 +59,13 @@ const router = createRouter({
       path: "/documentos",
       name: "documento",
       component: () => import("../components/documentos/DocumentoListado.vue"),
-    }
+    },
+    {
+      path: "/stans",
+      name: "stans",
+      component: () => import("../views/StansView.vue"),
+      props: true,
+    },
   ],
 })
 

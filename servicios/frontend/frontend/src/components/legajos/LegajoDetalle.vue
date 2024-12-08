@@ -23,7 +23,7 @@
         <p>LEG_{{ legajo.id }}</p>
         <StateBadge v-if="legajo.estado" :state="legajo.estado?.nombre" />
         <p>Fecha entrada: {{ formatDate(legajo.fecha_entrada) }}</p>
-        <p>Objetivo: {{legajo.objetivo}}</p>
+        <p>Objetivo: {{ legajo.objetivo }}</p>
         <div v-if="legajo.cliente">
           <h6>Cliente</h6>
           <p>{{ legajo.cliente.nombre }}</p>
@@ -59,7 +59,7 @@
                             class="dropdown-item"
                             data-bs-toggle="modal"
                             data-bs-target="#exampleModal"
-                            @click="viewFile( documento.id, documento.nombre)"
+                            @click="viewFile(documento.id, documento.nombre)"
                           >
                             Ver documento
                           </button>
@@ -74,24 +74,24 @@
                           </button>
                         </li>
                         <li>
-                          <label for="upload-pdf" class="dropdown-item">
-                          Editar
-                          <input
-                            id="upload-pdf"
-                            type="file"
-                            accept="application/pdf"
-                            @change="handleFileUpload($event, documento.id, legajo.id, true)"
-                            class="dropdown-item"
-                            hidden
-                          />
-                        </label>
+                          <label :for="`edit-pdf-${documento.id}`" class="dropdown-item">
+                            Editar
+                            <input
+                              :id="`edit-pdf-${documento.id}`"
+                              type="file"
+                              accept="application/pdf"
+                              @change="handleFileUpload($event, documento.id, legajo.id, true)"
+                              class="dropdown-item"
+                              hidden
+                            />
+                          </label>
                         </li>
                       </template>
                       <li v-else>
-                        <label for="upload-pdf" class="dropdown-item">
+                        <label :for="`upload-pdf-${documento.id}`" class="dropdown-item">
                           Cargar
                           <input
-                            id="upload-pdf"
+                            :id="`upload-pdf-${documento.id}`"
                             type="file"
                             accept="application/pdf"
                             @change="handleFileUpload($event, documento.id, legajo.id)"
@@ -102,6 +102,22 @@
                       </li>
                     </ul>
                   </div>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="3" class="">Mails</td>
+                <td>
+                  <RouterLink :to="`/mails/${legajo.id}`" class="btn btn-primary"
+                    >Ver Mails</RouterLink
+                  >
+                </td>
+              </tr>
+              <tr>
+                <td colspan="3" class="">Muestras</td>
+                <td>
+                  <RouterLink :to="`/muestras/${legajo.id}`" class="btn btn-primary"
+                    >Ver Muestras</RouterLink
+                  >
                 </td>
               </tr>
             </tbody>
@@ -119,7 +135,9 @@
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
-            <h1 class="modal-title fs-5" id="exampleModalLabel">{{ actualFile?.nombre_documento }}</h1>
+            <h1 class="modal-title fs-5" id="exampleModalLabel">
+              {{ actualFile?.nombre_documento }}
+            </h1>
             <button
               type="button"
               class="btn-close"
@@ -128,8 +146,8 @@
             ></button>
           </div>
           <div class="modal-body">
-            <div v-if="fileUrl" style="height: 100vh;"> 
-              <vue-pdf-app :pdf="fileUrl" :page-number="1" ></vue-pdf-app> 
+            <div v-if="fileUrl" style="height: 100vh">
+              <vue-pdf-app :pdf="fileUrl" :page-number="1"></vue-pdf-app>
             </div>
             <div v-else>
               <p>No se encontro el archivo</p>
@@ -160,13 +178,13 @@
 </template>
 
 <script>
-import VuePdfApp from 'vue3-pdf-app' 
+import VuePdfApp from 'vue3-pdf-app'
 import 'vue3-pdf-app/dist/icons/main.css'
 export default {
   components: {
-    VuePdfApp
-  }
-};
+    VuePdfApp,
+  },
+}
 </script>
 
 <script setup>
@@ -178,9 +196,6 @@ import { storeToRefs } from 'pinia'
 import { ref } from 'vue'
 import axios from 'axios'
 import StateBadge from '../StateBadge.vue'
-
-
-
 
 const route = useRoute()
 const legajosStore = useLegajosStore()
@@ -197,7 +212,7 @@ const formatDate = (dateString) => {
   const options = { year: 'numeric', day: '2-digit', month: '2-digit' }
   return new Date(dateString).toLocaleDateString('es-ES', options)
 }
-const handleFileUpload = async (event, id, legajoId, editar=false) => {
+const handleFileUpload = async (event, id, legajoId, editar = false) => {
   const file = event.target.files[0]
   if (file && file.type === 'application/pdf') {
     try {
@@ -206,8 +221,7 @@ const handleFileUpload = async (event, id, legajoId, editar=false) => {
       console.log(response)
       if (response.status === 200) {
         window.location.reload()
-      }
-      else {
+      } else {
         throw new Error('No se pudo subir el archivo')
       }
     } catch (error) {
@@ -224,22 +238,25 @@ const existeDocumento = (nombreDocumento) => {
 }
 
 const downloadDocumento = async (tipo, legajo_id) => {
-  actualFile.value = legajo.value.documento.find(
-    (doc) => doc.tipo_documento_id === tipo,
+  actualFile.value = legajo.value.documento.find((doc) => doc.tipo_documento_id === tipo)
+  const response = await documentosStore.download(
+    actualFile.value.nombre_documento,
+    tipo,
+    legajo_id,
   )
-  const response = await documentosStore.download(actualFile.value.nombre_documento, tipo, legajo_id)
   console.log(response)
 }
 
 const viewFile = async (id, tipo) => {
-  actualFile.value = legajo.value.documento.find(
-    (doc) => doc.tipo_documento_id === id,
-  )
+  actualFile.value = legajo.value.documento.find((doc) => doc.tipo_documento_id === id)
   try {
-    const response = await axios.get(`http://127.0.0.1:5000/api/documentos/view/${actualFile.value.nombre_documento}`, {
-      params: { tipo },
-      responseType: 'blob',
-    })
+    const response = await axios.get(
+      `http://127.0.0.1:5000/api/documentos/view/${actualFile.value.nombre_documento}`,
+      {
+        params: { tipo },
+        responseType: 'blob',
+      },
+    )
 
     // Crear una URL para visualizar el archivo
     const blob = new Blob([response.data], { type: response.headers['content-type'] })

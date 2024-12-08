@@ -9,9 +9,6 @@ import { RouterLink, RouterView } from 'vue-router'
         <img alt="Vue logo" class="logo" src="@/assets/Logo.png" width="50" height="50" />
       </RouterLink>
       <div class="nav-links">
-        <RouterLink to="/mails/1">Mails</RouterLink>
-        <RouterLink to="/muestras/1">Muestras</RouterLink> 
-        <RouterLink to="/informes/1">Informes</RouterLink>
         <RouterLink to="/legajos">Legajos</RouterLink>
         <RouterLink to="/documentos">Documentos</RouterLink>
         <RouterLink to="/stans">Stans</RouterLink>

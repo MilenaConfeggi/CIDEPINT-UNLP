@@ -33,7 +33,6 @@ def upload():
     file = request.files['file']
     tipo = request.form['tipo']
     legajo_id = request.form['legajo_id']
-    editar = request.form['editar']
     
     if file.filename == '' or not file.filename.endswith('.pdf'):
         return jsonify({"error": "Por favor, selecciona un archivo PDF válido"}), 400
@@ -51,41 +50,42 @@ def upload():
 
     try:        
         file_path = documentos_path / file.filename
-        if editar:
-            data = {
-                'legajo_id': legajo_id,
-                'tipo_documento_id': tipo,
-                'nombre_documento': None
-            }
-            old_file = find_documento(data)
-            if old_file is None:
-                return jsonify({"error": "No se encontro el archivo"}), 404
+        data = {
+            'legajo_id': legajo_id,
+            'tipo_documento_id': td.id,
+            'nombre_documento': None
+        }
+        old_file = find_documento(data)
+        print(old_file)
+        if old_file:
             old_documento_path = documentos_path / old_file.nombre_documento
+            print(old_documento_path)
             if old_documento_path.exists():
+                print(old_documento_path)
                 old_documento_path.unlink()
                 file.save(str(file_path))
                 old_file.nombre_documento = file.filename
                 db.session.commit()
                 return jsonify({"message": f"Archivo guardado exitosamente en {file_path}"}), 200
             else:
-                return jsonify({"error": "No se encontro el archivo"}), 404
+                return jsonify({"error": f"No se encontro el archivo {file.filename}, {old_documento_path}"}), 404
         else:
+            counter = 1
+            while file_path.exists():
+                file.filename = f"{Path(file.filename).stem}({counter}){Path(file.filename).suffix}"  
+                file_path = documentos_path / file.filename
+                counter += 1
+            
             data = {
                 'nombre_documento': file.filename,
                 'fecha_creacion': datetime.now(),
                 'estado_id': 1,
                 'legajo_id': legajo_id,
-                'tipo_documento_id': tipo,
+                'tipo_documento_id': td.id,
             }
             if not create_documento(data):
                 return jsonify({"error": "No se pudo crear el documento"}), 400
-            
-            counter = 1
-            while file_path.exists():
-                new_filename = f"{file.stem}({counter}){file.suffix}"  
-                file_path = documentos_path / new_filename
-                counter += 1
-            
+
             file.save(str(file_path))
             return jsonify({"message": f"Archivo guardado exitosamente en {file_path}"}), 200
     except Exception as e:

@@ -1,5 +1,5 @@
 <template>
-    <span :class="badgeClass">{{ stateLabel }}</span>
+    <h2> <span :class="badgeClass">{{ stateLabel }}</span> </h2>
   </template>
   
   <script setup>

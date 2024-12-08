@@ -3,7 +3,7 @@
 {% block content %}
 <div>
   <div id="context-menu" class="hidden">
-    {% if current_user.empleado.rol == 'Administrador' or current_user.empleado.rol == 'Colaborador' %}
+    {% if current_user.rol == 'Administrador' or current_user.rol == 'Colaborador' %}
       <ul>
         <li class="flex flex-wrap" id="eliminar">
           Eliminar
@@ -81,7 +81,7 @@
                 <p class="mt-1 text-md font-medium text-gray-900 break-words">{{ carpeta.nombre }}</p>
             </a>
         {% endfor %}
-        {% if request.args.get('anio',anios[0]|string) == anios[0]|string and (current_user.empleado.rol == 'Administrador' or current_user.empleado.rol == 'Colaborador') %}
+        {% if request.args.get('anio',anios[0]|string) == anios[0]|string and (current_user.rol == 'Administrador' or current_user.rol == 'Colaborador') %}
           <a href="{{url_for('archivos.nueva_carpeta')}}">
               <svg class="px-4 aspect-square w-full rounded-lg object-cover group-hover:opacity-75 xl:aspect-[7/7]"
                       aria-hidden="true"

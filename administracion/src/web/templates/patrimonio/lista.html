@@ -68,7 +68,7 @@
                         </button>
                     </div>
                 </div>
-                {% if current_user.empleado.rol == 'Administrador' or current_user.empleado.rol == 'Colaborador' %}
+                {% if current_user.rol == 'Administrador' or current_user.rol == 'Colaborador' %}
                     <div class="flex flex-wrap items-end mb-1">
                         <!-- Enlace para agregar nuevo registro -->
                         <a href="{{ url_for('patrimonio.nuevo_bien') }}"
@@ -125,7 +125,7 @@
                                 ></path>
                             </svg>
                         </a>
-                        {% if current_user.empleado.rol == 'Administrador' or current_user.empleado.rol == 'Colaborador' %}
+                        {% if current_user.rol == 'Administrador' or current_user.rol == 'Colaborador' %}
                             <a href="{{ url_for('patrimonio.editar_bien', id_bien=bien.id) }}"
                             class="flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-black-600 rounded-lg focus:outline-none focus:shadow-outline-gray"
                             aria-label="Editar"

@@ -15,6 +15,7 @@ from administracion.src.web.controllers.roles import role_required
 from flask_login import current_user
 from models.personal.personal import User
 from models.personal.empleado import Empleado
+from models.archivos_admin.archivo import Archivo
 
 
 personal_bp = Blueprint("personal", __name__, url_prefix="/personal")
@@ -56,7 +57,8 @@ def registrar_usuario():
         # Crear nuevo usuario
         nuevo_usuario = User(
             username=username,
-            password=password
+            password=password,
+            rol=rol
         )
             # Crear empleado asociado al usuario
         nuevo_empleado = Empleado(
@@ -72,8 +74,7 @@ def registrar_usuario():
             telefono=telefono,
             domicilio=domicilio,
             fecha_nacimiento=fecha_nacimiento,
-            observaciones=observaciones,
-            rol=rol
+            observaciones=observaciones
         )
         success, message = nuevo_empleado.save()
         if success:
@@ -86,9 +87,9 @@ def registrar_usuario():
     areas = Area.query.all()
     
     # Determinar las opciones de rol disponibles según el rol del usuario actual
-    if current_user.empleado.rol == 'Administrador':
+    if current_user.rol == 'Administrador':
         roles_disponibles = ['Colaborador', 'Administrador', 'Personal']
-    elif current_user.empleado.rol == 'Colaborador':
+    elif current_user.rol == 'Colaborador':
         roles_disponibles = ['Personal']
     else:
         roles_disponibles = []
@@ -136,7 +137,7 @@ def ver_empleados():
         ))
     
     if not mostrar_inhabilitados:
-        query = query.filter_by(habilitado=True)
+        query = query.join(User).filter(User.habilitado == True)
     
     if orden == 'asc':
         query = query.order_by(cast(getattr(Empleado, ordenar_por), String).asc())
@@ -155,7 +156,7 @@ def descargar_empleados():
     ordenar_por = request.args.get('ordenar_por', 'nombre')
     orden = request.args.get('orden', 'asc')
     
-    query = Empleado.query.filter_by(habilitado=True)
+    query = Empleado.query.join(User).filter(User.habilitado == True)
     
     if busqueda:
         query = query.filter(or_(
@@ -213,7 +214,7 @@ def ver_perfil(id):
     user = User.query.get_or_404(id)
     
     # Verificar si el usuario actual tiene permiso para ver este perfil
-    if current_user.empleado.rol == 'Personal' and current_user.id != user.id:
+    if current_user.rol == 'Personal' and current_user.id != user.id:
         flash('No tienes permiso para ver este perfil.', 'error')
         return redirect(url_for('personal.ver_perfil', id=current_user.id))
     
@@ -253,7 +254,7 @@ def ver_perfil(id):
             user.empleado.observaciones = request.form.get('observaciones') or None
             
             # Solo permitir modificar el área si el usuario es 'Administrador'
-            if current_user.empleado.rol == 'Administrador':
+            if current_user.rol == 'Administrador':
                 area_nombre = request.form.get('area_id')
                 area = Area.query.filter_by(nombre=area_nombre).first()
                 if area:
@@ -294,7 +295,7 @@ def ver_perfil(id):
         {'name': 'nombre', 'label': 'Nombre', 'type': 'text', 'value': user.empleado.nombre or ''},
         {'name': 'apellido', 'label': 'Apellido', 'type': 'text', 'value': user.empleado.apellido or ''},
         {'name': 'dni', 'label': 'DNI', 'type': 'text', 'value': user.empleado.dni or ''},
-        {'name': 'area_id', 'label': 'Área', 'type': 'select', 'value': user.empleado.area_id or '', 'options': [area.nombre for area in areas], 'disabled': current_user.empleado.rol != 'Administrador'},
+        {'name': 'area_id', 'label': 'Área', 'type': 'select', 'value': user.empleado.area_id or '', 'options': [area.nombre for area in areas], 'disabled': current_user.rol != 'Administrador'},
         {'name': 'dependencia', 'label': 'Dependencia', 'type': 'select', 'value': user.empleado.dependencia or '', 'options': dependencias},
         {'name': 'cargo', 'label': 'Cargo', 'type': 'select', 'value': user.empleado.cargo or '', 'options': cargos},
         {'name': 'subdivision_cargo', 'label': 'Subdivisión del Cargo', 'type': 'select', 'value': user.empleado.subdivision_cargo or '', 'options': subdivisiones_cargo.get(user.empleado.cargo, [])},
@@ -323,14 +324,8 @@ def descargar_archivo(id):
 @role_required('Administrador', 'Colaborador') 
 def inhabilitar_usuario(id):
     user = User.query.get_or_404(id)
-    current_user = User.query.get(session['user_id'])  # Asumiendo que el ID del usuario actual está en la sesión
     
-    # Verificar permisos
-    if current_user.empleado.cargo not in ['Colaborador', 'Administrador']:
-        flash('No tienes permiso para inhabilitar este usuario', 'error')
-        return redirect(url_for('personal.ver_perfil', id=user.id))
-    
-    user.empleado.habilitado = False
+    user.habilitado = False
     user.update()
     flash('Usuario inhabilitado con éxito', 'success')
     return redirect(url_for('personal.ver_perfil', id=user.id))

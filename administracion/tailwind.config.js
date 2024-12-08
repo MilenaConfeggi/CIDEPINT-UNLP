@@ -10,6 +10,7 @@ module.exports = {
   },
   plugins: [require('flowbite/plugin')({
     datatables:true,
-  })
+  }),
+  require('tailwindcss-animated')
   ],
 }

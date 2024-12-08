@@ -5,48 +5,31 @@
 {% block content %}
 
 <div class="container mx-auto px-4">
+
   <h1 class="text-2xl font-bold mb-4">Calendario de Ausencias</h1>
   
-  <div class="flex justify-between mb-4">
-    <a href="{{ url_for('ausencia.ver_calendario', mes=mes-1 if mes > 1 else 12, año=año if mes > 1 else año-1) }}" class="bg-blue-500 text-white px-4 py-2 rounded">Mes Anterior</a>
-    <a href="{{ url_for('ausencia.ver_calendario', mes=mes+1 if mes < 12 else 1, año=año if mes < 12 else año+1) }}" class="bg-blue-500 text-white px-4 py-2 rounded">Mes Siguiente</a>
-  </div>
-  
-  <table class="min-w-full bg-white">
-    <thead>
-      <tr>
-        <th class="py-2 px-4 border-b">Domingo</th>
-        <th class="py-2 px-4 border-b">Lunes</th>
-        <th class="py-2 px-4 border-b">Martes</th>
-        <th class="py-2 px-4 border-b">Miércoles</th>
-        <th class="py-2 px-4 border-b">Jueves</th>
-        <th class="py-2 px-4 border-b">Viernes</th>
-        <th class="py-2 px-4 border-b">Sábado</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% set dia = primer_dia %}
-      {% for semana in range(6) %}
+  {% if ausencias %}
+    <table class="min-w-full bg-white">
+      <thead>
         <tr>
-          {% for dia_semana in range(7) %}
-            <td class="py-2 px-4 border-b align-top">
-              {% if dia.month == mes %}
-                <div class="font-bold">{{ dia.day }}</div>
-                {% for ausencia in calendario[dia] %}
-                  <div class="mt-2">
-                    <p>{{ ausencia.empleado.nombre }} {{ ausencia.empleado.apellido }}</p>
-                    <p>DNI: {{ ausencia.empleado.dni }}</p>
-                    <p>Motivo: {{ ausencia.motivo }}</p>
-                  </div>
-                {% endfor %}
-              {% endif %}
-              {% set dia = dia + timedelta(days=1) %}
-            </td>
-          {% endfor %}
+          <th class="py-2 px-4 border-b">Nombre del Empleado</th>
+          <th class="py-2 px-4 border-b">DNI</th>
+          <th class="py-2 px-4 border-b">Período de Ausencia</th>
         </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+        {% for ausencia in ausencias %}
+          <tr>
+            <td class="py-2 px-4 border-b text-center">{{ ausencia.empleado.nombre }} {{ ausencia.empleado.apellido }}</td>
+            <td class="py-2 px-4 border-b text-center">{{ ausencia.empleado.dni }}</td>
+            <td class="py-2 px-4 border-b text-center">{{ ausencia.fecha_desde.strftime('%d-%m-%y') }} hasta {{ ausencia.fecha_hasta.strftime('%d-%m-%y') }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="text-center text-gray-500">No hay ausencias registradas actualmente</p>
+  {% endif %}
 </div>
 
 {% endblock %}

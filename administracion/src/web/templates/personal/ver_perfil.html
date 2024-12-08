@@ -5,10 +5,12 @@
 {% block content %}
 
 <div class="container mx-auto px-4">
+
   <h1 class="text-2xl font-bold mb-4">Perfil de Usuario</h1>
   
-  <form action="{{ url_for('personal.ver_perfil', id=user.id) }}" method="POST" enctype="multipart/form-data" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+  <form action="{{ url_for('personal.ver_perfil', id=user.id) }}" method="POST" enctype="multipart/form-data" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 grid grid-cols-2 md:grid-cols-4 gap-4">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="form_type" value="update_profile">
     
     {% for campo in campos %}
       <div class="mb-4">
@@ -16,7 +18,7 @@
         {% if campo.type == 'textarea' %}
           <textarea name="{{ campo.name }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">{{ campo.value }}</textarea>
         {% elif campo.type == 'select' %}
-          <select name="{{ campo.name }}" id="{{ campo.name }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+          <select name="{{ campo.name }}" id="{{ campo.name }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" {% if campo.disabled %}disabled{% endif %}>
             {% for option in campo.options %}
               <option value="{{ option }}" {% if option == campo.value %}selected{% endif %}>{{ option }}</option>
             {% endfor %}
@@ -26,26 +28,31 @@
         {% endif %}
       </div>
     {% endfor %}
+    
+    {% if current_user.id == user.id %}
     <div class="mb-4">
       <label class="block text-gray-700 text-sm font-bold mb-2">Contraseña:</label>
       <input type="password" name="password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
     </div>
-    <div class="mb-4">
+    {% endif %}
+    
+    <div class="mb-4 col-span-2">
       <label class="block text-gray-700 text-sm font-bold mb-2">Saldo Actual:</label>
       <p>{{ user.saldo_actual }}</p>
     </div>
-    <div class="mb-4">
+    <div class="mb-4 col-span-2">
       <label class="block text-gray-700 text-sm font-bold mb-2">Saldo de su Área:</label>
       <p>{{ saldo_area }}</p>
     </div>
-    <div class="flex items-center justify-between">
-      <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Guardar Cambios</button>
+    <div class="flex items-center justify-between col-span-2">
+      <button type="submit" id="guardar-cambios-btn" class="bg-blue-500 text-white px-4 py-2 rounded">Guardar Cambios</button>
     </div>
   </form>
 
   <h2 class="text-xl font-bold mb-4">Archivos</h2>
-  <form action="{{ url_for('personal.ver_perfil', id=user.id) }}" method="POST" enctype="multipart/form-data" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+  <form action="{{ url_for('personal.ver_perfil', id=user.id) }}" method="POST" enctype="multipart/form-data" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="form_type" value="upload_file">
     
     <div class="mb-4">
       <label for="archivo" class="block text-gray-700 text-sm font-bold mb-2">Subir Archivo:</label>
@@ -55,7 +62,7 @@
       <label for="tipo" class="block text-gray-700 text-sm font-bold mb-2">Tipo de Archivo:</label>
       <input type="text" name="tipo" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
     </div>
-    <div class="flex items-center justify-between">
+    <div class="flex items-center justify-between col-span-2">
       <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Subir Archivo</button>
     </div>
   </form>
@@ -72,10 +79,12 @@
     {% endfor %}
   </ul>
 
-  <form action="{{ url_for('personal.inhabilitar_usuario', id=user.id) }}" method="POST" class="mt-4">
+  {% if current_user.id != user.id %}
+  <form id="inhabilitar-usuario-form" action="{{ url_for('personal.inhabilitar_usuario', id=user.id) }}" method="POST" class="mt-4 mb-4">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded">Inhabilitar Usuario</button>
+    <button type="button" id="inhabilitar-usuario-btn" class="bg-red-500 text-white px-4 py-2 rounded">Inhabilitar Usuario</button>
   </form>
+  {% endif %}
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -108,24 +117,26 @@
 
     // Inicializar las opciones de subdivisión de cargo al cargar la página
     updateSubdivisionCargoOptions();
-  });
-</script>
 
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
     // Mostrar alertas basadas en los mensajes flash
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          Swal.fire({
-            title: "{{ '¡Éxito!' if category == 'success' else '¡Error!' }}",
-            text: "{{ message }}",
-            icon: "{{ category }}",
-            confirmButtonText: 'Aceptar'
-          });
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
+
+
+    // Manejar la confirmación de inhabilitación
+    document.getElementById('inhabilitar-usuario-btn').addEventListener('click', function() {
+      Swal.fire({
+        title: '¿Estás seguro?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, inhabilitar',
+        cancelButtonText: 'Cancelar'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          document.getElementById('inhabilitar-usuario-form').submit();
+        }
+      });
+    });
   });
 </script>
 

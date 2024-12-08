@@ -1,33 +1,64 @@
-{% extends "layout.html" %}
-{% block title %}
-    Panel de Personal
-{% endblock %}
+{% extends "layout.html" %} {% block title %} Panel de Personal {% endblock %}
 {% block content %}
 
-<div class="container mx-auto px-4 py-8">
+<div class="container mx-auto px-4 py-8 items-start">
+  <div class="flex justify-between w-full">
     <h1 class="text-3xl font-bold mb-8">Panel de Personal</h1>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div class="bg-white shadow-md rounded-lg p-6">
-            <a href="{{ url_for('area.crear_area') }}" class="block text-center">
-                <h2 class="text-xl font-semibold mb-2">Crear Área</h2>
-            </a>
-        </div>
-        <div class="bg-white shadow-md rounded-lg p-6">
-            <a href="{{ url_for('area.listar_areas') }}" class="block text-center">
-                <h2 class="text-xl font-semibold mb-2">Listar Áreas</h2>
-            </a>
-        </div>
-        <div class="bg-white shadow-md rounded-lg p-6">
-            <a href="{{ url_for('personal.registrar_usuario') }}" class="block text-center">
-                <h2 class="text-xl font-semibold mb-2">Crear Personal</h2>
-            </a>
-        </div>
-        <div class="bg-white shadow-md rounded-lg p-6">
-            <a href="{{ url_for('personal.ver_empleados') }}" class="block text-center">
-                <h2 class="text-xl font-semibold mb-2">Ver Empleados</h2>
-            </a>
-        </div>
+
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="bg-white shadow-md rounded-lg p-6">
+      <a href="{{ url_for('area.crear_area') }}" class="block text-center">
+        <h2 class="text-xl font-semibold mb-2">Crear Área</h2>
+      </a>
     </div>
+    <div class="bg-white shadow-md rounded-lg p-6">
+      <a href="{{ url_for('area.listar_areas') }}" class="block text-center">
+        <h2 class="text-xl font-semibold mb-2">Listar Áreas</h2>
+      </a>
+    </div>
+    <div class="bg-white shadow-md rounded-lg p-6">
+      <a
+        href="{{ url_for('personal.registrar_usuario') }}"
+        class="block text-center"
+      >
+        <h2 class="text-xl font-semibold mb-2">Crear Personal</h2>
+      </a>
+    </div>
+    <div class="bg-white shadow-md rounded-lg p-6">
+      <a
+        href="{{ url_for('personal.ver_empleados') }}"
+        class="block text-center"
+      >
+        <h2 class="text-xl font-semibold mb-2">Ver Empleados</h2>
+      </a>
+    </div>
+    <div class="bg-white shadow-md rounded-lg p-6">
+      <a
+        href="{{ url_for('ausencia.registrar_ausencia') }}"
+        class="block text-center"
+      >
+        <h2 class="text-xl font-semibold mb-2">Registrar Ausencia</h2>
+      </a>
+    </div>
+    <div class="bg-white shadow-md rounded-lg p-6">
+      <a
+        href="{{ url_for('ausencia.ver_calendario') }}"
+        class="block text-center"
+      >
+        <h2 class="text-xl font-semibold mb-2">Ver Ausencias</h2>
+      </a>
+    </div>
+    <div class="bg-white shadow-md rounded-lg p-6">
+      <a
+        href="{{ url_for('personal.ver_perfil', id=current_user.id) }}"
+        class="block text-center"
+      >
+        <h2 class="text-xl font-semibold mb-2">Ver Perfil</h2>
+      </a>
+    </div>
+  </div>
 </div>
 
 {% endblock %}

@@ -6,51 +6,56 @@
 
 <div class="container mx-auto px-4">
   <h1 class="text-2xl font-bold mb-4">Empleados</h1>
-  
-  <form method="GET" action="{{ url_for('personal.ver_empleados') }}" class="mb-4">
-    <div class="flex items-center">
+
+  <form method="GET" action="{{ url_for('personal.ver_empleados') }}" class="mb-4" id="filtro-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="flex items-center gap-4">
       <input type="text" id="busqueda" name="busqueda" value="{{ busqueda or '' }}" placeholder="Buscar por nombre, apellido, DNI, área, dependencia o cargo" class="mr-2">
       <input type="hidden" name="ordenar_por" value="{{ ordenar_por }}">
       <input type="hidden" name="orden" value="{{ orden }}">
       <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Buscar</button>
+      <label for="mostrar_inhabilitados" class="flex items-center">
+        <input type="checkbox" id="mostrar_inhabilitados" name="mostrar_inhabilitados" value="1" {% if mostrar_inhabilitados %}checked{% endif %} onchange="document.getElementById('filtro-form').submit();">
+        <span class="ml-2">Mostrar Inhabilitados</span>
+      </label>
     </div>
   </form>
   
   <div class="mb-4">
-    <a href="{{ url_for('personal.descargar_empleados', formato='excel', busqueda=busqueda, ordenar_por=ordenar_por, orden=orden) }}" class="bg-green-500 text-white px-4 py-2 rounded">Descargar Excel</a>
-    <a href="{{ url_for('personal.descargar_empleados', formato='pdf', busqueda=busqueda, ordenar_por=ordenar_por, orden=orden) }}" class="bg-red-500 text-white px-4 py-2 rounded">Descargar PDF</a>
+    <a href="{{ url_for('personal.descargar_empleados', formato='excel', busqueda=busqueda, ordenar_por=ordenar_por, orden=orden, mostrar_inhabilitados=mostrar_inhabilitados) }}" class="bg-green-500 text-white px-4 py-2 rounded">Descargar Excel</a>
+    <a href="{{ url_for('personal.descargar_empleados', formato='pdf', busqueda=busqueda, ordenar_por=ordenar_por, orden=orden, mostrar_inhabilitados=mostrar_inhabilitados) }}" class="bg-red-500 text-white px-4 py-2 rounded">Descargar PDF</a>
   </div>
   
   <table class="min-w-full bg-white">
     <thead>
       <tr>
         <th class="py-2 px-4 border-b text-center">
-          <a href="{{ url_for('personal.ver_empleados', busqueda=busqueda, ordenar_por='nombre', orden='asc' if ordenar_por != 'nombre' or orden == 'desc' else 'desc') }}">
+          <a href="{{ url_for('personal.ver_empleados', busqueda=busqueda, ordenar_por='nombre', orden='asc' if ordenar_por != 'nombre' or orden == 'desc' else 'desc', mostrar_inhabilitados=mostrar_inhabilitados) }}">
             Nombre
           </a>
         </th>
         <th class="py-2 px-4 border-b text-center">
-          <a href="{{ url_for('personal.ver_empleados', busqueda=busqueda, ordenar_por='apellido', orden='asc' if ordenar_por != 'apellido' or orden == 'desc' else 'desc') }}">
+          <a href="{{ url_for('personal.ver_empleados', busqueda=busqueda, ordenar_por='apellido', orden='asc' if ordenar_por != 'apellido' or orden == 'desc' else 'desc', mostrar_inhabilitados=mostrar_inhabilitados) }}">
             Apellido
           </a>
         </th>
         <th class="py-2 px-4 border-b text-center">
-          <a href="{{ url_for('personal.ver_empleados', busqueda=busqueda, ordenar_por='dni', orden='asc' if ordenar_por != 'dni' or orden == 'desc' else 'desc') }}">
+          <a href="{{ url_for('personal.ver_empleados', busqueda=busqueda, ordenar_por='dni', orden='asc' if ordenar_por != 'dni' or orden == 'desc' else 'desc', mostrar_inhabilitados=mostrar_inhabilitados) }}">
             DNI
           </a>
         </th>
         <th class="py-2 px-4 border-b text-center">
-          <a href="{{ url_for('personal.ver_empleados', busqueda=busqueda, ordenar_por='dependencia', orden='asc' if ordenar_por != 'dependencia' or orden == 'desc' else 'desc') }}">
+          <a href="{{ url_for('personal.ver_empleados', busqueda=busqueda, ordenar_por='dependencia', orden='asc' if ordenar_por != 'dependencia' or orden == 'desc' else 'desc', mostrar_inhabilitados=mostrar_inhabilitados) }}">
             Dependencia
           </a>
         </th>
         <th class="py-2 px-4 border-b text-center">
-          <a href="{{ url_for('personal.ver_empleados', busqueda=busqueda, ordenar_por='area', orden='asc' if ordenar_por != 'area' or orden == 'desc' else 'desc') }}">
+          <a href="{{ url_for('personal.ver_empleados', busqueda=busqueda, ordenar_por='area_id', orden='asc' if ordenar_por != 'area_id' or orden == 'desc' else 'desc', mostrar_inhabilitados=mostrar_inhabilitados) }}">
             Área
           </a>
         </th>
         <th class="py-2 px-4 border-b text-center">
-          <a href="{{ url_for('personal.ver_empleados', busqueda=busqueda, ordenar_por='cargo', orden='asc' if ordenar_por != 'cargo' or orden == 'desc' else 'desc') }}">
+          <a href="{{ url_for('personal.ver_empleados', busqueda=busqueda, ordenar_por='cargo', orden='asc' if ordenar_por != 'cargo' or orden == 'desc' else 'desc', mostrar_inhabilitados=mostrar_inhabilitados) }}">
             Cargo
           </a>
         </th>
@@ -59,11 +64,13 @@
     <tbody>
       {% for empleado in empleados %}
         <tr>
-          <td class="py-2 px-4 border-b text-center">{{ empleado.nombre }}</td>
+          <td class="py-2 px-4 border-b text-center">
+            <a href="{{ url_for('personal.ver_perfil', id=empleado.id) }}" class="text-blue-500 hover:underline">{{ empleado.nombre }}</a>
+          </td>
           <td class="py-2 px-4 border-b text-center">{{ empleado.apellido }}</td>
           <td class="py-2 px-4 border-b text-center">{{ empleado.dni }}</td>
           <td class="py-2 px-4 border-b text-center">{{ empleado.dependencia }}</td>
-          <td class="py-2 px-4 border-b text-center">{{ empleado.area }}</td>
+          <td class="py-2 px-4 border-b text-center">{{ empleado.area.nombre }}</td>
           <td class="py-2 px-4 border-b text-center">{{ empleado.cargo }}</td>
         </tr>
       {% endfor %}

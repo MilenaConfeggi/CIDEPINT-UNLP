@@ -15,6 +15,9 @@ def list_legajos(page=1, per_page=10, empresa=None, fecha=None):
         query = query.filter(Legajo.fecha_entrada == fecha)
     return query.paginate(page=page, per_page=per_page, error_out=False)
 
+def list_legajos_all():
+    return db.session.query(Legajo).all()
+
 def create_legajo(data):
     if find_legajo_by_id(data['nro_legajo']):
         return None

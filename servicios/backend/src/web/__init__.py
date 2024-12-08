@@ -52,14 +52,14 @@ def create_app(env="development", static_folder=""):
         print("Tipos de documentos creados!")
         seedsLegajo.seeds_legajos()
         print("Legajos creados!")
-        seedsMuestra.seeds_muestras()
-        print("Muestras creadas!")
-        seedsMails.seeds_mails()
-        print("Mails creados!")
+        #seedsMuestra.seeds_muestras()
+        #print("Muestras creadas!")
+        #seedsMails.seeds_mails()
+        #print("Mails creados!")
         seedsCliente.seeds_clientes()
         print("Clientes creados!")
-        seedsDocumento.seeds_documentos()
-        print("Documentos creados!")
+        #seedsDocumento.seeds_documentos()
+        #print("Documentos creados!")
 
     return app
     

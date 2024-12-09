@@ -1,5 +1,13 @@
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
+import { RouterLink, RouterView } from 'vue-router';
+import { useAuthStore } from '@/stores/auth'; // Importa tu store de autenticación
+
+const authStore = useAuthStore();
+
+const logout = () => {
+  authStore.removeToken();
+  location.reload(); // Recarga la página para que se aplique el guard
+};
 </script>
 
 <template>
@@ -12,6 +20,8 @@ import { RouterLink, RouterView } from 'vue-router'
         <RouterLink to="/legajos">Legajos</RouterLink>
         <RouterLink to="/documentos">Documentos</RouterLink>
         <RouterLink to="/stans">Stans</RouterLink>
+        <button @click="logout">Logout</button> 
+        <RouterLink to="/log-in">Login</RouterLink>
       </div>
     </nav>
     <main>
@@ -44,6 +54,19 @@ import { RouterLink, RouterView } from 'vue-router'
 }
 
 .nav-links a:hover {
+  text-decoration: underline;
+}
+
+.nav-links button {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  text-decoration: none;
+  font-size: 1rem;
+}
+
+.nav-links button:hover {
   text-decoration: underline;
 }
 

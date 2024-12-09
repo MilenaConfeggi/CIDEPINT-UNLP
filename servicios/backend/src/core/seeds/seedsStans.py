@@ -3,7 +3,7 @@ from models.base import db
 from models.presupuestos.ensayo import Ensayo
 from models.presupuestos.ensayo_stan import EnsayoStan
 from servicios.backend.src.core.services.servicioPresupuesto import crear_stan, crear_ensayo, crear_ensayo_stan
-def seed_stans():
+def seeds_stans():
     seed_stan()
     seed_ensayos()
     seed_ensayos_stans()

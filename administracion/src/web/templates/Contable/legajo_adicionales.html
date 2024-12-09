@@ -1,0 +1,83 @@
+{% extends 'layout.html' %}
+{% block title %} Documentos del Legajo {% endblock %}
+{% block content %}
+<div class="px-4">
+    <div class="px-4 sm:px-0">
+        <h3 class="text-base/7 font-semibold text-gray-900">Documentos del Legajo: {{ legajo.nro_legajo }}</h3>
+    </div>
+    <div class="mt-6 border-t border-gray-100">
+        <dl class="divide-y divide-gray-100">
+            <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                <dt class="text-sm/6 font-medium text-gray-900">Cliente</dt>
+                <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{{ legajo.cliente }}</dd>
+            </div>
+        </dl>
+    </div>
+</div>
+
+<!-- Subir nuevo documento -->
+<form class="px-4" method="POST" enctype="multipart/form-data" action="{{ url_for('contable.uploads', legajo_id=legajo.id) }}">
+    {{ form.hidden_tag() }}
+    <div class="border-b border-gray-900/10 pb-12">
+        <h2 class="text-base/7 font-semibold text-gray-900">Nuevo Documento</h2>
+        <p class="mt-1 text-sm/6 text-gray-600">Sube un nuevo documento para este legajo.</p>
+        <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+            <div class="sm:col-span-4">
+                <label for="tipo" class="block text-sm/6 font-medium text-gray-900">Tipo de Documento</label>
+                <div class="mt-2">
+                    {{ form.tipo(class="form-control block w-full text-sm/6 text-gray-700", placeholder="Selecciona un tipo") }}
+                </div>
+            </div>
+            <div class="sm:col-span-4">
+                <label for="file" class="block text-sm/6 font-medium text-gray-900">Archivo</label>
+                <div class="mt-2">
+                    {{ form.file(class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border file:border-gray-300 file:bg-white file:text-gray-700 hover:file:bg-gray-100") }}
+                </div>
+            </div>
+        </div>
+        <button type="submit" class="rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600">
+            Subir Documento
+        </button>
+    </div>
+</form>
+
+<!-- Documentos existentes -->
+<h3 class="px-4 mt-6 text-base/7 font-semibold text-gray-900">Documentos Existentes</h3>
+<div class="px-4 w-full overflow-x-auto">
+    {% if documentos %}
+    <table class="w-full whitespace-no-wrap">
+        <thead>
+        <tr class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b bg-gray-50">
+            <th class="px-4 py-3">Tipo</th>
+            <th class="px-4 py-3">Nombre</th>
+            <th class="px-4 py-3">Acciones</th>
+        </tr>
+        </thead>
+        <tbody class="bg-white divide-y">
+        {% for documento in documentos %}
+        <tr class="text-gray-700">
+            <td class="px-4 py-3 text-sm">{{ documento.tipo_documento.nombre }}</td>
+            <td class="px-4 py-3 text-sm">{{ documento.nombre_documento }}</td>
+            <td class="px-4 py-3 text-sm">
+                <!-- Descargar -->
+                <a href="{{ url_for('contable.download', documento_id=documento.id) }}" class="text-blue-600 hover:underline">
+                    Descargar
+                </a>
+                <!-- 
+                <form method="POST" action="{{ url_for('contable.delete_document', documento_id=documento.id) }}" style="display:inline;">
+                    {{ delete_form.hidden_tag() }}
+                    <button type="submit" class="text-red-600 hover:underline">
+                        Eliminar
+                    </button>
+                </form>
+                Eliminar -->
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="text-sm text-gray-600">No hay documentos asociados a este legajo.</p>
+    {% endif %}
+</div>
+{% endblock %}

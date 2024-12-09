@@ -383,6 +383,21 @@ flask = ">=2.2.5"
 sqlalchemy = ">=2.0.16"
 
 [[package]]
+name = "flask-login"
+version = "0.6.3"
+description = "User authentication and session management for Flask."
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "Flask-Login-0.6.3.tar.gz", hash = "sha256:5e23d14a607ef12806c699590b89d0f0e0d67baeec599d75947bf9c147330333"},
+    {file = "Flask_Login-0.6.3-py3-none-any.whl", hash = "sha256:849b25b82a436bf830a054e74214074af59097171562ab10bfa999e6b78aae5d"},
+]
+
+[package.dependencies]
+Flask = ">=1.0.4"
+Werkzeug = ">=1.0.1"
+
+[[package]]
 name = "flask-wtf"
 version = "1.2.2"
 description = "Form rendering, validation, and CSRF protection for Flask with WTForms."
@@ -917,4 +932,4 @@ email = ["email-validator"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "7dd7983fd3a32a4b6f76bce61e0757aeac4e591c243b39d0717af7ef65c8064f"
+content-hash = "59e1d9e77c22df12060ea5673e9e5d1aaf43a8a3189350783f138e2f01fa8d7c"

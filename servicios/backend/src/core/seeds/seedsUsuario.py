@@ -1,6 +1,7 @@
 from datetime import datetime
-from servicios.backend.src.core.services.servicioUsuario import crear_usuario, crear_rol
+from servicios.backend.src.core.services.servicioUsuario import crear_usuario, crear_rol, crear_permiso, asignar_permiso
 from models.usuarios.rol import Rol
+from models.usuarios.permiso import Permiso
 from models.base import db
 from web import bcrypt
 
@@ -42,4 +43,43 @@ def seed_usuarios():
     db.session.add(usuario1)
     db.session.add(usuario2)
     db.session.add(usuario3)
+
+    todosLosPermisos = [ #Acá van todos los permisos a insertar (todos los posibles permisos que hay en el sistema)
+        "listar_usuarios", #Por favor, ponerle el mismo nombre que el nombre del método del controlador
+        "borrar_usuario",
+    ]
+    PERMISSIONS = { #Acá van los permisos que tiene cada rol
+        "administrador": [ #Tienen que ser declarados previamente en todosLosPermisos
+            "listar_usuarios",
+            "borrar_usuario",
+        ],
+        "jefe_de_area": [
+        ],
+        "trabajador": [
+        ],
+    }
+
+    for per in todosLosPermisos:
+        permission = crear_permiso(
+            {
+                "nombre": per,
+            }
+        )
+
+    def find_permission_by_name(permiso):
+        return Permiso.query.filter_by(nombre=permiso).first()
+
+    def find_role_by_name(rol):
+        return Rol.query.filter_by(nombre=rol).first()
+
+    for rol in PERMISSIONS:
+        for per in PERMISSIONS[rol]:
+            asignar_permiso(
+                {
+                    "rol": (find_role_by_name(rol)),
+                    "permiso": (find_permission_by_name(per))
+                }
+            )
+
+
     db.session.commit()

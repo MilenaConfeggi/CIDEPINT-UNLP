@@ -47,11 +47,15 @@ def seed_usuarios():
     todosLosPermisos = [ #Acá van todos los permisos a insertar (todos los posibles permisos que hay en el sistema)
         "listar_usuarios", #Por favor, ponerle el mismo nombre que el nombre del método del controlador
         "borrar_usuario",
+        "listar_stans",
+        "cargar_stan",
     ]
     PERMISSIONS = { #Acá van los permisos que tiene cada rol
         "administrador": [ #Tienen que ser declarados previamente en todosLosPermisos
             "listar_usuarios",
             "borrar_usuario",
+            "listar_stans",
+            "cargar_stan"
         ],
         "jefe_de_area": [
         ],

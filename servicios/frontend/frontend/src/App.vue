@@ -1,12 +1,36 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router';
 import { useAuthStore } from '@/stores/auth'; // Importa tu store de autenticación
+import { ref, computed, watchEffect } from 'vue';
 
 const authStore = useAuthStore();
 
+// Recuperar el token desde el store o localStorage
+const token = ref(authStore.getToken() || localStorage.getItem('access_token'));
+
+// Recuperar los permisos desde localStorage
+const permisos = ref(JSON.parse(localStorage.getItem('permisos')) || []);
+
+// Computada para verificar si el usuario tiene el permiso "listar_stans"
+const tienePermisoListarStans = computed(() => {
+  return permisos.value.includes('listar_stans');
+});
+
+// Computada para verificar si el usuario está logueado
+const estaLogueado = computed(() => {
+  return !!token.value; // Si el token existe, significa que el usuario está logueado
+});
+
+// WatchEffect para actualizar los permisos cuando cambien en localStorage
+watchEffect(() => {
+  permisos.value = JSON.parse(localStorage.getItem('permisos')) || [];
+});
+
 const logout = () => {
   authStore.removeToken();
+  localStorage.removeItem('permisos');
   location.reload(); // Recarga la página para que se aplique el guard
+  console.log('Logout');
 };
 </script>
 
@@ -19,8 +43,11 @@ const logout = () => {
       <div class="nav-links">
         <RouterLink to="/legajos">Legajos</RouterLink>
         <RouterLink to="/documentos">Documentos</RouterLink>
-        <RouterLink to="/stans">Stans</RouterLink>
-        <button @click="logout">Logout</button> 
+        
+        <!-- Mostrar el botón de Stans solo si el usuario está logueado y tiene el permiso "listar_stans" -->
+        <RouterLink v-if="estaLogueado && tienePermisoListarStans" to="/stans">Stans</RouterLink>
+        
+        <button @click="logout">Logout</button>
         <RouterLink to="/log-in">Login</RouterLink>
       </div>
     </nav>

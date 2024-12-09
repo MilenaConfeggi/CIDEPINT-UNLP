@@ -1,6 +1,7 @@
 <template>
   <main>
-    <button class="stans-button" @click="mostrarFormularioSubir">Cargar STAN</button>
+    <!-- Mostrar el botón solo si el usuario tiene el permiso "cargar_stan" -->
+    <button v-if="tienePermisoCargarStan" class="stans-button" @click="mostrarFormularioSubir">Cargar STAN</button>
     <ListadoStans @modificar-stan="mostrarFormularioModificar" />
 
     <!-- Modal de SubirStan -->
@@ -23,16 +24,26 @@
 
 <script setup>
 import { useRouter } from 'vue-router';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 const authStore = useAuthStore();
 const router = useRouter();
+
 // Verificación del token al montar el componente
 onMounted(() => {
   if (!authStore.getToken()) {
     router.push({ name: 'logIn' });
   }
 });
+
+// Recuperar los permisos desde localStorage (o Vuex)
+const permisos = JSON.parse(localStorage.getItem('permisos')) || [];
+
+// Computada para verificar si el usuario tiene el permiso "cargar_stan"
+const tienePermisoCargarStan = computed(() => {
+  return permisos.includes('cargar_stan');
+});
+
 import ListadoStans from '../components/stans/ListadoStans.vue';
 import SubirStan from '../components/stans/SubirStan.vue';
 import ModificarStan from '../components/stans/ModificarStan.vue';

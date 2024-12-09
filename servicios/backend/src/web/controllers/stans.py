@@ -8,8 +8,8 @@ bp = Blueprint('stans', __name__, url_prefix='/stans')
 @jwt_required()
 def listar_stans():
 
-    stans = servicioPresupuesto.listar_stans()  # Tu lógica
-    data = stansSchema.dump(stans)  # Serialización
+    stans = servicioPresupuesto.listar_stans()  
+    data = stansSchema.dump(stans)  
     return jsonify(data), 200
 
 @bp.post("/subir_stan")

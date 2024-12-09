@@ -15,6 +15,7 @@ from servicios.backend.src.core.seeds import seedsLegajo
 from flask_cors import CORS
 from flask_session import Session
 from flask_bcrypt import Bcrypt
+from flask_jwt_extended import JWTManager
 
 session = Session()
 bcrypt = Bcrypt()
@@ -26,7 +27,7 @@ def create_app(env="development", static_folder=""):
     db.init_app(app)
     session.init_app(app)
     bcrypt.init_app(app)
-
+    JWTManager(app)
     CORS(app)
     @app.route("/")
     def home():

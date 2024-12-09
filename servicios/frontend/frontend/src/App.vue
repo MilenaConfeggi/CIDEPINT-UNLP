@@ -20,7 +20,8 @@ const logout = () => {
         <RouterLink to="/legajos">Legajos</RouterLink>
         <RouterLink to="/documentos">Documentos</RouterLink>
         <RouterLink to="/stans">Stans</RouterLink>
-        <button @click="logout">Logout</button> <!-- Botón de logout -->
+        <button @click="logout">Logout</button> 
+        <RouterLink to="/log-in">Login</RouterLink>
       </div>
     </nav>
     <main>

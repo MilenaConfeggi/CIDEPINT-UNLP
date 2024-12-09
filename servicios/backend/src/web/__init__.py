@@ -21,11 +21,9 @@ from servicios.backend.src.web.api.legajosAPI import bp as legajos_api_bp
 from servicios.backend.src.web.api.documentoAPI import bp as documentos_api_bp
 from servicios.backend.src.web.api.areaAPI import bp as area_bp
 from flask_cors import CORS
-from flask_session import Session
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
 
-session = Session()
 bcrypt = Bcrypt()
 
 
@@ -33,7 +31,6 @@ def create_app(env="development", static_folder=""):
     app = Flask(__name__)
     app.config.from_object(config[env])
     db.init_app(app)
-    session.init_app(app)
     bcrypt.init_app(app)
     JWTManager(app)
     CORS(app)
@@ -81,6 +78,10 @@ def create_app(env="development", static_folder=""):
         print("Mails creados!")
         seedsCliente.seeds_clientes()
         print("Clientes creados!")
+        seedsStans.seeds_stans()
+        print("Stans creados!")
+        seedsUsuario.seeds_usuarios()
+        print("Usuarios creados!")
         #seedsDocumento.seeds_documentos()
         #print("Documentos creados!")
 

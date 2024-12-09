@@ -8,9 +8,6 @@ bp = Blueprint('stans', __name__, url_prefix='/stans')
 @jwt_required()
 def listar_stans():
 
-    current_user = get_jwt_identity()  # Obtener identidad del JWT
-    print(f"Usuario autenticado: {current_user}")  # Mostrar el usuario autenticado
-
     stans = servicioPresupuesto.listar_stans()  # Tu lógica
     data = stansSchema.dump(stans)  # Serialización
     return jsonify(data), 200

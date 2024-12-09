@@ -36,23 +36,34 @@
 
 <script setup>
 import { ref, onMounted, defineEmits } from 'vue';
+import { useAuthStore } from '@/stores/auth';
 
 const stans = ref([]);
 const selectedStan = ref(null);
 const emit = defineEmits(['modificar-stan']);
+const authStore = useAuthStore();
 
 const fetchStans = async () => {
   try {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/stans`);
+    const token = authStore.getToken();
+    console.log('Token:', token);
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/stans`, {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
+    });
+
     if (!response.ok) {
-      throw new Error('Error al obtener los stans');
+      throw new Error("Error al obtener los stans");
     }
+
     stans.value = await response.json();
   } catch (error) {
-    console.error('Error al obtener los stans:', error);
+    console.error("Error al obtener los stans:", error);
   }
 };
-
 const highlightRow = (id) => {
   selectedStan.value = id;
 };

@@ -28,13 +28,11 @@ import { useAuthStore } from '@/stores/auth';
 const authStore = useAuthStore();
 const router = useRouter();
 // Verificación del token al montar el componente
-//onMounted(() => {
-//  if (!authStore.getToken()) {
-//    router.push({ name: 'logIn' });
-//  }
-//  console.log('Token:', authStore.getToken());
-//});
-console.log("Token " + authStore.getToken());
+onMounted(() => {
+  if (!authStore.getToken()) {
+    router.push({ name: 'logIn' });
+  }
+});
 import ListadoStans from '../components/stans/ListadoStans.vue';
 import SubirStan from '../components/stans/SubirStan.vue';
 import ModificarStan from '../components/stans/ModificarStan.vue';

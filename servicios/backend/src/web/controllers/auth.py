@@ -7,14 +7,23 @@ bp = Blueprint('auth', __name__, url_prefix='/auth')
 @bp.post("/authenticate")
 def authenticate():
     try:
+        # Extraer correo y contraseña del request
         mail = request.json.get("mail")
         password = request.json.get("password")
-        print(mail, password)
+        if not mail or not password:
+            return jsonify({"error": "El correo y la contraseña son obligatorios"}), 400
+
+        # Validar el usuario
         usuario = servicioUsuario.check_user(mail, password)
-        access_token = create_access_token({"mail": mail, "password":password}, Config.JWT_SECRET)
-        return jsonify({"info": "Sesión iniciada correctamente", "access_token":access_token}), 200
-    except KeyError as e:
-        return jsonify({"Error": "Parámetros faltantes o inválidos"}), 400
+        if not usuario:
+            return jsonify({"error": "El usuario y la contraseña no coinciden"}), 406
+
+        # Generar el token JWT usando el correo como identidad
+        access_token = create_access_token(identity=mail)
+
+        return jsonify({"info": "Sesión iniciada correctamente", "access_token": access_token}), 200
+    except KeyError:
+        return jsonify({"error": "Parámetros faltantes o inválidos"}), 400
     except Exception as e:
         print(e)
-        return jsonify({"Error": "El usuario y la contraseña no coinciden"}), 406
+        return jsonify({"error": "Ha ocurrido un error"}), 500

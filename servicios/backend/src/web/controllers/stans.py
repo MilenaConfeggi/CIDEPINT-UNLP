@@ -1,14 +1,15 @@
 from servicios.backend.src.core.services import servicioPresupuesto
 from flask import Blueprint, jsonify, abort, request, send_file, send_from_directory
 from servicios.backend.src.web.schemas.stan import stansSchema, stanSchema, ensayoSchema, EnsayosSchema
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_identity
 bp = Blueprint('stans', __name__, url_prefix='/stans')
 
-@bp.get("/")
+@bp.route("/", methods=["GET"])
 @jwt_required()
 def listar_stans():
-    stans = servicioPresupuesto.listar_stans()
-    data = stansSchema.dump(stans)
+
+    stans = servicioPresupuesto.listar_stans()  # Tu lógica
+    data = stansSchema.dump(stans)  # Serialización
     return jsonify(data), 200
 
 @bp.post("/subir_stan")

@@ -62,6 +62,9 @@ def seeds_tipos_documento():
         {
             'nombre': 'orden_facturacion',
         },
+        {
+            'nombre': 'adicional',
+        },
     ]
     for data in tipos_documento_data:
         db.session.add(Tipo_Documento(**data))

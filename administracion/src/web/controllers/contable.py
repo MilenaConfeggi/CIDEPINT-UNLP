@@ -174,7 +174,13 @@ def get_distribuciones(id):
     data = distribucionDB.list_distribuciones_by_legajo(id)
     legajo = legajoDB.get_legajo(id)
     return render_template("contable/listar_distribuciones.html",distribuciones = data, legajo = legajo)
-
+@bp.get("/legajos/<int:id>/documentos")
+def get_documentosAdd(id):
+    form = UploadDocumentoForm(legajo_id=id)
+    form.tipo.data = "adicional"
+    legajo = legajoDB.find_legajo_by_id(id)
+    documentos = [doc for doc in legajo.documento if doc.tipo_documento.nombre == "adicional"]
+    return render_template("contable/legajo_adicionales.html",form = form,legajo = legajo,documentos = documentos)
 @bp.post('/upload')
 def upload():
     file = request.files['file']
@@ -197,13 +203,15 @@ def upload():
 
     try:        
         file_path = documentos_path / file.filename
+        
         data = {
             'legajo_id': legajo_id,
             'tipo_documento_id': td.id,
             'nombre_documento': None
         }
-        old_file = find_documento(data)
-        print(old_file)
+        old_file = None
+        if tipo != 'adicional':
+            old_file = find_documento(data)
         if old_file:
             old_documento_path = documentos_path / old_file.nombre_documento
             print(old_documento_path)
@@ -234,7 +242,8 @@ def upload():
                 return jsonify({"error": "No se pudo crear el documento"}), 400
 
             file.save(str(file_path))
-            return jsonify({"message": f"Archivo guardado exitosamente en {file_path}"}), 200
+            flash("Documento subido correctamente","success")
+            return redirect(url_for("contable.get_legajos"))
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 @bp.get('/download/<int:documento_id>')

@@ -35,6 +35,32 @@ const router = createRouter({
       props: true,
     },
     {
+      path: "/legajos",
+      name: "legajos",
+      component: () => import("../views/LegajoView.vue"),
+    },
+    {
+      path: "/legajos/:id",
+      name: "legajo",
+      component: () => import("../components/legajos/LegajoDetalle.vue"),
+      props: true,
+    },
+    {
+      path: "/legajos/cancelar/:id",
+      name: "cancelar",
+      component: () => import("../components/legajos/LegajoCancel.vue"),
+    },
+    {
+      path: "/legajos/newLegajo",
+      name: "newLegajo",
+      component: () => import("../components/legajos/LegajoForm.vue"),
+    },
+    {
+      path: "/documentos",
+      name: "documento",
+      component: () => import("../components/documentos/DocumentoListado.vue"),
+    },
+    {
       path: "/stans",
       name: "stans",
       component: () => import("../views/StansView.vue"),
@@ -44,7 +70,13 @@ const router = createRouter({
       path: "/interareas",
       name: "interareas",
       component: () => import("../views/InterareasView.vue"),
-    }
+    },
+    {
+      path: "/log-in",
+      name: "logIn",
+      component: () => import("../views/LogIn.vue"),
+      props: true,
+    },
   ],
 })
 

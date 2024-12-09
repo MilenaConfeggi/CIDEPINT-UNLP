@@ -3,7 +3,7 @@ from models.base import db
 from models.presupuestos.ensayo import Ensayo
 from models.presupuestos.ensayo_stan import EnsayoStan
 from servicios.backend.src.core.services.servicioPresupuesto import crear_stan, crear_ensayo, crear_ensayo_stan
-def seed_stans():
+def seeds_stans():
     seed_stan()
     seed_ensayos()
     seed_ensayos_stans()
@@ -11,19 +11,19 @@ def seed_stans():
 def seed_stan():
     stan_data = [
         {
-            'numero': 'STAN 1',
+            'numero': '1',
             'precio_pesos': 1000,
             'precio_dolares': 100,
             "precio_por_muestra": True
         },
         {
-            'numero': 'STAN 2',
+            'numero': '2',
             'precio_pesos': 2000,
             'precio_dolares': 200,
             "precio_por_muestra": False
         },
         {
-            'numero': 'STAN 3',
+            'numero': '3',
             'precio_pesos': 3000,
             'precio_dolares': 300,
             "precio_por_muestra": True
@@ -31,7 +31,7 @@ def seed_stan():
     ]
 
     for data in stan_data:
-        crear_stan(data['numero'], data['precio_pesos'], data['precio_dolares'], data['precio_por_muestra'])
+        crear_stan(data)
 
 def seed_ensayos():
     ensayos_data = [

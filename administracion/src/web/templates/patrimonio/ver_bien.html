@@ -1,0 +1,161 @@
+{% extends 'layout.html' %}
+{% block title%} Bien {% endblock %}
+{% block content%}
+<form method="POST" action="{{ url_for('patrimonio.eliminar_archivo', id_bien=bien.id) }}">
+  <div class="modal hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="fixed inset-0 bg-gray-500/75 transition-opacity" aria-hidden="true"></div>
+        <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+            <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+                    <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                        <h3 class="text-base font-semibold text-gray-900" id="modal-title">¿Eliminar archivo?</h3>
+                          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                          <input type="hidden" name="id_archivo" value="" />
+                    </div>
+                    <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                      <button type="submit" class="mt-3 mx-2 mb-2 inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-red-500 sm:mt-0 sm:w-auto">Confirmar</button>
+                      <button type="button" class="close-modal mx-2 mb-2 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm hover:bg-gray-50 sm:ml-3 sm:w-auto">Cancelar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+<a href="{{url_for('patrimonio.index')}}"
+  class="inline-flex items-center px-3 py-4 rounded-md text-black-500 hover:bg-black-50">
+  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-6 w-6">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h18">
+      </path>
+  </svg>
+  <span class="ml-1 font-bold text-lg">Volver</span>
+</a>
+<div class="px-4 py-3 mx-8 mt-2 mb-8 bg-white rounded-lg shadow-md">
+  
+    <div class="px-4 sm:px-0">
+      <h3 class="text-base/7 font-semibold text-gray-900">{{ bien.titulo }}</h3>
+    </div>
+    <div class="mt-6 border-t border-gray-100">
+      <dl class="divide-y divide-gray-100">
+        <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+          <dt class="text-sm/6 font-medium text-gray-900">Area</dt>
+          <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{{ bien.area.nombre }}</dd>
+        </div>
+        <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+          <dt class="text-sm/6 font-medium text-gray-900">Número de inventario</dt>
+          <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{{ bien.numero_inventario }}</dd>
+        </div>
+        <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+          <dt class="text-sm/6 font-medium text-gray-900">Año</dt>
+          <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{{ bien.anio }}</dd>
+        </div>
+        <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+          <dt class="text-sm/6 font-medium text-gray-900">Institución</dt>
+          <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{{ bien.institucion }}</dd>
+        </div>
+        <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+          <dt class="text-sm/6 font-medium text-gray-900">Descripción</dt>
+          <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{{ bien.descripcion }}</dd>
+        </div>
+        {% if bien.motivo_baja %}
+            <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                <dt class="text-sm/6 font-medium text-gray-900">Motivo de baja</dt>
+                <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{{ bien.motivo_baja }}</dd>
+            </div>
+        {% endif %}
+        <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0 overflow-x-auto">
+          <dt class="text-sm/6 font-medium text-gray-900">Archivos adjuntos</dt>
+          <dd class="mt-2 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+            {% if current_user.empleado.rol == 'Administrador' or current_user.empleado.rol == 'Colaborador' or  bien.archivos %}
+              <ul role="list" class="divide-y divide-gray-100 rounded-md border border-gray-200">
+                  {% for archivo in bien.archivos %}
+                      <li class="flex items-center justify-between py-4 pl-4 pr-5 text-sm/6">
+                          <div class="flex w-0 flex-1 items-center">
+                            <svg class="size-5 shrink-0 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
+                                <path fill-rule="evenodd" d="M15.621 4.379a3 3 0 0 0-4.242 0l-7 7a3 3 0 0 0 4.241 4.243h.001l.497-.5a.75.75 0 0 1 1.064 1.057l-.498.501-.002.002a4.5 4.5 0 0 1-6.364-6.364l7-7a4.5 4.5 0 0 1 6.368 6.36l-3.455 3.553A2.625 2.625 0 1 1 9.52 9.52l3.45-3.451a.75.75 0 1 1 1.061 1.06l-3.45 3.451a1.125 1.125 0 0 0 1.587 1.595l3.454-3.553a3 3 0 0 0 0-4.242Z" clip-rule="evenodd" />
+                            </svg>
+                            <div class="ml-4 flex min-w-0 flex-1 gap-2">
+                                <span class="truncate font-medium">{{ archivo.nombre }}</span>
+                            </div>
+                          </div>
+                          {% if current_user.empleado.rol == 'Administrador' or current_user.empleado.rol == 'Colaborador' %}
+                            <button data-id="{{ archivo.id }}" class="open-modal-btn ml-4 shrink-0 size-5">
+                              <svg class="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fill-rule="evenodd"
+                                  d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                                  clip-rule="evenodd"
+                                  ></path>
+                              </svg>
+                            </button>
+                          {% endif %}
+                          <div class="ml-4 shrink-0">
+                            <a target="_blank" href="{{url_for('patrimonio.descargar_archivo', id_bien=bien.id, id_archivo=archivo.id)}}" class="font-medium text-indigo-600 hover:text-indigo-500">Descargar</a>
+                          </div>
+                      </li>
+                  {% endfor %}
+                  {% if current_user.empleado.rol == 'Administrador' or current_user.empleado.rol == 'Colaborador' %}
+                    <li>
+                      <form class="flex items-center justify-between py-4 pl-4 pr-5 text-sm/6" method="POST" enctype="multipart/form-data" action="{{ url_for('patrimonio.subir_archivo', id_bien=bien.id) }}">
+                        <label for="archivo" class="flex w-0 flex-1 items-center cursor-pointer">
+                          <svg class="size-5 shrink-0 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
+                            <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
+                          </svg>
+                          <div class="ml-4 flex min-w-0 flex-1 gap-2">
+                              <span class="truncate font-medium">Subir archivo</span>
+                          </div>
+                          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                          <input id="archivo" name="archivo" type="file" class="hidden" onchange="this.form.submit()">
+                        </label>
+                      </form>
+                  </li>
+                {% endif %}
+              </ul>
+            {% endif %}
+          </dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Selecciona todos los botones para abrir modales
+      const openModalButtons = document.querySelectorAll('.open-modal-btn');
+      // Selecciona todos los botones para cerrar modales
+      const closeModalButton = document.querySelector('.close-modal');
+      
+      const modal = document.querySelector(`.modal`);
+
+      // Función para abrir el modal correspondiente
+      const openModal = (id) => {
+        document.querySelector('input[name="id_archivo"]').value = id;
+        modal.classList.remove('hidden'); // Muestra el modal
+      };
+    
+      // Función para cerrar el modal correspondiente
+      const closeModal = (id) => {
+        modal.classList.add('hidden'); // Oculta el modal
+      };
+    
+      // Asocia evento de clic a los botones de abrir modal
+      openModalButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+          const id = button.getAttribute('data-id');
+          openModal(id);
+        });
+      });
+    
+      // Asocia evento de clic a los botones de cerrar modal
+      closeModalButton.addEventListener('click', () => {
+          const id = modal.getAttribute('data-id');
+          closeModal(id);
+      });
+    
+      // Cierra el modal al hacer clic fuera del contenido
+      modal.addEventListener('click', (event) => {
+          if (event.target === modal) {
+            const id = modal.getAttribute('data-id');
+            closeModal(id);
+          }
+      });
+    });
+  </script>
+{% endblock %}

@@ -9,7 +9,7 @@ from flask import session
 from flask import request
 
 def crear_usuario(data):
-    if Usuario.query.filter_by(mail=data.get('mail'), esta_borrado=False):
+    if Usuario.query.filter_by(mail=data.get('mail'), esta_borrado=False).first():
         raise ValueError("Ya existe un usuario con ese mail")
     nuevo_usuario = Usuario(
         mail=data.get('mail'),
@@ -28,13 +28,26 @@ def crear_rol(data):
     db.session.commit()
     return nuevo_rol
 
+def crear_permiso(data):
+    nuevo_permiso = Permiso(
+        nombre=data.get('nombre'),
+    )
+    db.session.add(nuevo_permiso)
+    db.session.commit()
+    return nuevo_permiso
+
+def asignar_permiso(data):
+    rol_permiso = RolPermiso(rol=data.get('rol'), permiso=data.get('permiso'))
+    db.session.add(rol_permiso)
+    db.session.commit()
+
 def listar_usuarios():
     usuarios = Usuario.query.filter_by(esta_borrado=False).all()
     return usuarios
 
 def eliminar_usuario(id_usuario):
     usuario = Usuario.query.get(id_usuario)
-    if usuario is none:
+    if usuario is None:
         raise ValueError("No se encontró el usuario seleccionado")
     usuario.esta_borrado = True
     db.session.commit()
@@ -48,6 +61,7 @@ def check_user(usermail, password):
     Si el usuario existe y las contraseñas coinciden devuelve el usuario, sino devuelve None
     """
     usuario = obtener_usuario_por_mail(usermail)
+    print(usuario)
     if (not usuario) or (
         not (
             usuario.contra and bcrypt.check_password_hash(usuario.contra, password)

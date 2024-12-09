@@ -8,28 +8,25 @@ def seeds_muestras():
     seed_fotos()
 
 def seed_muestras():
-    # Crear legajo provisional
-    legajo_provisional = Legajo()
-    db.session.add(legajo_provisional)
-    db.session.commit()
+
 
     muestras_data = [
         {
             'fecha_ingreso': datetime(2024, 1, 1),
             'iden_cliente': 'Muestra 1',
-            'legajo_id': legajo_provisional.id,
+            'legajo_id': 35,
             "terminada": False
         },
         {
             'fecha_ingreso': datetime(2024, 2, 1),
             'iden_cliente': 'Muestra 2',
-            'legajo_id': legajo_provisional.id,
+            'legajo_id': 35,
             "terminada": False
         },
         {
             'fecha_ingreso': datetime(2024, 3, 1),
             'iden_cliente': 'Muestra 3',
-            'legajo_id': legajo_provisional.id,
+            'legajo_id': 35,
             "terminada": False
         }
     ]

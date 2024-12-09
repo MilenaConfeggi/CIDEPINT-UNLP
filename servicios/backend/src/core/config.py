@@ -7,6 +7,8 @@ class Config():
     TESTING = False
     SECRET_KEY = getenv('SECRET_KEY', urandom(24).hex())
     SESSION_TYPE = "filesystem"
+    JWT_SECRET = getenv("JWT_SECRET")
+    
 class DevelopmentConfig(Config):
     PORT = getenv("PORT")
     DB_NAME = getenv("DB_NAME")

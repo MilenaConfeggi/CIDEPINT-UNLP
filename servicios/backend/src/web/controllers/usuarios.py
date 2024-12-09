@@ -13,7 +13,7 @@ def listar_usuarios():
     return jsonify(data), 200
 
 @bp.get("/delete")
-def borrarUsuario():
+def borrar_usuario():
     try:
         servicioUsuario.eliminar_usuario(id_usuario)
         return jsonify({"info": "Usuario borrado exitosamente"}), 200

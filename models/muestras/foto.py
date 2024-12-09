@@ -6,5 +6,5 @@ class Foto(db.Model):
     nombre_archivo = db.Column(db.String(100), nullable=False)
     fecha = db.Column(db.Date, nullable=False)
 
-    muestra_id = db.Column(db.Integer, db.ForeignKey('muestra.id'), nullable=False)
-    muestra = db.relationship('Muestra', backref='fotos')
+    muestra_id = db.Column(db.Integer, db.ForeignKey('muestra.id'))
+    muestra = db.relationship('Muestra', back_populates='fotos')

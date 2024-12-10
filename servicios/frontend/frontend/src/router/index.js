@@ -83,6 +83,18 @@ const router = createRouter({
       component: () => import("../views/LogIn.vue"),
       props: true,
     },
+    {
+      path: "/usuarios",
+      name: "usuarios",
+      component: () => import("../views/UsuariosView.vue"),
+      props: true,
+    },
+    {
+      path: "/usuarios/crear",
+      name: "usuarios_crear",
+      component: () => import("../components/usuarios/CrearUsuario.vue"),
+      props: true,
+    },
   ],
 })
 

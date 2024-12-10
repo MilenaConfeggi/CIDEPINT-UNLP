@@ -92,3 +92,9 @@ def tiene_permiso(permiso):
     permissions = obtener_permisos(usuario)
 
     return usuario is not None and permiso in permissions
+
+def buscar_rol_por_id(rol_id):
+    return Rol.query.filter_by(id=rol_id).first()
+
+def listar_roles():
+    return Rol.query.all()

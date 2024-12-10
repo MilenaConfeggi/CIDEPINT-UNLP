@@ -3,7 +3,7 @@
 {% block content %}
 <div class="px-4">
     <div class="px-4 sm:px-0">
-        <h3 class="text-base/7 font-semibold text-gray-900">Documentos del Legajo: {{ legajo.nro_legajo }}</h3>
+        <h3 class="text-base/7 font-semibold text-gray-900">Documentos adicionales del Legajo: {{ legajo.nro_legajo }}</h3>
     </div>
     <div class="mt-6 border-t border-gray-100">
         <dl class="divide-y divide-gray-100">
@@ -42,7 +42,6 @@
     <table class="w-full whitespace-no-wrap">
         <thead>
         <tr class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b bg-gray-50">
-            <th class="px-4 py-3">Tipo</th>
             <th class="px-4 py-3">Nombre</th>
             <th class="px-4 py-3">Acciones</th>
         </tr>
@@ -56,14 +55,14 @@
                 <a href="{{ url_for('contable.download', documento_id=documento.id) }}" class="text-blue-600 hover:underline">
                     Descargar
                 </a>
-                <!-- 
-                <form method="POST" action="{{ url_for('contable.download', documento_id=documento.id) }}" style="display:inline;">
-                    {{ form.hidden_tag() }}
-                    <button type="submit" class="text-red-600 hover:underline">
+                <div>
+                <form method="POST" action="{{ url_for('contable.delete_document', documento_id=documento.id) }}" style="display:inline;">
+                    {{ delete_form.hidden_tag() }}
+                    <button type="submit" class="text-red-600 hover:underline" onclick="return confirm('¿Estás seguro de que deseas eliminar este documento?');">
                         Eliminar
                     </button>
                 </form>
-                Eliminar -->
+            </div>
             </td>
         </tr>
         {% endfor %}

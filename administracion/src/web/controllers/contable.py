@@ -25,7 +25,7 @@ from flask import current_app as app
 from datetime import datetime
 from pathlib import Path
 import os
-from administracion.src.web.forms.documento_legajo_nuevo import UploadDocumentoForm ,DownloadForm
+from administracion.src.web.forms.documento_legajo_nuevo import UploadDocumentoForm ,DownloadForm ,DeleteForm
 @bp.get("/")
 @role_required('Administrador', 'Colaborador')
 def index():
@@ -180,7 +180,8 @@ def get_documentosAdd(id):
     form.tipo.data = "adicional"
     legajo = legajoDB.find_legajo_by_id(id)
     documentos = [doc for doc in legajo.documento if doc.tipo_documento.nombre == "adicional"]
-    return render_template("contable/legajo_adicionales.html",form = form,legajo = legajo,documentos = documentos)
+    delete_form = DeleteForm()
+    return render_template("contable/legajo_adicionales.html",form = form,legajo = legajo,documentos = documentos, delete_form=delete_form)
 @bp.post('/upload')
 def upload():
     file = request.files['file']
@@ -214,14 +215,13 @@ def upload():
             old_file = find_documento(data)
         if old_file:
             old_documento_path = documentos_path / old_file.nombre_documento
-            print(old_documento_path)
             if old_documento_path.exists():
-                print(old_documento_path)
                 old_documento_path.unlink()
                 file.save(str(file_path))
                 old_file.nombre_documento = file.filename
                 db.session.commit()
-                return jsonify({"message": f"Archivo guardado exitosamente en {file_path}"}), 200
+                flash("Documento subido correctamente","success")
+                return redirect(url_for("contable.get_legajos"))
             else:
                 return jsonify({"error": "No se encontro el archivo"}), 404
         else:
@@ -243,9 +243,36 @@ def upload():
 
             file.save(str(file_path))
             flash("Documento subido correctamente","success")
+            if tipo == 'adicional':
+                return redirect(url_for("contable.get_documentosAdd",id=legajo_id))
             return redirect(url_for("contable.get_legajos"))
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+@bp.post('/delete_document/<int:documento_id>')
+def delete_document(documento_id):
+    documento = get_documento(documento_id)
+    if documento is None:
+        return jsonify({"error": "No se encontro el archivo"}), 404
+    tipo = documento.tipo_documento.nombre
+    filename = documento.nombre_documento
+
+    # Ruta base de los documentos
+    current_file = Path(__file__).resolve()
+    project_root = current_file.parents[4]
+    documentos_path = project_root / "documentos" / tipo
+
+    # Ruta completa del archivo
+    file_path = documentos_path / filename
+
+    # Verificar que el archivo exista
+    if not file_path.exists():
+        return jsonify({"error": "El archivo no existe"}), 404
+
+    # Eliminar el archivo
+    file_path.unlink()
+    db.session.delete(documento)
+    db.session.commit()
+    return redirect(url_for("contable.get_documentosAdd",id=documento.legajo_id))
 @bp.get('/download/<int:documento_id>')
 def download(documento_id):
      # Extraer el ID del documento desde el formulario

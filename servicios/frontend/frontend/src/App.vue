@@ -23,6 +23,7 @@ const tienePermisoListarUsuarios = computed(() => {
 
 // Computada para verificar si el usuario está logueado
 const estaLogueado = computed(() => {
+  console.log(token.value);
   return !!token.value; // Si el token existe, significa que el usuario está logueado
 });
 
@@ -33,6 +34,7 @@ watchEffect(() => {
 
 const logout = () => {
   authStore.removeToken();
+  localStorage.removeItem('access_token'); // Remove the token from localStorage
   localStorage.removeItem('permisos');
   location.reload(); // Recarga la página para que se aplique el guard
   console.log('Logout');
@@ -46,17 +48,16 @@ const logout = () => {
         <img alt="Vue logo" class="logo" src="@/assets/Logo.png" width="50" height="50" />
       </RouterLink>
       <div class="nav-links">
-        <RouterLink to="/legajos">Legajos</RouterLink>
-        <RouterLink to="/documentos">Documentos</RouterLink>
+        <RouterLink v-if="estaLogueado" to="/legajos">Legajos</RouterLink>
+        <RouterLink v-if="estaLogueado" to="/documentos">Documentos</RouterLink>
         
-        <!-- Mostrar el botón de Stans solo si el usuario está logueado y tiene el permiso "listar_stans" -->
         <RouterLink v-if="estaLogueado && tienePermisoListarStans" to="/stans">Stans</RouterLink>
 
         <!-- Mostrar el botón de Stans solo si el usuario está logueado y tiene el permiso "listar_stans" -->
         <RouterLink v-if="estaLogueado && tienePermisoListarUsuarios" to="/usuarios">Usuarios</RouterLink>
         
-        <button @click="logout">Logout</button>
-        <RouterLink to="/log-in">Login</RouterLink>
+        <RouterLink v-if="!estaLogueado" to="/log-in">Iniciar Sesión</RouterLink>
+        <button v-if="estaLogueado" @click="logout">Cerrar Sesión</button>
       </div>
     </nav>
     <main>

@@ -46,6 +46,7 @@
 <script>
 import { ref, onMounted, watch } from 'vue';
 import axios from 'axios';
+import { useAuthStore } from '@/stores/auth'
 
 export default {
   props: {
@@ -66,8 +67,15 @@ export default {
     const seleccionadas = ref([]);
 
     const fetchFotos = async () => {
+      const authStore = useAuthStore();
+      const token = authStore.getToken();
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/muestras/fotos_por_fecha/${props.legajoId}/${props.fechaSeleccionada}`);
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/muestras/fotos_por_fecha/${props.legajoId}/${props.fechaSeleccionada}`, {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "multipart/form-data"
+          }
+        });
         fotos.value = response.data;
       } catch (err) {
         error.value = 'Error al cargar las fotos';
@@ -104,9 +112,16 @@ export default {
     };
 
     const descargarSeleccionadas = async () => {
+      const authStore = useAuthStore();
+      const token = authStore.getToken();
       for (const id of seleccionadas.value) {
         try {
-          const response = await fetch(`/muestras/descargar_fotos/${id}`);
+          const response = await fetch(`/muestras/descargar_fotos/${id}`, {
+            headers: {
+              "Authorization": `Bearer ${token}`,
+              "Content-Type": "multipart/form-data"
+            }
+          });
           const blob = await response.blob();
           const url = window.URL.createObjectURL(blob);
           const a = document.createElement('a');

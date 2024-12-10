@@ -172,7 +172,7 @@ def crear_distribucion(id):
 @bp.get("/distribuciones/<int:id>")
 def get_distribuciones(id):
     data = distribucionDB.list_distribuciones_by_legajo(id)
-    legajo = legajoDB.get_legajo(id)
+    legajo = legajoDB.find_legajo_by_id(id)
     return render_template("contable/listar_distribuciones.html",distribuciones = data, legajo = legajo)
 @bp.get("/legajos/<int:id>/documentos")
 def get_documentosAdd(id):

@@ -10,6 +10,8 @@ bp = Blueprint('stans', __name__, url_prefix='/stans')
 def listar_stans():
     if not check_permission("listar_stans"):
         return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
+    current_user = get_jwt_identity()
+    print(current_user)
     stans = servicioPresupuesto.listar_stans()  
     data = stansSchema.dump(stans)  
     return jsonify(data), 200

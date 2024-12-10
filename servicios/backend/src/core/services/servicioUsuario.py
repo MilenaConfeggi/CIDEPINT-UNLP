@@ -5,8 +5,8 @@ from models.usuarios.rol_permiso import RolPermiso
 from models.usuarios.usuario import Usuario
 from datetime import datetime
 from web import bcrypt
-from flask import session
 from flask import request
+from flask_jwt_extended import get_jwt_identity, jwt_required
 
 def crear_usuario(data):
     if Usuario.query.filter_by(mail=data.get('mail'), esta_borrado=False).first():
@@ -82,12 +82,13 @@ def obtener_permisos(user):
     flat_permisos = tuple(item for sublist in a for item in sublist)
     return flat_permisos
 
-
+@jwt_required()
 def tiene_permiso(permiso):
-    user_mail = session.get("user")
+    print(get_jwt_identity())
+    user_mail = get_jwt_identity()
     usuario = obtener_usuario_por_mail(user_mail)
     if usuario.system_admin == True:
         return True
     permissions = obtener_permisos(usuario)
 
-    return usuario is not None and permission in permissions
+    return usuario is not None and permiso in permissions

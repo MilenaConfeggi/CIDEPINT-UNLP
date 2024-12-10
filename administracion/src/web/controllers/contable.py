@@ -121,7 +121,7 @@ def get_crear_distribucion(id):
     empleados_por_area = {}
     for empleado in empleados:
         empleados_por_area.setdefault(empleado.area_id, []).append(empleado.id)
-    return render_template("contable/crear_distribucion.html", form = form,empleados_por_area=empleados_por_area, )
+    return render_template("contable/crear_distribucion.html", form = form,empleados_por_area=empleados_por_area, id_legajo = id)
 
 @bp.post("/distribuciones/crear/<int:id>")
 def crear_distribucion(id):

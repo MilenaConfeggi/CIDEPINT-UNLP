@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
 {% block title %}Nueva Distribución{% endblock %}
 {% block content %}
-    <form class="px-4" method="POST" action="{{ url_for('contable.crear_distribucion', id = request.args.get('id', 1)) }}">
+    <form class="px-4" method="POST" action="{{ url_for('contable.crear_distribucion', id = id_legajo) }}">
         {{ form.hidden_tag() }}
 
         <h2 class="text-lg font-bold mb-4">Crear Nueva Distribución</h2>
@@ -47,11 +47,16 @@
         </div>
         <div class="mb-4">
         <label for="ganancias_de_id" class="block text-sm font-medium text-gray-700">Área de Ganancias</label>
-        {{ form.ganancias_de_id(class='block w-full border border-gray-300 rounded py-2 px-3', id="ganancias-de-id") }}
+        <select class="block w-full border border-gray-300 rounded py-2 px-3" id="ganancias-de-id" name="ganancias_de_id">
+            <option value="" disabled selected>Elija un área para las ganancias</option>
+            {% for choice in form.ganancias_de_id.choices %}
+                <option value="{{ choice[0] }}">{{ choice[1] }}</option>
+            {% endfor %}
+        </select>
         {% for error in form.ganancias_de_id.errors %}
             <p class="text-red-500 text-sm">{{ error }}</p>
         {% endfor %}
-        </div>
+    </div>
         
         <div class="mb-4">
             <label for="costos_de_id" class="block text-sm font-medium text-gray-700">Área de Costos</label>

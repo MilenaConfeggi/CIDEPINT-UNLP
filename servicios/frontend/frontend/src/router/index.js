@@ -97,12 +97,14 @@ const routes = [
       name: "usuarios",
       component: () => import("../views/UsuariosView.vue"),
       props: true,
+      meta: { requiresAuth: true }
     },
     {
       path: "/usuarios/crear",
       name: "usuarios_crear",
       component: () => import("../components/usuarios/CrearUsuario.vue"),
       props: true,
+      meta: { requiresAuth: true }
     },
 ];
 

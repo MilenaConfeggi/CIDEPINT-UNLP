@@ -11,9 +11,15 @@ def listar_interareas():
     print("data:", data)
     return jsonify(data), 200
 
+@bp.get("/<int:id>")
+def obtener_interarea(id):
+    interarea = servicioInterarea.obtener_interarea(id)
+    data = interareaSchema.dump(interarea)
+    return jsonify(data), 200
+
 @bp.post("/crear")
 def crear_interarea():
     data = request.get_json()
     interarea = servicioInterarea.crear_interarea(data)
     data = interareaSchema.dump(interarea)
-    return jsonify(data), 201
+    return jsonify(data), 201   

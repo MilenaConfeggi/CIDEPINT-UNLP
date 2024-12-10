@@ -20,6 +20,7 @@ from servicios.backend.src.web.controllers.auth import bp as auth_bp
 from servicios.backend.src.web.controllers.stans import bp as stans_bp
 from servicios.backend.src.web.api.legajosAPI import bp as legajos_api_bp
 from servicios.backend.src.web.api.documentoAPI import bp as documentos_api_bp
+from servicios.backend.src.web.controllers.interarea import bp as interarea_bp
 from servicios.backend.src.web.api.areaAPI import bp as area_bp
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt

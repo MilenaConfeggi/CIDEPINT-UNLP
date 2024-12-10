@@ -72,6 +72,12 @@ const router = createRouter({
       component: () => import("../views/InterareasView.vue"),
     },
     {
+      path: "/interarea-detalle/:id",
+      name: "InterareaDetalle",
+      component: () => import("../components/interareas/DetalleInterarea.vue"),
+      props: true, 
+    },
+    {
       path: "/log-in",
       name: "logIn",
       component: () => import("../views/LogIn.vue"),

@@ -133,3 +133,9 @@ def descargar_foto(id_muestra, filename):
     if not os.path.exists(file_path):
         abort(404, description="Resource not found")
     return send_file(file_path, as_attachment=True)
+
+@bp.get("/")
+def listar_muestras():
+    muestras = servicioMuestras.listar_todas()
+    data = muestrasSchema.dump(muestras)
+    return jsonify(data), 200

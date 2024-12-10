@@ -80,3 +80,6 @@ def listar_fotos_por_fecha(legajo_id, fecha):
         Muestra.legajo_id == legajo_id,
         Foto.fecha == fecha
     ).all()
+
+def listar_todas():
+    return Muestra.query.all()

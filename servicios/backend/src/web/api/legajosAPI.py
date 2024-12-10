@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from flask import current_app as app
-from models.legajos import list_legajos, find_legajo_by_id, create_legajo
+from models.legajos import list_legajos, find_legajo_by_id, create_legajo, list_legajos_all
 from models.documentos import find_estado_by_nombre
 from models.clientes import create_cliente
 from ..schemas.legajos import legajos_schema, legajo_schema, pagination_legajos_schema
@@ -48,3 +48,9 @@ def cancel_legajo(id):
     legajo.motivo_cancelacion = motivo
     db.session.commit()
     return jsonify({"message": "Legajo cancelado"}), 200
+
+@bp.get('/all')
+def listado_completo():
+    legajos = list_legajos_all()            
+    data = legajos_schema.dump(legajos)
+    return jsonify(data), 200

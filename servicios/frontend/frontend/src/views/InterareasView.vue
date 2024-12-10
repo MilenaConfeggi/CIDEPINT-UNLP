@@ -1,20 +1,15 @@
 <template>
-    <div class="container mt-4">
-        <h1 class="text-center mb-4">Interareas</h1>
-        <!-- Botón para mostrar el formulario en un modal -->
-        <button class="btn btn-success" @click="mostrarFormularioInterarea = true">Nueva Interarea</button>
-        
-        <!-- Modal de Solicitar Interarea -->
-        <div v-if="mostrarFormularioInterarea" class="modal-overlay" @click="cerrarFormularioInterarea">
-            <div class="modal-content" @click.stop>
-                <button class="close-button" @click="cerrarFormularioInterarea">&times;</button>
-                <NuevaInterarea />
-            </div>
-        </div>
-
-        <!-- Listado de interareas (esto se mantendrá visible debajo del modal) -->
-        <ListadoInterareas @interareasFetched="setInterareas"/>
+  <div class="container mt-4">
+    <h1 class="text-center mb-4">Interareas</h1>
+    <button class="btn btn-success mb-4" @click="mostrarFormularioInterarea = true">Nueva Interarea</button>
+    <div v-if="mostrarFormularioInterarea" class="modal-overlay" @click="cerrarFormularioInterarea">
+      <div @click.stop>
+        <button class="btn-close" aria-label="Cerrar" @click="cerrarFormularioInterarea"></button>
+        <NuevaInterarea />
+      </div>
     </div>
+    <ListadoInterareas @interareasFetched="setInterareas" />
+  </div>
 </template>
 
 <script setup>
@@ -22,20 +17,17 @@ import { ref } from 'vue';
 import ListadoInterareas from '@/components/interareas/ListadoInterareas.vue';
 import NuevaInterarea from '@/components/interareas/NuevaInterarea.vue';
 
-// Usamos ref para controlar el estado del modal
 const mostrarFormularioInterarea = ref(false);
 
 const interareas = ref([]);
 
-// Método para cerrar el modal
 const cerrarFormularioInterarea = () => {
-    mostrarFormularioInterarea.value = false;
+  mostrarFormularioInterarea.value = false;
 };
 
 const setInterareas = (data) => {
-    interareas.value = data;
+  interareas.value = data;
 };
-
 </script>
 
 <style scoped>
@@ -52,16 +44,7 @@ const setInterareas = (data) => {
   z-index: 1000; 
 }
 
-.modal-content {
-  background-color: white;
-  padding: 20px;
-  border-radius: 8px;
-  max-width: 500px;
-  width: 100%;
-  position: relative;
-}
-
-.close-button {
+.modal-content .btn-close {
   position: absolute;
   top: 10px;
   right: 10px;
@@ -69,5 +52,18 @@ const setInterareas = (data) => {
   border: none;
   font-size: 24px;
   cursor: pointer;
+}
+
+.modal-overlay .modal-content {
+  transform: translateY(-50px);
+  opacity: 0;
+  animation: slideIn 0.3s forwards;
+}
+
+@keyframes slideIn {
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 </style>

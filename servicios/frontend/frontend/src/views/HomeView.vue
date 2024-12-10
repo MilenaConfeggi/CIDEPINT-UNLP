@@ -59,6 +59,18 @@
           </div>
         </div>
       </div>
+      <div class="col">
+        <div class="card">
+          <img src="/interareas.png" class="card-img-top" alt="interareas" />
+          <div class="card-body">
+            <h5 class="card-title">Interareas</h5>
+            <p class="card-text">
+              Menejo de interáreas para realizar solicitudes y subir resultados.
+            </p>
+            <RouterLink to="/interareas" class="btn btn-primary">Ver Interareas</RouterLink>
+          </div>
+        </div>
+      </div>
     </div>
   </main>
 </template>

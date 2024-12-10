@@ -1,23 +1,17 @@
 from servicios.backend.src.core.services.servicioInterarea import crear_interarea
 from models.legajos.legajo import Legajo
-from models.areas.area import Area
+from models.personal.area import Area
+from models.muestras.muestra import Muestra
 from models.base import db
 from datetime import datetime
-from servicios.backend.src.core.seeds.seedsMuestra import seed_muestras
 
 def seeds_interarea():
     seed_interareas()
 
 def seed_interareas():
-    # Llamar a seed_muestras para obtener las muestras creadas
-    muestras = seed_muestras()
-
-    # Crear legajo y área provisionales
-    legajo_provisional = Legajo()
-    area_provisional = Area()
-    db.session.add(legajo_provisional)
-    db.session.add(area_provisional)
-    db.session.commit()
+    muestras = Muestra.query.all()
+    legajo_provisional = Legajo.query.all()
+    area_provisional = Area.query.all()
 
     interareas_data = [
         {
@@ -28,8 +22,8 @@ def seed_interareas():
             'nombre_solicitud_no_firmada': 'prueba1.1',
             'investigacion': True,
             'nro_interarea': 1,
-            'legajo_id': legajo_provisional.id,
-            'area_id': area_provisional.id,
+            'legajo_id': legajo_provisional[0].id,
+            'area_id': area_provisional[0].id,
             'muestra_id': muestras[0].id
         },
         {
@@ -40,8 +34,8 @@ def seed_interareas():
             'nombre_solicitud_no_firmada': 'prueba2.1',
             'investigacion': False,
             'nro_interarea': 2,
-            'legajo_id': legajo_provisional.id,
-            'area_id': area_provisional.id,
+            'legajo_id': legajo_provisional[1].id,
+            'area_id': area_provisional[1].id,
             'muestra_id': muestras[1].id  # Asignar otra muestra
         },
         {
@@ -52,8 +46,8 @@ def seed_interareas():
             'nombre_solicitud_no_firmada': 'prueba2.1',
             'investigacion': False,
             'nro_interarea': 2,
-            'legajo_id': legajo_provisional.id,
-            'area_id': area_provisional.id,
+            'legajo_id': legajo_provisional[2].id,
+            'area_id': area_provisional[2].id,
             'muestra_id': muestras[2].id 
         }
     ]

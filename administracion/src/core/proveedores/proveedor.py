@@ -1,6 +1,8 @@
 from models.compras.proveedor import Proveedor
 from models.base import db
 
+def listar_proveedores():
+    return Proveedor.query.filter(Proveedor.activo == True).all()
 
 def filtrar_proveedores(razon_social, contacto, page, per_page):
     query = Proveedor.query.filter(Proveedor.activo == True)

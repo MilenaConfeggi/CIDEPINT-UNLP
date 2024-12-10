@@ -98,6 +98,12 @@
                         {% for fondo in compra.fondos %}
                             <li>{{ fondo.titulo }}</li>
                         {% endfor %}
+                        {% for area in compra.areas %}
+                            <li>{{ area.nombre }}</li>
+                        {% endfor %}
+                        {% for empleado in compra.empleados %}
+                            <li>{{ empleado.nombre }} - {{ empleado.dni }}</li>
+                        {% endfor %}
                     </td>
                     <td class="px-4 py-3">
                         <a href="{{ url_for('compra.ver_compra', id_compra=compra.id) }}" class="text-indigo-600 hover:text-indigo-900">

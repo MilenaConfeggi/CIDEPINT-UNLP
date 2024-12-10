@@ -1,16 +1,36 @@
 from flask_wtf import FlaskForm
-from wtforms import DateField, SelectField, SelectMultipleField, StringField, FloatField, FieldList, FormField, ValidationError
+from wtforms import DateField, SelectField, StringField, FloatField, FieldList, FormField, ValidationError
 from wtforms.validators import DataRequired
 from models.compras.compra import estado_compra
-from models.personal.empleado import Empleado
-from models.personal.area import Area
-from models.Fondo.fondo import Fondo
-from models.compras.proveedor import Proveedor
+from administracion.src.core.servicios.personal import listar_empleados, listar_areas
+from administracion.src.core.fondos.fondo import listar_fondos 
+from administracion.src.core.proveedores.proveedor import listar_proveedores
 import re
 
-class DynamicFieldForm(FlaskForm):
-    id = StringField('id')
-    detalle = StringField('detalle')
+class FormularioEmpleado(FlaskForm):
+    id_empleado = SelectField('Empleado', choices=[], coerce=int, validators=[DataRequired()])
+    monto = FloatField('Monto', validators=[DataRequired()])
+
+    def __init__(self, *args, **kwargs):
+        super(FormularioEmpleado, self).__init__(*args, **kwargs)
+        self.id_empleado.choices = [(empleado.id, f"{empleado.nombre} {empleado.apellido} - {empleado .dni}") for empleado in listar_empleados()]
+
+class FormularioArea(FlaskForm):
+    id_area = SelectField('Area', choices=[], coerce=int, validators=[DataRequired()])
+    monto = FloatField('Monto', validators=[DataRequired()])
+
+    def __init__(self, *args, **kwargs):
+        super(FormularioArea, self).__init__(*args, **kwargs)
+        self.id_area.choices = [(area.id, area.nombre) for area in listar_areas()]
+
+class FormularioFondo(FlaskForm):
+    titulo_fondo = SelectField('Fondo', choices=[], coerce=str, validators=[DataRequired()])
+    monto = FloatField('Monto', validators=[DataRequired()])
+
+    def __init__(self, *args, **kwargs):
+        super(FormularioFondo, self).__init__(*args, **kwargs)
+        self.titulo_fondo.choices = [fondo.titulo for fondo in listar_fondos()]
+
 
 class form_agregar_compra(FlaskForm):
 
@@ -40,24 +60,16 @@ class form_agregar_compra(FlaskForm):
         message="Este campo es requerido")])
     numero_factura = StringField('numero_factura', validators=[DataRequired(
         message="Este campo es requerido")])
-    fondos = SelectMultipleField('fondos')
-    empleados = SelectMultipleField('empleados')
-    areas = SelectMultipleField('areas')
-    fondos_detalle = FieldList(FormField(DynamicFieldForm))
-    empleados_detalle = FieldList(FormField(DynamicFieldForm))
-    areas_detalle = FieldList(FormField(DynamicFieldForm))
+    fondos = FieldList(FormField(FormularioFondo), min_entries=0)
+    empleados = FieldList(FormField(FormularioEmpleado), min_entries=0)
+    areas = FieldList(FormField(FormularioArea), min_entries=0)
     
     def __init__(self, *args, **kwargs):
         super(form_agregar_compra, self).__init__(*args, **kwargs)
 
-        fondos_choices = [(fondo.titulo, fondo.titulo) for fondo in Fondo.query.all()]
         empleados_choices = [(empleado.id, f"{empleado.nombre} {empleado.apellido}") 
-                             for empleado in Empleado.query.all() if empleado.habilitado]
-        areas_choices = [(area.id, area.nombre) for area in Area.query.all()]
-        proveedores_choices = [(proveedor.id, proveedor.razon_social) for proveedor in Proveedor.query.all() if proveedor.activo]
+                             for empleado in listar_empleados()]
+        proveedores_choices = [(proveedor.id, proveedor.razon_social) for proveedor in listar_proveedores()]
 
-        self.fondos.choices = fondos_choices 
-        self.empleados.choices = empleados_choices
-        self.areas.choices = areas_choices
         self.proveedor.choices = proveedores_choices
         self.solicitante.choices = empleados_choices

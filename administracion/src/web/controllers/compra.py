@@ -1,15 +1,16 @@
-from flask import Blueprint, render_template, request, redirect, flash, url_for, session, Response
-import csv
+from flask import Blueprint, render_template, request, redirect, flash, url_for, Response
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from io import BytesIO
 from flask_login import current_user
-from administracion.src.core.compras.compra import filtrar_compras, buscar_compra, filtrar_compras_descargadas
+from administracion.src.core.compras.compra import filtrar_compras, buscar_compra, filtrar_compras_descargadas, crear_compra
 from administracion.src.core.proveedores.proveedor import filtrar_proveedores, chequeo_razon_social_existente, crear_proveedor, borrar_proveedor, actualizar_proveedor, buscar_proveedor
 from administracion.src.web.forms.form_agregar_proveedor import form_agregar_proveedor
 from administracion.src.web.forms.form_editar_proveedor import form_editar_proveedor
 from administracion.src.web.forms.form_agregar_compra import form_agregar_compra
 from administracion.src.web.controllers.roles import role_required
+from administracion.src.core.servicios.personal import listar_empleados, listar_areas, conseguir_area_de_id, conseguir_empleado_de_id
+from administracion.src.core.fondos.fondo import listar_fondos, conseguir_fondo_de_id
 
 bp = Blueprint("compra",__name__,url_prefix="/compra")
 
@@ -254,31 +255,64 @@ def descargar_compras_pdf():
 @role_required('Administrador', 'Colaborador')
 def agregar_compra():
     form = form_agregar_compra()
-    return render_template("compras/creacion_compra.html", form=form)
+    areas = listar_areas()
+    empleados = listar_empleados()
+    fondos = listar_fondos()
+    return render_template("compras/creacion_compra.html", form=form, areas=areas, empleados=empleados, fondos=fondos)
 
 @bp.post("/agregando_compra")
 @role_required('Administrador', 'Colaborador')
 def agregando_compra():
-
     form = form_agregar_compra(request.form)
     if form.validate_on_submit():
-
-        print("FONDOS")
-        print(form.fondos.data)
-        print(form.fondos_detalle.data)
-
-        print("AREAS")
-        print(form.areas.data)
-        print(form.areas_detalle.data)
-
-        flash("correctamente", "success")
+        monto = 0
+        fondos, empleados, areas = [], [], []
+        for area in form.areas.data:
+            area_obj = conseguir_area_de_id(area["id_area"])
+            if area["monto"] > area_obj.saldo:
+                flash("El monto de un área no puede ser superior a su saldo", "danger")
+                return render_template("compras/creacion_compra.html", form=form)
+            areas.append((area_obj, area["monto"]))
+            monto += area["monto"]
+        for empleado in form.empleados.data:
+            empleado_obj = conseguir_empleado_de_id(empleado["id_empleado"])
+            if empleado["monto"] > empleado_obj.importe:
+                flash("El monto de un empleado no puede ser superior a su saldo", "danger")
+                return render_template("compras/creacion_compra.html", form=form)
+            empleados.append((empleado_obj, empleado["monto"]))
+            monto += empleado["monto"]
+        for fondo in form.fondos.data:
+            fondo_obj = conseguir_fondo_de_id(fondo["titulo_fondo"])
+            if fondo["monto"] > fondo_obj.saldo:
+                flash("El monto de un fondo no puede ser superior a su saldo", "danger")
+                return render_template("compras/creacion_compra.html", form=form)
+            fondos.append((fondo_obj, fondo["monto"]))
+            monto += fondo["monto"]
+        if (form.estado.data == "APROBADA" and monto <= form.importe.data) or (form.estado.data == "REALIZADA" and monto == form.importe.data):
+            crear_compra(
+                form.fecha.data, form.descripcion.data, form.proveedor.data,
+                form.solicitante.data, form.importe.data, form.observaciones.data,
+                form.estado.data, form.numero_factura.data, fondos, empleados, areas
+            )
+            flash("Compra agregada correctamente", "success")
+        elif form.estado.data not in ["APROBADA", "REALIZADA"]:
+            crear_compra(
+                form.fecha.data, form.descripcion.data, form.proveedor.data,
+                form.solicitante.data, form.importe.data, form.observaciones.data,
+                form.estado.data, form.numero_factura.data, [], [], []
+            )
+            flash("Compra agregada correctamente", "success")
+        else:
+            print("Entro al else")
+            flash("El monto de las áreas, empleados y fondos no coincide con el importe de la compra", "danger")
+            return render_template("compras/creacion_compra.html", form=form)
+        
         return redirect(url_for("compra.lista_compras"))
     else:
         first_error_field = next(iter(form.errors))
         first_error_message = form.errors[first_error_field][0]
         flash(
-            f"Error en el campo {getattr(form, first_error_field).label.text}: {
-              first_error_message}",
+            f"Error en el campo {getattr(form, first_error_field).label.text}: {first_error_message}",
             "danger",
         )
         return render_template("compras/creacion_compra.html", form=form)

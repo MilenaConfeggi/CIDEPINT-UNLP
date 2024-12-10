@@ -55,28 +55,34 @@
             <dt class="text-sm/6 font-medium text-gray-900">Numero factura</dt>
             <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{{ compra.numero_factura }}</dd>
         </div>
-        {% if compra.estado.value == "Realizada" or compra.estado.value == "Aceptada" %}
+        {% if compra.estado.value == "Realizada" or compra.estado.value == "Aprobada" %}
             <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
                 <dt class="text-sm/6 font-medium text-gray-900">Fuentes de financiamiento</dt>
                 <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
+                    {% if compra.fondos %}
                     <strong>Fondos:</strong>
                     <ul>
                         {% for fondo in compra.fondos %}
-                            <li>{{ fondo.razon_social }}</li>
+                            <li>{{ fondo.titulo }}</li>
                         {% endfor %}
                     </ul>
+                    {% endif %}
+                    {% if compra.areas %}
                     <strong>Areas:</strong>
                     <ul>
                         {% for area in compra.areas %}
                             <li>{{ area.nombre }}</li>
                         {% endfor %}
                     </ul>
+                    {% endif %}
+                    {% if compra.empleados %}
                     <strong>Empleados:</strong>
                     <ul>
                         {% for empleado in compra.empleados %}
                             <li>{{ empleado.nombre }} {{ empleado.apellido }}</li>
                         {% endfor %}
                     </ul>
+                    {% endif %}
                 </dd>
             </div>
         {% endif %}

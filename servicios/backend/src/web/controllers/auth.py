@@ -23,7 +23,7 @@ def authenticate():
         permisos = list(servicioUsuario.obtener_permisos(usuario))
         return jsonify({"info": "Sesión iniciada correctamente", "access_token": access_token, "permisos": permisos}), 200
     except KeyError:
-        return jsonify({"error": "Parámetros faltantes o inválidos"}), 400
+        return jsonify({"error": "Parámetros faltantes o inválidos"}), 401
     except Exception as e:
         print(e)
         return jsonify({"error": "Ha ocurrido un error"}), 500

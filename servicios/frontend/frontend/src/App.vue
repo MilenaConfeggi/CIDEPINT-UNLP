@@ -16,6 +16,11 @@ const tienePermisoListarStans = computed(() => {
   return permisos.value.includes('listar_stans');
 });
 
+// Computada para verificar si el usuario tiene el permiso "listar_usuarios"
+const tienePermisoListarUsuarios = computed(() => {
+  return permisos.value.includes('listar_usuarios');
+});
+
 // Computada para verificar si el usuario está logueado
 const estaLogueado = computed(() => {
   console.log(token.value);
@@ -47,6 +52,9 @@ const logout = () => {
         <RouterLink v-if="estaLogueado" to="/documentos">Documentos</RouterLink>
         
         <RouterLink v-if="estaLogueado && tienePermisoListarStans" to="/stans">Stans</RouterLink>
+
+        <!-- Mostrar el botón de Stans solo si el usuario está logueado y tiene el permiso "listar_stans" -->
+        <RouterLink v-if="estaLogueado && tienePermisoListarUsuarios" to="/usuarios">Usuarios</RouterLink>
         
         <RouterLink v-if="!estaLogueado" to="/log-in">Iniciar Sesión</RouterLink>
         <button v-if="estaLogueado" @click="logout">Cerrar Sesión</button>

@@ -4,15 +4,22 @@ from servicios.backend.src.web.schemas.muestras import muestrasSchema, muestraSc
 import os
 from werkzeug.utils import secure_filename
 from marshmallow import ValidationError
+from flask_jwt_extended import jwt_required, get_jwt_identity
+from web.helpers.auth import is_authenticated, check_permission
 
 UPLOAD_FOLDER = os.path.abspath("documentos")
 
 bp = Blueprint('muestras', __name__, url_prefix='/muestras')
 
 @bp.get("/<int:id_legajo>")
+@jwt_required()
 def listar_muestras_identificadas(id_legajo):
-    mails = servicioMuestras.listar_muestras(id_legajo)
-    data = muestrasSchema.dump(mails, many=True)
+    if not check_permission("listar_muestras_identificadas"):
+        return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
+    muestras = servicioMuestras.listar_muestras(id_legajo)
+    if not muestras:
+        return jsonify({"Error": "No se encontraron muestras para el legajo proporcionado"}), 404
+    data = muestrasSchema.dump(muestras, many=True)
     return jsonify(data), 200
 
 @bp.post("/subir_muestras/<int:id_legajo>")

@@ -19,7 +19,7 @@ const routes = [
     name: "muestras",
     component: () => import("../views/MuestrasIdentificadasView.vue"),
     props: true,
-    meta: { requiresAuth: true } 
+    meta: { requiresAuth: true} 
   },
   {
     path: "/muestras/:legajoId/carpetas",
@@ -117,10 +117,20 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore();
   const isAuthenticated = !!authStore.getToken(); // Verificar si el usuario está autenticado
+  const userPermissions = JSON.parse(localStorage.getItem('permisos')) || []; // Obtener permisos del usuario
 
   if (to.matched.some(record => record.meta.requiresAuth) && !isAuthenticated) {
     // Si la ruta requiere autenticación y el usuario no está autenticado, redirigir a la página de inicio de sesión
     next({ name: 'logIn' });
+  } else if (to.matched.some(record => record.meta.requiredPermission)) {
+    const requiredPermission = to.meta.requiredPermission;
+    if (!userPermissions.includes(requiredPermission)) {
+      // Si el usuario no tiene el permiso requerido, redirigir a una página de acceso denegado o a la página de inicio
+      next({ name: 'home' });
+    } else {
+      // Si el usuario tiene el permiso requerido, permitir el acceso a la ruta
+      next();
+    }
   } else {
     // De lo contrario, permitir el acceso a la ruta
     next();

@@ -34,12 +34,10 @@ def index():
 def index_fondo():
     fondos = fondo.listar_fondos()
     return render_template("contable/contable.html",fondos = fondos)
-
 @bp.get("/fondos")
 def get_crear_fondo():
     form = FormularioNuevoFondo()
     return render_template("contable/crear_fondo.html", form = form)
-
 @bp.post("/fondos")
 def crear_fondo():
     form = FormularioNuevoFondo(request.form)
@@ -59,8 +57,6 @@ def crear_fondo():
         # Mostrar el error
         flash(f"El campo {getattr(form, first_error_field).label.text} {first_error_message}", 'danger')
         return render_template("contable/crear_fondo.html", form=form)
-
-
 @bp.get("/fondos/<string:fondo_id>")
 def mostrar_fondo(fondo_id):
     form = FormularioNuevoIngreso()
@@ -91,7 +87,6 @@ def crear_ingreso(fondo_id):
         first_error_field = next(iter(form.errors))
         first_error_message = form.errors[first_error_field][0]
     return redirect(url_for("contable.mostrar_fondo",fondo_id=fondo_id))
-
 @bp.get("/legajos")
 def get_legajos():
     legajos = legajoDB.list_legajos_all()
@@ -111,7 +106,6 @@ def get_legajos():
         })
     form = DownloadForm()
     return render_template("contable/legajos.html",legajos = resultado, forms=forms,formDescarga = form)
-
 @bp.get("/distribuciones/crear/<int:id>")
 def get_crear_distribucion(id):
     form = FormularioNuevaDistribucion()
@@ -121,8 +115,8 @@ def get_crear_distribucion(id):
     empleados_por_area = {}
     for empleado in empleados:
         empleados_por_area.setdefault(empleado.area_id, []).append(empleado.id)
-    return render_template("contable/crear_distribucion.html", form = form,empleados_por_area=empleados_por_area, id_legajo = id)
-
+    distribucion_max_id = distribucionDB.get_max_id()
+    return render_template("contable/crear_distribucion.html", form = form,empleados_por_area=empleados_por_area, id_legajo = id, distribucion_max_id = distribucion_max_id)
 @bp.post("/distribuciones/crear/<int:id>")
 def crear_distribucion(id):
     form = FormularioNuevaDistribucion(request.form)
@@ -168,7 +162,6 @@ def crear_distribucion(id):
         first_error_field = next(iter(form.errors))
         first_error_message = form.errors[first_error_field][0]
         return render_template("contable/crear_distribucion.html", form = form)
-    
 @bp.get("/distribuciones/<int:id>")
 def get_distribuciones(id):
     data = distribucionDB.list_distribuciones_by_legajo(id)

@@ -9,7 +9,9 @@ def create_distribucion(**kwargs):
     db.session.commit()
     return dist
 
-
+def get_max_id():
+    # Obtener la distribución con el mayor id
+    return db.session.query(Distribucion).order_by(Distribucion.id.desc()).first()
 def get_distribucion(id):
     # Obtener una distribución por su id
     return db.session.query(Distribucion).filter_by(id=id).first()

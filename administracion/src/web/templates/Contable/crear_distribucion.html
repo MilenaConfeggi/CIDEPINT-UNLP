@@ -7,31 +7,7 @@
         <h2 class="text-lg font-bold mb-4">Crear Nueva Distribución</h2>
 
         <div class="mb-4">
-            <label for="porcentaje_area" class="block text-sm font-medium text-gray-700">Porcentaje Área</label>
-            {{ form.porcentaje_area(class_='block w-full border border-gray-300 rounded py-2 px-3', placeholder="Ingrese el porcentaje del área") }}
-            {% for error in form.porcentaje_area.errors %}
-                <p class="text-red-500 text-sm">{{ error }}</p>
-            {% endfor %}
-        </div>
-
-        <div class="mb-4">
-            <label for="porcentaje_empleados" class="block text-sm font-medium text-gray-700">Porcentaje Empleados</label>
-            {{ form.porcentaje_empleados(class_='block w-full border border-gray-300 rounded py-2 px-3', placeholder="Ingrese el porcentaje de empleados") }}
-            {% for error in form.porcentaje_empleados.errors %}
-                <p class="text-red-500 text-sm">{{ error }}</p>
-            {% endfor %}
-        </div>
-
-        <div class="mb-4">
-            <label for="porcentaje_comisiones" class="block text-sm font-medium text-gray-700">Porcentaje Comisiones</label>
-            {{ form.porcentaje_comisiones(class_='block w-full border border-gray-300 rounded py-2 px-3', placeholder="Ingrese el porcentaje de comisiones") }}
-            {% for error in form.porcentaje_comisiones.errors %}
-                <p class="text-red-500 text-sm">{{ error }}</p>
-            {% endfor %}
-        </div>
-
-        <div class="mb-4">
-            <label for="monto_a_distribuir" class="block text-sm font-medium text-gray-700">Monto a Distribuir</label>
+            <label for="monto_a_distribuir" class="block text-sm font-medium text-gray-700">Monto a total a distribuir</label>
             {{ form.monto_a_distribuir(class_='block w-full border border-gray-300 rounded py-2 px-3', placeholder="Ingrese el monto a distribuir") }}
             {% for error in form.monto_a_distribuir.errors %}
                 <p class="text-red-500 text-sm">{{ error }}</p>
@@ -39,12 +15,37 @@
         </div>
 
         <div class="mb-4">
-            <label for="costos" class="block text-sm font-medium text-gray-700">Costos</label>
+            <label for="porcentaje_comisiones" class="block text-sm font-medium text-gray-700">Porcentaje de Comisiones que se le descontara al monto total</label>
+            {{ form.porcentaje_comisiones(class_='block w-full border border-gray-300 rounded py-2 px-3', placeholder="Ingrese el porcentaje de comisiones", value=19) }}
+            {% for error in form.porcentaje_comisiones.errors %}
+                <p class="text-red-500 text-sm">{{ error }}</p>
+            {% endfor %}
+        </div>
+
+        <div class="mb-4">
+            <label for="costos" class="block text-sm font-medium text-gray-700">Costos que se le restara al monto despues de las comisiones</label>
             {{ form.costos(class_='block w-full border border-gray-300 rounded py-2 px-3', placeholder="Ingrese los costos") }}
             {% for error in form.costos.errors %}
                 <p class="text-red-500 text-sm">{{ error }}</p>
             {% endfor %}
         </div>
+
+        <div class="mb-4">
+            <label for="costos_de_id" class="block text-sm font-medium text-gray-700">Área de Costos que se llevara como ingreo el monto ingresado como costo</label>
+            {{ form.costos_de_id(class='block w-full border border-gray-300 rounded py-2 px-3') }}
+            {% for error in form.costos_de_id.errors %} <!--Falta que se elija de manera automatica al cidepint-->
+                <p class="text-red-500 text-sm">{{ error }}</p>
+            {% endfor %}
+        </div>
+
+        <div class="mb-4">
+            <label for="porcentaje_area" class="block text-sm font-medium text-gray-700">Porcentaje Área para las ganancias, el resto se lo llevara el cidepint</label>
+            {{ form.porcentaje_area(class_='block w-full border border-gray-300 rounded py-2 px-3', placeholder="Ingrese el porcentaje del área", value=40) }}
+            {% for error in form.porcentaje_area.errors %}
+                <p class="text-red-500 text-sm">{{ error }}</p>
+            {% endfor %}
+        </div>
+
         <div class="mb-4">
         <label for="ganancias_de_id" class="block text-sm font-medium text-gray-700">Área de Ganancias</label>
         <select class="block w-full border border-gray-300 rounded py-2 px-3" id="ganancias-de-id" name="ganancias_de_id">
@@ -58,20 +59,20 @@
         {% endfor %}
     </div>
         
-        <div class="mb-4">
-            <label for="costos_de_id" class="block text-sm font-medium text-gray-700">Área de Costos</label>
-            {{ form.costos_de_id(class='block w-full border border-gray-300 rounded py-2 px-3') }}
-            {% for error in form.costos_de_id.errors %}
-                <p class="text-red-500 text-sm">{{ error }}</p>
-            {% endfor %}
-        </div>
-        <label for="empleados_seleccionados">Seleccionar Empleados</label>
+        <label for="empleados_seleccionados">Seleccionar Empleados que recibiran una parte  del monto</label>
         <div id="empleados-seleccionados">
             {% for subfield in form.empleados_seleccionados %}
                 <div>
                     <input type="checkbox" id="empleado-{{ subfield.id }}" name="{{ subfield.name }}" value="{{ subfield.data }}" {% if subfield.checked %}checked{% endif %}>
                     <label for="{{ subfield.id }}">{{ subfield.label.text }}</label>
                 </div>
+            {% endfor %}
+        </div>
+        <div class="mb-4">
+            <label for="porcentaje_empleados" class="block text-sm font-medium text-gray-700">Porcentaje del monto que se llevaran los Empleados, el resto se lo llevara la area seleccionada como ganancia</label>
+            {{ form.porcentaje_empleados(class_='block w-full border border-gray-300 rounded py-2 px-3', placeholder="Ingrese el porcentaje de empleados", value=distribucion_max_id.porcentaje_empleados if distribucion_max_id is not none else '') }}
+            {% for error in form.porcentaje_empleados.errors %}
+                <p class="text-red-500 text-sm">{{ error }}</p>
             {% endfor %}
         </div>
         <div class="mt-6">

@@ -1,24 +1,24 @@
 {% extends 'layout.html' %}
 {% block title%} Bienes {% endblock %}
 {% block content%}
-    <div class="px-4 py-3 mx-8 mt-2 mb-8 bg-white rounded-lg shadow-md">
-        <h3 class="mb-4 text-lg font-semibold text-gray-600">Búsqueda</h3>
+    <div class="px-4 py-3 mx-8 mt-2 mb-8 bg-white rounded-lg shadow-md animate-fade-right animate-once">
+        <h3 class="mb-4 text-lg font-semibold text-gray-600">Patrimonio</h3>
             <hr />
             <form class="mb-4 flex flex-wrap justify-between items-end" method="get" action="{{ url_for('patrimonio.index') }}">
                 <div class="grid gap-6 mb-8 md:grid-cols-2 xl:grid-cols-5">
-                    <label class="block text-sm">
+                    <label class="block text-md">
                         <span class="text-gray-700">Titulo</span>
                         <input
-                          class="block w-full mt-1 text-sm focus:border-purple-400 focus:outline-none focus:shadow-outline-purple form-input"
+                          class="block w-full mt-1 text-md focus:border-purple-400 focus:outline-none focus:shadow-outline-purple form-input"
                           placeholder="Ingrese titulo"
                           value="{{ request.args.get('titulo', '') }}"
                           name="titulo"
                         />
                     </label>
-                    <label class="block text-sm">
+                    <label class="block text-md">
                         <span class="text-gray-700">Numero de inventario</span>
                         <input
-                          class="block w-full mt-1 text-sm focus:border-purple-400 focus:outline-none focus:shadow-outline-purple form-input"
+                          class="block w-full mt-1 text-md focus:border-purple-400 focus:outline-none focus:shadow-outline-purple form-input"
                           placeholder="Ingrese número de inventario"
                           value="{{ request.args.get('numero_inventario', '') }}"
                           name="numero_inventario"
@@ -30,7 +30,7 @@
                         </span>
                         <select
                             name="area"
-                            class="block w-full mt-1 text-sm form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple"
+                            class="block w-full text-sm form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple"
                         >
                           <option>Todas</option>
                           {% for area in areas %}
@@ -44,13 +44,13 @@
                         </span>
                         <select
                             name="baja"
-                            class="block w-full mt-1 text-sm form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple"
+                            class="block w-full text-sm form-select focus:border-purple-400 focus:outline-none focus:shadow-outline-purple"
                         >
                           <option>Activos</option>
                           <option {% if request.args.get('baja') == 'De baja' %} selected {% endif %}>De baja</option>
                         </select>
                     </label>
-                    <div class="block text-m flex items-center">
+                    <div class="text-md flex items-end">
                         <button type="submit" class="px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 flex flex-wrap bg-blue-600 border border-transparent rounded-lg active:bg-blue-600 hover:bg-blue-700 focus:outline-none focus:shadow-outline-blue">
                             Buscar
                             <svg
@@ -68,13 +68,15 @@
                         </button>
                     </div>
                 </div>
-                <div class="flex flex-wrap items-end mb-1">
-                    <!-- Enlace para agregar nuevo registro -->
-                    <a href="{{ url_for('patrimonio.nuevo_bien') }}"
-                       class="px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-green-600 border border-transparent rounded-lg active:bg-green-600 hover:bg-green-700 focus:outline-none focus:shadow-outline-green">
-                        Agregar Bien
-                    </a>
-                </div>
+                {% if current_user.rol == 'Administrador' or current_user.rol == 'Colaborador' %}
+                    <div class="flex flex-wrap items-end mb-1">
+                        <!-- Enlace para agregar nuevo registro -->
+                        <a href="{{ url_for('patrimonio.nuevo_bien') }}"
+                        class="px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-green-500 border border-transparent rounded-lg active:bg-green-600 hover:bg-green-700 focus:outline-none focus:shadow-outline-green">
+                            Agregar Bien
+                        </a>
+                    </div>
+                {% endif %}
             </form>
         <div class="w-full overflow-x-auto">
         <table class="w-full whitespace-no-wrap">
@@ -123,57 +125,59 @@
                                 ></path>
                             </svg>
                         </a>
-                        <a href="{{ url_for('patrimonio.editar_bien', id_bien=bien.id) }}"
-                        class="flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-black-600 rounded-lg focus:outline-none focus:shadow-outline-gray"
-                        aria-label="Editar"
-                        >
-                            <svg
-                                class="w-5 h-5"
-                                aria-hidden="true"
-                                fill="currentColor"
-                                viewBox="0 0 20 20"
+                        {% if current_user.rol == 'Administrador' or current_user.rol == 'Colaborador' %}
+                            <a href="{{ url_for('patrimonio.editar_bien', id_bien=bien.id) }}"
+                            class="flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-black-600 rounded-lg focus:outline-none focus:shadow-outline-gray"
+                            aria-label="Editar"
                             >
-                                <path
-                                d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"
-                                ></path>
-                            </svg>
-                        </a>
-                        {% if bien.motivo_baja %}
-                            <button data-id="{{ bien.id }}"
-                            class="open-modal-restaurar-btn flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-black-600 rounded-lg focus:outline-none focus:shadow-outline-gray"
-                            aria-label="Restaurar">
-                            <svg
-                                class="w-5 h-5"
-                                aria-hidden="true"
-                                fill="currentColor"
-                                viewBox="0 0 512 512"
-                            >
-                                <path
-                                fill-rule="evenodd"
-                                d="M105.1 202.6c7.7-21.8 20.2-42.3 37.8-59.8c62.5-62.5 163.8-62.5 226.3 0L386.3 160 352 160c-17.7 0-32 14.3-32 32s14.3 32 32 32l111.5 0c0 0 0 0 0 0l.4 0c17.7 0 32-14.3 32-32l0-112c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 35.2L414.4 97.6c-87.5-87.5-229.3-87.5-316.8 0C73.2 122 55.6 150.7 44.8 181.4c-5.9 16.7 2.9 34.9 19.5 40.8s34.9-2.9 40.8-19.5zM39 289.3c-5 1.5-9.8 4.2-13.7 8.2c-4 4-6.7 8.8-8.1 14c-.3 1.2-.6 2.5-.8 3.8c-.3 1.7-.4 3.4-.4 5.1L16 432c0 17.7 14.3 32 32 32s32-14.3 32-32l0-35.1 17.6 17.5c0 0 0 0 0 0c87.5 87.4 229.3 87.4 316.7 0c24.4-24.4 42.1-53.1 52.9-83.8c5.9-16.7-2.9-34.9-19.5-40.8s-34.9 2.9-40.8 19.5c-7.7 21.8-20.2 42.3-37.8 59.8c-62.5 62.5-163.8 62.5-226.3 0l-.1-.1L125.6 352l34.4 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L48.4 288c-1.6 0-3.2 .1-4.8 .3s-3.1 .5-4.6 1z"
-                                d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                                clip-rule="evenodd"
-                                ></path>
-                            </svg>
-                            </button>
-                        {% else %}
-                            <button data-id="{{ bien.id }}"
-                            class="open-modal-btn flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-black-600 rounded-lg focus:outline-none focus:shadow-outline-gray"
-                            aria-label="Borrar"
-                            >
-                            <svg
-                                class="w-5 h-5"
-                                aria-hidden="true"
-                                fill="currentColor"
-                                viewBox="0 0 20 20"
-                            >
-                                <path
-                                fill-rule="evenodd"
-                                d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                                clip-rule="evenodd"
-                                ></path>
-                            </svg>
-                            </button>
+                                <svg
+                                    class="w-5 h-5"
+                                    aria-hidden="true"
+                                    fill="currentColor"
+                                    viewBox="0 0 20 20"
+                                >
+                                    <path
+                                    d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"
+                                    ></path>
+                                </svg>
+                            </a>
+                            {% if bien.motivo_baja %}
+                                <button data-id="{{ bien.id }}"
+                                class="open-modal-restaurar-btn flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-black-600 rounded-lg focus:outline-none focus:shadow-outline-gray"
+                                aria-label="Restaurar">
+                                <svg
+                                    class="w-5 h-5"
+                                    aria-hidden="true"
+                                    fill="currentColor"
+                                    viewBox="0 0 512 512"
+                                >
+                                    <path
+                                    fill-rule="evenodd"
+                                    d="M105.1 202.6c7.7-21.8 20.2-42.3 37.8-59.8c62.5-62.5 163.8-62.5 226.3 0L386.3 160 352 160c-17.7 0-32 14.3-32 32s14.3 32 32 32l111.5 0c0 0 0 0 0 0l.4 0c17.7 0 32-14.3 32-32l0-112c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 35.2L414.4 97.6c-87.5-87.5-229.3-87.5-316.8 0C73.2 122 55.6 150.7 44.8 181.4c-5.9 16.7 2.9 34.9 19.5 40.8s34.9-2.9 40.8-19.5zM39 289.3c-5 1.5-9.8 4.2-13.7 8.2c-4 4-6.7 8.8-8.1 14c-.3 1.2-.6 2.5-.8 3.8c-.3 1.7-.4 3.4-.4 5.1L16 432c0 17.7 14.3 32 32 32s32-14.3 32-32l0-35.1 17.6 17.5c0 0 0 0 0 0c87.5 87.4 229.3 87.4 316.7 0c24.4-24.4 42.1-53.1 52.9-83.8c5.9-16.7-2.9-34.9-19.5-40.8s-34.9 2.9-40.8 19.5c-7.7 21.8-20.2 42.3-37.8 59.8c-62.5 62.5-163.8 62.5-226.3 0l-.1-.1L125.6 352l34.4 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L48.4 288c-1.6 0-3.2 .1-4.8 .3s-3.1 .5-4.6 1z"
+                                    d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                                    clip-rule="evenodd"
+                                    ></path>
+                                </svg>
+                                </button>
+                            {% else %}
+                                <button data-id="{{ bien.id }}"
+                                class="open-modal-btn flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-black-600 rounded-lg focus:outline-none focus:shadow-outline-gray"
+                                aria-label="Borrar"
+                                >
+                                <svg
+                                    class="w-5 h-5"
+                                    aria-hidden="true"
+                                    fill="currentColor"
+                                    viewBox="0 0 20 20"
+                                >
+                                    <path
+                                    fill-rule="evenodd"
+                                    d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                                    clip-rule="evenodd"
+                                    ></path>
+                                </svg>
+                                </button>
+                            {% endif %}
                         {% endif %}
                     </div>
                     </td>

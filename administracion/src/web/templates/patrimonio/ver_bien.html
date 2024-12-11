@@ -29,7 +29,7 @@
   </svg>
   <span class="ml-1 font-bold text-lg">Volver</span>
 </a>
-<div class="px-4 py-3 mx-8 mt-2 mb-8 bg-white rounded-lg shadow-md">
+<div class="px-4 py-3 mx-8 mt-2 mb-8 bg-white rounded-lg shadow-md animate-fade-left">
   
     <div class="px-4 sm:px-0">
       <h3 class="text-base/7 font-semibold text-gray-900">{{ bien.titulo }}</h3>
@@ -65,45 +65,51 @@
         <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0 overflow-x-auto">
           <dt class="text-sm/6 font-medium text-gray-900">Archivos adjuntos</dt>
           <dd class="mt-2 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-            <ul role="list" class="divide-y divide-gray-100 rounded-md border border-gray-200">
-                {% for archivo in bien.archivos %}
-                    <li class="flex items-center justify-between py-4 pl-4 pr-5 text-sm/6">
-                        <div class="flex w-0 flex-1 items-center">
+            {% if current_user.rol == 'Administrador' or current_user.rol == 'Colaborador' or  bien.archivos %}
+              <ul role="list" class="divide-y divide-gray-100 rounded-md border border-gray-200">
+                  {% for archivo in bien.archivos %}
+                      <li class="flex items-center justify-between py-4 pl-4 pr-5 text-sm/6">
+                          <div class="flex w-0 flex-1 items-center">
+                            <svg class="size-5 shrink-0 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
+                                <path fill-rule="evenodd" d="M15.621 4.379a3 3 0 0 0-4.242 0l-7 7a3 3 0 0 0 4.241 4.243h.001l.497-.5a.75.75 0 0 1 1.064 1.057l-.498.501-.002.002a4.5 4.5 0 0 1-6.364-6.364l7-7a4.5 4.5 0 0 1 6.368 6.36l-3.455 3.553A2.625 2.625 0 1 1 9.52 9.52l3.45-3.451a.75.75 0 1 1 1.061 1.06l-3.45 3.451a1.125 1.125 0 0 0 1.587 1.595l3.454-3.553a3 3 0 0 0 0-4.242Z" clip-rule="evenodd" />
+                            </svg>
+                            <div class="ml-4 flex min-w-0 flex-1 gap-2">
+                                <span class="truncate font-medium">{{ archivo.nombre }}</span>
+                            </div>
+                          </div>
+                          {% if current_user.rol == 'Administrador' or current_user.rol == 'Colaborador' %}
+                            <button data-id="{{ archivo.id }}" class="open-modal-btn ml-4 shrink-0 size-5">
+                              <svg class="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fill-rule="evenodd"
+                                  d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                                  clip-rule="evenodd"
+                                  ></path>
+                              </svg>
+                            </button>
+                          {% endif %}
+                          <div class="ml-4 shrink-0">
+                            <a target="_blank" href="{{url_for('patrimonio.descargar_archivo', id_bien=bien.id, id_archivo=archivo.id)}}" class="font-medium text-indigo-600 hover:text-indigo-500">Descargar</a>
+                          </div>
+                      </li>
+                  {% endfor %}
+                  {% if current_user.rol == 'Administrador' or current_user.rol == 'Colaborador' %}
+                    <li>
+                      <form class="flex items-center justify-between py-4 pl-4 pr-5 text-sm/6" method="POST" enctype="multipart/form-data" action="{{ url_for('patrimonio.subir_archivo', id_bien=bien.id) }}">
+                        <label for="archivo" class="flex w-0 flex-1 items-center cursor-pointer">
                           <svg class="size-5 shrink-0 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
-                              <path fill-rule="evenodd" d="M15.621 4.379a3 3 0 0 0-4.242 0l-7 7a3 3 0 0 0 4.241 4.243h.001l.497-.5a.75.75 0 0 1 1.064 1.057l-.498.501-.002.002a4.5 4.5 0 0 1-6.364-6.364l7-7a4.5 4.5 0 0 1 6.368 6.36l-3.455 3.553A2.625 2.625 0 1 1 9.52 9.52l3.45-3.451a.75.75 0 1 1 1.061 1.06l-3.45 3.451a1.125 1.125 0 0 0 1.587 1.595l3.454-3.553a3 3 0 0 0 0-4.242Z" clip-rule="evenodd" />
+                            <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
                           </svg>
                           <div class="ml-4 flex min-w-0 flex-1 gap-2">
-                              <span class="truncate font-medium">{{ archivo.nombre }}</span>
+                              <span class="truncate font-medium">Subir archivo</span>
                           </div>
-                        </div>
-                        <button data-id="{{ archivo.id }}" class="open-modal-btn ml-4 shrink-0 size-5">
-                          <svg class="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20">
-                              <path fill-rule="evenodd"
-                              d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                              clip-rule="evenodd"
-                              ></path>
-                          </svg>
-                        </button>
-                        <div class="ml-4 shrink-0">
-                          <a target="_blank" href="{{url_for('patrimonio.descargar_archivo', id_bien=bien.id, id_archivo=archivo.id)}}" class="font-medium text-indigo-600 hover:text-indigo-500">Descargar</a>
-                        </div>
-                    </li>
-                {% endfor %}
-                <li>
-                  <form class="flex items-center justify-between py-4 pl-4 pr-5 text-sm/6" method="POST" enctype="multipart/form-data" action="{{ url_for('patrimonio.subir_archivo', id_bien=bien.id) }}">
-                    <label for="archivo" class="flex w-0 flex-1 items-center cursor-pointer">
-                      <svg class="size-5 shrink-0 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
-                        <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
-                      </svg>
-                      <div class="ml-4 flex min-w-0 flex-1 gap-2">
-                          <span class="truncate font-medium">Subir archivo</span>
-                      </div>
-                      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                      <input id="archivo" name="archivo" type="file" class="hidden" onchange="this.form.submit()">
-                    </label>
-                  </form>
-              </li>
-            </ul>
+                          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                          <input id="archivo" name="archivo" type="file" class="hidden" onchange="this.form.submit()">
+                        </label>
+                      </form>
+                  </li>
+                {% endif %}
+              </ul>
+            {% endif %}
           </dd>
         </div>
       </dl>

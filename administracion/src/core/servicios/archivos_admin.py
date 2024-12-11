@@ -15,7 +15,7 @@ def listar_archivos_de_carpeta(id_carpeta):
 
 
 def listar_carpetas(anio):
-    if current_user.empleado.rol != 'Personal':
+    if current_user.rol != 'Personal':
         return Carpeta.query.filter(
             extract('year', Carpeta.fecha_ingreso) == anio
         ).order_by(Carpeta.nombre.asc()).all()

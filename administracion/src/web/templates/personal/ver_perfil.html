@@ -44,8 +44,8 @@
       <label class="block text-gray-700 text-sm font-bold mb-2">Saldo de su Área:</label>
       <p>{{ saldo_area }}</p>
     </div>
-    <div class="flex items-center justify-between col-span-2">
-      <button type="submit" id="guardar-cambios-btn" class="bg-blue-500 text-white px-4 py-2 rounded">Guardar Cambios</button>
+    <div class="flex items-center sm:justify-end col-span-2 w-full justify-center">
+      <button type="submit" id="guardar-cambios-btn" class="bg-blue-500 text-white px-4 py-2 rounded-full">Guardar Cambios</button>
     </div>
   </form>
 
@@ -62,22 +62,26 @@
       <label for="tipo" class="block text-gray-700 text-sm font-bold mb-2">Tipo de Archivo:</label>
       <input type="text" name="tipo" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
     </div>
-    <div class="flex items-center justify-between col-span-2">
-      <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Subir Archivo</button>
+    <div class="flex items-center justify-between coarl-span-2">
+      <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-full">Subir Archivo</button>
     </div>
   </form>
 
-  <ul>
+  <ul class="space-y-4">
+    <h2 class="text-xl font-bold mb-4">Lista de Archivos</h2>
     {% for archivo in archivos %}
-      <li class="mb-2">
-        <a href="{{ url_for('personal.descargar_archivo', id=archivo.id) }}" class="text-blue-500">{{ archivo.nombre }}</a> - <span class="text-gray-600">{{ archivo.tipo }}</span>
+      <li class="flex items-center justify-between py-4 bg-white shadow rounded-lg">
+        <div>
+          <a href="{{ url_for('personal.descargar_archivo', id=archivo.id) }}" class="text-blue-500 font-semibold hover:underline">{{ archivo.nombre }}</a>
+          <span class="text-gray-600 ml-2">{{ archivo.tipo }}</span>
+        </div>
         <form action="{{ url_for('personal.eliminar_archivo', id=archivo.id) }}" method="POST" class="inline">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-          <button type="submit" class="text-red-500 ml-2">Eliminar</button>
+          <button type="submit" class="text-red-500 hover:text-red-700 ml-4">Eliminar</button>
         </form>
       </li>
     {% endfor %}
-  </ul>
+</ul>
 
   {% if current_user.id != user.id %}
   <form id="inhabilitar-usuario-form" action="{{ url_for('personal.inhabilitar_usuario', id=user.id) }}" method="POST" class="mt-4 mb-4">

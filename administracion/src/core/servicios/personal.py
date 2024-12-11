@@ -1,4 +1,5 @@
 import os
+from models.personal.ausencia import Ausencia
 from werkzeug.utils import secure_filename
 from flask import current_app
 from sqlalchemy import extract
@@ -64,4 +65,14 @@ def listar_areas():
     return Area.query.all()
 
 def listar_usuarios_personal():
-    return User.query.join(Empleado).filter(Empleado.rol == 'Personal').all()
+    return User.query.filter(User.rol == 'Personal', User.habilitado == True).all()
+
+
+def eliminar_ausencia(id_ausencia):
+    
+    ausencia = Ausencia.query.get(id_ausencia)
+    if ausencia:
+        db.session.delete(ausencia)
+        db.session.commit()
+        return True
+    return False

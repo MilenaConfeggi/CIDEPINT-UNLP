@@ -11,10 +11,16 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@jaxtheprime/vue3-dropzone": "^3.3.0",
     "axios": "^1.7.7",
+    "bootstrap": "^5.3.3",
+    "pdfjs-dist": "^4.9.155",
+    "pdfvuer": "^2.0.1",
     "pinia": "^2.2.6",
     "vue": "^3.5.12",
-    "vue-router": "^4.4.5"
+    "vue-router": "^4.4.5",
+    "vue3-dropzone": "^2.2.1",
+    "vue3-pdf-app": "^1.0.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.14.0",

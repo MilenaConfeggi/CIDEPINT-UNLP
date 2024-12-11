@@ -7,23 +7,20 @@ def seeds_mails():
     seed_mails()
 
 def seed_mails():
-    # Crear legajo provisional
-    legajo_provisional = Legajo()
-    db.session.add(legajo_provisional)
-    db.session.commit()
+
 
     mails_data = [
         {
             'nombre_archivo': 'mail1.jpg',
-            'legajo_id': legajo_provisional.id
+            'legajo_id': 34
         },
         {
             'nombre_archivo': 'mail2.jpg',
-            'legajo_id': legajo_provisional.id
+            'legajo_id': 34
         },
         {
             'nombre_archivo': 'mail3.jpg',
-            'legajo_id': legajo_provisional.id
+            'legajo_id': 34
         }
     ]
 

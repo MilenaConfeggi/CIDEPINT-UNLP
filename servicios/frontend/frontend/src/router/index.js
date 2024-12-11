@@ -33,6 +33,32 @@ const router = createRouter({
       name: "informes",
       component: () => import("../views/InformesView.vue"),
       props: true,
+    },
+    {
+      path: "/legajos",
+      name: "legajos",
+      component: () => import("../views/LegajoView.vue"),
+    },
+    {
+      path: "/legajos/:id",
+      name: "legajo",
+      component: () => import("../components/legajos/LegajoDetalle.vue"),
+      props: true,
+    },
+    {
+      path: "/legajos/cancelar/:id",
+      name: "cancelar",
+      component: () => import("../components/legajos/LegajoCancel.vue"),
+    },
+    {
+      path: "/legajos/newLegajo",
+      name: "newLegajo",
+      component: () => import("../components/legajos/LegajoForm.vue"),
+    },
+    {
+      path: "/documentos",
+      name: "documento",
+      component: () => import("../components/documentos/DocumentoListado.vue"),
     }
   ],
 })

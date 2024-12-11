@@ -57,6 +57,7 @@ def seed_usuarios():
         "cargar_fotos",
         "listar_fotos",
         "descargar_fotos",
+        "enviar_fotos",
     ]
     PERMISSIONS = { #Acá van los permisos que tiene cada rol
         "administrador": [ #Tienen que ser declarados previamente en todosLosPermisos
@@ -70,6 +71,7 @@ def seed_usuarios():
             "cargar_fotos",
             "listar_fotos",
             "descargar_fotos",
+            "enviar_fotos",
         ],
         "jefe_de_area": [
             "listar_muestras_identificadas",

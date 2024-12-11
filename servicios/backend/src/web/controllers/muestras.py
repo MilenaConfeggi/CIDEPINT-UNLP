@@ -1,3 +1,7 @@
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email import encoders
 from servicios.backend.src.core.services import servicioMuestras, servicioMail
 from flask import Blueprint, jsonify, abort, request, send_file, send_from_directory
 from servicios.backend.src.web.schemas.muestras import muestrasSchema, muestraSchema, fotosSchema, fotoSchema
@@ -6,7 +10,11 @@ from werkzeug.utils import secure_filename
 from marshmallow import ValidationError
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from web.helpers.auth import is_authenticated, check_permission
-
+import smtplib
+import zipfile
+from io import BytesIO
+from servicios.backend.src.core.config import config
+from models.legajos import find_mail_legajo
 UPLOAD_FOLDER = os.path.abspath("documentos")
 
 bp = Blueprint('muestras', __name__, url_prefix='/muestras')
@@ -153,3 +161,47 @@ def listar_muestras():
     muestras = servicioMuestras.listar_todas()
     data = muestrasSchema.dump(muestras)
     return jsonify(data), 200
+
+@bp.post("/enviar_mail/<int:id_legajo>/<fecha>")
+@jwt_required()
+def enviar_mail(id_legajo, fecha):
+    fotos = servicioMuestras.listar_fotos_por_fecha(id_legajo, fecha)
+    if not fotos:
+        return jsonify({"error": "No se encontraron fotos para la fecha proporcionada"}), 404
+
+    # Crear un archivo ZIP en memoria
+    zip_buffer = BytesIO()
+    with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+        for foto in fotos:
+            file_path = os.path.join(UPLOAD_FOLDER, "muestras", str(foto.muestra_id), foto.nombre_archivo)
+            zip_file.write(file_path, os.path.basename(file_path))
+
+    zip_buffer.seek(0)
+
+    try:
+        servidor = smtplib.SMTP('smtp.gmail.com', 587)
+        servidor.starttls()
+        servidor.login(config["development"].MAIL_USER, config["development"].MAIL_PASSWORD)
+
+        msg = MIMEMultipart()
+        msg["From"] = config["development"].MAIL_USER
+        correo = find_mail_legajo(id_legajo)
+        msg["To"] = correo
+        msg["Subject"] = "Fotos de muestras"
+
+        body = "Adjunto encontrarás las fotos de las muestras correspondientes a la fecha proporcionada."
+        msg.attach(MIMEText(body, 'plain'))
+
+        # Adjuntar el archivo ZIP
+        part = MIMEBase('application', 'octet-stream')
+        part.set_payload(zip_buffer.read())
+        encoders.encode_base64(part)
+        part.add_header('Content-Disposition', 'attachment; filename="fotos_muestras.zip"')
+        msg.attach(part)
+
+        servidor.sendmail(config["development"].MAIL_USER, correo, msg.as_string())
+        servidor.quit()
+        return jsonify({"message": "Correo enviado correctamente"}), 200
+    except Exception as e:
+        print(e)
+        return jsonify({"error": "No se pudo enviar el correo"}), 500

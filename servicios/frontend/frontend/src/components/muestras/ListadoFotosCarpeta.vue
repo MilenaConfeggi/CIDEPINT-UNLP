@@ -2,7 +2,7 @@
   <div class="container mt-4">
     <h1 class="text-center mb-4">Fotos para la fecha {{ formatFecha(fechaSeleccionada) }}</h1>
     <div class="d-flex justify-content-end mb-3" v-if="seleccionadas.length > 0">
-      <button class="btn btn-primary" @click="descargarSeleccionadas">
+      <button  v-if="tienePermisoDescargar" class="btn btn-primary" @click="descargarSeleccionadas">
         <i class="fas fa-download"></i> Descargar
       </button>
     </div>
@@ -44,9 +44,15 @@
 </template>
 
 <script>
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, computed } from 'vue';
 import axios from 'axios';
 import { useAuthStore } from '@/stores/auth'
+
+const permisos = JSON.parse(localStorage.getItem('permisos')) || [];
+
+const tienePermisoDescargar = computed(() => {
+  return permisos.includes('descargar_fotos');
+});
 
 export default {
   props: {

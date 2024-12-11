@@ -5,8 +5,11 @@
       <h1 class="text-center mb-4 title">Muestras para el legajo {{ legajoId }}</h1>
       <hr class="line">
     </div>
-    <div v-if="error" class="alert alert-danger" role="alert">{{ error }}</div>
-    <div v-if="muestras.length" class="row">
+    <div v-if="error && !noMuestras" class="alert alert-danger" role="alert">{{ error }}</div>
+    <div v-if="noMuestras" class="text-center">
+      <p class="text-muted">No hay muestras disponibles para este legajo.</p>
+    </div>
+    <div v-if="muestras.length && !noMuestras" class="row">
       <div v-for="muestra in muestras" :key="muestra.id" class="col-md-3 mb-4">
         <div class="card">
           <div class="card-body">
@@ -26,7 +29,7 @@
         </div>
       </div>
     </div>
-    <div v-else class="text-center">
+    <div v-else-if="!error && !noMuestras" class="text-center">
       <p class="text-muted">No hay muestras disponibles.</p>
     </div>
 
@@ -64,6 +67,7 @@ export default {
 
     const mostrarListadoFotos = ref(false);
     const muestraSeleccionada = ref(null);
+    const noMuestras = ref(false);
 
     const permisos = JSON.parse(localStorage.getItem('permisos')) || [];
 
@@ -72,7 +76,21 @@ export default {
     });
 
     const fetchMuestras = async () => {
-      await store.fetchMuestras(props.legajoId);
+      noMuestras.value = false;
+      error.value = null;
+      try {
+        await store.fetchMuestras(props.legajoId);
+        if (muestras.value.length === 0) {
+          noMuestras.value = true;
+        }
+      } catch (err) {
+        if (err.response && err.response.status === 404) {
+          noMuestras.value = true;
+          error.value = 'No hay muestras disponibles para este legajo.';
+        } else {
+          error.value = err.response?.data?.message || 'Error al obtener las muestras';
+        }
+      }
     };
 
     const mostrarFotos = (muestraId) => {
@@ -105,8 +123,8 @@ export default {
         if (response.status === 200) {
           fetchMuestras(); // Refrescar la lista de muestras después de terminar una muestra
         }
-      } catch (error) {
-        console.error('Error al terminar la muestra:', error);
+      } catch (err) {
+        error.value = err.response?.data?.message || 'Error al terminar la muestra';
       }
     };
 
@@ -116,7 +134,7 @@ export default {
 
     watch(() => props.legajoId, fetchMuestras);
 
-    return { muestras, error, mostrarFotos, cerrarListadoFotos, mostrarListadoFotos, muestraSeleccionada, confirmarTerminarMuestra, tienePermisoTerminar };
+    return { muestras, error, mostrarFotos, cerrarListadoFotos, mostrarListadoFotos, muestraSeleccionada, confirmarTerminarMuestra, tienePermisoTerminar, noMuestras };
   }
 };
 </script>

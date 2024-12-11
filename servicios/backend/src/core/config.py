@@ -8,6 +8,8 @@ class Config():
     SECRET_KEY = getenv('SECRET_KEY', urandom(24).hex())
     SESSION_TYPE = "filesystem"
     JWT_SECRET = getenv("JWT_SECRET")
+    MAIL_USER = getenv("MAIL_USER")
+    MAIL_PASSWORD = getenv("MAIL_PASSWORD")
     
 class DevelopmentConfig(Config):
     PORT = getenv("PORT")

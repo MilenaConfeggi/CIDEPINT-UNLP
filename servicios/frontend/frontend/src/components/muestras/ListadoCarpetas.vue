@@ -35,6 +35,7 @@
 import { ref, onMounted, watch, computed } from 'vue';
 import axios from 'axios';
 import ListadoFotosCarpeta from './ListadoFotosCarpeta.vue';
+import { useAuthStore } from '@/stores/auth';
 
 export default {
   components: {
@@ -54,9 +55,15 @@ export default {
     const fechaSeleccionada = ref(null);
 
     const fetchFotos = async () => {
+      const authStore = useAuthStore();
+      const token = authStore.getToken();
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/muestras/fotos_por_legajo/${props.legajoId}`);
-        console.log('Response data:', response.data); // Verificar la respuesta del backend
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/muestras/fotos_por_legajo/${props.legajoId}`, {
+              headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "multipart/form-data"
+              },
+            });
         fotos.value = response.data;
         agruparFotosPorFecha();
       } catch (err) {

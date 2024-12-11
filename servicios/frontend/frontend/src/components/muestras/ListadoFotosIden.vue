@@ -40,6 +40,7 @@
 <script>
 import { ref, onMounted, watch } from 'vue';
 import axios from 'axios';
+import { useAuthStore } from '@/stores/auth'
 
 export default {
   props: {
@@ -55,8 +56,15 @@ export default {
     const fotoSeleccionada = ref(null);
 
     const fetchFotos = async () => {
+      const authStore = useAuthStore();
+      const token = authStore.getToken();
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/muestras/fotos/${props.muestraId}`);
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/muestras/fotos/${props.muestraId}`, {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "multipart/form-data"
+          }
+        });
         fotos.value = response.data;
       } catch (err) {
         error.value = 'Error al cargar las fotos';

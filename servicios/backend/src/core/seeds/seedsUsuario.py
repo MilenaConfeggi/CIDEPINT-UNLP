@@ -51,17 +51,35 @@ def seed_usuarios():
         "borrar_usuario",
         "listar_stans",
         "cargar_stan",
+        "cargar_muestra",
+        "listar_muestras_identificadas",
+        "terminar_muestra",
+        "cargar_fotos",
+        "listar_fotos",
+        "descargar_fotos",
     ]
     PERMISSIONS = { #Acá van los permisos que tiene cada rol
         "administrador": [ #Tienen que ser declarados previamente en todosLosPermisos
             "listar_usuarios",
             "borrar_usuario",
             "listar_stans",
-            "cargar_stan"
+            "cargar_stan",
+            "cargar_muestra",
+            "listar_muestras_identificadas",
+            "terminar_muestra",
+            "cargar_fotos",
+            "listar_fotos",
+            "descargar_fotos",
         ],
         "jefe_de_area": [
+            "listar_muestras_identificadas",
+            "cargar_fotos",
+            "listar_fotos",
         ],
         "trabajador": [
+            "listar_muestras_identificadas",
+            "cargar_fotos",
+            "listar_fotos",
         ],
     }
 

@@ -4,18 +4,26 @@ from servicios.backend.src.web.schemas.muestras import muestrasSchema, muestraSc
 import os
 from werkzeug.utils import secure_filename
 from marshmallow import ValidationError
+from flask_jwt_extended import jwt_required, get_jwt_identity
+from web.helpers.auth import is_authenticated, check_permission
 
 UPLOAD_FOLDER = os.path.abspath("documentos")
 
 bp = Blueprint('muestras', __name__, url_prefix='/muestras')
 
 @bp.get("/<int:id_legajo>")
+@jwt_required()
 def listar_muestras_identificadas(id_legajo):
-    mails = servicioMuestras.listar_muestras(id_legajo)
-    data = muestrasSchema.dump(mails, many=True)
+    if not check_permission("listar_muestras_identificadas"):
+        return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
+    muestras = servicioMuestras.listar_muestras(id_legajo)
+    if not muestras:
+        return jsonify({"Error": "No se encontraron muestras para el legajo proporcionado"}), 404
+    data = muestrasSchema.dump(muestras, many=True)
     return jsonify(data), 200
 
 @bp.post("/subir_muestras/<int:id_legajo>")
+@jwt_required()
 def cargar_muestra(id_legajo):
     try:
         data = request.get_json()
@@ -50,12 +58,14 @@ def cargar_muestra(id_legajo):
         return jsonify({"message": "Ha ocurrido un error inesperado, revise que muestras se han cargado antes de volver a intentarlo"}), 500
 
 @bp.post("/terminar_muestra/<int:id_muestra>")
+@jwt_required()
 def terminar_muestra(id_muestra):
     muestra = servicioMuestras.terminar_muestra(id_muestra)
     return jsonify({"message": "La muestra se terminó con exito"}), 200
 
 
 @bp.post("/subir_fotos/<int:legajo_id>")
+@jwt_required()
 def cargar_fotos(legajo_id):
     if 'archivo' not in request.files:
         return jsonify({"error": "Debes seleccionar un archivo"}), 400
@@ -101,6 +111,7 @@ def cargar_fotos(legajo_id):
   
 
 @bp.get("/fotos/<int:id_muestra>")
+@jwt_required()
 def listar_fotos(id_muestra):
     fotos = servicioMuestras.listar_fotos(id_muestra)
     data = fotosSchema.dump(fotos, many=True)
@@ -115,18 +126,21 @@ def obtener_imagen(id_muestra, filename):
     return send_from_directory(folder_path, filename)
 
 @bp.get("/fotos_por_legajo/<int:id_legajo>")
+@jwt_required()
 def listar_fotos_por_legajo(id_legajo):
     fotos = servicioMuestras.listar_fotos_por_legajo(id_legajo)
     data = fotosSchema.dump(fotos, many=True)
     return jsonify(data), 200
 
 @bp.get("/fotos_por_fecha/<int:id_legajo>/<fecha>")
+@jwt_required()
 def listar_fotos_por_fecha(id_legajo, fecha):
     fotos = servicioMuestras.listar_fotos_por_fecha(id_legajo, fecha)
     data = fotosSchema.dump(fotos, many=True)
     return jsonify(data), 200
 
 @bp.get("/descargar_fotos/<int:id_muestra>/<filename>")
+@jwt_required()
 def descargar_foto(id_muestra, filename):
     folder_path = os.path.normpath(os.path.join(UPLOAD_FOLDER, "muestras", str(id_muestra)))
     file_path = os.path.normpath(os.path.join(folder_path, filename))

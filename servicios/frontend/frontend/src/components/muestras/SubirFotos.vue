@@ -63,6 +63,9 @@
 </template>
 
 <script>
+import axios from "axios";
+import { useAuthStore } from '@/stores/auth';
+
 export default {
   props: {
     legajoId: {
@@ -88,13 +91,19 @@ export default {
   },
   methods: {
     async fetchMuestras() {
+      const authStore = useAuthStore();
+      const token = authStore.getToken();
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/muestras/${this.legajoId}`);
-        const data = await response.json();
-        if (response.ok) {
-          this.muestras = data.filter(muestra => !muestra.terminada); // Filtrar muestras terminadas
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/muestras/${this.legajoId}`, {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
+          },
+        });
+        if (response.status === 200) {
+          this.muestras = response.data.filter(muestra => !muestra.terminada); // Filtrar muestras terminadas
         } else {
-          this.error = data.message || 'Error al obtener las muestras';
+          this.error = response.data.message || 'Error al obtener las muestras';
         }
       } catch (error) {
         this.error = error.message || 'Error al obtener las muestras';
@@ -126,6 +135,9 @@ export default {
       this.error = null;
       this.successMessage = null;
 
+      const authStore = useAuthStore();
+      const token = authStore.getToken();
+
       try {
         for (const foto of this.fotos) {
           const formData = new FormData();
@@ -133,22 +145,23 @@ export default {
           formData.append('muestra_id', foto.selectedMuestra);
           formData.append('fecha', foto.fecha);
 
-          const response = await fetch(
+          const response = await axios.post(
             `${import.meta.env.VITE_API_URL}/muestras/subir_fotos/${this.legajoId}`,
+            formData,
             {
-              method: 'POST',
-              body: formData,
+              headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "multipart/form-data"
+              },
             }
           );
 
-          const data = await response.json();
-
-          if (!response.ok) {
-            throw new Error(data.message || 'Error al enviar los datos');
+          if (response.status !== 200) {
+            throw new Error(response.data.message || 'Error al enviar los datos');
           }
 
-          this.successMessage = data.message || 'Fotos subidas con éxito';
-          console.log('Respuesta del servidor:', data);
+          this.successMessage = response.data.message || 'Fotos subidas con éxito';
+          console.log('Respuesta del servidor:', response.data);
         }
       } catch (error) {
         this.error = error.message || 'Hubo un problema al subir las fotos, asegúrate de que los archivos sean .png, .jpg o .jpeg';

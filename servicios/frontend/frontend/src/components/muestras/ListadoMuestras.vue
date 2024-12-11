@@ -15,8 +15,12 @@
             <p class="card-text">Fecha de ingreso: {{ muestra.fecha_ingreso }}</p>
             <div class="d-flex align-items-center">
               <button @click="mostrarFotos(muestra.id)" class="btn btn-primary">Ver fotos</button>
-              <button v-if="!muestra.terminada" @click="confirmarTerminarMuestra(muestra.id)" class="btn btn-danger ml-2">Terminar</button>
-              <p v-else class="text-danger mb-0 ml-2">Terminada</p>
+              <template v-if="muestra.terminada">
+                <p class="text-danger mb-0 ml-2">Terminada</p>
+              </template>
+              <template v-else>
+                <button v-if="tienePermisoTerminar" @click="confirmarTerminarMuestra(muestra.id)" class="btn btn-danger ml-2">Terminar</button>
+              </template>
             </div>
           </div>
         </div>
@@ -37,11 +41,12 @@
 </template>
 
 <script>
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, computed } from 'vue';
 import { useMuestrasStore } from '@/stores/muestras';
 import { storeToRefs } from 'pinia';
 import ListadoFotosIden from './ListadoFotosIden.vue';
 import axios from 'axios';
+import { useAuthStore } from '@/stores/auth';
 
 export default {
   components: {
@@ -59,6 +64,12 @@ export default {
 
     const mostrarListadoFotos = ref(false);
     const muestraSeleccionada = ref(null);
+
+    const permisos = JSON.parse(localStorage.getItem('permisos')) || [];
+
+    const tienePermisoTerminar = computed(() => {
+      return permisos.includes('terminar_muestra');
+    });
 
     const fetchMuestras = async () => {
       await store.fetchMuestras(props.legajoId);
@@ -81,8 +92,16 @@ export default {
     };
 
     const terminarMuestra = async (muestraId) => {
+      const authStore = useAuthStore();
+      const token = authStore.getToken();
       try {
-        const response = await axios.post(`${import.meta.env.VITE_API_URL}/muestras/terminar_muestra/${muestraId}`);
+        const response = await axios.post(`${import.meta.env.VITE_API_URL}/muestras/terminar_muestra/${muestraId}`, {}, {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
+          },
+        });
+
         if (response.status === 200) {
           fetchMuestras(); // Refrescar la lista de muestras después de terminar una muestra
         }
@@ -97,7 +116,7 @@ export default {
 
     watch(() => props.legajoId, fetchMuestras);
 
-    return { muestras, error, mostrarFotos, cerrarListadoFotos, mostrarListadoFotos, muestraSeleccionada, confirmarTerminarMuestra };
+    return { muestras, error, mostrarFotos, cerrarListadoFotos, mostrarListadoFotos, muestraSeleccionada, confirmarTerminarMuestra, tienePermisoTerminar };
   }
 };
 </script>

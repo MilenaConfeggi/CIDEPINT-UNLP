@@ -2,7 +2,7 @@
   <div class="container mt-4">
     <h1 class="text-center mb-4">Fotos para la fecha {{ formatFecha(fechaSeleccionada) }}</h1>
     <div class="d-flex justify-content-end mb-3" v-if="seleccionadas.length > 0">
-      <button class="btn btn-primary" @click="descargarSeleccionadas">
+      <button  v-if="tienePermisoDescargar" class="btn btn-primary" @click="descargarSeleccionadas">
         <i class="fas fa-download"></i> Descargar
       </button>
     </div>
@@ -44,8 +44,15 @@
 </template>
 
 <script>
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, computed } from 'vue';
 import axios from 'axios';
+import { useAuthStore } from '@/stores/auth'
+
+const permisos = JSON.parse(localStorage.getItem('permisos')) || [];
+
+const tienePermisoDescargar = computed(() => {
+  return permisos.includes('descargar_fotos');
+});
 
 export default {
   props: {
@@ -66,8 +73,15 @@ export default {
     const seleccionadas = ref([]);
 
     const fetchFotos = async () => {
+      const authStore = useAuthStore();
+      const token = authStore.getToken();
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/muestras/fotos_por_fecha/${props.legajoId}/${props.fechaSeleccionada}`);
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/muestras/fotos_por_fecha/${props.legajoId}/${props.fechaSeleccionada}`, {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "multipart/form-data"
+          }
+        });
         fotos.value = response.data;
       } catch (err) {
         error.value = 'Error al cargar las fotos';
@@ -104,9 +118,16 @@ export default {
     };
 
     const descargarSeleccionadas = async () => {
+      const authStore = useAuthStore();
+      const token = authStore.getToken();
       for (const id of seleccionadas.value) {
         try {
-          const response = await fetch(`/muestras/descargar_fotos/${id}`);
+          const response = await fetch(`/muestras/descargar_fotos/${id}`, {
+            headers: {
+              "Authorization": `Bearer ${token}`,
+              "Content-Type": "multipart/form-data"
+            }
+          });
           const blob = await response.blob();
           const url = window.URL.createObjectURL(blob);
           const a = document.createElement('a');

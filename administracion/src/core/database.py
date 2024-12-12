@@ -32,8 +32,9 @@ def reset():
     db.session.commit()
 
 def seed():
-    default_area = Area(nombre='Default Area', saldo=0)
-    db.session.add(default_area)
+    default_area = Area(nombre='CIDEPINT', saldo=0)
+    tecno_area = Area(nombre='Area Tecnologica', saldo=0)
+    db.session.add(default_area, tecno_area)
 
     bien_1 = Bien(
             titulo='Vasija',
@@ -288,7 +289,7 @@ def seed():
     personal_1 = Empleado(
         user=usuario_1,
         email='rober@example.com',
-        area=default_area,  # Asigna el área creada
+        area=tecno_area,  # Asigna el área creada
         dni='204060',
         nombre='Rober',
         apellido='Tito',
@@ -345,7 +346,8 @@ def seed():
 
     usuario_4 = User(
         username='ana',
-        password='ana'
+        password='ana',
+        rol='Colaborador'
     )    
     
     personal_4 = Empleado(

@@ -139,6 +139,14 @@ def crear_distribucion(id):
         areaDB.sumar_saldo_area(area_costos, costos)
         monto_modificado = (monto_a_distribuir * (1 - porcentaje_comisiones))-costos
         areaDB.sumar_saldo_area(area_ganancias, (monto_modificado * porcentaje_area)*(1-porcentaje_empleados))
+        areaDB.sumar_saldo_area(1, (monto_modificado * (1 - porcentaje_area))*0.95)
+        #get todos los colaboradores y admin
+        empleados = empleadoDB.list_empleados()
+        colaboradores = [empleado for empleado in empleados if empleado.user.rol == "Colaborador" or empleado.user.rol == "Administrador"]
+        for colaborador in colaboradores:
+            colaborador.saldo += (((monto_modificado * (1 - porcentaje_area))*0.05) / len(colaboradores))
+        
+
         # Relacion con los empleados
         empleados_ids = form.empleados_seleccionados.data
         monto_empleado = ((monto_modificado * porcentaje_area)*(porcentaje_empleados)) / len(empleados_ids)

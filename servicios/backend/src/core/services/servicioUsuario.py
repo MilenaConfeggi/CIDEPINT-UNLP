@@ -3,20 +3,22 @@ from models.usuarios.permiso import Permiso
 from models.usuarios.rol import Rol
 from models.usuarios.rol_permiso import RolPermiso
 from models.usuarios.usuario import Usuario
+from models.personal.empleado import Empleado
 from datetime import datetime
 from web import bcrypt
 from flask import request
 from flask_jwt_extended import get_jwt_identity, jwt_required
 
 def crear_usuario(data):
-    if Usuario.query.filter_by(mail=data.get('mail'), esta_borrado=False).first():
+    if Usuario.query.filter_by(mail=data.get('mail'), esta_borrado=False).first() is not None:
         raise ValueError("Ya existe un usuario con ese mail")
     nuevo_usuario = Usuario(
         mail=data.get('mail'),
-        contra=data.get('contra'),
+        contra=bcrypt.generate_password_hash(data.get('contra').encode("utf-8")),
         rol=data.get('rol'),
     )
     db.session.add(nuevo_usuario)
+    data.get('empleado').usuario_servicio = nuevo_usuario
     db.session.commit()
     return nuevo_usuario
 
@@ -98,3 +100,6 @@ def buscar_rol_por_id(rol_id):
 
 def listar_roles():
     return Rol.query.all()
+
+def listar_empleados():
+    return Empleado.query.filter_by(usuario_servicio=None).all()

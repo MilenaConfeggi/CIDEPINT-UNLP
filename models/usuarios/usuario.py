@@ -13,6 +13,8 @@ class Usuario(db.Model):
 
     rol_id = db.Column(db.Integer, db.ForeignKey("rol.id"), nullable=False)
     rol = db.relationship("Rol", back_populates="usuario")
+
+    empleado = db.relationship("Empleado", back_populates="usuario_servicio")
     
     def __repr__(self):
         return f"<Usuario {self.mail}, {self.contra}>"

@@ -40,7 +40,11 @@ Crear un nuevo Fondo</a>
                 </div>
                 </td>
                 <td class="px-4 py-3 text-sm">
-                    Cliente
+                    {%if legajo.cliente %}
+                        {{ legajo.cliente.nombre }}
+                    {% else %}
+                        No disponible
+                    {% endif %}
                 </td>
                 <td class="px-4 py-3 text-sm">
                     {% if legajo.documentos['Presupuesto CIDEPINT'] %}
@@ -53,7 +57,14 @@ Crear un nuevo Fondo</a>
                     {% endif %}
                 </td>
                 <td class="px-4 py-3 text-sm">
-                    Orden de compra PDF
+                    {% if legajo.documentos['Orden de compra'] %}
+                    <a href="{{ url_for('contable.download', documento_id=legajo.documentos['Orden de compra'].id) }}" 
+                       class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500">
+                        Descargar
+                    </a>
+                    {% else %}
+                    No disponible
+                    {% endif %}
                 </td>
                 <td class="px-4 py-3 text-sm">
                     <form method="POST" enctype="multipart/form-data" action="{{ url_for('contable.upload') }}">
@@ -83,7 +94,14 @@ Crear un nuevo Fondo</a>
                      
                 </td>
                 <td class="px-4 py-3 text-sm">
-                    Factura PDF
+                    {% if legajo.documentos['Factura'] %}
+                    <a href="{{ url_for('contable.download', documento_id=legajo.documentos['Factura'].id) }}" 
+                       class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500">
+                        Descargar
+                    </a>
+                    {% else %}
+                    No disponible
+                    {% endif %}
                 </td>
                 <td class="px-4 py-3 text-sm">
                     <a href="{{ url_for('contable.get_documentosAdd',id=legajo.id) }}"

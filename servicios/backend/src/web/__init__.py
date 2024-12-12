@@ -58,8 +58,8 @@ def create_app(env="development", static_folder=""):
         #print("Mails creados!")
         seedsCliente.seeds_clientes()
         print("Clientes creados!")
-        #seedsDocumento.seeds_documentos()
-        #print("Documentos creados!")
+        seedsDocumento.seeds_documentos()
+        print("Documentos creados!")
 
     return app
     

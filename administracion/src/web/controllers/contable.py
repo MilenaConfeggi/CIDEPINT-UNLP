@@ -97,7 +97,9 @@ def get_legajos():
     resultado = []
 
     for legajo in legajos:
+        print(legajo.documento)
         documentos = {doc.tipo_documento.nombre: doc for doc in legajo.documento}
+        print(documentos)
         resultado.append({
             "id": legajo.id,
             "nro_legajo": legajo.nro_legajo,

@@ -31,30 +31,33 @@ def listar_empleados():
 
 @bp.post("/crear")
 def crear_usuario():
-    data = request.get_json()
+    try:
+        data = request.get_json()
 
-    if data['mail'] == []:
-        return jsonify({"message": "No se ha cargado mail"}), 400
-    
-    if data['contra'] == []:
-        return jsonify({"message": "No se ha seleccionado contraseña"}), 400
+        if data['mail'] == []:
+            return jsonify({"message": "No se ha cargado mail"}), 400
+        
+        if data['contra'] == []:
+            return jsonify({"message": "No se ha seleccionado contraseña"}), 400
 
-    if data['rol'] == []:
-        return jsonify({"message": "No se ha seleccionado rol"}), 400
+        if data['rol'] == []:
+            return jsonify({"message": "No se ha seleccionado rol"}), 400
 
-    if data['empleado'] == []:
-        return jsonify({"message": "No se ha seleccionado empleado"}), 400
-    
-    if not servicioUsuario.buscar_rol_por_id(data['rol']):
-        return jsonify({"message": "Rol inexistente"}), 400
-    
-    data['rol'] = servicioUsuario.buscar_rol_por_id(data['rol'])
+        if data['empleado'] == []:
+            return jsonify({"message": "No se ha seleccionado empleado"}), 400
+        
+        if not servicioUsuario.buscar_rol_por_id(data['rol']):
+            return jsonify({"message": "Rol inexistente"}), 400
+        
+        data['rol'] = servicioUsuario.buscar_rol_por_id(data['rol'])
 
-    data['empleado'] = get_empleado(data['empleado'])
-    
-    servicioUsuario.crear_usuario(data)
-    
-    return jsonify({"message": "Usuario creado correctamente"}), 200
+        data['empleado'] = get_empleado(data['empleado'])
+        
+        servicioUsuario.crear_usuario(data)
+        
+        return jsonify({"message": "Usuario creado correctamente"}), 200
+    except ValueError as e:
+        return jsonify({"message": str(e)}), 401
 
 @bp.post("/delete")
 def borrar_usuario():

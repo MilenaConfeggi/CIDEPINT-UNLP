@@ -12,6 +12,17 @@ from flask_jwt_extended import get_jwt_identity, jwt_required
 def crear_usuario(data):
     if Usuario.query.filter_by(mail=data.get('mail'), esta_borrado=False).first() is not None:
         raise ValueError("Ya existe un usuario con ese mail")
+
+
+    if data.get('rol').nombre == "jefe_de_area":
+        jefesDeAreas = Usuario.query.filter_by(rol=data.get('rol'), esta_borrado=False).all()
+        empleadosJefesDeArea = ()
+        for jefe in jefesDeAreas:
+            emp = Empleado.query.filter_by(usuario_servicio_id=jefe.id).first()
+            if emp is not None and emp.area == data.get('empleado').area:
+                raise ValueError("Ya existe un jefe de area para esa área, por favor saque al jefe de área anterior para ingresar uno nuevo")
+
+                
     nuevo_usuario = Usuario(
         mail=data.get('mail'),
         contra=bcrypt.generate_password_hash(data.get('contra').encode("utf-8")),

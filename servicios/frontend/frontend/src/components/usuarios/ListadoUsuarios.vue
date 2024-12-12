@@ -8,16 +8,21 @@
           <tr>
             <th>Mail</th>
             <th>Rol</th>
+            <th>Eliminar</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="usuario in usuarios" :key="usuario.id" @click="highlightRow(usuario.id)" :class="{ 'table-active': selectedUsuario === usuario.id }">
             <td>{{ usuario.mail }}</td>
             <td>{{ usuario.rol }}</td>
-            <!--<td>
-              <button @click.stop="modificarStan(stan.id)" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Modificar</button>
-            </td>
-            -->
+            <td>
+            <button
+              @click.stop="confirmarEliminacion(usuario.id)"
+              class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+            >
+              Eliminar
+            </button>
+          </td>
           </tr>
         </tbody>
       </table>
@@ -36,7 +41,6 @@
   const fetchUsuarios = async () => {
     try {
       const token = authStore.getToken();
-      console.log('Token:', token);
       const response = await fetch(`${import.meta.env.VITE_API_URL}/usuarios`, {
         method: "GET",
         headers: {
@@ -57,10 +61,35 @@
   const highlightRow = (id) => {
     selectedUsuario.value = id;
   };
+
+  const confirmarEliminacion = (id) => {
+    if (confirm('¿Estás seguro de que deseas eliminar este usuario?')) {
+      eliminarUsuario(id);
+    }
+  };
   
-  //const modificarStan = (id) => {
-  //  emit('modificar-stan', id);
-  //};
+  const eliminarUsuario = async (id) => {
+    try {
+      console.log(id)
+      const token = authStore.getToken();
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/usuarios/borrar`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ "id": id })
+      });
+  
+      if (!response.ok) {
+        throw new Error("Error al eliminar el usuario");
+      }
+  
+      usuarios.value = await response.json();
+    } catch (error) {
+      console.error("Error al eliminar el usuario:", error);
+    }
+  };
   
   onMounted(() => {
     fetchUsuarios();
@@ -102,7 +131,7 @@
   }
   
   button {
-    background-color: #007bff;
+    background-color: #dF2b00;
     color: white;
     padding: 10px 20px;
     border: none;
@@ -113,6 +142,6 @@
   }
   
   button:hover {
-    background-color: #0056b3;
+    background-color: #A01b00;
   }
   </style>

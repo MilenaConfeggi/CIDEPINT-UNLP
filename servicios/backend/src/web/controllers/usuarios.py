@@ -59,13 +59,17 @@ def crear_usuario():
     except ValueError as e:
         return jsonify({"message": str(e)}), 401
 
-@bp.post("/delete")
+@bp.post("/borrar")
 def borrar_usuario():
+    data = request.get_json()
+    id_usuario = data.get('id')
     try:
         servicioUsuario.eliminar_usuario(id_usuario)
-        return jsonify({"info": "Usuario borrado exitosamente"}), 200
+        usuarios = servicioUsuario.listar_usuarios()
+        data = usuariosSchema.dump(usuarios, many=True)
+        return jsonify(data), 200
     except ValueError as e:
-        return jsonify({"error": str(e)}), 406
+        return jsonify({"message": str(e)}), 406
 
 
 

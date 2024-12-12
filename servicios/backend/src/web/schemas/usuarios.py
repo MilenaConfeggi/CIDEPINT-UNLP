@@ -1,6 +1,7 @@
 from marshmallow import Schema, fields, ValidationError
 
 class UsuarioSchema(Schema):
+    id = fields.Int(dump_only=True)
     mail = fields.Str(required=True)
 
     #Me trae el nombre del rol, así no me da el rol completo

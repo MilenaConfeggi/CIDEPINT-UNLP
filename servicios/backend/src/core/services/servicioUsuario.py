@@ -62,6 +62,8 @@ def eliminar_usuario(id_usuario):
     usuario = Usuario.query.get(id_usuario)
     if usuario is None:
         raise ValueError("No se encontró el usuario seleccionado")
+    empleado = Empleado.query.filter_by(usuario_servicio=usuario).first()
+    empleado.usuario_servicio = None
     usuario.esta_borrado = True
     db.session.commit()
 

@@ -17,8 +17,10 @@ def seed_usuarios():
     db.session.add(rol_trabajador)
     rol_jefe_de_area = crear_rol({"nombre": "jefe_de_area"})
     db.session.add(rol_jefe_de_area)
-    rol_administrador = crear_rol({"nombre": "administrador"})
-    db.session.add(rol_administrador)
+    rol_secretaria = crear_rol({"nombre": "secretaria"})
+    db.session.add(rol_secretaria)
+    rol_director = crear_rol({"nombre": "director"})
+    db.session.add(rol_director)
     db.session.commit()
 
     default_area = Area(nombre='Area 2fault', saldo=0)
@@ -193,15 +195,24 @@ def seed_usuarios():
     )
     usuario3 = crear_usuario(
         {
-            "mail": "admin@example.com",
+            "mail": "director@example.com",
             "contra": "soyadmin",
-            "rol": rol_administrador,
+            "rol": rol_director,
             "empleado": personal_3,
+        }
+    )
+    usuario4 = crear_usuario(
+        {
+            "mail": "secretaria@example.com",
+            "contra": "soysecretaria",
+            "rol": rol_secretaria,
+            "empleado": personal_4,
         }
     )
     db.session.add(usuario1)
     db.session.add(usuario2)
     db.session.add(usuario3)
+    db.session.add(usuario4)
 
     todosLosPermisos = [ #Acá van todos los permisos a insertar (todos los posibles permisos que hay en el sistema)
         "listar_usuarios", #Por favor, ponerle el mismo nombre que el nombre del método del controlador
@@ -217,7 +228,20 @@ def seed_usuarios():
         "enviar_fotos",
     ]
     PERMISSIONS = { #Acá van los permisos que tiene cada rol
-        "administrador": [ #Tienen que ser declarados previamente en todosLosPermisos
+        "director": [ #Tienen que ser declarados previamente en todosLosPermisos
+            "listar_usuarios",
+            "borrar_usuario",
+            "listar_stans",
+            "cargar_stan",
+            "cargar_muestra",
+            "listar_muestras_identificadas",
+            "terminar_muestra",
+            "cargar_fotos",
+            "listar_fotos",
+            "descargar_fotos",
+            "enviar_fotos",
+        ],
+        "secretaria": [
             "listar_usuarios",
             "borrar_usuario",
             "listar_stans",

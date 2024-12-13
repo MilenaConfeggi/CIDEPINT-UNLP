@@ -55,7 +55,7 @@ def seed_usuarios():
     
     personal_2 = Empleado(
         user=usuario_2,
-        email='maria@example.com',
+        email='moniquita@example.com',
         area=default_area,
         dni='204061',
         nombre='Maria',
@@ -78,7 +78,7 @@ def seed_usuarios():
     
     personal_3 = Empleado(
         user=usuario_3,
-        email='juan@example.com',
+        email='pepito@example.com',
         area=default_area,
         dni='204062',
         nombre='Juan',
@@ -101,7 +101,7 @@ def seed_usuarios():
     
     personal_4 = Empleado(
         user=usuario_4,
-        email='ana@example.com',
+        email='secretaria@example.com',
         area=default_area,
         dni='204063',
         nombre='Ana',
@@ -124,7 +124,7 @@ def seed_usuarios():
     
     personal_5 = Empleado(
         user=usuario_5,
-        email='luis@example.com',
+        email='director@example.com',
         area=default_area,
         dni='204064',
         nombre='Luis',
@@ -182,7 +182,6 @@ def seed_usuarios():
             "mail": "pepito@example.com",
             "contra": "123",
             "rol": rol_trabajador,
-            "empleado": personal_1,
             "cambiar_contra": False,
         }
     )
@@ -191,7 +190,6 @@ def seed_usuarios():
             "mail": "moniquita@example.com",
             "contra": "321",
             "rol": rol_jefe_de_area,
-            "empleado": personal_2,
             "cambiar_contra": False,
         }
     )
@@ -200,7 +198,6 @@ def seed_usuarios():
             "mail": "director@example.com",
             "contra": "soyadmin",
             "rol": rol_director,
-            "empleado": personal_3,
             "cambiar_contra": False,
         }
     )
@@ -209,7 +206,6 @@ def seed_usuarios():
             "mail": "secretaria@example.com",
             "contra": "soysecretaria",
             "rol": rol_secretaria,
-            "empleado": personal_4,
             "cambiar_contra": False,
         }
     )

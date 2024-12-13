@@ -25,19 +25,6 @@
                 </option>
             </select>
         </div>
-        <div class="mb-4">
-            <label for="empleado" class="block text-gray-700 text-sm font-bold mb-2">Empleado:</label>
-            <select
-                id="rol"
-                v-model="usuario.empleado"
-                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                required
-            >
-                <option v-for="empleado in empleadosExistentes" :key="empleado.id" :value="empleado.id">
-                {{ empleado.nombre }} {{ empleado.apellido }}
-                </option>
-            </select>
-        </div>
         <div v-if="error" class="alert alert-danger mb-4" role="alert">
           {{ error }}
         </div>
@@ -83,18 +70,6 @@
       console.error('Error al obtener los roles:', error);
     }
   };
-  
-  const fetchEmpleados = async () => {
-    try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/usuarios/empleados`);
-      if (!response.ok) {
-        throw new Error('Error al obtener los empleados');
-      }
-      empleadosExistentes.value = await response.json();
-    } catch (error) {
-      console.error('Error al obtener los empleados:', error);
-    }
-  };
 
   const submitForm = async () => {
     error.value = null;
@@ -132,7 +107,6 @@
   
   onMounted(() => {
     fetchRoles();
-    fetchEmpleados();
   });
   </script>
   

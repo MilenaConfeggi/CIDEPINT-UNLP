@@ -49,17 +49,12 @@ def crear_usuario():
 
         if data['rol'] == []:
             return jsonify({"message": "No se ha seleccionado rol"}), 400
-
-        if data['empleado'] == []:
-            return jsonify({"message": "No se ha seleccionado empleado"}), 400
         
         if not servicioUsuario.buscar_rol_por_id(data['rol']):
             return jsonify({"message": "Rol inexistente"}), 400
         
         data['rol'] = servicioUsuario.buscar_rol_por_id(data['rol'])
 
-        data['empleado'] = get_empleado(data['empleado'])
-        
         servicioUsuario.crear_usuario(data)
         
         return jsonify({"message": "Usuario creado correctamente"}), 200

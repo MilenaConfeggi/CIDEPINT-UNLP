@@ -1,5 +1,6 @@
 from administracion.src.core.fondos import fondo
 from administracion.src.core.ingresos import ingreso as ingresoDB
+from administracion.src.core.servicios import archivos_admin as archivos_adminDB
 from models import distribucion as distribucionDB
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, send_file
 from administracion.src.web.forms.fondo_nuevo import FormularioNuevoFondo
@@ -47,6 +48,12 @@ def crear_fondo():
         if fondo.conseguir_fondo_de_id(data["titulo"]):
             flash("Ya existe un fondo con ese título", 'error')
             return render_template("contable/crear_fondo.html", form=form)
+        #Crear carpeta
+        if archivos_adminDB.chequear_nombre_carpeta_existente(data["titulo"]):
+            flash("Ya existe una carpeta con ese título", 'error')
+            return render_template("contable/crear_fondo.html", form=form)
+        archivos_adminDB.crear_carpeta(data["titulo"],[],[])
+
         fondo.create_fondo(**data)
         flash("Fondo creado correctamente","success")
         return redirect(url_for("contable.index"))

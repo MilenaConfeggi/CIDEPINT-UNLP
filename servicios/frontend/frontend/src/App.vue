@@ -48,6 +48,7 @@ const logout = () => {
         <img alt="Vue logo" class="logo" src="@/assets/Logo.png" width="50" height="50" />
       </RouterLink>
       <div class="nav-links">
+        <RouterLink v-if="estaLogueado" to="/ver_perfil">Mi Perfil</RouterLink>
         <RouterLink v-if="estaLogueado" to="/legajos">Legajos</RouterLink>
         <RouterLink v-if="estaLogueado" to="/documentos">Documentos</RouterLink>
         

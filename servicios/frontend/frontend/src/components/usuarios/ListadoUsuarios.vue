@@ -70,7 +70,6 @@
   
   const eliminarUsuario = async (id) => {
     try {
-      console.log(id)
       const token = authStore.getToken();
       const response = await fetch(`${import.meta.env.VITE_API_URL}/usuarios/borrar`, {
         method: "POST",

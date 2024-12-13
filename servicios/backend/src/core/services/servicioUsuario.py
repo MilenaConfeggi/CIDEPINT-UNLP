@@ -22,11 +22,15 @@ def crear_usuario(data):
             if emp is not None and emp.area == data.get('empleado').area:
                 raise ValueError("Ya existe un jefe de area para esa área, por favor saque al jefe de área anterior para ingresar uno nuevo")
 
-                
+    cambiar = True
+    if data.get('cambiar_contra') is not None:
+        cambiar = data.get('cambiar_contra')
+
     nuevo_usuario = Usuario(
         mail=data.get('mail'),
         contra=bcrypt.generate_password_hash(data.get('contra').encode("utf-8")),
         rol=data.get('rol'),
+        cambiar_contra=cambiar,
     )
     db.session.add(nuevo_usuario)
     data.get('empleado').usuario_servicio = nuevo_usuario
@@ -71,12 +75,15 @@ def obtener_usuario_por_mail(email):
     usuario = Usuario.query.filter_by(mail=email, esta_borrado=False).first()
     return usuario
 
+def obtener_empleado_por_mail(email):
+    empleado = Empleado.query.filter_by(email=email, habilitado=True).first()
+    return empleado
+
 def check_user(usermail, password):
     """
     Si el usuario existe y las contraseñas coinciden devuelve el usuario, sino devuelve None
     """
     usuario = obtener_usuario_por_mail(usermail)
-    print(usuario)
     if (not usuario) or (
         not (
             usuario.contra and bcrypt.check_password_hash(usuario.contra, password)
@@ -99,11 +106,12 @@ def obtener_permisos(user):
 
 @jwt_required()
 def tiene_permiso(permiso):
-    print(get_jwt_identity())
     user_mail = get_jwt_identity()
     usuario = obtener_usuario_por_mail(user_mail)
     if usuario.system_admin == True:
         return True
+    if usuario.cambiar_contra:
+        return False
     permissions = obtener_permisos(usuario)
 
     return usuario is not None and permiso in permissions
@@ -116,3 +124,12 @@ def listar_roles():
 
 def listar_empleados():
     return Empleado.query.filter_by(usuario_servicio=None).all()
+
+@jwt_required()
+def cambiar_contra(password):
+    user_mail = get_jwt_identity()
+    usuario = obtener_usuario_por_mail(user_mail)
+    usuario.contra = bcrypt.generate_password_hash(password.encode("utf-8"))
+    usuario.cambiar_contra = False
+    db.session.commit()
+    return True

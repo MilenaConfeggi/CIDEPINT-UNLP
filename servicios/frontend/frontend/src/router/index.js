@@ -106,6 +106,27 @@ const routes = [
       props: true,
       meta: { requiresAuth: true }
     },
+    {
+      path: "/cambiar_contra",
+      name: "cambiar_contra",
+      component: () => import("../components/usuarios/CambiarContra.vue"),
+      props: true,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: "/cambiar_contra_vieja",
+      name: "cambiar_contra_vieja",
+      component: () => import("../components/usuarios/CambiarContraVieja.vue"),
+      props: true,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: "/ver_perfil",
+      name: "ver_perfil",
+      component: () => import("../components/usuarios/VerPerfil.vue"),
+      props: true,
+      meta: { requiresAuth: true }
+    },
 ];
 
 const router = createRouter({

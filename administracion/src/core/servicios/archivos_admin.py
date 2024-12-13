@@ -136,3 +136,5 @@ def editar_carpeta(
     db.session.commit()
     
     return carpeta
+def get_carpeta_by_nombre(nombre):
+    return Carpeta.query.filter(Carpeta.nombre == nombre).first()

@@ -79,11 +79,17 @@ def crear_ingreso(fondo_id):
     fond = fondo.conseguir_fondo_de_id(fondo_id)
     if not fond:
         return redirect(url_for('contable.index'))
-    form = FormularioNuevoIngreso(request.form)
-    if form.validate_on_submit():
+    if True:
         data = request.form.to_dict()
         data["receptor_id"] = fondo_id
         csrf_token = data.pop("csrf_token", None)
+        file = data.pop("file", None)
+        #subir archivo
+        if 'file' in request.files and request.files['file'].filename != '':
+            archivo = request.files['file']
+
+            id_carpeta = archivos_adminDB.get_carpeta_by_nombre(fond.titulo).id
+            archivos_adminDB.guardar_archivo_en_carpeta(id_carpeta, archivo)
         ingresoDB.create_ingreso(**data)
         fond.saldo += float(data["monto"])
         fondo.modificar_fondo(fondo_id, saldo=fond.saldo)

@@ -1,65 +1,68 @@
 <template>
     <div class="login-container">
       <div class="login-card">
-        <h2>Mi Perfil</h2>
-        <p>Nombre: {{ nombre }}</p>
-        <p>Apellido: {{ apellido }}</p>
-        <p>Mail: {{ mail }}</p>
-        <button @click="cambiar_contra_vieja">Cambiar Contraseña</button>
+        <h2>Cambiar Contraseña</h2>
+        <form @submit.prevent="cambiar_contra_vieja">
+          <div class="form-group">
+            <label for="oldpassword">Ingrese su contraseña anterior:</label>
+            <input type="password" v-model="oldpassword" placeholder="Ingrese su contraseña anterior" required />
+          </div>
+          <div class="form-group">
+            <label for="password">Ingrese una nueva contraseña:</label>
+            <input type="password" v-model="password" placeholder="Ingrese una nueva contraseña" required />
+          </div>
+          <div class="form-group">
+            <label for="passw2">Ingrese de nuevo la nueva contraseña:</label>
+            <input type="password" v-model="passw2" placeholder="Confirma tu contraseña" required />
+          </div>
+          <button type="submit">Cambiar Contraseña</button>
+        </form>
         <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
       </div>
     </div>
   </template>
   
   <script>
-  import axios from "axios";
-  import { useAuthStore } from "@/stores/auth";
+  import axios from 'axios';
+  import { useAuthStore } from '@/stores/auth';
+  const authStore = useAuthStore();
   
   export default {
     data() {
       return {
-        errorMessage: "",
-        nombre: "",
-        apellido: "",
-        mail: "",
+        oldpassword: '',
+        password: '',
+        passw2: '',
+        errorMessage: ''
       };
     },
-    async mounted() {
-      const authStore = useAuthStore();
-      const token = authStore.getToken();
-  
-      // Verifica si el token no existe y redirige
-      if (!token) {
-        this.$router.push({ name: "logIn" });
-        return; // Detén la ejecución del resto del código
-      }
-  
-      try {
-        // Realiza la petición al servidor
-        const response = await axios.get(
-          `${import.meta.env.VITE_API_URL}/usuarios/ver_perfil`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`, // Incluye el token en el encabezado
-            },
-          }
-        );
-  
-        // Asigna los datos a las variables del componente
-        this.nombre = response.data.nombre;
-        this.apellido = response.data.apellido;
-        this.mail = response.data.email;
-      } catch (error) {
-        // Maneja errores de la petición
-        this.errorMessage =
-          error.response?.data?.Error || "Error al cargar el perfil";
-      }
-    },
-  
+    mounted() {
+        const authStore = useAuthStore();
+        if (!authStore.getToken()) {
+            this.$router.push({ name: 'logIn' });
+        }
+  },
     methods: {
       async cambiar_contra_vieja() {
+        const token = authStore.getToken();
         try {
-          this.$router.push({ name: 'cambiar_contra_vieja' }).then(() => {
+            if (this.password != this.passw2){
+                this.errorMessage = "Las nuevas contraseñas no coinciden"
+                return;
+            }
+          const response = await axios.post(`${import.meta.env.VITE_API_URL}/auth/cambiar_contra_vieja`, {
+            oldpassword: this.oldpassword,
+            password: this.password,
+            passw2: this.passw2
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}` // Agrega el token en el encabezado
+            }
+          }
+        );
+          this.$router.push({ name: 'home' }).then(() => {
+            location.reload();
           });
         } catch (error) {
           this.errorMessage = error.response?.data?.Error || 'Error al cambiar contraseña';

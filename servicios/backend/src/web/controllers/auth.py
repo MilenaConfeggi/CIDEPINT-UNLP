@@ -51,3 +51,27 @@ def cambiar_contra():
     except Exception as e:
         print(e)
         return jsonify({"error": "Ha ocurrido un error"}), 500
+
+@bp.post("/cambiar_contra_vieja")
+@jwt_required()
+def cambiar_contra_vieja():
+    try:
+        oldpassword = request.json.get("oldpassword")
+        password = request.json.get("password")
+        passw2 = request.json.get("passw2")
+        if not passw2 or not password:
+            return jsonify({"error": "La contraseña es obligatoria"}), 400
+
+        if passw2 != password:
+            return jsonify({"error": "Las contraseñas no coinciden"}), 406
+        
+        usuario = servicioUsuario.check_user(get_jwt_identity(), oldpassword)
+        
+        servicioUsuario.cambiar_contra(password)
+
+        return jsonify({"info": "Contraseña cambiada correctamente"}), 200
+    except KeyError:
+        return jsonify({"error": "Parámetros faltantes o inválidos"}), 401
+    except Exception as e:
+        print(e)
+        return jsonify({"error": "Ha ocurrido un error"}), 500

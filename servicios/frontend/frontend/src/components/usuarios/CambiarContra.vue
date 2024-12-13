@@ -41,6 +41,10 @@
       async cambiar_contra() {
         const token = authStore.getToken();
         try {
+            if (this.password != this.passw2){
+                this.errorMessage = "Las nuevas contraseñas no coinciden"
+                return;
+            }
           const response = await axios.post(`${import.meta.env.VITE_API_URL}/auth/cambiar_contra`, {
             password: this.password,
             passw2: this.passw2

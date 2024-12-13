@@ -75,12 +75,15 @@ def obtener_usuario_por_mail(email):
     usuario = Usuario.query.filter_by(mail=email, esta_borrado=False).first()
     return usuario
 
+def obtener_empleado_por_mail(email):
+    empleado = Empleado.query.filter_by(email=email, habilitado=True).first()
+    return empleado
+
 def check_user(usermail, password):
     """
     Si el usuario existe y las contraseñas coinciden devuelve el usuario, sino devuelve None
     """
     usuario = obtener_usuario_por_mail(usermail)
-    print(usuario)
     if (not usuario) or (
         not (
             usuario.contra and bcrypt.check_password_hash(usuario.contra, password)

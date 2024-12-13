@@ -116,3 +116,9 @@ def listar_roles():
 
 def listar_empleados():
     return Empleado.query.filter_by(usuario_servicio=None).all()
+
+def es_jefe_de_area(usuario):
+    return usuario.rol.nombre == "jefe_de_area"
+
+def es_director(usuario):
+    return usuario.rol.nombre == "director"

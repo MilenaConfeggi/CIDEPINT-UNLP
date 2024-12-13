@@ -88,6 +88,28 @@
                             />
                           </label>
                         </li>
+                        <li>
+                          <button
+                            type="button"
+                            class="dropdown-item"
+                            @click="verInforme(legajo.id)"
+                          >
+                            Ver Informe
+                          </button>
+                        </li>
+                        <li>
+                          <label :for="`upload-informe-firmado-${documento.id}`" class="dropdown-item">
+                            Subir Informe Firmado
+                            <input
+                              :id="`upload-informe-firmado-${documento.id}`"
+                              type="file"
+                              accept="application/pdf"
+                              @change="uploadInformeFirmado($event, documento.id, legajo.id)"
+                              class="dropdown-item"
+                              hidden
+                            />
+                          </label>
+                        </li>
                       </template>
                       <template v-else>
                         <li v-if="existeDocumento(documento.nombre)">
@@ -208,7 +230,7 @@
             aria-label="Close"
           ></button>
         </div>
-        <div class="toast-body">El archivo no se pudo cargar. {{ error }}</div>
+        <div class="toast-body">{{ errorMessage }}</div>
       </div>
     </div>
   </main>
@@ -225,12 +247,11 @@ export default {
 </script>
 
 <script setup>
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useLegajosStore } from '../../stores/legajos'
 import { useDocumentosStore } from '../../stores/documentos'
 import { storeToRefs } from 'pinia'
-import { ref } from 'vue'
 import axios from 'axios'
 import StateBadge from '../StateBadge.vue'
 import { useAuthStore } from '../../stores/auth'
@@ -242,9 +263,7 @@ const documentosStore = useDocumentosStore()
 const { legajo, loading, error } = storeToRefs(legajosStore)
 const { tipos_documentos } = storeToRefs(documentosStore)
 const showToast = ref(false)
-const fileName = ref(null)
-const fileUrl = ref(null)
-const actualFile = ref(null)
+const errorMessage = ref('')
 
 const formatDate = (dateString) => {
   const options = { year: 'numeric', day: '2-digit', month: '2-digit' }
@@ -273,10 +292,11 @@ const uploadDocumentacion = async (event, id, legajoId) => {
       if (response.status === 200) {
         window.location.reload()
       } else {
-        throw new Error('No se pudo subir el archivo')
+        throw new Error(response.data.error || 'No se pudo subir el archivo')
       }
     } catch (error) {
       console.error('Error al subir el archivo:', error)
+      errorMessage.value = error.response?.data?.error || 'Error al subir el archivo'
       showToast.value = true
     }
   } else {
@@ -306,10 +326,45 @@ const uploadInforme = async (event, id, legajoId) => {
       if (response.status === 200) {
         window.location.reload()
       } else {
-        throw new Error('No se pudo subir el archivo')
+        throw new Error(response.data.error || 'No se pudo subir el archivo')
       }
     } catch (error) {
       console.error('Error al subir el archivo:', error)
+      errorMessage.value = error.response?.data?.error || 'Error al subir el archivo'
+      showToast.value = true
+    }
+  } else {
+    alert('Por favor selecciona un archivo PDF.')
+  }
+}
+
+const uploadInformeFirmado = async (event, id, legajoId) => {
+  const file = event.target.files[0]
+  const authStore = useAuthStore();
+  const token = authStore.getToken();
+  if (file && file.type === 'application/pdf') {
+    try {
+      const formData = new FormData()
+      formData.append('archivo', file)
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/informes/cargar_informe_firmado/${legajoId}`,
+        formData,
+        {
+          headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "multipart/form-data"
+              },
+        },
+      )
+      console.log(response)
+      if (response.status === 200) {
+        window.location.reload()
+      } else {
+        throw new Error(response.data.error || 'No se pudo subir el archivo')
+      }
+    } catch (error) {
+      console.error('Error al subir el archivo:', error)
+      errorMessage.value = error.response?.data?.error || 'Error al subir el archivo'
       showToast.value = true
     }
   } else {
@@ -349,6 +404,8 @@ const viewFile = async (id, tipo, legajoId) => {
     window.open(url, '_blank');
   } catch (error) {
     console.error('Error al obtener el documento:', error);
+    errorMessage.value = error.message || 'Error al obtener el documento'
+    showToast.value = true
   }
 }
 
@@ -370,6 +427,31 @@ const verDocumentacion = async (id) => {
     window.open(url, '_blank');
   } catch (error) {
     console.error('Error al obtener el documento:', error);
+    errorMessage.value = error.message || 'Error al obtener el documento'
+    showToast.value = true
+  }
+}
+
+const verInforme = async (id) => {
+  const authStore = useAuthStore();
+  const token = authStore.getToken();
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/informes/ver_informe/${id}`, {
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Error al obtener el informe');
+    }
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank');
+  } catch (error) {
+    console.error('Error al obtener el informe:', error);
+    errorMessage.value = error.message || 'Error al obtener el informe'
+    showToast.value = true
   }
 };
 
@@ -379,6 +461,8 @@ onMounted(async () => {
     await documentosStore.getTiposDocumentos()
   } catch (err) {
     console.error('Error al cargar el legajo:', err)
+    errorMessage.value = err.message || 'Error al cargar el legajo'
+    showToast.value = true
   }
 })
 </script>

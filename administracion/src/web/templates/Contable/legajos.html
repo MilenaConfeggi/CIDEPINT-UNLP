@@ -67,6 +67,7 @@ Crear un nuevo Fondo</a>
                     {% endif %}
                 </td>
                 <td class="px-4 py-3 text-sm">
+                    <!--
                     <form method="POST" enctype="multipart/form-data" action="{{ url_for('contable.upload') }}">
                         {{ forms[legajo.id].hidden_tag() }}
                         <div class="flex items-center gap-2">
@@ -82,14 +83,39 @@ Crear un nuevo Fondo</a>
                             {% endif %}
                         </div>
                     </form>
-                    
+                    -->
                     {% if legajo.documentos['orden_facturacion'] %}
                     <a href="{{ url_for('contable.download', documento_id=legajo.documentos['orden_facturacion'].id) }}" 
                        class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500">
                         Descargar
                     </a>
+                    <form method="POST" action="{{ url_for('contable.delete_document', documento_id=legajo.documentos['orden_facturacion'].id) }}" style="display:inline;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="text-red-600 hover:underline" onclick="return confirm('¿Estás seguro de que deseas eliminar este documento?');">
+                            Eliminar
+                        </button>
+                    </form>
                     {% else %}
-                    No disponible
+                    <form method="POST" enctype="multipart/form-data" action="{{ url_for('contable.upload') }}"> 
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="legajo_id" value="{{ legajo.id }}">
+                        <input type="hidden" name="tipo" value="orden_facturacion">
+                        <label for="archivo" class="cursor-pointer">
+                          <svg class="px-4 aspect-square w-10% rounded-lg bg-gray-200 object-cover group-hover:opacity-75 xl:aspect-[7/7]"
+                            aria-hidden="true"
+                            fill="currentColor"
+                            viewBox="0 0 448 512"
+                            >
+                            <path
+                          fill-rule="evenodd"
+                          d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"
+                          clip-rule="evenodd"
+                            ></path>
+                          </svg>
+                          <p class="mt-1 text-md font-medium text-gray-900 break-words">Subir archivo</p>
+                        </label>
+                        <input id="archivo" name="file" type="file" class="hidden" onchange="this.form.submit()">
+                      </form>
                     {% endif %}
                      
                 </td>

@@ -275,7 +275,10 @@ def delete_document(documento_id):
     file_path.unlink()
     db.session.delete(documento)
     db.session.commit()
-    return redirect(url_for("contable.get_documentosAdd",id=documento.legajo_id))
+    if tipo == 'adicional':
+        return redirect(url_for("contable.get_documentosAdd",id=documento.legajo_id))
+    else:
+        return redirect(url_for("contable.get_legajos"))
 @bp.get('/download/<int:documento_id>')
 def download(documento_id):
      # Extraer el ID del documento desde el formulario

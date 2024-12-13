@@ -106,6 +106,13 @@ const routes = [
       props: true,
       meta: { requiresAuth: true }
     },
+    {
+      path: "/cambiar_contra",
+      name: "cambiar_contra",
+      component: () => import("../components/usuarios/CambiarContra.vue"),
+      props: true,
+      meta: { requiresAuth: true }
+    },
 ];
 
 const router = createRouter({

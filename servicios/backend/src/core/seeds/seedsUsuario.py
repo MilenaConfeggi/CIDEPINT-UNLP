@@ -13,13 +13,13 @@ def seeds_usuarios():
 
 
 def seed_usuarios():
-    rol_trabajador = crear_rol({"nombre": "trabajador"})
+    rol_trabajador = crear_rol({"nombre": "Trabajador"})
     db.session.add(rol_trabajador)
-    rol_jefe_de_area = crear_rol({"nombre": "jefe_de_area"})
+    rol_jefe_de_area = crear_rol({"nombre": "Jefe de area"})
     db.session.add(rol_jefe_de_area)
-    rol_secretaria = crear_rol({"nombre": "secretaria"})
+    rol_secretaria = crear_rol({"nombre": "Secretaria"})
     db.session.add(rol_secretaria)
-    rol_director = crear_rol({"nombre": "director"})
+    rol_director = crear_rol({"nombre": "Director"})
     db.session.add(rol_director)
     db.session.commit()
 
@@ -183,6 +183,7 @@ def seed_usuarios():
             "contra": "123",
             "rol": rol_trabajador,
             "empleado": personal_1,
+            "cambiar_contra": False,
         }
     )
     usuario2 = crear_usuario(
@@ -191,6 +192,7 @@ def seed_usuarios():
             "contra": "321",
             "rol": rol_jefe_de_area,
             "empleado": personal_2,
+            "cambiar_contra": False,
         }
     )
     usuario3 = crear_usuario(
@@ -199,6 +201,7 @@ def seed_usuarios():
             "contra": "soyadmin",
             "rol": rol_director,
             "empleado": personal_3,
+            "cambiar_contra": False,
         }
     )
     usuario4 = crear_usuario(
@@ -207,6 +210,7 @@ def seed_usuarios():
             "contra": "soysecretaria",
             "rol": rol_secretaria,
             "empleado": personal_4,
+            "cambiar_contra": False,
         }
     )
     db.session.add(usuario1)
@@ -228,7 +232,7 @@ def seed_usuarios():
         "enviar_fotos",
     ]
     PERMISSIONS = { #Acá van los permisos que tiene cada rol
-        "director": [ #Tienen que ser declarados previamente en todosLosPermisos
+        "Director": [ #Tienen que ser declarados previamente en todosLosPermisos
             "listar_usuarios",
             "borrar_usuario",
             "listar_stans",
@@ -241,7 +245,7 @@ def seed_usuarios():
             "descargar_fotos",
             "enviar_fotos",
         ],
-        "secretaria": [
+        "Secretaria": [
             "listar_usuarios",
             "borrar_usuario",
             "listar_stans",
@@ -254,12 +258,12 @@ def seed_usuarios():
             "descargar_fotos",
             "enviar_fotos",
         ],
-        "jefe_de_area": [
+        "Jefe de area": [
             "listar_muestras_identificadas",
             "cargar_fotos",
             "listar_fotos",
         ],
-        "trabajador": [
+        "Trabajador": [
             "listar_muestras_identificadas",
             "cargar_fotos",
             "listar_fotos",

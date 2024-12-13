@@ -20,8 +20,11 @@ def allowed_file(filename):
 def cargar_documentacion(id_legajo):
     print(id_legajo)
     if(servicioInforme.buscar_documentacion_por_legajo(id_legajo)):
-        return jsonify({"error": "Ya existe documentación para este legajo"}), 400
-    
+        servicioInforme.eliminar_documentacion_anterior(id_legajo)
+        servicioInforme.eliminar_informe_anterior(id_legajo)
+        mensaje = "Se ha eliminado la documentación anterior e informes en caso de que los hubiera"
+    else:
+        mensaje = " "
     if 'archivo' not in request.files:
         return jsonify({"error": "Debes seleccionar un archivo"}), 400
 
@@ -46,7 +49,7 @@ def cargar_documentacion(id_legajo):
         os.makedirs(folder_path, exist_ok=True)
         archivo.save(os.path.join(folder_path, filename))
         doc = servicioDocumento.crear_documento(doc_data)
-        return jsonify({"message": "Documentación subida con éxito"}), 200
+        return jsonify({"message": "Documentación subida con éxito", "info": mensaje}), 200
     except ValidationError as err:
         print(err.messages)  # Imprime los mensajes de error de validación
         return jsonify({"message": f"Error en la validación de los datos: {err.messages}"}), 400
@@ -100,6 +103,7 @@ def cargar_informe(id_legajo):
         }
 
         # Guardar el archivo en el servidor
+        servicioInforme.eliminar_informe_anterior(id_legajo)
         folder_path = os.path.join(UPLOAD_FOLDER, "informes", str(id_legajo))
         os.makedirs(folder_path, exist_ok=True)
         archivo.save(os.path.join(folder_path, filename))

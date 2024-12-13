@@ -26,14 +26,7 @@ def seeds_documentos():
             'estado_id': 3,
             'tipo_documento_id': 3,
             'legajo_id': 33
-        },
-        {
-            'nombre_documento': 'Documento 4',
-            'fecha_creacion': datetime(2024, 1, 1),
-            'estado_id': 4,
-            'tipo_documento_id': 4,
-            'legajo_id': 33
-        }        
+        },   
     ]
     for data in documentos_data:
         db.session.add(Documento(**data))

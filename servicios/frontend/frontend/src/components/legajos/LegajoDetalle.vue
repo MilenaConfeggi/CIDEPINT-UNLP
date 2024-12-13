@@ -222,7 +222,7 @@
     <div v-if="showToast" class="toast-container position-fixed bottom-0 end-0 p-3">
       <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="toast-header">
-          <strong class="me-auto">Error</strong>
+          <strong class="me-auto">{{ errorMessage ? 'Error' : 'Éxito' }}</strong>
           <button
             type="button"
             class="btn-close"
@@ -230,7 +230,7 @@
             aria-label="Close"
           ></button>
         </div>
-        <div class="toast-body">{{ errorMessage }}</div>
+        <div class="toast-body">{{ errorMessage || successMessage }}</div>
       </div>
     </div>
   </main>
@@ -264,6 +264,7 @@ const { legajo, loading, error } = storeToRefs(legajosStore)
 const { tipos_documentos } = storeToRefs(documentosStore)
 const showToast = ref(false)
 const errorMessage = ref('')
+const successMessage = ref('')
 
 const authStore = useAuthStore();
 const permisos = JSON.parse(localStorage.getItem('permisos')) || [];
@@ -296,7 +297,9 @@ const uploadDocumentacion = async (event, id, legajoId) => {
       )
       console.log(response)
       if (response.status === 200) {
-        window.location.reload()
+        successMessage.value = 'Documentación subida correctamente';
+        showToast.value = true;
+        setTimeout(() => window.location.reload(), 2000);
       } else {
         throw new Error(response.data.error || 'No se pudo subir el archivo')
       }
@@ -329,7 +332,9 @@ const uploadInforme = async (event, id, legajoId) => {
       )
       console.log(response)
       if (response.status === 200) {
-        window.location.reload()
+        successMessage.value = 'Informe subido correctamente';
+        showToast.value = true;
+        setTimeout(() => window.location.reload(), 2000);
       } else {
         throw new Error(response.data.error || 'No se pudo subir el archivo')
       }
@@ -362,7 +367,9 @@ const uploadInformeFirmado = async (event, id, legajoId) => {
       )
       console.log(response)
       if (response.status === 200) {
-        window.location.reload()
+        successMessage.value = 'Informe firmado subido correctamente';
+        showToast.value = true;
+        setTimeout(() => window.location.reload(), 2000);
       } else {
         throw new Error(response.data.error || 'No se pudo subir el archivo')
       }
@@ -401,15 +408,15 @@ const viewFile = async (id, tipo, legajoId) => {
     });
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.error || 'Error al obtener el documento');
+      throw new Error(errorData.message || 'Error al obtener el documento');
     }
     const blob = await response.blob();
     const url = URL.createObjectURL(blob);
     window.open(url, '_blank');
   } catch (error) {
     console.error('Error al obtener el documento:', error);
-    errorMessage.value = error.message || 'Error al obtener el documento'
-    showToast.value = true
+    errorMessage.value = error.message || 'Error al obtener el documento';
+    showToast.value = true;
   }
 }
 
@@ -424,15 +431,15 @@ const verDocumentacion = async (id) => {
     });
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.error || 'Error al obtener el documento');
+      throw new Error(errorData.message || 'Error al obtener el documento');
     }
     const blob = await response.blob();
     const url = URL.createObjectURL(blob);
     window.open(url, '_blank');
   } catch (error) {
     console.error('Error al obtener el documento:', error);
-    errorMessage.value = error.message || 'Error al obtener el documento'
-    showToast.value = true
+    errorMessage.value = error.message || 'Error al obtener el documento';
+    showToast.value = true;
   }
 }
 
@@ -447,15 +454,15 @@ const verInforme = async (id) => {
     });
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.error || 'Error al obtener el informe');
+      throw new Error(errorData.message || 'Error al obtener el informe');
     }
     const blob = await response.blob();
     const url = URL.createObjectURL(blob);
     window.open(url, '_blank');
   } catch (error) {
     console.error('Error al obtener el informe:', error);
-    errorMessage.value = error.message || 'Error al obtener el informe'
-    showToast.value = true
+    errorMessage.value = error.message || 'Error al obtener el informe';
+    showToast.value = true;
   }
 };
 

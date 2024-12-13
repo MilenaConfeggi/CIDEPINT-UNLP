@@ -97,14 +97,14 @@ def get_legajos():
     resultado = []
 
     for legajo in legajos:
-        print(legajo.documento)
         documentos = {doc.tipo_documento.nombre: doc for doc in legajo.documento}
-        print(documentos)
+        distribuciones = distribucionDB.list_distribuciones_by_legajo(legajo.id)
         resultado.append({
             "id": legajo.id,
             "nro_legajo": legajo.nro_legajo,
             "cliente": legajo.cliente,
             "documentos": documentos,
+            "distribuciones" : distribuciones
         })
     form = DownloadForm()
     return render_template("contable/legajos.html",legajos = resultado, forms=forms,formDescarga = form)
@@ -191,8 +191,9 @@ def upload():
     tipo = request.form['tipo']
     legajo_id = request.form['legajo_id']
     
-    if file.filename == '' or not file.filename.endswith('.pdf'):
-        return jsonify({"error": "Por favor, selecciona un archivo PDF válido"}), 400
+    if file.filename == '':# or not file.filename.endswith('.pdf'):
+        flash("El archivo tiene que terner nombre o/y una extencion valida", "danger")
+        return redirect(url_for("contable.get_legajos"))
     td = get_tipo_documento_nombre(tipo)
     if td is None:
         return jsonify({"error": "El tipo de documento no existe"}), 400

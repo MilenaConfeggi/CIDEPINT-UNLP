@@ -66,7 +66,7 @@ Crear un nuevo Fondo</a>
                     No disponible
                     {% endif %}
                 </td>
-                <td class="px-4 py-3 text-sm">
+                <td class="px-4 py-3 text-sm {% if legajo.documentos['orden_facturacion'] %}bg-green-600{% else %}bg-red-600{% endif %}">
                     <!--
                     <form method="POST" enctype="multipart/form-data" action="{{ url_for('contable.upload') }}">
                         {{ forms[legajo.id].hidden_tag() }}
@@ -149,7 +149,7 @@ Crear un nuevo Fondo</a>
                 <td class="px-4 py-3 text-sm">
                     Recibo
                 </td>
-                <td class="px-4 py-3 text-sm">
+                <td class="px-4 py-3 text-sm {% if legajo.distribuciones %}bg-green-600{% else %}bg-red-600{% endif %}" >
                     <a href="{{ url_for('contable.get_distribuciones',id=legajo.id) }}"
                         class="flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-black-600 rounded-lg focus:outline-none focus:shadow-outline-gray"
                         aria-label="Ver"

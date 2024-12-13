@@ -6,9 +6,6 @@ from models.personal.empleado import Empleado
 from models.personal.personal import User
 from models.personal.area import Area
 from models.base import db
-from flask_bcrypt import Bcrypt
-
-bcrypt = Bcrypt()
 
 
 def seeds_usuarios():
@@ -181,7 +178,7 @@ def seed_usuarios():
     usuario1 = crear_usuario(
         {
             "mail": "pepito@example.com",
-            "contra": bcrypt.generate_password_hash("123".encode("utf-8")),
+            "contra": "123",
             "rol": rol_trabajador,
             "empleado": personal_1,
         }
@@ -189,7 +186,7 @@ def seed_usuarios():
     usuario2 = crear_usuario(
         {
             "mail": "moniquita@example.com",
-            "contra": bcrypt.generate_password_hash("321".encode("utf-8")),
+            "contra": "321",
             "rol": rol_jefe_de_area,
             "empleado": personal_2,
         }
@@ -197,7 +194,7 @@ def seed_usuarios():
     usuario3 = crear_usuario(
         {
             "mail": "admin@example.com",
-            "contra": bcrypt.generate_password_hash("soyadmin".encode("utf-8")),
+            "contra": "soyadmin",
             "rol": rol_administrador,
             "empleado": personal_3,
         }

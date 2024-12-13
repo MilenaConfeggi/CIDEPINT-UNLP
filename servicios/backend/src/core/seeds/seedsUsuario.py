@@ -226,6 +226,11 @@ def seed_usuarios():
         "listar_fotos",
         "descargar_fotos",
         "enviar_fotos",
+        "cargar_documentacion",
+        "ver documentacion",
+        "cargar_informe",
+        "cargar_informe_firmado",
+        "ver informe",
     ]
     PERMISSIONS = { #Acá van los permisos que tiene cada rol
         "Director": [ #Tienen que ser declarados previamente en todosLosPermisos
@@ -240,6 +245,10 @@ def seed_usuarios():
             "listar_fotos",
             "descargar_fotos",
             "enviar_fotos",
+            "ver documentacion",
+            "cargar_informe",
+            "cargar_informe_firmado",
+            "ver informe",
         ],
         "Secretaria": [
             "listar_usuarios",
@@ -253,11 +262,18 @@ def seed_usuarios():
             "listar_fotos",
             "descargar_fotos",
             "enviar_fotos",
+            "ver documentacion",
+            "cargar_informe",
+            "ver informe",
         ],
         "Jefe de area": [
             "listar_muestras_identificadas",
             "cargar_fotos",
             "listar_fotos",
+            "cargar_documentacion",
+            "ver documentacion",
+            "cargar_informe_firmado",
+            "ver informe",
         ],
         "Trabajador": [
             "listar_muestras_identificadas",

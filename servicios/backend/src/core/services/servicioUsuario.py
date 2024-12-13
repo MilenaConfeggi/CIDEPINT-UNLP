@@ -144,3 +144,10 @@ def cambiar_contra(password):
     usuario.cambiar_contra = False
     db.session.commit()
     return True
+
+
+def es_jefe_de_area(usuario):
+    return usuario.rol.nombre == "jefe_de_area"
+
+def es_director(usuario):
+    return usuario.rol.nombre == "director"

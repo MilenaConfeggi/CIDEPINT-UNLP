@@ -1,7 +1,7 @@
 from servicios.backend.src.core.config import Config
 from flask import jsonify, abort, Blueprint, request
 from servicios.backend.src.core.services import servicioUsuario
-from servicios.backend.src.web.schemas.usuarios import usuariosSchema, rolesSchema, empleadosSchema
+from servicios.backend.src.web.schemas.usuarios import usuariosSchema, usuarioSchema, rolesSchema, empleadosSchema
 from servicios.backend.src.web.helpers.auth import is_authenticated, check_permission
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from administracion.src.core.Empleado import get_empleado
@@ -27,6 +27,13 @@ def listar_roles():
 def listar_empleados():
     empleados = servicioUsuario.listar_empleados()
     data = empleadosSchema.dump(empleados, many=True)
+    return jsonify(data), 200
+
+@bp.get("/ver_perfil")
+@jwt_required()
+def ver_perfil():
+    usuario = servicioUsuario.obtener_usuario_por_mail(get_jwt_identity())
+    data = usuarioSchema.dump(usuario)
     return jsonify(data), 200
 
 @bp.post("/crear")

@@ -113,6 +113,13 @@ const routes = [
       props: true,
       meta: { requiresAuth: true }
     },
+    {
+      path: "/ver_perfil",
+      name: "ver_perfil",
+      component: () => import("../components/usuarios/VerPerfil.vue"),
+      props: true,
+      meta: { requiresAuth: true }
+    },
 ];
 
 const router = createRouter({

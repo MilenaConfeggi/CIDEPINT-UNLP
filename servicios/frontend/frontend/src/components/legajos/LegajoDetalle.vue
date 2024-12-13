@@ -53,7 +53,7 @@
                     </button>
                     <ul class="dropdown-menu">
                       <template v-if="documento.nombre === 'Informe'">
-                        <li>
+                        <li v-if="hasPermission('cargar_documentacion')">
                           <label :for="`upload-doc-${documento.id}`" class="dropdown-item">
                             Subir Documentacion
                             <input
@@ -66,7 +66,7 @@
                             />
                           </label>
                         </li>
-                        <li>
+                        <li v-if="hasPermission('ver documentacion')">
                           <button
                             type="button"
                             class="dropdown-item"
@@ -75,7 +75,7 @@
                             Ver Documentacion
                           </button>
                         </li>
-                        <li>
+                        <li v-if="hasPermission('cargar_informe')">
                           <label :for="`upload-informe-${documento.id}`" class="dropdown-item">
                             Subir Informe
                             <input
@@ -88,7 +88,7 @@
                             />
                           </label>
                         </li>
-                        <li>
+                        <li v-if="hasPermission('ver informe')">
                           <button
                             type="button"
                             class="dropdown-item"
@@ -97,7 +97,7 @@
                             Ver Informe
                           </button>
                         </li>
-                        <li>
+                        <li v-if="hasPermission('cargar_informe_firmado')">
                           <label :for="`upload-informe-firmado-${documento.id}`" class="dropdown-item">
                             Subir Informe Firmado
                             <input
@@ -265,6 +265,13 @@ const { tipos_documentos } = storeToRefs(documentosStore)
 const showToast = ref(false)
 const errorMessage = ref('')
 
+const authStore = useAuthStore();
+const permisos = JSON.parse(localStorage.getItem('permisos')) || [];
+
+const hasPermission = (permiso) => {
+  return permisos.includes(permiso);
+}
+
 const formatDate = (dateString) => {
   const options = { year: 'numeric', day: '2-digit', month: '2-digit' }
   return new Date(dateString).toLocaleDateString('es-ES', options)
@@ -272,7 +279,6 @@ const formatDate = (dateString) => {
 
 const uploadDocumentacion = async (event, id, legajoId) => {
   const file = event.target.files[0]
-  const authStore = useAuthStore();
   const token = authStore.getToken();
   if (file && file.type === 'application/pdf') {
     try {
@@ -306,7 +312,6 @@ const uploadDocumentacion = async (event, id, legajoId) => {
 
 const uploadInforme = async (event, id, legajoId) => {
   const file = event.target.files[0]
-  const authStore = useAuthStore();
   const token = authStore.getToken();
   if (file && file.type === 'application/pdf') {
     try {
@@ -340,7 +345,6 @@ const uploadInforme = async (event, id, legajoId) => {
 
 const uploadInformeFirmado = async (event, id, legajoId) => {
   const file = event.target.files[0]
-  const authStore = useAuthStore();
   const token = authStore.getToken();
   if (file && file.type === 'application/pdf') {
     try {
@@ -387,7 +391,6 @@ const downloadDocumento = async (tipo, legajo_id) => {
 }
 
 const viewFile = async (id, tipo, legajoId) => {
-  const authStore = useAuthStore();
   const token = authStore.getToken();
   try {
     const response = await fetch(`${import.meta.env.VITE_API_URL}/informes/ver_documento/${legajoId}`, {
@@ -397,7 +400,8 @@ const viewFile = async (id, tipo, legajoId) => {
       },
     });
     if (!response.ok) {
-      throw new Error('Error al obtener el documento');
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Error al obtener el documento');
     }
     const blob = await response.blob();
     const url = URL.createObjectURL(blob);
@@ -410,7 +414,6 @@ const viewFile = async (id, tipo, legajoId) => {
 }
 
 const verDocumentacion = async (id) => {
-  const authStore = useAuthStore();
   const token = authStore.getToken();
   try {
     const response = await fetch(`${import.meta.env.VITE_API_URL}/informes/ver_documento/${id}`, {
@@ -420,7 +423,8 @@ const verDocumentacion = async (id) => {
       },
     });
     if (!response.ok) {
-      throw new Error('Error al obtener el documento');
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Error al obtener el documento');
     }
     const blob = await response.blob();
     const url = URL.createObjectURL(blob);
@@ -433,7 +437,6 @@ const verDocumentacion = async (id) => {
 }
 
 const verInforme = async (id) => {
-  const authStore = useAuthStore();
   const token = authStore.getToken();
   try {
     const response = await fetch(`${import.meta.env.VITE_API_URL}/informes/ver_informe/${id}`, {
@@ -443,7 +446,8 @@ const verInforme = async (id) => {
       },
     });
     if (!response.ok) {
-      throw new Error('Error al obtener el informe');
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Error al obtener el informe');
     }
     const blob = await response.blob();
     const url = URL.createObjectURL(blob);

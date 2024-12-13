@@ -10,17 +10,30 @@ from flask import request
 from flask_jwt_extended import get_jwt_identity, jwt_required
 
 def crear_usuario(data):
+    empleado = Empleado.query.filter_by(email=data.get('mail')).first()
+    print(empleado)
+    if empleado is None:
+        raise ValueError("No existe un empleado con ese mail, por favor primero agregue un empleado con el mismo mail")
+
     if Usuario.query.filter_by(mail=data.get('mail'), esta_borrado=False).first() is not None:
         raise ValueError("Ya existe un usuario con ese mail")
 
-
-    if data.get('rol').nombre == "jefe_de_area":
+    #verifico que no pueda haber usuarios jefes de areas en la misma área
+    if data.get('rol').nombre == "Jefe de area":
         jefesDeAreas = Usuario.query.filter_by(rol=data.get('rol'), esta_borrado=False).all()
-        empleadosJefesDeArea = ()
         for jefe in jefesDeAreas:
             emp = Empleado.query.filter_by(usuario_servicio_id=jefe.id).first()
-            if emp is not None and emp.area == data.get('empleado').area:
+            if emp is not None and emp.area == empleado.area:
                 raise ValueError("Ya existe un jefe de area para esa área, por favor saque al jefe de área anterior para ingresar uno nuevo")
+
+    usuario = Usuario.query.filter_by(mail=data.get('mail'), esta_borrado=True).first()
+    if usuario is not None:
+        usuario.contra=bcrypt.generate_password_hash(data.get('contra').encode("utf-8"))
+        usuario.rol=data.get('rol')
+        usuario.esta_borrado=False
+        usuario.cambiar_contra=True
+        db.session.commit()
+        return usuario
 
     cambiar = True
     if data.get('cambiar_contra') is not None:
@@ -33,7 +46,7 @@ def crear_usuario(data):
         cambiar_contra=cambiar,
     )
     db.session.add(nuevo_usuario)
-    data.get('empleado').usuario_servicio = nuevo_usuario
+    empleado.usuario_servicio = nuevo_usuario
     db.session.commit()
     return nuevo_usuario
 
@@ -66,8 +79,6 @@ def eliminar_usuario(id_usuario):
     usuario = Usuario.query.get(id_usuario)
     if usuario is None:
         raise ValueError("No se encontró el usuario seleccionado")
-    empleado = Empleado.query.filter_by(usuario_servicio=usuario).first()
-    empleado.usuario_servicio = None
     usuario.esta_borrado = True
     db.session.commit()
 

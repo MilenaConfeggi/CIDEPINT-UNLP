@@ -39,10 +39,16 @@ export default {
           password: this.password
         });
         authStore.setToken(response.data.access_token);
-        localStorage.setItem('permisos', JSON.stringify(response.data.permisos));
-        this.$router.push({ name: 'home' }).then(() => {
-          location.reload();
+        if (response.data.cambiar_contra){
+          this.$router.push({ name: 'cambiar_contra' }).then(() => {
         });
+        }
+        else{
+          localStorage.setItem('permisos', JSON.stringify(response.data.permisos));
+          this.$router.push({ name: 'home' }).then(() => {
+            location.reload();
+          });
+        }
       } catch (error) {
         this.errorMessage = error.response?.data?.Error || 'Error al iniciar sesión';
       }

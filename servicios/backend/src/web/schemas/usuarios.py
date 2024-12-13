@@ -15,6 +15,7 @@ class EmpleadoSchema(Schema):
     id = fields.Int(dump_only=True)
     nombre = fields.Str(required=True)
     apellido = fields.Str(required=True)
+    email = fields.Str(required=True)
     usuario_servicio_id = fields.Int(required=True)
 
 usuarioSchema = UsuarioSchema()

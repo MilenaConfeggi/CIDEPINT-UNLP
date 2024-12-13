@@ -13,13 +13,13 @@ def seeds_usuarios():
 
 
 def seed_usuarios():
-    rol_trabajador = crear_rol({"nombre": "trabajador"})
+    rol_trabajador = crear_rol({"nombre": "Trabajador"})
     db.session.add(rol_trabajador)
-    rol_jefe_de_area = crear_rol({"nombre": "jefe_de_area"})
+    rol_jefe_de_area = crear_rol({"nombre": "Jefe de area"})
     db.session.add(rol_jefe_de_area)
-    rol_secretaria = crear_rol({"nombre": "secretaria"})
+    rol_secretaria = crear_rol({"nombre": "Secretaria"})
     db.session.add(rol_secretaria)
-    rol_director = crear_rol({"nombre": "director"})
+    rol_director = crear_rol({"nombre": "Director"})
     db.session.add(rol_director)
     db.session.commit()
 
@@ -55,7 +55,7 @@ def seed_usuarios():
     
     personal_2 = Empleado(
         user=usuario_2,
-        email='maria@example.com',
+        email='moniquita@example.com',
         area=default_area,
         dni='204061',
         nombre='Maria',
@@ -78,7 +78,7 @@ def seed_usuarios():
     
     personal_3 = Empleado(
         user=usuario_3,
-        email='juan@example.com',
+        email='pepito@example.com',
         area=default_area,
         dni='204062',
         nombre='Juan',
@@ -101,7 +101,7 @@ def seed_usuarios():
     
     personal_4 = Empleado(
         user=usuario_4,
-        email='ana@example.com',
+        email='secretaria@example.com',
         area=default_area,
         dni='204063',
         nombre='Ana',
@@ -124,7 +124,7 @@ def seed_usuarios():
     
     personal_5 = Empleado(
         user=usuario_5,
-        email='luis@example.com',
+        email='director@example.com',
         area=default_area,
         dni='204064',
         nombre='Luis',
@@ -182,7 +182,7 @@ def seed_usuarios():
             "mail": "pepito@example.com",
             "contra": "123",
             "rol": rol_trabajador,
-            "empleado": personal_1,
+            "cambiar_contra": False,
         }
     )
     usuario2 = crear_usuario(
@@ -190,7 +190,7 @@ def seed_usuarios():
             "mail": "moniquita@example.com",
             "contra": "321",
             "rol": rol_jefe_de_area,
-            "empleado": personal_2,
+            "cambiar_contra": False,
         }
     )
     usuario3 = crear_usuario(
@@ -198,7 +198,7 @@ def seed_usuarios():
             "mail": "director@example.com",
             "contra": "soyadmin",
             "rol": rol_director,
-            "empleado": personal_3,
+            "cambiar_contra": False,
         }
     )
     usuario4 = crear_usuario(
@@ -206,7 +206,7 @@ def seed_usuarios():
             "mail": "secretaria@example.com",
             "contra": "soysecretaria",
             "rol": rol_secretaria,
-            "empleado": personal_4,
+            "cambiar_contra": False,
         }
     )
     db.session.add(usuario1)
@@ -233,7 +233,7 @@ def seed_usuarios():
         "ver informe",
     ]
     PERMISSIONS = { #Acá van los permisos que tiene cada rol
-        "director": [ #Tienen que ser declarados previamente en todosLosPermisos
+        "Director": [ #Tienen que ser declarados previamente en todosLosPermisos
             "listar_usuarios",
             "borrar_usuario",
             "listar_stans",
@@ -250,7 +250,7 @@ def seed_usuarios():
             "cargar_informe_firmado",
             "ver informe",
         ],
-        "secretaria": [
+        "Secretaria": [
             "listar_usuarios",
             "borrar_usuario",
             "listar_stans",
@@ -266,7 +266,7 @@ def seed_usuarios():
             "cargar_informe",
             "ver informe",
         ],
-        "jefe_de_area": [
+        "Jefe de area": [
             "listar_muestras_identificadas",
             "cargar_fotos",
             "listar_fotos",
@@ -275,7 +275,7 @@ def seed_usuarios():
             "cargar_informe_firmado",
             "ver informe",
         ],
-        "trabajador": [
+        "Trabajador": [
             "listar_muestras_identificadas",
             "cargar_fotos",
             "listar_fotos",

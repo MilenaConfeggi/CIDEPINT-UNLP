@@ -52,19 +52,56 @@
                       Acciones
                     </button>
                     <ul class="dropdown-menu">
-                      <template v-if="existeDocumento(documento.nombre)">
+                      <template v-if="documento.nombre === 'Informe'">
                         <li>
+                          <label :for="`upload-doc-${documento.id}`" class="dropdown-item">
+                            Subir Documentacion
+                            <input
+                              :id="`upload-doc-${documento.id}`"
+                              type="file"
+                              accept="application/pdf"
+                              @change="uploadDocumentacion($event, documento.id, legajo.id)"
+                              class="dropdown-item"
+                              hidden
+                            />
+                          </label>
+                        </li>
+                        <li>
+                          <button
+                            type="button"
+                            class="dropdown-item"
+                            @click="verDocumentacion(legajo.id)"
+                          >
+                            Ver Documentacion
+                          </button>
+                        </li>
+                        <li>
+                          <label :for="`upload-informe-${documento.id}`" class="dropdown-item">
+                            Subir Informe
+                            <input
+                              :id="`upload-informe-${documento.id}`"
+                              type="file"
+                              accept="application/pdf"
+                              @change="uploadInforme($event, documento.id, legajo.id)"
+                              class="dropdown-item"
+                              hidden
+                            />
+                          </label>
+                        </li>
+                      </template>
+                      <template v-else>
+                        <li v-if="existeDocumento(documento.nombre)">
                           <button
                             type="button"
                             class="dropdown-item"
                             data-bs-toggle="modal"
                             data-bs-target="#exampleModal"
-                            @click="viewFile(documento.id, documento.nombre)"
+                            @click="viewFile(documento.id, documento.nombre, legajo.id)"
                           >
                             Ver documento
                           </button>
                         </li>
-                        <li>
+                        <li v-if="existeDocumento(documento.nombre)">
                           <button
                             type="button"
                             class="dropdown-item"
@@ -73,7 +110,7 @@
                             Descargar
                           </button>
                         </li>
-                        <li>
+                        <li v-if="existeDocumento(documento.nombre)">
                           <label :for="`edit-pdf-${documento.id}`" class="dropdown-item">
                             Editar
                             <input
@@ -86,20 +123,20 @@
                             />
                           </label>
                         </li>
+                        <li v-else>
+                          <label :for="`upload-pdf-${documento.id}`" class="dropdown-item">
+                            Cargar
+                            <input
+                              :id="`upload-pdf-${documento.id}`"
+                              type="file"
+                              accept="application/pdf"
+                              @change="handleFileUpload($event, documento.id, legajo.id)"
+                              class="dropdown-item"
+                              hidden
+                            />
+                          </label>
+                        </li>
                       </template>
-                      <li v-else>
-                        <label :for="`upload-pdf-${documento.id}`" class="dropdown-item">
-                          Cargar
-                          <input
-                            :id="`upload-pdf-${documento.id}`"
-                            type="file"
-                            accept="application/pdf"
-                            @change="handleFileUpload($event, documento.id, legajo.id)"
-                            class="dropdown-item"
-                            hidden
-                          />
-                        </label>
-                      </li>
                     </ul>
                   </div>
                 </td>
@@ -196,6 +233,7 @@ import { storeToRefs } from 'pinia'
 import { ref } from 'vue'
 import axios from 'axios'
 import StateBadge from '../StateBadge.vue'
+import { useAuthStore } from '../../stores/auth'
 
 const route = useRoute()
 const legajosStore = useLegajosStore()
@@ -212,12 +250,58 @@ const formatDate = (dateString) => {
   const options = { year: 'numeric', day: '2-digit', month: '2-digit' }
   return new Date(dateString).toLocaleDateString('es-ES', options)
 }
-const handleFileUpload = async (event, id, legajoId, editar = false) => {
+
+const uploadDocumentacion = async (event, id, legajoId) => {
   const file = event.target.files[0]
+  const authStore = useAuthStore();
+  const token = authStore.getToken();
   if (file && file.type === 'application/pdf') {
     try {
-      fileName.value = file.name
-      const response = await documentosStore.subirArchivo(file, id, legajoId, editar)
+      const formData = new FormData()
+      formData.append('archivo', file)
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/informes/cargar_documentacion/${legajoId}`,
+        formData,
+        {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data',
+          },
+        },
+      )
+      console.log(response)
+      if (response.status === 200) {
+        window.location.reload()
+      } else {
+        throw new Error('No se pudo subir el archivo')
+      }
+    } catch (error) {
+      console.error('Error al subir el archivo:', error)
+      showToast.value = true
+    }
+  } else {
+    alert('Por favor selecciona un archivo PDF.')
+  }
+}
+
+const uploadInforme = async (event, id, legajoId) => {
+  const file = event.target.files[0]
+  const authStore = useAuthStore();
+  const token = authStore.getToken();
+  if (file && file.type === 'application/pdf') {
+    try {
+      const formData = new FormData()
+      formData.append('archivo', file)
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/informes/cargar_informe/${legajoId}`,
+        formData,
+        {
+          headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "multipart/form-data"
+              },
+        },
+      )
       console.log(response)
       if (response.status === 200) {
         window.location.reload()
@@ -247,26 +331,47 @@ const downloadDocumento = async (tipo, legajo_id) => {
   console.log(response)
 }
 
-const viewFile = async (id, tipo) => {
-  actualFile.value = legajo.value.documento.find((doc) => doc.tipo_documento_id === id)
+const viewFile = async (id, tipo, legajoId) => {
+  const authStore = useAuthStore();
+  const token = authStore.getToken();
   try {
-    const response = await axios.get(
-      `http://127.0.0.1:5000/api/documentos/view/${actualFile.value.nombre_documento}`,
-      {
-        params: { tipo },
-        responseType: 'blob',
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/informes/ver_documento/${legajoId}`, {
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        'Content-Type': 'multipart/form-data',
       },
-    )
-
-    // Crear una URL para visualizar el archivo
-    const blob = new Blob([response.data], { type: response.headers['content-type'] })
-    console.log(response.data)
-    fileUrl.value = URL.createObjectURL(blob)
+    });
+    if (!response.ok) {
+      throw new Error('Error al obtener el documento');
+    }
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank');
   } catch (error) {
-    console.error('Error al obtener el archivo:', error)
-    alert('No se pudo cargar el archivo.')
+    console.error('Error al obtener el documento:', error);
   }
 }
+
+const verDocumentacion = async (id) => {
+  const authStore = useAuthStore();
+  const token = authStore.getToken();
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/informes/ver_documento/${id}`, {
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Error al obtener el documento');
+    }
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank');
+  } catch (error) {
+    console.error('Error al obtener el documento:', error);
+  }
+};
 
 onMounted(async () => {
   try {

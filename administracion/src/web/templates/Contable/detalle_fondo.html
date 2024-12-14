@@ -38,7 +38,7 @@
     </div>
 </form>
 -->
-<form class="px-4" method="POST" action="{{ url_for('contable.crear_ingreso', fondo_id = fondo.titulo) }}">
+<form class="px-4" method="POST" action="{{ url_for('contable.crear_ingreso', fondo_id = fondo.titulo) }}" enctype="multipart/form-data">
     <input type="text" name="csrf_token" value="{{ csrf_token() }}" hidden>
 
     <div class="border-b border-gray-900/10 pb-12">
@@ -73,6 +73,7 @@
         >
             <th class="px-4 py-3">Monto</th>
             <th class="px-4 py-3">Fecha</th>
+            <th class="px-4 py-3">Archivo</th>
         </tr>
         </thead>
         <tbody
@@ -89,6 +90,14 @@
                 </td>
                 <td class="px-4 py-3 text-sm">
                 {{ ingreso.fecha }}
+                </td>
+                <td>
+                    {% if ingreso.archivo_id %}
+                        <a data-id="{{ ingreso.archivo_id }}" class="group" href="{{ url_for('contable.descargar_ingreso',id=ingreso.id ) }}" target="_blank">descargar</a>
+                    {% else %}
+                        No hay archivo
+                    {% endif %}
+                   
                 </td>
             </tr>
         {% endfor %}

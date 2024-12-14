@@ -83,6 +83,7 @@ def guardar_archivo_en_carpeta(id_carpeta, archivo):
 
     db.session.add(nuevo_archivo)
     db.session.commit()
+    return nuevo_archivo
 
 
 def eliminar_archivo(id_archivo):

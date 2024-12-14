@@ -2,7 +2,7 @@ from administracion.src.core.fondos import fondo
 from administracion.src.core.ingresos import ingreso as ingresoDB
 from administracion.src.core.servicios import archivos_admin as archivos_adminDB
 from models import distribucion as distribucionDB
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, send_file
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, send_file, send_from_directory
 from administracion.src.web.forms.fondo_nuevo import FormularioNuevoFondo
 from administracion.src.web.forms.ingreso_nuevo import FormularioNuevoIngreso
 from administracion.src.web.forms.distribucion_nuevo import FormularioNuevaDistribucion
@@ -87,9 +87,8 @@ def crear_ingreso(fondo_id):
         #subir archivo
         if 'file' in request.files and request.files['file'].filename != '':
             archivo = request.files['file']
-
             id_carpeta = archivos_adminDB.get_carpeta_by_nombre(fond.titulo).id
-            archivos_adminDB.guardar_archivo_en_carpeta(id_carpeta, archivo)
+            data['archivo_id'] = archivos_adminDB.guardar_archivo_en_carpeta(id_carpeta, archivo).id
         ingresoDB.create_ingreso(**data)
         fond.saldo += float(data["monto"])
         fondo.modificar_fondo(fondo_id, saldo=fond.saldo)
@@ -100,6 +99,25 @@ def crear_ingreso(fondo_id):
         first_error_field = next(iter(form.errors))
         first_error_message = form.errors[first_error_field][0]
     return redirect(url_for("contable.mostrar_fondo",fondo_id=fondo_id))
+@bp.get("/ingreso/descargar/<int:id>")
+def descargar_ingreso(id):
+    ingreso = ingresoDB.conseguir_ingreso_de_id(id)
+    if not ingreso:
+        return redirect(url_for("contable.index"))
+    archivo = ingreso.archivo_id
+    if not archivo:
+        return redirect(url_for("contable.index"))
+    id_carpeta = archivos_adminDB.get_carpeta_by_nombre(ingreso.receptor.titulo).id
+
+    directorio = archivos_adminDB.conseguir_directorio(id_carpeta)
+    archivo = archivos_adminDB.conseguir_archivo_de_id(ingreso.archivo_id)
+    
+    filepath = os.path.join(directorio, archivo.nombre)
+    if not os.path.exists(filepath):
+        flash("Archivo no encontrado", "error")
+        return redirect(url_for('contable.mostrar_fondo',fondo_id=ingreso.receptor_id))
+
+    return send_from_directory(directorio, archivo.nombre, as_attachment=True)
 @bp.get("/legajos")
 def get_legajos():
     legajos = legajoDB.list_legajos_all()

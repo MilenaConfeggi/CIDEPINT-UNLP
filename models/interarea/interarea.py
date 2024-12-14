@@ -11,15 +11,15 @@ class Interarea(db.Model):
     nombre_solicitud_firmada = db.Column(db.String(255), nullable=True)
     nombre_solicitud_no_firmada = db.Column(db.String(255), nullable=True)
     investigacion = db.Column(db.Boolean, nullable=False)
-    nro_interarea = db.Column(db.Integer, nullable=False)
+    nro_interarea = db.Column(db.String(40), nullable=False)
     
     # Relaciones
-    legajo_id = db.Column(db.Integer, db.ForeignKey('legajo.id'), nullable=False)
+    legajo_id = db.Column(db.Integer, db.ForeignKey('legajo.id'), nullable=True)
     legajo = db.relationship('Legajo', backref=db.backref('interareas', lazy=True))
 
     area_id = db.Column(db.Integer, db.ForeignKey('area.id'), nullable=False)
     area = db.relationship('Area', backref=db.backref('interareas', lazy=True))
 
-    muestra_id = db.Column(db.Integer, db.ForeignKey('muestra.id'), nullable=False)
+    muestra_id = db.Column(db.Integer, db.ForeignKey('muestra.id'), nullable=True)
     muestra = db.relationship('Muestra', backref=db.backref('interareas', lazy=True))
     

@@ -14,6 +14,7 @@
     "@jaxtheprime/vue3-dropzone": "^3.3.0",
     "axios": "^1.7.7",
     "bootstrap": "^5.3.3",
+    "pdf-lib": "^1.17.1",
     "pdfjs-dist": "^4.9.155",
     "pdfvuer": "^2.0.1",
     "pinia": "^2.2.6",

@@ -8,7 +8,7 @@ class InterareaSchema(Schema):
     nombre_solicitud_firmada = fields.Str(required=True)
     nombre_solicitud_no_firmada = fields.Str(required=True)
     investigacion = fields.Boolean(required=True)
-    nro_interarea = fields.Int(required=True)
+    nro_interarea = fields.Str(required=True)
     legajo_id = fields.Int(dump_only=True)
     area_id = fields.Int(dump_only=True)
     muestra_id = fields.Int(dump_only=True)

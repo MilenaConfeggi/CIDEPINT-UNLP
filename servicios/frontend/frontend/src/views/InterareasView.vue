@@ -1,7 +1,7 @@
 <template>
   <div class="container mt-4">
     <h1 class="text-center mb-4">Interareas</h1>
-    <button class="btn btn-success mb-4" @click="mostrarFormularioInterarea = true">Nueva Interarea</button>
+    <button  class="btn btn-success mb-4" @click="mostrarFormularioInterarea = true">Nueva Interarea</button>
     <div v-if="mostrarFormularioInterarea" class="modal-overlay" @click="cerrarFormularioInterarea">
       <div @click.stop>
         <button class="btn-close" aria-label="Cerrar" @click="cerrarFormularioInterarea"></button>
@@ -13,13 +13,15 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import ListadoInterareas from '@/components/interareas/ListadoInterareas.vue';
 import NuevaInterarea from '@/components/interareas/NuevaInterarea.vue';
 
 const mostrarFormularioInterarea = ref(false);
 
 const interareas = ref([]);
+
+const permisos = JSON.parse(localStorage.getItem('permisos')) || [];
 
 const cerrarFormularioInterarea = () => {
   mostrarFormularioInterarea.value = false;
@@ -28,6 +30,11 @@ const cerrarFormularioInterarea = () => {
 const setInterareas = (data) => {
   interareas.value = data;
 };
+
+const tienePermisoCargarInterarea = computed(() => {
+  return permisos.includes('cargar_interarea');
+});
+
 </script>
 
 <style scoped>

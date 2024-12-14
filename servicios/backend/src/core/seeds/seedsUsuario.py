@@ -51,6 +51,8 @@ def seed_usuarios():
         "borrar_usuario",
         "listar_stans",
         "cargar_stan",
+        "listar_interareas",
+        "cargar_interarea",
     ]
     PERMISSIONS = { #Acá van los permisos que tiene cada rol
         "administrador": [ #Tienen que ser declarados previamente en todosLosPermisos

@@ -29,6 +29,10 @@
             No se ha encontrado la interárea.
         </div>
         <div class="text-center mt-4">
+            <button CargarResultado class="btn btn-primary">Cargar Resultado</button>
+            <button class="btn btn-secondary">Cargar solicitud firmada</button>
+            <button class="btn btn-secondary">Descargar solicitud</button>
+            <button class="btn btn-secondary">Ver resultados</button>
             <button @click="volverAlListado" class="btn btn-secondary">Volver al Listado</button>
         </div>
     </div>
@@ -57,12 +61,8 @@ const fetchInterarea = async (id) => {
 };
 
 onMounted(() => {
-    const id = route.params.id; // Obtener el ID desde los parámetros de la ruta
-    if (id) {
-        fetchInterarea(id);
-    } else {
-        console.error("No se proporcionó un ID para la interárea.");
-    }
+    const id = route.params.id;
+    fetchInterarea(id);
 });
 
 const volverAlListado = () => {

@@ -9,6 +9,10 @@ class Empleado(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     user = db.relationship('User', back_populates='empleado')
+
+    usuario_servicio_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=True)
+    usuario_servicio = db.relationship('Usuario', back_populates='empleado')
+
     email = db.Column(db.String(120), unique=True, nullable=False)
     area_id = db.Column(db.Integer, db.ForeignKey('area.id'), nullable=False)
     area = db.relationship('Area', backref=db.backref('empleados', lazy=True))
@@ -87,6 +91,7 @@ class Empleado(db.Model):
         self.habilitado = habilitado
         self.rol = rol
         self.primer_login = True
+        self.usuario_servicio = None
 
     def __repr__(self) -> str:
         return f"Empleado {self.nombre} {self.apellido}"

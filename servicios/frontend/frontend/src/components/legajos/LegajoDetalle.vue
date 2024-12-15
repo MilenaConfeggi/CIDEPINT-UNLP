@@ -52,19 +52,78 @@
                       Acciones
                     </button>
                     <ul class="dropdown-menu">
-                      <template v-if="existeDocumento(documento.nombre)">
-                        <li>
+                      <template v-if="documento.nombre === 'Informe'">
+                        <li v-if="hasPermission('cargar_documentacion')">
+                          <label :for="`upload-doc-${documento.id}`" class="dropdown-item">
+                            Subir Documentacion
+                            <input
+                              :id="`upload-doc-${documento.id}`"
+                              type="file"
+                              accept="application/pdf"
+                              @change="uploadDocumentacion($event, documento.id, legajo.id)"
+                              class="dropdown-item"
+                              hidden
+                            />
+                          </label>
+                        </li>
+                        <li v-if="hasPermission('ver documentacion')">
+                          <button
+                            type="button"
+                            class="dropdown-item"
+                            @click="verDocumentacion(legajo.id)"
+                          >
+                            Ver Documentacion
+                          </button>
+                        </li>
+                        <li v-if="hasPermission('cargar_informe')">
+                          <label :for="`upload-informe-${documento.id}`" class="dropdown-item">
+                            Subir Informe
+                            <input
+                              :id="`upload-informe-${documento.id}`"
+                              type="file"
+                              accept="application/pdf"
+                              @change="uploadInforme($event, documento.id, legajo.id)"
+                              class="dropdown-item"
+                              hidden
+                            />
+                          </label>
+                        </li>
+                        <li v-if="hasPermission('ver informe')">
+                          <button
+                            type="button"
+                            class="dropdown-item"
+                            @click="verInforme(legajo.id)"
+                          >
+                            Ver Informe
+                          </button>
+                        </li>
+                        <li v-if="hasPermission('cargar_informe_firmado')">
+                          <label :for="`upload-informe-firmado-${documento.id}`" class="dropdown-item">
+                            Subir Informe Firmado
+                            <input
+                              :id="`upload-informe-firmado-${documento.id}`"
+                              type="file"
+                              accept="application/pdf"
+                              @change="uploadInformeFirmado($event, documento.id, legajo.id)"
+                              class="dropdown-item"
+                              hidden
+                            />
+                          </label>
+                        </li>
+                      </template>
+                      <template v-else>
+                        <li v-if="existeDocumento(documento.nombre)">
                           <button
                             type="button"
                             class="dropdown-item"
                             data-bs-toggle="modal"
                             data-bs-target="#exampleModal"
-                            @click="viewFile(documento.id, documento.nombre)"
+                            @click="viewFile(documento.id, documento.nombre, legajo.id)"
                           >
                             Ver documento
                           </button>
                         </li>
-                        <li>
+                        <li v-if="existeDocumento(documento.nombre)">
                           <button
                             type="button"
                             class="dropdown-item"
@@ -73,7 +132,7 @@
                             Descargar
                           </button>
                         </li>
-                        <li>
+                        <li v-if="existeDocumento(documento.nombre)">
                           <label :for="`edit-pdf-${documento.id}`" class="dropdown-item">
                             Editar
                             <input
@@ -86,20 +145,20 @@
                             />
                           </label>
                         </li>
+                        <li v-else>
+                          <label :for="`upload-pdf-${documento.id}`" class="dropdown-item">
+                            Cargar
+                            <input
+                              :id="`upload-pdf-${documento.id}`"
+                              type="file"
+                              accept="application/pdf"
+                              @change="handleFileUpload($event, documento.id, legajo.id)"
+                              class="dropdown-item"
+                              hidden
+                            />
+                          </label>
+                        </li>
                       </template>
-                      <li v-else>
-                        <label :for="`upload-pdf-${documento.id}`" class="dropdown-item">
-                          Cargar
-                          <input
-                            :id="`upload-pdf-${documento.id}`"
-                            type="file"
-                            accept="application/pdf"
-                            @change="handleFileUpload($event, documento.id, legajo.id)"
-                            class="dropdown-item"
-                            hidden
-                          />
-                        </label>
-                      </li>
                     </ul>
                   </div>
                 </td>
@@ -163,7 +222,7 @@
     <div v-if="showToast" class="toast-container position-fixed bottom-0 end-0 p-3">
       <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="toast-header">
-          <strong class="me-auto">Error</strong>
+          <strong class="me-auto">{{ errorMessage ? 'Error' : 'Éxito' }}</strong>
           <button
             type="button"
             class="btn-close"
@@ -171,7 +230,7 @@
             aria-label="Close"
           ></button>
         </div>
-        <div class="toast-body">El archivo no se pudo cargar. {{ error }}</div>
+        <div class="toast-body">{{ errorMessage || successMessage }}</div>
       </div>
     </div>
   </main>
@@ -188,14 +247,14 @@ export default {
 </script>
 
 <script setup>
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useLegajosStore } from '../../stores/legajos'
 import { useDocumentosStore } from '../../stores/documentos'
 import { storeToRefs } from 'pinia'
-import { ref } from 'vue'
 import axios from 'axios'
 import StateBadge from '../StateBadge.vue'
+import { useAuthStore } from '../../stores/auth'
 
 const route = useRoute()
 const legajosStore = useLegajosStore()
@@ -204,28 +263,119 @@ const documentosStore = useDocumentosStore()
 const { legajo, loading, error } = storeToRefs(legajosStore)
 const { tipos_documentos } = storeToRefs(documentosStore)
 const showToast = ref(false)
-const fileName = ref(null)
-const fileUrl = ref(null)
-const actualFile = ref(null)
+const errorMessage = ref('')
+const successMessage = ref('')
+
+const authStore = useAuthStore();
+const permisos = JSON.parse(localStorage.getItem('permisos')) || [];
+
+const hasPermission = (permiso) => {
+  return permisos.includes(permiso);
+}
 
 const formatDate = (dateString) => {
   const options = { year: 'numeric', day: '2-digit', month: '2-digit' }
   return new Date(dateString).toLocaleDateString('es-ES', options)
 }
-const handleFileUpload = async (event, id, legajoId, editar = false) => {
+
+const uploadDocumentacion = async (event, id, legajoId) => {
   const file = event.target.files[0]
+  const token = authStore.getToken();
   if (file && file.type === 'application/pdf') {
     try {
-      fileName.value = file.name
-      const response = await documentosStore.subirArchivo(file, id, legajoId, editar)
+      const formData = new FormData()
+      formData.append('archivo', file)
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/informes/cargar_documentacion/${legajoId}`,
+        formData,
+        {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data',
+          },
+        },
+      )
       console.log(response)
       if (response.status === 200) {
-        window.location.reload()
+        successMessage.value = 'Documentación subida correctamente';
+        showToast.value = true;
+        setTimeout(() => window.location.reload(), 2000);
       } else {
-        throw new Error('No se pudo subir el archivo')
+        throw new Error(response.data.error || 'No se pudo subir el archivo')
       }
     } catch (error) {
       console.error('Error al subir el archivo:', error)
+      errorMessage.value = error.response?.data?.error || 'Error al subir el archivo'
+      showToast.value = true
+    }
+  } else {
+    alert('Por favor selecciona un archivo PDF.')
+  }
+}
+
+const uploadInforme = async (event, id, legajoId) => {
+  const file = event.target.files[0]
+  const token = authStore.getToken();
+  if (file && file.type === 'application/pdf') {
+    try {
+      const formData = new FormData()
+      formData.append('archivo', file)
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/informes/cargar_informe/${legajoId}`,
+        formData,
+        {
+          headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "multipart/form-data"
+              },
+        },
+      )
+      console.log(response)
+      if (response.status === 200) {
+        successMessage.value = 'Informe subido correctamente';
+        showToast.value = true;
+        setTimeout(() => window.location.reload(), 2000);
+      } else {
+        throw new Error(response.data.error || 'No se pudo subir el archivo')
+      }
+    } catch (error) {
+      console.error('Error al subir el archivo:', error)
+      errorMessage.value = error.response?.data?.error || 'Error al subir el archivo'
+      showToast.value = true
+    }
+  } else {
+    alert('Por favor selecciona un archivo PDF.')
+  }
+}
+
+const uploadInformeFirmado = async (event, id, legajoId) => {
+  const file = event.target.files[0]
+  const token = authStore.getToken();
+  if (file && file.type === 'application/pdf') {
+    try {
+      const formData = new FormData()
+      formData.append('archivo', file)
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/informes/cargar_informe_firmado/${legajoId}`,
+        formData,
+        {
+          headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "multipart/form-data"
+              },
+        },
+      )
+      console.log(response)
+      if (response.status === 200) {
+        successMessage.value = 'Informe firmado subido correctamente';
+        showToast.value = true;
+        setTimeout(() => window.location.reload(), 2000);
+      } else {
+        throw new Error(response.data.error || 'No se pudo subir el archivo')
+      }
+    } catch (error) {
+      console.error('Error al subir el archivo:', error)
+      errorMessage.value = error.response?.data?.error || 'Error al subir el archivo'
       showToast.value = true
     }
   } else {
@@ -247,26 +397,74 @@ const downloadDocumento = async (tipo, legajo_id) => {
   console.log(response)
 }
 
-const viewFile = async (id, tipo) => {
-  actualFile.value = legajo.value.documento.find((doc) => doc.tipo_documento_id === id)
+const viewFile = async (id, tipo, legajoId) => {
+  const token = authStore.getToken();
   try {
-    const response = await axios.get(
-      `http://127.0.0.1:5000/api/documentos/view/${actualFile.value.nombre_documento}`,
-      {
-        params: { tipo },
-        responseType: 'blob',
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/informes/ver_documento/${legajoId}`, {
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        'Content-Type': 'multipart/form-data',
       },
-    )
-
-    // Crear una URL para visualizar el archivo
-    const blob = new Blob([response.data], { type: response.headers['content-type'] })
-    console.log(response.data)
-    fileUrl.value = URL.createObjectURL(blob)
+    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Error al obtener el documento');
+    }
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank');
   } catch (error) {
-    console.error('Error al obtener el archivo:', error)
-    alert('No se pudo cargar el archivo.')
+    console.error('Error al obtener el documento:', error);
+    errorMessage.value = error.message || 'Error al obtener el documento';
+    showToast.value = true;
   }
 }
+
+const verDocumentacion = async (id) => {
+  const token = authStore.getToken();
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/informes/ver_documento/${id}`, {
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Error al obtener el documento');
+    }
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank');
+  } catch (error) {
+    console.error('Error al obtener el documento:', error);
+    errorMessage.value = error.message || 'Error al obtener el documento';
+    showToast.value = true;
+  }
+}
+
+const verInforme = async (id) => {
+  const token = authStore.getToken();
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/informes/ver_informe/${id}`, {
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Error al obtener el informe');
+    }
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank');
+  } catch (error) {
+    console.error('Error al obtener el informe:', error);
+    errorMessage.value = error.message || 'Error al obtener el informe';
+    showToast.value = true;
+  }
+};
 
 onMounted(async () => {
   try {
@@ -274,6 +472,8 @@ onMounted(async () => {
     await documentosStore.getTiposDocumentos()
   } catch (err) {
     console.error('Error al cargar el legajo:', err)
+    errorMessage.value = err.message || 'Error al cargar el legajo'
+    showToast.value = true
   }
 })
 </script>

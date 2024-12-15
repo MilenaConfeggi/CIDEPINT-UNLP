@@ -2,12 +2,14 @@ from servicios.backend.src.core.services import servicioPresupuesto
 from flask import Blueprint, jsonify, abort, request, send_file, send_from_directory
 from servicios.backend.src.web.schemas.stan import stansSchema, stanSchema, ensayoSchema, EnsayosSchema
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from web.helpers.auth import is_authenticated, check_permission
 bp = Blueprint('stans', __name__, url_prefix='/stans')
 
 @bp.route("/", methods=["GET"])
 @jwt_required()
 def listar_stans():
-
+    if not check_permission("listar_stans"):
+        return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
     stans = servicioPresupuesto.listar_stans()  
     data = stansSchema.dump(stans)  
     return jsonify(data), 200

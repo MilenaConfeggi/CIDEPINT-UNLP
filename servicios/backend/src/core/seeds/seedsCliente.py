@@ -5,7 +5,7 @@ from models.base import db
 def seeds_clientes():
     clientes_data = [
         {
-            'email': 'cliente1@mail.com',
+            'email': 'milenaconfeggi@gmail.com',
             'cuit': '123456789',
             'telefono': '123456789',
             'celular': '123456789',

@@ -1,12 +1,19 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { useAuthStore } from '@/stores/auth';
 import ListadoMuestras from '../components/muestras/ListadoMuestras.vue';
 import IdentificarMuestras from '../components/muestras/IdentificarMuestras.vue';
 
 const route = useRoute();
 const router = useRouter();
 const legajoId = Number(route.params.legajoId);
+
+const permisos = JSON.parse(localStorage.getItem('permisos')) || [];
+
+const tienePermisoCargar = computed(() => {
+  return permisos.includes('cargar_muestra');
+});
 
 // Propiedad reactiva para controlar la visibilidad de la ventana modal
 const mostrarIdentificarMuestras = ref(false);
@@ -32,7 +39,7 @@ const cambiarVistaCarpetas = () => {
     <!-- Botón para cambiar la vista a MuestrasCarpetasView -->
     <button class="carpetas-button" @click="cambiarVistaCarpetas">Ver Carpetas</button>
     <!-- Botón para mostrar la ventana modal -->
-    <button class="upload-button" @click="mostrarFormularioIdentificar">Identificar muestra</button>
+    <button v-if="tienePermisoCargar" class="upload-button" @click="mostrarFormularioIdentificar">Identificar muestra</button>
 
 
     <!-- ListadoMuestras siempre visible -->

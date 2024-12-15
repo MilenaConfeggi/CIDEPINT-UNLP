@@ -1,9 +1,12 @@
 <template>
   <div class="container mt-4">
     <h1 class="text-center mb-4">Fotos para la fecha {{ formatFecha(fechaSeleccionada) }}</h1>
-    <div class="d-flex justify-content-end mb-3" v-if="seleccionadas.length > 0">
-      <button class="btn btn-primary" @click="descargarSeleccionadas">
+    <div class="d-flex justify-content-end mb-3">
+      <button v-if="tienePermisoDescargar" class="btn btn-primary" @click="descargarSeleccionadas">
         <i class="fas fa-download"></i> Descargar
+      </button>
+      <button v-if="tienePermisoEnviarMail" class="btn btn-secondary ml-2" @click="enviarMail">
+        <i class="fas fa-envelope"></i> Enviar Correo
       </button>
     </div>
     <div v-if="error" class="alert alert-danger" role="alert">{{ error }}</div>
@@ -44,8 +47,19 @@
 </template>
 
 <script>
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, computed } from 'vue';
 import axios from 'axios';
+import { useAuthStore } from '@/stores/auth'
+
+const permisos = JSON.parse(localStorage.getItem('permisos')) || [];
+
+const tienePermisoDescargar = computed(() => {
+  return permisos.includes('descargar_fotos');
+});
+
+const tienePermisoEnviarMail = computed(() => {
+  return permisos.includes('enviar_fotos');
+});
 
 export default {
   props: {
@@ -66,8 +80,15 @@ export default {
     const seleccionadas = ref([]);
 
     const fetchFotos = async () => {
+      const authStore = useAuthStore();
+      const token = authStore.getToken();
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/muestras/fotos_por_fecha/${props.legajoId}/${props.fechaSeleccionada}`);
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/muestras/fotos_por_fecha/${props.legajoId}/${props.fechaSeleccionada}`, {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "multipart/form-data"
+          }
+        });
         fotos.value = response.data;
       } catch (err) {
         error.value = 'Error al cargar las fotos';
@@ -104,9 +125,16 @@ export default {
     };
 
     const descargarSeleccionadas = async () => {
+      const authStore = useAuthStore();
+      const token = authStore.getToken();
       for (const id of seleccionadas.value) {
         try {
-          const response = await fetch(`/muestras/descargar_fotos/${id}`);
+          const response = await fetch(`/muestras/descargar_fotos/${id}`, {
+            headers: {
+              "Authorization": `Bearer ${token}`,
+              "Content-Type": "multipart/form-data"
+            }
+          });
           const blob = await response.blob();
           const url = window.URL.createObjectURL(blob);
           const a = document.createElement('a');
@@ -122,13 +150,31 @@ export default {
       }
     };
 
+    const enviarMail = async () => {
+      const authStore = useAuthStore();
+      const token = authStore.getToken();
+      try {
+        const response = await axios.post(`${import.meta.env.VITE_API_URL}/muestras/enviar_mail/${props.legajoId}/${props.fechaSeleccionada}`, {}, {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
+          }
+        });
+        console.log(response.data);
+        alert('Correo enviado correctamente');
+      } catch (error) {
+        console.error('Error al enviar el correo:', error);
+        alert('Error al enviar el correo');
+      }
+    };
+
     onMounted(() => {
       fetchFotos();
     });
 
     watch(() => props.fechaSeleccionada, fetchFotos);
 
-    return { fotos, error, getImageUrl, mostrarVerFoto, cerrarVerFoto, mostrarVerFotoModal, fotoSeleccionada, formatFecha, seleccionadas, toggleSeleccionar, descargarSeleccionadas };
+    return { fotos, error, getImageUrl, mostrarVerFoto, cerrarVerFoto, mostrarVerFotoModal, fotoSeleccionada, formatFecha, seleccionadas, toggleSeleccionar, descargarSeleccionadas, enviarMail, tienePermisoDescargar, tienePermisoEnviarMail };
   }
 };
 </script>
@@ -215,5 +261,18 @@ export default {
 
 .btn-primary i {
   margin-right: 5px;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  border-color: #6c757d;
+}
+
+.btn-secondary i {
+  margin-right: 5px;
+}
+
+.ml-2 {
+  margin-left: 0.5rem;
 }
 </style>

@@ -11,8 +11,12 @@ class Usuario(db.Model):
     fecha_creacion = db.Column(db.DateTime, default=datetime.now, nullable=False)
     fecha_modificacion = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
 
+    cambiar_contra = db.Column(db.Boolean, default=True, nullable=False)
+
     rol_id = db.Column(db.Integer, db.ForeignKey("rol.id"), nullable=False)
     rol = db.relationship("Rol", back_populates="usuario")
+
+    empleado = db.relationship("Empleado", back_populates="usuario_servicio")
     
     def __repr__(self):
         return f"<Usuario {self.mail}, {self.contra}>"

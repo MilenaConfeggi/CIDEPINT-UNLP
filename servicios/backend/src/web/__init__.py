@@ -5,7 +5,6 @@ from servicios.backend.src.core.seeds import seedsMails
 from servicios.backend.src.core.seeds import seedsCliente
 from servicios.backend.src.core.seeds import seedsLegajo
 from servicios.backend.src.core.seeds import seedsEstados
-from servicios.backend.src.core.seeds import seedsInforme
 from servicios.backend.src.core.seeds import seedsDocumento
 from servicios.backend.src.core.seeds import seedsArea
 from servicios.backend.src.core.seeds import seedsUsuario
@@ -89,8 +88,8 @@ def create_app(env="development", static_folder=""):
         print("Usuarios creados!")
         seedsInterarea.seeds_interarea()
         print("Interareas creadas!")
-        #seedsDocumento.seeds_documentos()
-        #print("Documentos creados!")
+        seedsDocumento.seeds_documentos()
+        print("Documentos creados!")
 
     return app
     

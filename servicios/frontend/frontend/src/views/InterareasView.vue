@@ -1,7 +1,7 @@
 <template>
   <div class="container mt-4">
     <h1 class="text-center mb-4">Interareas</h1>
-    <button  class="btn btn-success mb-4" @click="mostrarFormularioInterarea = true">Nueva Interarea</button>
+    <button v-if="tienePermisoCargarInterarea" class="btn btn-success mb-4" @click="mostrarFormularioInterarea = true">Nueva Interarea</button>
     <div v-if="mostrarFormularioInterarea" class="modal-overlay" @click="cerrarFormularioInterarea">
       <div @click.stop>
         <button class="btn-close" aria-label="Cerrar" @click="cerrarFormularioInterarea"></button>
@@ -13,9 +13,15 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, onMounted, computed } from 'vue';
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/stores/auth';
+
 import ListadoInterareas from '@/components/interareas/ListadoInterareas.vue';
 import NuevaInterarea from '@/components/interareas/NuevaInterarea.vue';
+
+const authStore = useAuthStore();
+const router = useRouter();
 
 const mostrarFormularioInterarea = ref(false);
 
@@ -33,6 +39,12 @@ const setInterareas = (data) => {
 
 const tienePermisoCargarInterarea = computed(() => {
   return permisos.includes('cargar_interarea');
+});
+
+onMounted(() => {
+  if (!authStore.getToken()) {
+    router.push({ name: 'logIn' });
+  }
 });
 
 </script>

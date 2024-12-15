@@ -38,7 +38,6 @@ def generar_pdf(data):
         # Crear el nombre del archivo de salida
         tipo = data.get("tipo")
         identificacion = generarNroInterarea()
-        fecha = datetime.now().strftime("%Y/%m/%d")
         output_file_name = f"{tipo}_{identificacion}.pdf"
         output_file_path = os.path.join("documentos/interareas/solicitudes", output_file_name)
 

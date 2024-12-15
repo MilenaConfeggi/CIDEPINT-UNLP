@@ -147,7 +147,6 @@ export default {
         tipo: this.form.tipo,
         identificacion: this.form.identificacion,
         cantidad: this.form.cantidad,
-        fecha: new Date().toLocaleDateString('es-ES'),
         solicitante: this.form.solicitante // aca deberia sacar el area de la sesion
       };
 

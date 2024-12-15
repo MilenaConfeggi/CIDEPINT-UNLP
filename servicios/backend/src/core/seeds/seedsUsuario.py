@@ -59,11 +59,16 @@ def seed_usuarios():
             "listar_usuarios",
             "borrar_usuario",
             "listar_stans",
-            "cargar_stan"
+            "cargar_stan",
+            "listar_interareas"
         ],
         "jefe_de_area": [
+            "cargar_interarea",
+            "listar_interareas"
         ],
         "trabajador": [
+            "cargar_interarea",
+            "listar_interareas"
         ],
     }
 

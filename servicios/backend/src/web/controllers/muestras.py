@@ -159,8 +159,11 @@ def descargar_foto(id_muestra, filename):
 @bp.get("/")
 def listar_muestras():
     muestras = servicioMuestras.listar_todas()
-    data = muestrasSchema.dump(muestras)
-    return jsonify(data), 200
+    if muestras:
+        data = muestrasSchema.dump(muestras)
+        return jsonify(data), 200
+    else:
+        return jsonify({"message": "No se encontraron muestras"}), 404
 
 @bp.post("/enviar_mail/<int:id_legajo>/<fecha>")
 @jwt_required()

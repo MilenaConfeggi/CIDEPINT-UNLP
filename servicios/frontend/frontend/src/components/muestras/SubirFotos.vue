@@ -106,7 +106,11 @@ export default {
           this.error = response.data.message || 'Error al obtener las muestras';
         }
       } catch (error) {
-        this.error = error.message || 'Error al obtener las muestras';
+        if (error.response && error.response.status === 404) {
+          this.error = 'No se encontraron muestras';
+        } else {
+          this.error = error.response?.data?.message || error.message || 'Error al obtener las muestras';
+        }
       }
     },
     handleFileUpload(event, index) {

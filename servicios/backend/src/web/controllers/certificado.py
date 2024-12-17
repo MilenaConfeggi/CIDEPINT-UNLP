@@ -7,3 +7,8 @@ bp = Blueprint("certificado", __name__, url_prefix="/certificado")
 def crear_certificado(id_legajo):
     servicioCertificado.generar_certificado(id_legajo)
     return jsonify({"message": "Certificado generado"})
+
+@bp.get("/obtener_empleados/<int:id_legajo>")
+def obtener_empleados(id_legajo):
+    empleados = servicioCertificado.obtener_empleados(id_legajo)
+    return jsonify(empleados)

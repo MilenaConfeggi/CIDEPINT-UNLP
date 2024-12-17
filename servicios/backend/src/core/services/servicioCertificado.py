@@ -1,6 +1,7 @@
 from models.base import db
 from models.documentos.documento import Documento
 from models.legajos.legajo import Legajo
+from models.distribucion import Distribucion
 from models.distribucion import get_distribucion
 from datetime import datetime
 from PyPDF2 import PdfFileWriter, PdfFileReader, PdfWriter
@@ -114,3 +115,12 @@ def generar_certificado(id_legajo):
     doc.build(content)
 
     print(f"PDF generado: {output_filename}")
+
+
+def obtener_empleados(id_legajo):
+    distribucion = Distribucion.query.filter_by(legajo_id=id_legajo).first()
+    empleados = distribucion.empleados_asociados
+    nombres = []
+    for empleado in empleados:
+        nombres.append(f"{empleado.empleado.nombre} {empleado.empleado.apellido}")
+    return nombres

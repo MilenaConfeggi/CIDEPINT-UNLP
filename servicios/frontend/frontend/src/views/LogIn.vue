@@ -13,6 +13,11 @@
         </div>
         <button type="submit">Ingresar</button>
       </form>
+        <button 
+        class="recover-password-button" 
+        @click="redirectToRecoverPassword">
+        ¿Olvidaste tu contraseña?
+      </button>
       <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
     </div>
   </div>
@@ -51,6 +56,14 @@ export default {
         }
       } catch (error) {
         this.errorMessage = error.response?.data?.Error || 'Error al iniciar sesión';
+      }
+    },
+    redirectToRecoverPassword() {
+      try {
+        this.$router.push({ name: 'recuperar_contra' }).then(() => {
+          });
+      } catch (error) {
+       console.error("Error al redirigir a la página de recuperación:", error);
       }
     }
   }
@@ -156,4 +169,20 @@ button:hover {
   color: #ff4d4f;
   font-size: 0.9rem;
 }
+
+.recover-password-button {
+  margin-top: 10px;
+  width: 100%;
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.recover-password-button:hover {
+  background-color: #0056b3;
+}
+
 </style>

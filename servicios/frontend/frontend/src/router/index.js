@@ -89,6 +89,11 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
+    path: "/nueva-interarea",
+    name: "NuevaInterarea",
+    component: () => import("../components/interareas/NuevaInterarea.vue"),
+  },
+  {
     path: "/log-in",
     name: "logIn",
     component: () => import("../views/LogIn.vue"),
@@ -128,6 +133,12 @@ const routes = [
       component: () => import("../components/usuarios/VerPerfil.vue"),
       props: true,
       meta: { requiresAuth: true }
+    },
+    {
+      path: "/recuperar_contra",
+      name: "recuperar_contra",
+      component: () => import("../components/usuarios/RecuperarContra.vue"),
+      props: true,
     },
 ];
 

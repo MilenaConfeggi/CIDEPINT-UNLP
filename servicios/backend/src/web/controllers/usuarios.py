@@ -43,9 +43,6 @@ def crear_usuario():
 
         if data['mail'] == []:
             return jsonify({"message": "No se ha cargado mail"}), 400
-        
-        if data['contra'] == []:
-            return jsonify({"message": "No se ha seleccionado contraseña"}), 400
 
         if data['rol'] == []:
             return jsonify({"message": "No se ha seleccionado rol"}), 400
@@ -73,5 +70,18 @@ def borrar_usuario():
     except ValueError as e:
         return jsonify({"message": str(e)}), 406
 
+@bp.post("/recuperar_contra")
+def recuperar_contra():
+    try:
+        data = request.get_json()
+
+        if data['mail'] == []:
+            return jsonify({"message": "No se ha cargado mail"}), 400
+
+        servicioUsuario.recuperar_contra(data)
+        
+        return jsonify({"message": "Se envió un mail con una contraseña provisional a la dirección de correo del usuario"}), 200
+    except ValueError as e:
+        return jsonify({"message": str(e)}), 400
 
 

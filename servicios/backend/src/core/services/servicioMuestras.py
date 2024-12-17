@@ -1,6 +1,10 @@
+from flask_jwt_extended import get_jwt_identity, jwt_required
 from models import db
 from models.muestras.muestra import Muestra
 from models.muestras.foto import Foto
+from models.usuarios.usuario import Usuario
+from models.legajos.legajo import Legajo
+from models.personal.empleado import Empleado
 from datetime import datetime
 
 NRO_MUESTRA_INICIAL = 5
@@ -97,3 +101,12 @@ def listar_fotos_por_fecha(legajo_id, fecha):
 
 def listar_todas():
     return Muestra.query.all()
+
+
+def tiene_permiso(id_legajo, mail):
+    legajo = Legajo.query.filter_by(id=id_legajo).first()
+    usuario = Usuario.query.filter_by(mail=mail).first()
+    for empleado in usuario.empleado:
+        if empleado.area == legajo.area:
+            return True
+    return False

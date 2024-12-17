@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import HomeView from '../views/HomeView.vue';
+import axios from 'axios';
 
 const routes = [
   {
@@ -13,20 +14,21 @@ const routes = [
     name: "mails",
     component: () => import("../views/MailsView.vue"),
     props: true,
+    meta: { requiresAuth: true, checkLegajoPermission: true}
   },
   {
     path: "/muestras/:legajoId",
     name: "muestras",
     component: () => import("../views/MuestrasIdentificadasView.vue"),
     props: true,
-    meta: { requiresAuth: true} 
+    meta: { requiresAuth: true, checkLegajoPermission: true} 
   },
   {
     path: "/muestras/:legajoId/carpetas",
     name: "muestrasCarpetas",
     component: () => import("../views/MuestrasCarpetasView.vue"),
     props: true,
-    meta: { requiresAuth: true } 
+    meta: { requiresAuth: true, checkLegajoPermission: true } 
   },
   {
     path: "/informes/:legajoId",
@@ -135,27 +137,45 @@ const router = createRouter({
 });
 
 // Guardias de navegación global
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
   const isAuthenticated = !!authStore.getToken(); // Verificar si el usuario está autenticado
-  const userPermissions = JSON.parse(localStorage.getItem('permisos')) || []; // Obtener permisos del usuario
 
   if (to.matched.some(record => record.meta.requiresAuth) && !isAuthenticated) {
-    // Si la ruta requiere autenticación y el usuario no está autenticado, redirigir a la página de inicio de sesión
-    next({ name: 'logIn' });
-  } else if (to.matched.some(record => record.meta.requiredPermission)) {
-    const requiredPermission = to.meta.requiredPermission;
-    if (!userPermissions.includes(requiredPermission)) {
-      // Si el usuario no tiene el permiso requerido, redirigir a una página de acceso denegado o a la página de inicio
-      next({ name: 'home' });
-    } else {
-      // Si el usuario tiene el permiso requerido, permitir el acceso a la ruta
-      next();
-    }
-  } else {
-    // De lo contrario, permitir el acceso a la ruta
-    next();
+    // Si la ruta requiere autenticación y el usuario no está autenticado
+    return next({ name: 'logIn' });
   }
+
+  // Verificar permiso para rutas que tienen checkLegajoPermission
+  if (to.matched.some(record => record.meta.checkLegajoPermission)) {
+    const legajoId = to.params.legajoId;
+
+    if (!legajoId) {
+      console.error("Falta legajoId para verificar permisos");
+      return next({ name: 'home' });
+    }
+
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/muestras/permiso/${legajoId}`, {
+        headers: { Authorization: `Bearer ${authStore.getToken()}` },
+      });
+
+      if (response.status === 200) {
+        // Permiso concedido
+        return next();
+      }
+    } catch (error) {
+      // Redirigir en caso de error (403 o cualquier otro error)
+      if (error.response?.status === 403) {
+        console.warn('No tiene permiso para acceder a esta muestra');
+        return next({ name: 'home' });
+      }
+    }
+  }
+
+  // Continuar navegación si no hay restricciones
+  next();
 });
+
 
 export default router;

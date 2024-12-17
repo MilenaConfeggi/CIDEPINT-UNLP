@@ -89,6 +89,11 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
+    path: "/nueva-interarea",
+    name: "NuevaInterarea",
+    component: () => import("../components/interareas/NuevaInterarea.vue"),
+  },
+  {
     path: "/log-in",
     name: "logIn",
     component: () => import("../views/LogIn.vue"),

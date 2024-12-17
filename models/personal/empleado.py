@@ -64,7 +64,7 @@ class Empleado(db.Model):
             raise ValueError(f"Subdivisión de cargo '{value}' no es válida para el cargo '{self.cargo}'.")
         return value
 
-    def __init__(self, user, email, area, dni, nombre, apellido, dependencia=None, cargo=None, subdivision_cargo=None, telefono=None, domicilio=None, fecha_nacimiento=None, observaciones=None):
+    def __init__(self, user, email, area, dni, nombre, apellido, dependencia=None, cargo=None, subdivision_cargo=None, telefono=None, domicilio=None, fecha_nacimiento=None, observaciones=None, habilitado=True, rol='Personal'):
         self.user = user
         self.email = email
         self.area = area

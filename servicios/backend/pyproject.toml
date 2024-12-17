@@ -23,6 +23,8 @@ bcrypt = "^4.2.1"
 jsonify = "^0.5"
 flask-jwt-extended = "^4.7.1"
 flask-login = "^0.6.3"
+pypdf2 = "^3.0.1"
+reportlab = "^4.2.5"
 
 
 [tool.poetry.group.dev.dependencies]

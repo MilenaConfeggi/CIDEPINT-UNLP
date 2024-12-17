@@ -21,6 +21,7 @@ from servicios.backend.src.web.api.legajosAPI import bp as legajos_api_bp
 from servicios.backend.src.web.api.documentoAPI import bp as documentos_api_bp
 from servicios.backend.src.web.controllers.interarea import bp as interarea_bp
 from servicios.backend.src.web.api.areaAPI import bp as area_bp
+from servicios.backend.src.web.controllers.certificado import bp as certificado_bp
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
@@ -51,6 +52,7 @@ def create_app(env="development", static_folder=""):
     app.register_blueprint(auth_bp)
     app.register_blueprint(stans_bp)
     app.register_blueprint(interarea_bp)
+    app.register_blueprint(certificado_bp)
 
     @app.cli.command(name="reset-db")
     def reset_db():

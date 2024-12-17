@@ -231,6 +231,8 @@ def seed_usuarios():
         "cargar_informe",
         "cargar_informe_firmado",
         "ver informe",
+        "listar_interareas",
+        "cargar_interarea"
     ]
     PERMISSIONS = { #Acá van los permisos que tiene cada rol
         "Director": [ #Tienen que ser declarados previamente en todosLosPermisos
@@ -274,6 +276,8 @@ def seed_usuarios():
             "ver documentacion",
             "cargar_informe_firmado",
             "ver informe",
+            "listar_interareas",
+            "cargar_interarea",
         ],
         "Trabajador": [
             "listar_muestras_identificadas",

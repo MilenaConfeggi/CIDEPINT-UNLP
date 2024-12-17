@@ -6,14 +6,17 @@ class Interarea(db.Model):
     
     # Atributos
     fecha_creacion = db.Column(db.Date, nullable=False)
-    fecha_solicitud_no_firmada = db.Column(db.Date, nullable=True)
     fecha_solicitud_firmada = db.Column(db.Date, nullable=True)
-    nombre_solicitud_firmada = db.Column(db.String(255), nullable=True)
-    nombre_solicitud_no_firmada = db.Column(db.String(255), nullable=True)
+    nombre_archivo = db.Column(db.String(255), nullable=True)
     investigacion = db.Column(db.Boolean, nullable=False)
+    nro_investigacion = db.Column(db.String(40), nullable=True)
     nro_interarea = db.Column(db.String(40), nullable=False)
-    
+    resultados = db.Column(db.String(255), nullable=True)
+
     # Relaciones
+    estadoInterarea_id = db.Column(db.Integer, db.ForeignKey('estadoInterarea.id'), nullable=True)
+    estadoInterarea = db.relationship('EstadoInterarea', backref=db.backref('interareas', lazy=True))
+
     legajo_id = db.Column(db.Integer, db.ForeignKey('legajo.id'), nullable=True)
     legajo = db.relationship('Legajo', backref=db.backref('interareas', lazy=True))
 

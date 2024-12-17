@@ -147,7 +147,10 @@ def cambiar_contra(password):
 
 
 def es_jefe_de_area(usuario):
-    return usuario.rol.nombre == "jefe_de_area"
+    return usuario.rol.nombre == "Jefe de area"
 
-def es_director(usuario):
-    return usuario.rol.nombre == "director"
+def es_director(usuario):  
+    return usuario.rol.nombre == "Director"
+
+def es_secretaria(usuario):
+    return usuario.rol.nombre == "Secretaria"

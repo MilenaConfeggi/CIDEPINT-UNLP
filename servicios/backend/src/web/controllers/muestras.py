@@ -2,7 +2,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email import encoders
-from servicios.backend.src.core.services import servicioMuestras, servicioMail
+from servicios.backend.src.core.services import servicioMuestras, servicioUsuario
 from flask import Blueprint, jsonify, abort, request, send_file, send_from_directory
 from servicios.backend.src.web.schemas.muestras import muestrasSchema, muestraSchema, fotosSchema, fotoSchema
 import os
@@ -208,3 +208,14 @@ def enviar_mail(id_legajo, fecha):
     except Exception as e:
         print(e)
         return jsonify({"error": "No se pudo enviar el correo"}), 500
+
+@bp.get("/permiso/<int:id_legajo>")
+@jwt_required()  
+def permiso(id_legajo):
+    usuario = servicioUsuario.obtener_usuario_por_mail(get_jwt_identity())
+    if servicioUsuario.es_director(usuario) or servicioUsuario.es_secretaria(usuario):
+        return jsonify(""), 200
+    if not servicioMuestras.tiene_permiso(id_legajo, usuario.mail):
+        return jsonify({"message": "No tiene permiso para acceder a esta muestra"}), 403
+    return jsonify(""), 200
+    

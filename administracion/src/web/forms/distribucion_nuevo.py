@@ -67,4 +67,7 @@ class FormularioNuevaDistribucion(FlaskForm):
         # Poblamos las opciones de los SelectField con datos simulados (esto debería conectarse a la base de datos)
         self.ganancias_de_id.choices = [(area.id, f"{area.nombre}") for area in areaDB.list_areas()]
         self.costos_de_id.choices = [(area.id, f"{area.nombre}") for area in areaDB.list_areas()]
-        self.empleados_seleccionados.choices = [(empleado.id, f"{empleado.nombre} {empleado.apellido}") for empleado in empleadoDB.list_empleados()]
+        self.empleados_seleccionados.choices = sorted(
+            [(empleado.id, f"{empleado.nombre} {empleado.apellido} ({empleado.dni})") for empleado in empleadoDB.list_empleados() if empleado.user.habilitado],
+            key=lambda x: x[1]
+        )

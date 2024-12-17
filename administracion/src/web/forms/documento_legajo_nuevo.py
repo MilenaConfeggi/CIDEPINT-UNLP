@@ -18,3 +18,7 @@ class UploadDocumentoForm(FlaskForm):
 class DownloadForm(FlaskForm):
     documento_id = HiddenField("ID del documento")
     submit = SubmitField("Descargar")
+
+class DeleteForm(FlaskForm):
+    documento_id = HiddenField("ID del documento")
+    submit = SubmitField("Eliminar")

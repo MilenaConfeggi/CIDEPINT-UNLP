@@ -26,7 +26,26 @@ def seeds_documentos():
             'estado_id': 3,
             'tipo_documento_id': 3,
             'legajo_id': 33
-        },   
+        },
+        {
+            'nombre_documento': 'Documento 4',
+            'fecha_creacion': datetime(2024, 1, 1),
+            'estado_id': 4,
+            'tipo_documento_id': 4,
+            'legajo_id': 33
+        },
+        {    'nombre_documento': 'orden_compra',
+            'fecha_creacion': datetime(2024, 1, 1),
+            'estado_id': 1,
+            'tipo_documento_id': 5,
+            'legajo_id': 33
+        },
+        {    'nombre_documento': 'Factura',
+            'fecha_creacion': datetime(2024, 1, 1),
+            'estado_id': 1,
+            'tipo_documento_id': 6,
+            'legajo_id': 33
+        }
     ]
     for data in documentos_data:
         db.session.add(Documento(**data))
@@ -54,6 +73,9 @@ def seeds_tipos_documento():
         },
         {
             'nombre': 'orden_facturacion',
+        },
+        {
+            'nombre': 'adicional',
         },
     ]
     for data in tipos_documento_data:

@@ -7,3 +7,6 @@ class Ingreso(db.Model):
     fecha = db.Column(db.DateTime, default=datetime.now())
     receptor = db.relationship("Fondo")
     receptor_id = db.Column(db.String(100), db.ForeignKey("fondo.titulo"))
+
+    archivo = db.relationship("Archivo")
+    archivo_id = db.Column(db.Integer, db.ForeignKey("archivos.id"), nullable=True)

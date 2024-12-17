@@ -8,10 +8,40 @@ from datetime import datetime
 from web import bcrypt
 from flask import request
 from flask_jwt_extended import get_jwt_identity, jwt_required
+import secrets
+import string
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email import encoders
+from servicios.backend.src.core.config import config
+
+def generar_contrasena_aleatoria(longitud=14):
+    caracteres = string.ascii_letters + string.digits
+    contrasena = ''.join(secrets.choice(caracteres) for _ in range(longitud))
+    return contrasena
+
+def enviar_contrasena_por_mail(mail, contrasena):
+    servidor = smtplib.SMTP('smtp.gmail.com', 587)
+    servidor.starttls()
+    servidor.login(config["development"].MAIL_USER, config["development"].MAIL_PASSWORD)
+
+    msg = MIMEMultipart()
+    msg["From"] = config["development"].MAIL_USER
+    correo = mail
+    msg["To"] = correo
+    msg["Subject"] = "Contraseña usuario CIDEPINT (Area de Servicios)"
+
+    body = "Esta es su contraseña provisional para iniciar sesión en el sistema de CIDEPINT, luego deberá cambiarla: "
+    body = body + contrasena
+    msg.attach(MIMEText(body, 'plain'))
+
+    servidor.sendmail(config["development"].MAIL_USER, correo, msg.as_string())
+    servidor.quit()
 
 def crear_usuario(data):
     empleado = Empleado.query.filter_by(email=data.get('mail')).first()
-    print(empleado)
     if empleado is None:
         raise ValueError("No existe un empleado con ese mail, por favor primero agregue un empleado con el mismo mail")
 
@@ -34,21 +64,50 @@ def crear_usuario(data):
         usuario.cambiar_contra=True
         db.session.commit()
         return usuario
+    
 
     cambiar = True
     if data.get('cambiar_contra') is not None:
         cambiar = data.get('cambiar_contra')
 
-    nuevo_usuario = Usuario(
-        mail=data.get('mail'),
-        contra=bcrypt.generate_password_hash(data.get('contra').encode("utf-8")),
-        rol=data.get('rol'),
-        cambiar_contra=cambiar,
-    )
-    db.session.add(nuevo_usuario)
-    empleado.usuario_servicio = nuevo_usuario
+    if data.get('contra')is not None:
+        nuevo_usuario = Usuario(
+            mail=data.get('mail'),
+            contra=bcrypt.generate_password_hash(data.get('contra').encode("utf-8")),
+            rol=data.get('rol'),
+            cambiar_contra=cambiar,
+        )
+        db.session.add(nuevo_usuario)
+        empleado.usuario_servicio = nuevo_usuario
+        db.session.commit()
+        return nuevo_usuario
+    else:
+        contrasena = generar_contrasena_aleatoria()
+        nuevo_usuario = Usuario(
+            mail=data.get('mail'),
+            contra=bcrypt.generate_password_hash(contrasena.encode("utf-8")),
+            rol=data.get('rol'),
+            cambiar_contra=cambiar,
+        )
+        db.session.add(nuevo_usuario)
+        empleado.usuario_servicio = nuevo_usuario
+        enviar_contrasena_por_mail(data.get('mail'), contrasena)
+        db.session.commit()
+        return nuevo_usuario
+
+def recuperar_contra(data):
+    mail = data.get('mail')
+    usuario = obtener_usuario_por_mail(mail)
+
+    contrasena = generar_contrasena_aleatoria()
+
+    usuario.contra = bcrypt.generate_password_hash(contrasena.encode("utf-8"))
+    usuario.cambiar_contra = True
+
+    enviar_contrasena_por_mail(mail, contrasena)
+
     db.session.commit()
-    return nuevo_usuario
+    return usuario
 
 def crear_rol(data):
     nuevo_rol = Rol(
@@ -154,3 +213,4 @@ def es_director(usuario):
 
 def es_secretaria(usuario):
     return usuario.rol.nombre == "Secretaria"
+

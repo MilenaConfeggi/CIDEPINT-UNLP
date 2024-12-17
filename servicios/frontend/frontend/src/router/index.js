@@ -129,6 +129,12 @@ const routes = [
       props: true,
       meta: { requiresAuth: true }
     },
+    {
+      path: "/recuperar_contra",
+      name: "recuperar_contra",
+      component: () => import("../components/usuarios/RecuperarContra.vue"),
+      props: true,
+    },
 ];
 
 const router = createRouter({

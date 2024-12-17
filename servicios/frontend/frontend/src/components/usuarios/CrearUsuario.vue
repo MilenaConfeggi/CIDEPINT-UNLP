@@ -12,10 +12,6 @@
           <input type="email" id="mail" v-model="usuario.mail" class="form-control" required>
         </div>
         <div class="mb-4">
-          <label for="contra" class="form-label">Contraseña:</label>
-          <input type="password" id="contra" v-model="usuario.contra" class="form-control" required>
-        </div>
-        <div class="mb-4">
           <label for="rol" class="form-label">Rol:</label>
           <select id="rol" v-model="usuario.rol" class="form-control" required>
             <option v-for="rol in rolesExistentes" :key="rol.id" :value="rol.id">
@@ -41,7 +37,6 @@ const authStore = useAuthStore();
 
 const usuario = ref({
   mail: '',
-  contra: null,
   rol: null,
   empleado: null,
 });

@@ -77,6 +77,9 @@ def seeds_tipos_documento():
         {
             'nombre': 'adicional',
         },
+        {
+            'nombre': 'Recibo',
+        },
     ]
     for data in tipos_documento_data:
         db.session.add(Tipo_Documento(**data))

@@ -111,6 +111,22 @@
                           </label>
                         </li>
                       </template>
+                      <template v-else-if="documento.nombre === 'Certificado CIDEPINT'">
+                        <li>
+                          <RouterLink :to="`/generar_certificado/${legajo.id}`" class="dropdown-item">
+                            Generar
+                          </RouterLink>
+                        </li>
+                        <li v-if="existeDocumento(documento.nombre)">
+                          <button
+                            type="button"
+                            class="dropdown-item"
+                            @click="viewFile(documento.id, documento.nombre, legajo.id)"
+                          >
+                            Ver
+                          </button>
+                        </li>
+                      </template>
                       <template v-else>
                         <li v-if="existeDocumento(documento.nombre)">
                           <button

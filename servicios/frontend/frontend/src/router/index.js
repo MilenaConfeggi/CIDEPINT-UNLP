@@ -140,6 +140,13 @@ const routes = [
       component: () => import("../components/usuarios/RecuperarContra.vue"),
       props: true,
     },
+    {
+      path: "/generar_certificado/:id_legajo",
+      name: "generar_certificado",
+      component: () => import("../components/certificados/CrearCertificado.vue"),
+      props: true,
+      meta: { requiresAuth: true }
+    }
 ];
 
 const router = createRouter({

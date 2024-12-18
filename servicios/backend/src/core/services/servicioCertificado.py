@@ -13,11 +13,10 @@ import os
 
 UPLOAD_FOLDER = os.path.abspath("documentos")
 
-def generar_certificado(id_legajo):
+def generar_certificado(id_legajo, empleados):
     # Completar con los datos necesarios
     ensayo = "ensayo"
     cliente = Legajo.query.filter_by(id=id_legajo).first().cliente.nombre
-    empleados = ["Empleado 1", "Empleado 2", "Empleado 3"]
     fecha_desde = Legajo.query.filter_by(id=id_legajo).first().fecha_entrada.strftime("%d/%m/%Y")
     fecha_hasta = datetime.now().strftime("%d/%m/%Y")
     descripcion = "descripcion"
@@ -66,21 +65,13 @@ def generar_certificado(id_legajo):
                              "sistema SIGEVA, se tipificó esta actividad como: <b>Servicio</b>", styles["BodyText"]))
     content.append(Spacer(1, 12))  # Espaciador entre párrafos
     content.append(Paragraph("<b>Descripcion de la Actividad Tecnológica.</b>", styles["BodyText"]))
-    content.append(Paragraph("blablablablablabalbalablabalablablablablabalbalablabalbalablablabalab", styles["BodyText"]))
+    content.append(Paragraph(f"{descripcion}", styles["BodyText"]))
     content.append(Spacer(1, 12))
     content.append(Spacer(1, 12))
     content.append(Paragraph("<b>Integrantes del Grupo Ejecutor</b>", styles["BodyText"]))
     content.append(Spacer(1, 6))
 
     # Agregar la tabla con datos de los integrantes
-    # Simulación de datos de empleados
-    empleados = [
-        {"nombre": "Juan Pérez", "funcion": "Investigador", "participacion": "50%"},
-        {"nombre": "María López", "funcion": "Analista", "participacion": "30%"},
-        {"nombre": "Carlos Gómez", "funcion": "Técnico", "participacion": "20%"},
-    ]
-
-    # Encabezados y datos de la tabla
     datos_tabla = [["Nombre y Apellido", "Función", "% de Participación"]]
     for empleado in empleados:
         datos_tabla.append([empleado["nombre"], empleado["funcion"], empleado["participacion"]])

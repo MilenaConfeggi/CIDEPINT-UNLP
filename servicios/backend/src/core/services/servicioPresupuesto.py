@@ -16,6 +16,7 @@ def crear_stan(data):
         precio_pesos=data.get('precio_pesos'),
         precio_dolares=data.get('precio_dolares'),
         precio_por_muestra=data.get('precio_por_muestra'),
+        descripcion=data.get('descripcion')
     )
 
     if validar_numero_stan(stan.numero) == False:

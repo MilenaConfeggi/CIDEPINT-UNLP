@@ -11,8 +11,7 @@ export const useDocumentosStore = defineStore("documentos", {
     }),
     actions: {
         async getDocumentos(params) {
-            console.log(params)
-            const { page, per_page, tipo_documento, empresa, fecha, area } = params
+            const { page, per_page, tipo_documento, empresa, fecha, area, ensayo } = params
             this.loading = true;
             this.error = null;
             try {
@@ -25,6 +24,7 @@ export const useDocumentosStore = defineStore("documentos", {
                             empresa,
                             fecha,
                             area,
+                            ensayo
                         },
                     }
                 );

@@ -20,6 +20,8 @@
       </select>
       <label class="input-group-text" for="empresa">Empresa</label>
       <input v-model="empresa" type="text" aria-label="nombre del cliente" class="form-control" id="empresa" />
+      <label class="input-group-text" for="ensayo">Ensayo</label>
+      <input v-model="ensayo" class="form-control" id="ensayo" type="text" aria-label="nombre del ensayo" />
       <input type="date" v-model="fecha" @input="validateDates" placeholder="Fecha de inicio" id="fecha" />
     </div>
     <div v-if="documentos.items?.length">
@@ -127,6 +129,7 @@ var tipo_documento = ref('')
 var area = ref('')
 var empresa = ref('')
 var fecha = ref('')
+var ensayo = ref('')
 
 const { documentos, loading, error, totalPages, tipos_documentos } = storeToRefs(documentosStore)
 const { areas } = storeToRefs(areasStore)
@@ -147,6 +150,7 @@ const fetchDocumentos = async () => {
     empresa: empresa.value,
     fecha: fecha.value,
     area: area.value,
+    ensayo: ensayo.value,
   }
   await documentosStore.getDocumentos(params)
 }
@@ -166,7 +170,6 @@ const viewFile = async (doc) => {
 
     // Crear una URL para visualizar el archivo
     const blob = new Blob([response.data], { type: response.headers['content-type'] })
-    console.log(response.data)
     fileUrl.value = URL.createObjectURL(blob)
   } catch (error) {
     console.error('Error al obtener el archivo:', error)
@@ -187,13 +190,11 @@ const nextPage = () => {
 }
 
 onMounted(() => {
-  if (areas.value.length) {
-    fetchAreas()
-  }
+  fetchAreas()
   fetchDocumentos()
 })
 
-watch([tipo_documento, currentPage, area, empresa, fecha], () => {
+watch([tipo_documento, currentPage, area, empresa, fecha, ensayo], () => {
   fetchDocumentos()
 })
 </script>

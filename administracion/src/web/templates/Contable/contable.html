@@ -98,6 +98,7 @@
                         </svg>
                     </a>
                     </li>
+                    {% if fondos.iter_pages() %}
                     {% for page in fondos.iter_pages() %}
                         {% if page %}
                             {% if page != fondos.page %}
@@ -121,6 +122,7 @@
                             </li>
                         {% endif %}
                     {% endfor %}
+                    {% endif %}
                     <li>
                     <a
                         class="px-3 py-1 rounded-md rounded-r-lg focus:outline-none focus:shadow-outline-purple"

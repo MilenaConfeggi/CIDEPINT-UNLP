@@ -1,117 +1,97 @@
 {% extends 'layout.html' %}
 {% block title%} Fondo {% endblock %}
 {% block content%}
-<div class="px-4">
+<a href="{{url_for('contable.index_fondo')}}"
+  class="inline-flex items-center px-3 py-4 rounded-md text-black-500 hover:bg-black-50">
+  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-6 w-6">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h18">
+      </path>
+  </svg>
+  <span class="ml-1 font-bold text-lg">Volver</span>
+</a>
+<div class="px-4 py-3 mx-8 mt-2 mb-8 bg-white rounded-lg shadow-md animate-fade-left">
+  
     <div class="px-4 sm:px-0">
       <h3 class="text-base/7 font-semibold text-gray-900">{{ fondo.titulo }}</h3>
     </div>
     <div class="mt-6 border-t border-gray-100">
-        <dl class="divide-y divide-gray-100">
-            <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                <dt class="text-sm/6 font-medium text-gray-900">Saldo</dt>
-                <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{{ fondo.saldo }}</dd>
-            </div>
-        </dl>
-    </div>
-</div>
-<!--
-<form class="px-4" method="POST" action="{{ url_for('contable.crear_ingreso', fondo_id = fondo.titulo) }}">
-    {{ form.hidden_tag() }}
-
-    <div class="border-b border-gray-900/10 pb-12">
-        <h2 class="text-base/7 font-semibold text-gray-900">Nuevo Ingreso</h2>
-        <p class="mt-1 text-sm/6 text-gray-600">Ingrese el monto del nuevo Ingreso</p>
-        <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-            <div class="sm:col-span-4">
-                <label for="monto" class="block text-sm/6 font-medium text-gray-900">Monto</label>
-                <div class="mt-2">
-                    <div class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
-                        {{ form.monto(class='form-control block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm/6', placeholder='Ingrese el monto') }}
-                    </div>
-                </div>
-                <div class="mt-2">
-                    {{form.file(class='form-control block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm/6', placeholder='Ingrese el monto')}}
-                </div>
-            </div>
+      <dl class="divide-y divide-gray-100">
+        <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+          <dt class="text-sm/6 font-medium text-gray-900">Saldo</dt>
+          <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">${{ '{:,.0f}'.format(fondo.saldo) }}</dd>
         </div>
-    <button type="submit" class="rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600">Registrar</button>
-    </div>
-</form>
--->
-<form class="px-4" method="POST" action="{{ url_for('contable.crear_ingreso', fondo_id = fondo.titulo) }}" enctype="multipart/form-data">
-    <input type="text" name="csrf_token" value="{{ csrf_token() }}" hidden>
-
-    <div class="border-b border-gray-900/10 pb-12">
-        <h2 class="text-base/7 font-semibold text-gray-900">Nuevo Ingreso</h2>
-        <p class="mt-1 text-sm/6 text-gray-600">Ingrese el monto del nuevo Ingreso</p>
-        <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-            <div class="sm:col-span-4">
-                <label for="monto" class="block text-sm/6 font-medium text-gray-900">Monto</label>
-                <div class="mt-2">
-                    <div class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+        <form method="POST" action="{{ url_for('contable.crear_ingreso', fondo_id = fondo.titulo) }}" enctype="multipart/form-data">
+            <input type="text" name="csrf_token" value="{{ csrf_token() }}" hidden>
+        
+            <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                <h2 class="text-sm/6 font-medium text-gray-900">Nuevo Ingreso</h2>
+                <div class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0 flex space-x-4">
+                    <div>
+                        <label for="monto" class="block text-sm/6 font-medium text-gray-900">Monto</label>
                         <input type="number" name="monto" id="monto" class="form-control block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm/6" placeholder="Ingrese el monto">
                     </div>
-                </div>
-                <div class="mt-2">
-                    <label for="file" class="block text-sm/6 font-medium text-gray-900">Archivo</label>
-                    <div class="mt-2">
+                    <div>
+                        <label for="file" class="block text-sm/6 font-medium text-gray-900">Archivo</label>
                         <input type="file" name="file" id="file" class="form-control block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm/6">
+                    </div>
+                    <div class="flex items-end">
+                        <button type="submit" class="rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600">Registrar</button>
                     </div>
                 </div>
             </div>
+        </form>
+        <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0 overflow-x-auto">
+          <dt class="text-sm/6 font-medium text-gray-900">Ingresos</dt>
+          <dd class="mt-2 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+            {% if ingresos %}
+              <ul role="list" class="divide-y divide-gray-100 rounded-md border border-gray-200">
+                  {% for ingreso in ingresos %}
+                      <li class="flex items-center justify-between py-4 pl-4 pr-5 text-sm/6">
+                          <div class="flex w-0 flex-1 items-center">
+                            <svg class="size-5 shrink-0 text-gray-400" viewBox="0 0 320 512" fill="currentColor" aria-hidden="true" data-slot="icon">
+                                <path fill-rule="evenodd"
+                                d="M160 0c17.7 0 32 14.3 32 32l0 35.7c1.6 .2 3.1 .4 4.7 .7c.4 .1 .7 .1 1.1 .2l48 8.8c17.4 3.2 28.9 19.9 25.7 37.2s-19.9 28.9-37.2 25.7l-47.5-8.7c-31.3-4.6-58.9-1.5-78.3 6.2s-27.2 18.3-29 28.1c-2 10.7-.5 16.7 1.2 20.4c1.8 3.9 5.5 8.3 12.8 13.2c16.3 10.7 41.3 17.7 73.7 26.3l2.9 .8c28.6 7.6 63.6 16.8 89.6 33.8c14.2 9.3 27.6 21.9 35.9 39.5c8.5 17.9 10.3 37.9 6.4 59.2c-6.9 38-33.1 63.4-65.6 76.7c-13.7 5.6-28.6 9.2-44.4 11l0 33.4c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-34.9c-.4-.1-.9-.1-1.3-.2l-.2 0s0 0 0 0c-24.4-3.8-64.5-14.3-91.5-26.3c-16.1-7.2-23.4-26.1-16.2-42.2s26.1-23.4 42.2-16.2c20.9 9.3 55.3 18.5 75.2 21.6c31.9 4.7 58.2 2 76-5.3c16.9-6.9 24.6-16.9 26.8-28.9c1.9-10.6 .4-16.7-1.3-20.4c-1.9-4-5.6-8.4-13-13.3c-16.4-10.7-41.5-17.7-74-26.3l-2.8-.7s0 0 0 0C119.4 279.3 84.4 270 58.4 253c-14.2-9.3-27.5-22-35.8-39.6c-8.4-17.9-10.1-37.9-6.1-59.2C23.7 116 52.3 91.2 84.8 78.3c13.3-5.3 27.9-8.9 43.2-11L128 32c0-17.7 14.3-32 32-32z"
+                                clip-rule="evenodd" />
+                            </svg>
+                            <div class="ml-4 flex min-w-0 flex-1 gap-2">
+                                <span class="truncate font-medium">{{ '{:,.0f}'.format(ingreso.monto) }}</span>
+                            </div>
+                          </div>
+                          <div class="flex w-0 flex-1 items-center">
+                            <svg class="size-5 shrink-0 text-gray-400" viewBox="0 0 448 512" fill="currentColor" aria-hidden="true" data-slot="icon">
+                                <path fill-rule="evenodd"
+                                d="M152 24c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 40L64 64C28.7 64 0 92.7 0 128l0 16 0 48L0 448c0 35.3 28.7 64 64 64l320 0c35.3 0 64-28.7 64-64l0-256 0-48 0-16c0-35.3-28.7-64-64-64l-40 0 0-40c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 40L152 64l0-40zM48 192l352 0 0 256c0 8.8-7.2 16-16 16L64 464c-8.8 0-16-7.2-16-16l0-256z" 
+                                clip-rule="evenodd" />
+                            </svg>
+                            <div class="ml-4 flex min-w-0 flex-1 gap-2">
+                                <span class="truncate font-medium">{{ ingreso.fecha }}</span>
+                            </div>
+                          </div>
+                          <div class="ml-4 shrink-0">
+                            {% if ingreso.archivo_id %}
+                                <a data-id="{{ ingreso.archivo_id }}" class="font-medium" href="{{ url_for('contable.descargar_ingreso',id=ingreso.id ) }}" target="_blank">
+                                  <svg viewBox="0 0 384 512" class="size-5 shrink-0 text-indigo-600 hover:text-indigo-500" fill="currentColor" aria-hidden="true" data-slot="icon">
+                                    <path d="M320 464c8.8 0 16-7.2 16-16l0-288-80 0c-17.7 0-32-14.3-32-32l0-80L64 48c-8.8 0-16 7.2-16 16l0 384c0 8.8 7.2 16 16 16l256 0zM0 64C0 28.7 28.7 0 64 0L229.5 0c17 0 33.3 6.7 45.3 18.7l90.5 90.5c12 12 18.7 28.3 18.7 45.3L384 448c0 35.3-28.7 64-64 64L64 512c-35.3 0-64-28.7-64-64L0 64z"/>
+                                  </svg>
+                                </a>
+                            {% else %}
+                              <svg viewBox="0 0 384 512" class="size-5 shrink-0 text-gray-400" fill="currentColor" aria-hidden="true" data-slot="icon">
+                                <path d="M320 464c8.8 0 16-7.2 16-16l0-288-80 0c-17.7 0-32-14.3-32-32l0-80L64 48c-8.8 0-16 7.2-16 16l0 384c0 8.8 7.2 16 16 16l256 0zM0 64C0 28.7 28.7 0 64 0L229.5 0c17 0 33.3 6.7 45.3 18.7l90.5 90.5c12 12 18.7 28.3 18.7 45.3L384 448c0 35.3-28.7 64-64 64L64 512c-35.3 0-64-28.7-64-64L0 64z"/>
+                                <line x1="0" y1="0" x2="384" y2="512" stroke="black" stroke-width="10"/>
+                              </svg>
+                            {% endif %}
+                            <form method="POST" action="{{ url_for('contable.delete_ingreso', id=ingreso.id) }}" style="display:inline;">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('¿Está seguro de que desea eliminar este ingreso?');">Eliminar</button>
+                            </form>
+                          </div>
+                      </li>
+                  {% endfor %}
+              </ul>
+            {% endif %}
+          </dd>
         </div>
-    <button type="submit" class="rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600">Registrar</button>
+      </dl>
     </div>
-</form>
-<h3>Ingresos Pasados</h3>
-<div class="w-full overflow-x-auto">
-    {%if ingresos %}
-    <table class="w-full whitespace-no-wrap">
-        <thead>
-        <tr
-            class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b bg-gray-50"
-        >
-            <th class="px-4 py-3">Monto</th>
-            <th class="px-4 py-3">Fecha</th>
-            <th class="px-4 py-3">Archivo</th>
-            <th class="px-4 py-3">Acciones</th>
-        </tr>
-        </thead>
-        <tbody
-        class="bg-white divide-y"
-        >
-        {% for ingreso in ingresos %}
-            <tr class="text-gray-700">
-                <td class="px-4 py-3">
-                <div class="flex items-center text-sm">
-                    <div>
-                        <p class="font-semibold">{{ ingreso.monto }}</p>
-                    </div>
-                </div>
-                </td>
-                <td class="px-4 py-3 text-sm">
-                {{ ingreso.fecha }}
-                </td>
-                <td>
-                    {% if ingreso.archivo_id %}
-                        <a data-id="{{ ingreso.archivo_id }}" class="group" href="{{ url_for('contable.descargar_ingreso',id=ingreso.id ) }}" target="_blank">descargar</a>
-                    {% else %}
-                        No hay archivo asociado a ese ingreso
-                    {% endif %}
-                   
-                </td>
-                <td>
-                    <form method="POST" action="{{ url_for('contable.delete_ingreso', id=ingreso.id) }}" style="display:inline;">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                        <button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('¿Está seguro de que desea eliminar este ingreso?');">Eliminar</button>
-                    </form>
-                
-                </td>
-            </tr>
-        {% endfor %}
-    </table>
-    {%else%}
-    <p>No hay ingresos pasados</p>
-    {%endif%}
-</div>
+  </div>
 {% endblock %}

@@ -3,12 +3,8 @@
     Pagina de Cotable
 {% endblock %}
 {% block content %}
+<div class="px-4 py-3 mx-8 mt-2 mb-8 bg-white rounded-lg shadow-md animate-fade-right animate-once">
 <h1>Contable </h1>
-<div class="flex flex-wrap items-end mb-1">
-<a href="{{url_for('contable.get_crear_fondo')}}" 
-class="px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-green-600 border border-transparent rounded-lg active:bg-green-600 hover:bg-green-700 focus:outline-none focus:shadow-outline-green">
-Crear un nuevo Fondo</a>
-</div>
 <div class="flex flex-wrap items-end mb-1">
     {% if 'SinDistribucion' in request.args.getlist('filtro') %}
     <a href="{{ url_for('contable.get_legajos') }}" 
@@ -23,7 +19,7 @@ Crear un nuevo Fondo</a>
     {% endif %}
 </div>
 <div class="w-full overflow-x-auto">
-    <table class="w-full whitespace-no-wrap">
+    <table class="w-full whitespace-no-wrap mt-2">
         <thead>
         <tr
             class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b bg-gray-50"
@@ -61,8 +57,10 @@ Crear un nuevo Fondo</a>
                 <td class="px-4 py-3 text-sm">
                     {% if legajo.documentos['Presupuesto CIDEPINT'] %}
                     <a href="{{ url_for('contable.download', documento_id=legajo.documentos['Presupuesto CIDEPINT'].id) }}" 
-                       class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500">
-                        Descargar
+                    class="flex items-center justify-center px-2 py-2 text-sm font-medium leading-5 text-black-600 rounded-lg focus:outline-none focus:shadow-outline-gray">
+                        <svg viewBox="0 0 384 512" class="size-5 shrink-0 text-indigo-600 hover:text-indigo-500" fill="currentColor" aria-hidden="true" data-slot="icon">
+                            <path d="M320 464c8.8 0 16-7.2 16-16l0-288-80 0c-17.7 0-32-14.3-32-32l0-80L64 48c-8.8 0-16 7.2-16 16l0 384c0 8.8 7.2 16 16 16l256 0zM0 64C0 28.7 28.7 0 64 0L229.5 0c17 0 33.3 6.7 45.3 18.7l90.5 90.5c12 12 18.7 28.3 18.7 45.3L384 448c0 35.3-28.7 64-64 64L64 512c-35.3 0-64-28.7-64-64L0 64z"/>
+                        </svg>
                     </a>
                     {% else %}
                     No disponible
@@ -71,40 +69,38 @@ Crear un nuevo Fondo</a>
                 <td class="px-4 py-3 text-sm">
                     {% if legajo.documentos['Orden de compra'] %}
                     <a href="{{ url_for('contable.download', documento_id=legajo.documentos['Orden de compra'].id) }}" 
-                       class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500">
-                        Descargar
+                    class="flex items-center justify-center px-2 py-2 text-sm font-medium leading-5 text-black-600 rounded-lg focus:outline-none focus:shadow-outline-gray">
+                       <svg viewBox="0 0 384 512" class="size-5 shrink-0 text-indigo-600 hover:text-indigo-500" fill="currentColor" aria-hidden="true" data-slot="icon">
+                        <path d="M320 464c8.8 0 16-7.2 16-16l0-288-80 0c-17.7 0-32-14.3-32-32l0-80L64 48c-8.8 0-16 7.2-16 16l0 384c0 8.8 7.2 16 16 16l256 0zM0 64C0 28.7 28.7 0 64 0L229.5 0c17 0 33.3 6.7 45.3 18.7l90.5 90.5c12 12 18.7 28.3 18.7 45.3L384 448c0 35.3-28.7 64-64 64L64 512c-35.3 0-64-28.7-64-64L0 64z"/>
+                      </svg>
                     </a>
                     {% else %}
                     No disponible
                     {% endif %}
                 </td>
-                <td class="px-4 py-3 text-sm {% if legajo.documentos['orden_facturacion'] %}bg-green-600{% else %}bg-red-600{% endif %}">
-                    <!--
-                    <form method="POST" enctype="multipart/form-data" action="{{ url_for('contable.upload') }}">
-                        {{ forms[legajo.id].hidden_tag() }}
-                        <div class="flex items-center gap-2">
-                            {% if legajo.documentos['orden_facturacion'] %}
-                                <div class="flex items-center gap-2">
-                                    {{ forms[legajo.id].file(class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border file:border-gray-300 file:text-sm file:font-semibold file:bg-white file:text-gray-700 hover:file:bg-gray-100") }}
-                                    <span>Archivo ya subido. ¿Desea sobrescribirlo?</span>
-                                    <button type="submit" class="bg-red-600 text-white text-sm px-4 py-2 rounded hover:bg-red-500" onclick="return confirm('¿Está seguro de que desea sobrescribir el archivo?');">Sobrescribir</button>
-                                </div>
-                            {% else %}
-                                {{ forms[legajo.id].file(class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border file:border-gray-300 file:text-sm file:font-semibold file:bg-white file:text-gray-700 hover:file:bg-gray-100") }}
-                                {{ forms[legajo.id].submit(class="bg-blue-600 text-white text-sm px-4 py-2 rounded hover:bg-blue-500") }}
-                            {% endif %}
-                        </div>
-                    </form>
-                    -->
+                <td class="px-4 py-3 text-sm flex justify-center {% if legajo.documentos['orden_facturacion'] %}bg-green-600{% else %}bg-red-600{% endif %} bg-opacity-80">
                     {% if legajo.documentos['orden_facturacion'] %}
                     <a href="{{ url_for('contable.download', documento_id=legajo.documentos['orden_facturacion'].id) }}" 
-                       class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500">
-                        Descargar
+                    class="px-2 py-2 text-sm font-medium leading-5 text-black-600 rounded-lg focus:outline-none focus:shadow-outline-gray">
+                       <svg viewBox="0 0 384 512" class="size-5 shrink-0 text-indigo-700 hover:text-indigo-600" fill="currentColor" aria-hidden="true" data-slot="icon">
+                        <path d="M320 464c8.8 0 16-7.2 16-16l0-288-80 0c-17.7 0-32-14.3-32-32l0-80L64 48c-8.8 0-16 7.2-16 16l0 384c0 8.8 7.2 16 16 16l256 0zM0 64C0 28.7 28.7 0 64 0L229.5 0c17 0 33.3 6.7 45.3 18.7l90.5 90.5c12 12 18.7 28.3 18.7 45.3L384 448c0 35.3-28.7 64-64 64L64 512c-35.3 0-64-28.7-64-64L0 64z"/>
+                      </svg>
                     </a>
-                    <form method="POST" action="{{ url_for('contable.delete_document', documento_id=legajo.documentos['orden_facturacion'].id) }}" style="display:inline;">
+                    <form method="POST" action="{{ url_for('contable.delete_document', documento_id=legajo.documentos['orden_facturacion'].id) }}">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                        <button type="submit" class="text-red-600 hover:underline" onclick="return confirm('¿Estás seguro de que deseas eliminar este documento?');">
-                            Eliminar
+                        <button type="submit" class="px-2 py-2 text-sm font-medium leading-5 text-black-600 rounded-lg focus:outline-none focus:shadow-outline-gray" onclick="return confirm('¿Estás seguro de que deseas eliminar este documento?');">
+                            <svg
+                                    class="size-5 shrink-0 text-red-700 hover:text-red-600"
+                                    aria-hidden="true"
+                                    fill="currentColor"
+                                    viewBox="0 0 20 20"
+                                >
+                                    <path
+                                    fill-rule="evenodd"
+                                    d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                                    clip-rule="evenodd"
+                                    ></path>
+                                </svg>
                         </button>
                     </form>
                     {% else %}
@@ -113,7 +109,7 @@ Crear un nuevo Fondo</a>
                         <input type="hidden" name="legajo_id" value="{{ legajo.id }}">
                         <input type="hidden" name="tipo" value="orden_facturacion">
                         <label for="archivo" class="cursor-pointer">
-                          <svg class="px-4 aspect-square w-20 h-20 rounded-lg bg-gray-200 object-cover group-hover:opacity-75 xl:aspect-[7/7]"
+                          <svg class="px-4 aspect-square w-14 h-14 rounded-lg object-cover group-hover:opacity-75 xl:aspect-[7/7]"
                             aria-hidden="true"
                             fill="currentColor"
                             viewBox="0 0 448 512"
@@ -124,7 +120,6 @@ Crear un nuevo Fondo</a>
                           clip-rule="evenodd"
                             ></path>
                           </svg>
-                          <p class="mt-1 text-md font-medium text-gray-900 break-words">Subir archivo</p>
                         </label>
                         <input id="archivo" name="file" type="file" class="hidden" onchange="this.form.submit()">
                       </form>
@@ -134,8 +129,10 @@ Crear un nuevo Fondo</a>
                 <td class="px-4 py-3 text-sm">
                     {% if legajo.documentos['Factura'] %}
                     <a href="{{ url_for('contable.download', documento_id=legajo.documentos['Factura'].id) }}" 
-                       class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500">
-                        Descargar
+                    class="flex items-center justify-center px-2 py-2 text-sm font-medium leading-5 text-black-600 rounded-lg focus:outline-none focus:shadow-outline-gray">
+                    <svg viewBox="0 0 384 512" class="size-5 shrink-0 text-indigo-600 hover:text-indigo-500" fill="currentColor" aria-hidden="true" data-slot="icon">
+                        <path d="M320 464c8.8 0 16-7.2 16-16l0-288-80 0c-17.7 0-32-14.3-32-32l0-80L64 48c-8.8 0-16 7.2-16 16l0 384c0 8.8 7.2 16 16 16l256 0zM0 64C0 28.7 28.7 0 64 0L229.5 0c17 0 33.3 6.7 45.3 18.7l90.5 90.5c12 12 18.7 28.3 18.7 45.3L384 448c0 35.3-28.7 64-64 64L64 512c-35.3 0-64-28.7-64-64L0 64z"/>
+                    </svg>
                     </a>
                     {% else %}
                     No disponible
@@ -187,4 +184,7 @@ Crear un nuevo Fondo</a>
                 </td>
             </tr>
         {% endfor %}
+        </tbody>
+    </table>
+    </div>
 {% endblock %}

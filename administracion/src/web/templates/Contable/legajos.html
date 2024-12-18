@@ -9,7 +9,19 @@
 class="px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-green-600 border border-transparent rounded-lg active:bg-green-600 hover:bg-green-700 focus:outline-none focus:shadow-outline-green">
 Crear un nuevo Fondo</a>
 </div>
-
+<div class="flex flex-wrap items-end mb-1">
+    {% if 'SinDistribucion' in request.args.getlist('filtro') %}
+    <a href="{{ url_for('contable.get_legajos') }}" 
+       class="px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-blue-600 border border-transparent rounded-lg active:bg-blue-600 hover:bg-blue-700 focus:outline-none focus:shadow-outline-blue">
+        Ver todos los legajos
+    </a>
+    {% else %}
+    <a href="{{ url_for('contable.get_legajos', filtro='SinDistribucion') }}" 
+       class="px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-blue-600 border border-transparent rounded-lg active:bg-blue-600 hover:bg-blue-700 focus:outline-none focus:shadow-outline-blue">
+        Ver solo legajos sin distribución
+    </a>
+    {% endif %}
+</div>
 <div class="w-full overflow-x-auto">
     <table class="w-full whitespace-no-wrap">
         <thead>
@@ -147,7 +159,14 @@ Crear un nuevo Fondo</a>
                         </a>
                 </td>
                 <td class="px-4 py-3 text-sm">
-                    Recibo
+                    {% if legajo.documentos['Recibo'] %}
+                    <a href="{{ url_for('contable.download', documento_id=legajo.documentos['Recibo'].id) }}" 
+                       class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500">
+                        Descargar
+                    </a>
+                    {% else %}
+                    No disponible
+                    {% endif %}
                 </td>
                 <td class="px-4 py-3 text-sm {% if legajo.distribuciones %}bg-green-600{% else %}bg-red-600{% endif %}" >
                     <a href="{{ url_for('contable.get_distribuciones',id=legajo.id) }}"

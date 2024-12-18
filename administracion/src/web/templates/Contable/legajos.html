@@ -9,7 +9,19 @@
 class="px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-green-600 border border-transparent rounded-lg active:bg-green-600 hover:bg-green-700 focus:outline-none focus:shadow-outline-green">
 Crear un nuevo Fondo</a>
 </div>
-
+<div class="flex flex-wrap items-end mb-1">
+    {% if 'SinDistribucion' in request.args.getlist('filtro') %}
+    <a href="{{ url_for('contable.get_legajos') }}" 
+       class="px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-blue-600 border border-transparent rounded-lg active:bg-blue-600 hover:bg-blue-700 focus:outline-none focus:shadow-outline-blue">
+        Ver todos los legajos
+    </a>
+    {% else %}
+    <a href="{{ url_for('contable.get_legajos', filtro='SinDistribucion') }}" 
+       class="px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-blue-600 border border-transparent rounded-lg active:bg-blue-600 hover:bg-blue-700 focus:outline-none focus:shadow-outline-blue">
+        Ver solo legajos sin distribución
+    </a>
+    {% endif %}
+</div>
 <div class="w-full overflow-x-auto">
     <table class="w-full whitespace-no-wrap">
         <thead>

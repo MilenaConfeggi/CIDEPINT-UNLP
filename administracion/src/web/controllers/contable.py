@@ -120,6 +120,7 @@ def descargar_ingreso(id):
     return send_from_directory(directorio, archivo.nombre, as_attachment=True)
 @bp.get("/legajos")
 def get_legajos():
+    params = request.args.to_dict()
     legajos = legajoDB.list_legajos_all()
     legajos = [legajo for legajo in legajos if legajo.necesita_facturacion]
     forms = {}
@@ -131,13 +132,14 @@ def get_legajos():
     for legajo in legajos:
         documentos = {doc.tipo_documento.nombre: doc for doc in legajo.documento}
         distribuciones = distribucionDB.list_distribuciones_by_legajo(legajo.id)
-        resultado.append({
-            "id": legajo.id,
-            "nro_legajo": legajo.nro_legajo,
-            "cliente": legajo.cliente,
-            "documentos": documentos,
-            "distribuciones" : distribuciones
-        })
+        if((params.get('filtro') and params['filtro'] =="SinDistribucion" and distribuciones == [] )or not params.get('filtro')):
+            resultado.append({
+                "id": legajo.id,
+                "nro_legajo": legajo.nro_legajo,
+                "cliente": legajo.cliente,
+                "documentos": documentos,
+                "distribuciones" : distribuciones
+            })
     form = DownloadForm()
     return render_template("contable/legajos.html",legajos = resultado, forms=forms,formDescarga = form)
 @bp.get("/distribuciones/crear/<int:id>")

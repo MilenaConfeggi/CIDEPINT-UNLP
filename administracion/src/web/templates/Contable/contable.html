@@ -37,7 +37,11 @@ Crear un nuevo Fondo</a>
                 {{ fondo.saldo }}
                 </td>
                 <td class="px-4 py-3 text-sm">
-                <a href="{{ url_for('contable.mostrar_fondo', fondo_id=fondo.titulo) }}" class="text-indigo-600 hover:text-indigo-900">Ver</a>
+                <a href="{{ url_for('contable.mostrar_fondo', fondo_id=fondo.titulo) }}" class="text-indigo-600 hover:text-indigo-900">Ver Ingresos</a>
+                <form action="{{ url_for('contable.delete_fondo', fondo_id=fondo.titulo) }}" method="POST" style="display:inline;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('¿Estás seguro de que deseas eliminar este fondo?');">Eliminar</button>
+                </form>
                 </td>
             </tr>
         {% endfor %}

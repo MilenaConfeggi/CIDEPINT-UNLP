@@ -74,6 +74,7 @@
             <th class="px-4 py-3">Monto</th>
             <th class="px-4 py-3">Fecha</th>
             <th class="px-4 py-3">Archivo</th>
+            <th class="px-4 py-3">Acciones</th>
         </tr>
         </thead>
         <tbody
@@ -95,9 +96,16 @@
                     {% if ingreso.archivo_id %}
                         <a data-id="{{ ingreso.archivo_id }}" class="group" href="{{ url_for('contable.descargar_ingreso',id=ingreso.id ) }}" target="_blank">descargar</a>
                     {% else %}
-                        No hay archivo
+                        No hay archivo asociado a ese ingreso
                     {% endif %}
                    
+                </td>
+                <td>
+                    <form method="POST" action="{{ url_for('contable.delete_ingreso', id=ingreso.id) }}" style="display:inline;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('¿Está seguro de que desea eliminar este ingreso?');">Eliminar</button>
+                    </form>
+                
                 </td>
             </tr>
         {% endfor %}

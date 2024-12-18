@@ -9,7 +9,19 @@
 class="px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-green-600 border border-transparent rounded-lg active:bg-green-600 hover:bg-green-700 focus:outline-none focus:shadow-outline-green">
 Crear un nuevo Fondo</a>
 </div>
-
+<div class="flex flex-wrap items-end mb-1">
+    {% if 'SinDistribucion' in request.args.getlist('filtro') %}
+    <a href="{{ url_for('contable.get_legajos') }}" 
+       class="px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-blue-600 border border-transparent rounded-lg active:bg-blue-600 hover:bg-blue-700 focus:outline-none focus:shadow-outline-blue">
+        Ver todos los legajos
+    </a>
+    {% else %}
+    <a href="{{ url_for('contable.get_legajos', filtro='SinDistribucion') }}" 
+       class="px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-blue-600 border border-transparent rounded-lg active:bg-blue-600 hover:bg-blue-700 focus:outline-none focus:shadow-outline-blue">
+        Ver solo legajos sin distribución
+    </a>
+    {% endif %}
+</div>
 <div class="w-full overflow-x-auto">
     <table class="w-full whitespace-no-wrap">
         <thead>
@@ -40,27 +52,123 @@ Crear un nuevo Fondo</a>
                 </div>
                 </td>
                 <td class="px-4 py-3 text-sm">
-                    Cliente
+                    {%if legajo.cliente %}
+                        {{ legajo.cliente.nombre }}
+                    {% else %}
+                        No disponible
+                    {% endif %}
                 </td>
                 <td class="px-4 py-3 text-sm">
-                    Presupuesto PDf
+                    {% if legajo.documentos['Presupuesto CIDEPINT'] %}
+                    <a href="{{ url_for('contable.download', documento_id=legajo.documentos['Presupuesto CIDEPINT'].id) }}" 
+                       class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500">
+                        Descargar
+                    </a>
+                    {% else %}
+                    No disponible
+                    {% endif %}
                 </td>
                 <td class="px-4 py-3 text-sm">
-                    Orden de compra PDF
+                    {% if legajo.documentos['Orden de compra'] %}
+                    <a href="{{ url_for('contable.download', documento_id=legajo.documentos['Orden de compra'].id) }}" 
+                       class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500">
+                        Descargar
+                    </a>
+                    {% else %}
+                    No disponible
+                    {% endif %}
+                </td>
+                <td class="px-4 py-3 text-sm {% if legajo.documentos['orden_facturacion'] %}bg-green-600{% else %}bg-red-600{% endif %}">
+                    <!--
+                    <form method="POST" enctype="multipart/form-data" action="{{ url_for('contable.upload') }}">
+                        {{ forms[legajo.id].hidden_tag() }}
+                        <div class="flex items-center gap-2">
+                            {% if legajo.documentos['orden_facturacion'] %}
+                                <div class="flex items-center gap-2">
+                                    {{ forms[legajo.id].file(class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border file:border-gray-300 file:text-sm file:font-semibold file:bg-white file:text-gray-700 hover:file:bg-gray-100") }}
+                                    <span>Archivo ya subido. ¿Desea sobrescribirlo?</span>
+                                    <button type="submit" class="bg-red-600 text-white text-sm px-4 py-2 rounded hover:bg-red-500" onclick="return confirm('¿Está seguro de que desea sobrescribir el archivo?');">Sobrescribir</button>
+                                </div>
+                            {% else %}
+                                {{ forms[legajo.id].file(class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border file:border-gray-300 file:text-sm file:font-semibold file:bg-white file:text-gray-700 hover:file:bg-gray-100") }}
+                                {{ forms[legajo.id].submit(class="bg-blue-600 text-white text-sm px-4 py-2 rounded hover:bg-blue-500") }}
+                            {% endif %}
+                        </div>
+                    </form>
+                    -->
+                    {% if legajo.documentos['orden_facturacion'] %}
+                    <a href="{{ url_for('contable.download', documento_id=legajo.documentos['orden_facturacion'].id) }}" 
+                       class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500">
+                        Descargar
+                    </a>
+                    <form method="POST" action="{{ url_for('contable.delete_document', documento_id=legajo.documentos['orden_facturacion'].id) }}" style="display:inline;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="text-red-600 hover:underline" onclick="return confirm('¿Estás seguro de que deseas eliminar este documento?');">
+                            Eliminar
+                        </button>
+                    </form>
+                    {% else %}
+                    <form method="POST" enctype="multipart/form-data" action="{{ url_for('contable.upload') }}"> 
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="legajo_id" value="{{ legajo.id }}">
+                        <input type="hidden" name="tipo" value="orden_facturacion">
+                        <label for="archivo" class="cursor-pointer">
+                          <svg class="px-4 aspect-square w-20 h-20 rounded-lg bg-gray-200 object-cover group-hover:opacity-75 xl:aspect-[7/7]"
+                            aria-hidden="true"
+                            fill="currentColor"
+                            viewBox="0 0 448 512"
+                            >
+                            <path
+                          fill-rule="evenodd"
+                          d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"
+                          clip-rule="evenodd"
+                            ></path>
+                          </svg>
+                          <p class="mt-1 text-md font-medium text-gray-900 break-words">Subir archivo</p>
+                        </label>
+                        <input id="archivo" name="file" type="file" class="hidden" onchange="this.form.submit()">
+                      </form>
+                    {% endif %}
+                     
                 </td>
                 <td class="px-4 py-3 text-sm">
-                    Orden de facturación PDF
+                    {% if legajo.documentos['Factura'] %}
+                    <a href="{{ url_for('contable.download', documento_id=legajo.documentos['Factura'].id) }}" 
+                       class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500">
+                        Descargar
+                    </a>
+                    {% else %}
+                    No disponible
+                    {% endif %}
                 </td>
                 <td class="px-4 py-3 text-sm">
-                    Factura PDF
+                    <a href="{{ url_for('contable.get_documentosAdd',id=legajo.id) }}"
+                        class="flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-black-600 rounded-lg focus:outline-none focus:shadow-outline-gray"
+                        aria-label="Ver"
+                        >
+                            <svg
+                                class="w-5 h-5"
+                                aria-hidden="true"
+                                fill="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                d="M12 4.5C7.305 4.5 3.135 7.305 1.5 12c1.635 4.695 5.805 7.5 10.5 7.5s8.865-2.805 10.5-7.5C20.865 7.305 16.695 4.5 12 4.5zm0 12c-2.485 0-4.5-2.015-4.5-4.5s2.015-4.5 4.5-4.5 4.5 2.015 4.5 4.5-2.015 4.5-4.5 4.5zm0-7.5c-1.655 0-3 1.345-3 3s1.345 3 3 3 3-1.345 3-3-1.345-3-3-3z"
+                                ></path>
+                            </svg>
+                        </a>
                 </td>
                 <td class="px-4 py-3 text-sm">
-                    Documento asociado PDF
+                    {% if legajo.documentos['Recibo'] %}
+                    <a href="{{ url_for('contable.download', documento_id=legajo.documentos['Recibo'].id) }}" 
+                       class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500">
+                        Descargar
+                    </a>
+                    {% else %}
+                    No disponible
+                    {% endif %}
                 </td>
-                <td class="px-4 py-3 text-sm">
-                    Recibo
-                </td>
-                <td class="px-4 py-3 text-sm">
+                <td class="px-4 py-3 text-sm {% if legajo.distribuciones %}bg-green-600{% else %}bg-red-600{% endif %}" >
                     <a href="{{ url_for('contable.get_distribuciones',id=legajo.id) }}"
                         class="flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-black-600 rounded-lg focus:outline-none focus:shadow-outline-gray"
                         aria-label="Ver"
@@ -78,23 +186,5 @@ Crear un nuevo Fondo</a>
                         </a>
                 </td>
             </tr>
-            <!--    __tablename__ = 'legajo'
-    id = db.Column(db.Integer, primary_key=True)
-    nro_legajo = db.Column(db.String(100))
-    fecha_entrada = db.Column(db.DateTime)
-    objetivo = db.Column(db.String(100))
-    es_juridico = db.Column(db.Boolean)
-    necesita_facturacion = db.Column(db.Boolean)
-    motivo_cancelacion = db.Column(db.String(100), nullable=True)
-    #parte_del_proceso_cancelado = 
-    
-    cliente = db.relationship('Cliente', back_populates='legajo', uselist=False)
-    
-    resultado_encuesta = db.relationship('ResultadoEncuesta', back_populates='legajo')
-    mail = db.relationship('Mail', back_populates='legajo')
-    muestras = db.relationship('Muestra', back_populates='legajo')
-    presupuesto_cidepint = db.relationship('Presupuesto', back_populates='legajo')
-    documento_id = db.Column(db.Integer, db.ForeignKey('documento.id'), nullable=True)
-    documento = db.relationship('Documento', back_populates='legajos')-->
         {% endfor %}
 {% endblock %}

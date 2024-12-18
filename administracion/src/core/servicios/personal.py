@@ -65,7 +65,7 @@ def listar_areas():
     return Area.query.all()
 
 def listar_usuarios_personal():
-    return User.query.join(Empleado).filter(Empleado.rol == 'Personal', Empleado.habilitado == True).all()
+    return User.query.filter(User.rol == 'Personal', User.habilitado == True).all()
 
 def listar_empleados():
     return Empleado.query.filter(Empleado.habilitado).all()

@@ -5,8 +5,8 @@
 {% block content %}
 
 <div class="px-4 py-8 sm:mx-3 md:mx-5 xl:mx-60 sm:pt-200  md:pt-20 xl:pt-40 flex flex-col justify-center items-center">
-    <h1 class="text-3xl font-bold mb-8">Seleccionar tópico</h1>
-    <div class="grid gap-4 mb-8 md:grid-cols-3 xl:grid-cols-5">
+    <h1 class="text-3xl font-bold mb-8 animate-fade">Seleccionar tópico</h1>
+    <div class="grid gap-4 mb-8 md:grid-cols-3 {% if current_user.rol == 'Administrador' or current_user.rol == 'Colaborador' %} xl:grid-cols-5 {% else %} xl:grid-cols-3 {% endif %} animate-fade-up">
         <a class="flex items-center p-4 bg-white rounded-lg shadow-md"
         href="{{ url_for('archivos.index') }}">
             <div class="p-3 mr-4 text-orange-500 bg-orange-100 rounded-full">
@@ -41,23 +41,25 @@
                 </p>
             </div>
         </a>
-        <a class="flex items-center p-4 bg-white rounded-lg shadow-md"
-        href="{{ url_for('contable.index') }}">
-            <div class="p-3 mr-4 text-red-500 bg-red-100 rounded-full">
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 384 512">
-                <path
-                    fill-rule="evenodd"
-                    d="M64 0C28.7 0 0 28.7 0 64L0 448c0 35.3 28.7 64 64 64l256 0c35.3 0 64-28.7 64-64l0-384c0-35.3-28.7-64-64-64L64 0zM96 64l192 0c17.7 0 32 14.3 32 32l0 32c0 17.7-14.3 32-32 32L96 160c-17.7 0-32-14.3-32-32l0-32c0-17.7 14.3-32 32-32zm32 160a32 32 0 1 1 -64 0 32 32 0 1 1 64 0zM96 352a32 32 0 1 1 0-64 32 32 0 1 1 0 64zM64 416c0-17.7 14.3-32 32-32l96 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-96 0c-17.7 0-32-14.3-32-32zM192 256a32 32 0 1 1 0-64 32 32 0 1 1 0 64zm32 64a32 32 0 1 1 -64 0 32 32 0 1 1 64 0zm64-64a32 32 0 1 1 0-64 32 32 0 1 1 0 64zm32 64a32 32 0 1 1 -64 0 32 32 0 1 1 64 0zM288 448a32 32 0 1 1 0-64 32 32 0 1 1 0 64z"
-                    clip-rule="evenodd"
-                ></path>
-                </svg>
-            </div>
-            <div>
-                <p class="text-lg font-semibold text-gray-700">
-                    Contable
-                </p>
-            </div>
-        </a>
+        {% if current_user.rol == 'Administrador' or current_user.rol == 'Colaborador' %}
+            <a class="flex items-center p-4 bg-white rounded-lg shadow-md"
+            href="{{ url_for('contable.index') }}">
+                <div class="p-3 mr-4 text-red-500 bg-red-100 rounded-full">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 384 512">
+                    <path
+                        fill-rule="evenodd"
+                        d="M64 0C28.7 0 0 28.7 0 64L0 448c0 35.3 28.7 64 64 64l256 0c35.3 0 64-28.7 64-64l0-384c0-35.3-28.7-64-64-64L64 0zM96 64l192 0c17.7 0 32 14.3 32 32l0 32c0 17.7-14.3 32-32 32L96 160c-17.7 0-32-14.3-32-32l0-32c0-17.7 14.3-32 32-32zm32 160a32 32 0 1 1 -64 0 32 32 0 1 1 64 0zM96 352a32 32 0 1 1 0-64 32 32 0 1 1 0 64zM64 416c0-17.7 14.3-32 32-32l96 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-96 0c-17.7 0-32-14.3-32-32zM192 256a32 32 0 1 1 0-64 32 32 0 1 1 0 64zm32 64a32 32 0 1 1 -64 0 32 32 0 1 1 64 0zm64-64a32 32 0 1 1 0-64 32 32 0 1 1 0 64zm32 64a32 32 0 1 1 -64 0 32 32 0 1 1 64 0zM288 448a32 32 0 1 1 0-64 32 32 0 1 1 0 64z"
+                        clip-rule="evenodd"
+                    ></path>
+                    </svg>
+                </div>
+                <div>
+                    <p class="text-lg font-semibold text-gray-700">
+                        Contable
+                    </p>
+                </div>
+            </a>
+        {% endif %}
         <a class="flex items-center p-4 bg-white rounded-lg shadow-md"
         href="{{ url_for('patrimonio.index') }}">
             <div class="p-3 mr-4 text-green-500 bg-green-100 rounded-full">
@@ -75,23 +77,25 @@
                 </p>
             </div>
         </a>
-        <a class="flex items-center p-4 bg-white rounded-lg shadow-md"
-        href="{{ url_for('personal.index') }}">
-            <div class="p-3 mr-4 text-purple-500 bg-purple-100 rounded-full">
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 640 512">
-                <path
-                    fill-rule="evenodd"
-                    d="M72 88a56 56 0 1 1 112 0A56 56 0 1 1 72 88zM64 245.7C54 256.9 48 271.8 48 288s6 31.1 16 42.3l0-84.7zm144.4-49.3C178.7 222.7 160 261.2 160 304c0 34.3 12 65.8 32 90.5l0 21.5c0 17.7-14.3 32-32 32l-64 0c-17.7 0-32-14.3-32-32l0-26.8C26.2 371.2 0 332.7 0 288c0-61.9 50.1-112 112-112l32 0c24 0 46.2 7.5 64.4 20.3zM448 416l0-21.5c20-24.7 32-56.2 32-90.5c0-42.8-18.7-81.3-48.4-107.7C449.8 183.5 472 176 496 176l32 0c61.9 0 112 50.1 112 112c0 44.7-26.2 83.2-64 101.2l0 26.8c0 17.7-14.3 32-32 32l-64 0c-17.7 0-32-14.3-32-32zm8-328a56 56 0 1 1 112 0A56 56 0 1 1 456 88zM576 245.7l0 84.7c10-11.3 16-26.1 16-42.3s-6-31.1-16-42.3zM320 32a64 64 0 1 1 0 128 64 64 0 1 1 0-128zM240 304c0 16.2 6 31 16 42.3l0-84.7c-10 11.3-16 26.1-16 42.3zm144-42.3l0 84.7c10-11.3 16-26.1 16-42.3s-6-31.1-16-42.3zM448 304c0 44.7-26.2 83.2-64 101.2l0 42.8c0 17.7-14.3 32-32 32l-64 0c-17.7 0-32-14.3-32-32l0-42.8c-37.8-18-64-56.5-64-101.2c0-61.9 50.1-112 112-112l32 0c61.9 0 112 50.1 112 112z"
-                    clip-rule="evenodd"
-                ></path>
-                </svg>
-            </div>
-            <div>
-                <p class="text-lg font-semibold text-gray-700">
-                    Personal
-                </p>
-            </div>
-        </a>
+        {% if current_user.rol == 'Administrador' or current_user.rol == 'Colaborador' %}
+            <a class="flex items-center p-4 bg-white rounded-lg shadow-md"
+            href="{{ url_for('personal.index') }}">
+                <div class="p-3 mr-4 text-purple-500 bg-purple-100 rounded-full">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 640 512">
+                    <path
+                        fill-rule="evenodd"
+                        d="M72 88a56 56 0 1 1 112 0A56 56 0 1 1 72 88zM64 245.7C54 256.9 48 271.8 48 288s6 31.1 16 42.3l0-84.7zm144.4-49.3C178.7 222.7 160 261.2 160 304c0 34.3 12 65.8 32 90.5l0 21.5c0 17.7-14.3 32-32 32l-64 0c-17.7 0-32-14.3-32-32l0-26.8C26.2 371.2 0 332.7 0 288c0-61.9 50.1-112 112-112l32 0c24 0 46.2 7.5 64.4 20.3zM448 416l0-21.5c20-24.7 32-56.2 32-90.5c0-42.8-18.7-81.3-48.4-107.7C449.8 183.5 472 176 496 176l32 0c61.9 0 112 50.1 112 112c0 44.7-26.2 83.2-64 101.2l0 26.8c0 17.7-14.3 32-32 32l-64 0c-17.7 0-32-14.3-32-32zm8-328a56 56 0 1 1 112 0A56 56 0 1 1 456 88zM576 245.7l0 84.7c10-11.3 16-26.1 16-42.3s-6-31.1-16-42.3zM320 32a64 64 0 1 1 0 128 64 64 0 1 1 0-128zM240 304c0 16.2 6 31 16 42.3l0-84.7c-10 11.3-16 26.1-16 42.3zm144-42.3l0 84.7c10-11.3 16-26.1 16-42.3s-6-31.1-16-42.3zM448 304c0 44.7-26.2 83.2-64 101.2l0 42.8c0 17.7-14.3 32-32 32l-64 0c-17.7 0-32-14.3-32-32l0-42.8c-37.8-18-64-56.5-64-101.2c0-61.9 50.1-112 112-112l32 0c61.9 0 112 50.1 112 112z"
+                        clip-rule="evenodd"
+                    ></path>
+                    </svg>
+                </div>
+                <div>
+                    <p class="text-lg font-semibold text-gray-700">
+                        Personal
+                    </p>
+                </div>
+            </a>
+        {% endif %}
     </div>
 </div>
 

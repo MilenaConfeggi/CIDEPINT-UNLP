@@ -29,6 +29,7 @@
             <th class="px-4 py-3">Area de Ganancias</th>
             <th class="px-4 py-3">Area de Costos</th>
             <th class="px-4 py-3">Empleados</th>
+            <th class="px-4 py-3">Acciones</th>
         </tr>
         </thead>
         <tbody class="bg-white divide-y">
@@ -47,12 +48,19 @@
                     
                         <ul>
                         {% for empleado in distribucion.empleados_asociados %}
-                            <li>{{ empleado.empleado.saldo }}</li>
+                            <li>{{ empleado.empleado.nombre }} {{ empleado.empleado.apellido }}</li>
                         {% endfor %}
                         </ul>
                     {% else %}
                         <p>No hay empleados asignados</p>
                     {% endif %}
+                </td>
+                <td class="px-4 py-3 text-sm">
+                <form action="{{ url_for('contable.delete_distribucion', id=distribucion.id) }}" method="post" onsubmit="return confirm('¿Está seguro que desea eliminar esta distribución?');">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="text-red-600 hover:text-red-900">Eliminar</button>
+                </form>
+
                 </td>
             </tr>
         {% endfor %}

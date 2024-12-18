@@ -6,6 +6,10 @@ def listar_fondos():
     return Fondo.query.all()
 
 
+def filtrar_fondos(page, per_page):
+    return Fondo.query.filter_by(borrado=False).order_by(Fondo.titulo.asc()).paginate(page=page, per_page=per_page, error_out=False)
+
+
 def conseguir_fondo_de_id(fondo_id):
 
     return Fondo.query.get(fondo_id)

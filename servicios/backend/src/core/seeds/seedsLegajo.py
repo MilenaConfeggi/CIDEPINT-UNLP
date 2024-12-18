@@ -15,58 +15,31 @@ def seeds_legajos():
             'nro_legajo': 'LEG1',
             'es_juridico': True,
             'necesita_facturacion': True,
-            'motivo_cancelacion': None,
+            'objetivo': 'Objetivo de legajo',
         },
         {
             'fecha_entrada': datetime(2024, 1, 1),
-            'nro_legajo': 'LEG1',
+            'nro_legajo': 'LEG2',
             'es_juridico': True,
             'necesita_facturacion': True,
-            'motivo_cancelacion': None,
+            'objetivo': 'Objetivo de legajo2',
 
         },
         {
             'fecha_entrada': datetime(2024, 2, 1),
-            'nro_legajo': 'LEG2',
+            'nro_legajo': 'LEG3',
             'es_juridico': False,
             'necesita_facturacion': False,
-            'motivo_cancelacion': None,
+            'objetivo': 'Objetivo de legajo3',
         },
         {
             'fecha_entrada': datetime(2024, 3, 1),
-            'nro_legajo': 'LEG3',
+            'nro_legajo': 'LEG4',
             'es_juridico': True,
             'necesita_facturacion': True,
-            'motivo_cancelacion': None,
+            'objetivo': 'Objetivo de legajo4',
         }
     ]
-    cliente_data = {
-            'email': 'cliente1@mail.com',
-            'cuit': '123456789',
-            'telefono': '123456789',
-            'celular': '123456789',
-            'direccion': 'Calle 1',
-            'fecha_nacimiento': datetime(1990, 1, 1),
-            'contacto': 'Contacto 1',
-            'calle': 'Calle 1',
-            'numero': '1',
-            'localidad': 'Localidad 1',
-            'codigo_postal': '00000',
-            'piso': 'Piso 1',
-            'depto': 'Depto 1',
-            'legajo_id': 1
-        }
-
     for data in legajos_data:
         create_legajo(data)
-    
-    c = Cliente(**cliente_data)
-    db.session.add(c)
-    
-    cli = find_cliente_by_mail(cliente_data['email'])
-    print(cli.legajo.nro_legajo)
-    
-    leg = find_legajo_by_id("LEG1")
-    print(leg.cliente.cuit)
-    
     db.session.commit()

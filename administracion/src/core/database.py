@@ -35,8 +35,9 @@ def reset():
     db.session.commit()
 
 def seed():
-    default_area = Area(nombre='Default Area', saldo=0)
-    db.session.add(default_area)
+    default_area = Area(nombre='CIDEPINT', saldo=0)
+    tecno_area = Area(nombre='Area Tecnologica', saldo=0)
+    db.session.add(default_area, tecno_area)
 
     bien_1 = Bien(
             titulo='Vasija',
@@ -232,7 +233,9 @@ def seed():
 
     admin_user = User(
         username='admin',
-        password='admin'
+        password='admin',
+        habilitado=True,
+        rol='Administrador'
     )
     db.session.add(admin_user)
                 
@@ -251,8 +254,6 @@ def seed():
         domicilio='Admin Address',
         fecha_nacimiento=datetime.strptime('1970-01-01', '%Y-%m-%d'),
         observaciones='Usuario administrador por defecto',
-        habilitado=True,
-        rol='Administrador'
     )
     db.session.add(admin_empleado)
             
@@ -260,7 +261,9 @@ def seed():
     
     inhabilitado_user = User(
         username='inhabilitado',
-        password='inhabilitado'
+        password='inhabilitado',
+        habilitado=False,
+        rol='Personal'
     )
     db.session.add(inhabilitado_user)
                 
@@ -277,9 +280,7 @@ def seed():
         telefono='987654321',
         domicilio='Inhabilitado Address',
         fecha_nacimiento=datetime.strptime('1980-01-01', '%Y-%m-%d'),
-        observaciones='Usuario inhabilitado por defecto',
-        habilitado=False,
-        rol='Personal'
+        observaciones='Usuario inhabilitado por defecto'
     )
     db.session.add(inhabilitado_empleado)
 
@@ -324,7 +325,7 @@ def seed():
     personal_1 = Empleado(
         user=usuario_1,
         email='rober@example.com',
-        area=default_area,  # Asigna el área creada
+        area=tecno_area,  # Asigna el área creada
         dni='204060',
         nombre='Rober',
         apellido='Tito',
@@ -334,9 +335,7 @@ def seed():
         telefono='123456789',
         domicilio='Admin Address',
         fecha_nacimiento=datetime.strptime('1970-01-01', '%Y-%m-%d'),
-        observaciones='Usuario administrador por defecto',
-        habilitado=True,
-        rol='Personal'
+        observaciones='Usuario administrador por defecto'
     )
 
     usuario_2 = User(
@@ -357,9 +356,7 @@ def seed():
         telefono='123456780',
         domicilio='Maria Address',
         fecha_nacimiento=datetime.strptime('1985-02-01', '%Y-%m-%d'),
-        observaciones='Usuario personal',
-        habilitado=True,
-        rol='Personal'
+        observaciones='Usuario personal'
     )
 
     usuario_3 = User(
@@ -380,14 +377,13 @@ def seed():
         telefono='123456781',
         domicilio='Juan Address',
         fecha_nacimiento=datetime.strptime('1990-03-01', '%Y-%m-%d'),
-        observaciones='Usuario personal',
-        habilitado=True,
-        rol='Personal'
+        observaciones='Usuario personal'
     )
 
     usuario_4 = User(
         username='ana',
-        password='ana'
+        password='ana',
+        rol='Colaborador'
     )    
     
     personal_4 = Empleado(
@@ -403,9 +399,7 @@ def seed():
         telefono='123456782',
         domicilio='Ana Address',
         fecha_nacimiento=datetime.strptime('1995-04-01', '%Y-%m-%d'),
-        observaciones='Usuario personal',
-        habilitado=True,
-        rol='Personal'
+        observaciones='Usuario personal'
     )
 
     usuario_5 = User(
@@ -426,9 +420,7 @@ def seed():
         telefono='123456783',
         domicilio='Luis Address',
         fecha_nacimiento=datetime.strptime('1988-05-01', '%Y-%m-%d'),
-        observaciones='Usuario personal',
-        habilitado=True,
-        rol='Personal'
+        observaciones='Usuario personal'
     )
 
     usuario_6 = User(
@@ -449,9 +441,7 @@ def seed():
         telefono='123456784',
         domicilio='Laura Address',
         fecha_nacimiento=datetime.strptime('1992-06-01', '%Y-%m-%d'),
-        observaciones='Usuario personal',
-        habilitado=True,
-        rol='Personal'
+        observaciones='Usuario personal'
     )
 
     db.session.add_all([personal_1,usuario_1,personal_2, usuario_2, personal_3, usuario_3, personal_4, usuario_4, personal_5, usuario_5, personal_6, usuario_6])

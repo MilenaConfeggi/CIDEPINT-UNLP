@@ -1,44 +1,165 @@
 {% extends "layout.html" %}
 {% block title %}
-    Pagina de Cotable
+    Fondos
 {% endblock %}
 {% block content %}
-<h1>Contable </h1>
-<div class="flex flex-wrap items-end mb-1">
-<a href="{{url_for('contable.get_crear_fondo')}}" 
-class="px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-green-600 border border-transparent rounded-lg active:bg-green-600 hover:bg-green-700 focus:outline-none focus:shadow-outline-green">
-Crear un nuevo Fondo</a>
-</div>
-
-<div class="w-full overflow-x-auto">
-    <table class="w-full whitespace-no-wrap">
-        <thead>
-        <tr
-            class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b bg-gray-50"
-        >
-            <th class="px-4 py-3">Titulo</th>
-            <th class="px-4 py-3">Saldo</th>
-            <th class="px-4 py-3">Acciones</th>
-        </tr>
-        </thead>
-        <tbody
-        class="bg-white divide-y"
-        >
-        {% for fondo in fondos %}
-            <tr class="text-gray-700">
-                <td class="px-4 py-3">
-                <div class="flex items-center text-sm">
-                    <div>
-                        <p class="font-semibold">{{ fondo.titulo }}</p>
+        <div class="px-4 py-3 mx-8 mt-2 mb-8 bg-white rounded-lg shadow-md animate-fade-right animate-once">
+                <div class="mb-4 flex flex-wrap justify-between items-end">
+                    <h3 class="mb-1 text-lg font-semibold text-gray-600">Fondos</h3>
+                    <div class="flex flex-wrap items-end mb-1">
+                        <!-- Enlace para agregar nuevo registro -->
+                        <a href="{{url_for('contable.get_crear_fondo')}}"
+                        class="px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-green-500 border border-transparent rounded-lg active:bg-green-600 hover:bg-green-700 focus:outline-none focus:shadow-outline-green">
+                            Agregar Fondo
+                        </a>
                     </div>
                 </div>
-                </td>
-                <td class="px-4 py-3 text-sm">
-                {{ fondo.saldo }}
-                </td>
-                <td class="px-4 py-3 text-sm">
-                <a href="{{ url_for('contable.mostrar_fondo', fondo_id=fondo.titulo) }}" class="text-indigo-600 hover:text-indigo-900">Ver</a>
-                </td>
-            </tr>
-        {% endfor %}
+                <hr />
+            <div class="w-full overflow-x-auto">
+            <table class="w-full whitespace-no-wrap mt-2">
+                <thead>
+                <tr
+                    class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b bg-gray-50"
+                >
+                    <th class="px-4 py-3">Titulo</th>
+                    <th class="px-4 py-3">Saldo</th>
+                    <th class="px-4 py-3">Acciones</th>
+                </tr>
+                </thead>
+                <tbody
+                class="bg-white divide-y"
+                >
+                {% for fondo in fondos %}
+                    <tr class="text-gray-700">
+                        <td class="px-4 py-3">
+                        <div class="flex items-center text-sm">
+                            <div>
+                                <p class="font-semibold">{{ fondo.titulo }}</p>
+                            </div>
+                        </div>
+                        </td>
+                        <td class="px-4 py-3 text-sm">
+                        ${{ '{:,.0f}'.format(fondo.saldo) }}
+                        </td>
+                        <td class="px-4 py-3">
+                        <div class="flex items-center space-x-4 text-sm">
+                            <a href="{{ url_for('contable.mostrar_fondo', fondo_id=fondo.titulo) }}"
+                            class="flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-black-600 rounded-lg focus:outline-none focus:shadow-outline-gray"
+                            aria-label="Ver"
+                            >
+                                <svg
+                                    class="w-5 h-5"
+                                    aria-hidden="true"
+                                    fill="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                    d="M12 4.5C7.305 4.5 3.135 7.305 1.5 12c1.635 4.695 5.805 7.5 10.5 7.5s8.865-2.805 10.5-7.5C20.865 7.305 16.695 4.5 12 4.5zm0 12c-2.485 0-4.5-2.015-4.5-4.5s2.015-4.5 4.5-4.5 4.5 2.015 4.5 4.5-2.015 4.5-4.5 4.5zm0-7.5c-1.655 0-3 1.345-3 3s1.345 3 3 3 3-1.345 3-3-1.345-3-3-3z"
+                                    ></path>
+                                </svg>
+                            </a>
+                            <form action="{{ url_for('contable.delete_fondo', fondo_id=fondo.titulo) }}" method="POST" style="display:inline;">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('¿Estás seguro de que deseas eliminar este fondo?');"
+                                class="open-modal-btn flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-black-600 rounded-lg focus:outline-none focus:shadow-outline-gray"
+                                aria-label="Borrar"
+                                >
+                                <svg
+                                    class="w-5 h-5"
+                                    aria-hidden="true"
+                                    fill="currentColor"
+                                    viewBox="0 0 20 20"
+                                >
+                                    <path
+                                    fill-rule="evenodd"
+                                    d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                                    clip-rule="evenodd"
+                                    ></path>
+                                </svg>
+                            </form>
+                        </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+            </div>
+            <div
+            class="grid px-4 py-3 text-xs font-semibold tracking-wide text-gray-500 uppercase border-t bg-gray-50 sm:grid-cols-9"
+            >
+            <span class="flex items-center col-span-3">
+                Mostrando {{ fondos.first }}-{{ fondos.last }} de {{ fondos.total }}
+            </span>
+            <span class="col-span-2"></span>
+            <!-- Pagination -->
+            <span class="flex col-span-4 mt-2 sm:mt-auto sm:justify-end">
+                <nav aria-label="Table navigation">
+                <ul class="inline-flex items-center">
+                    <li>
+                    <a
+                        class="px-3 py-1 rounded-md rounded-l-lg focus:outline-none focus:shadow-outline-purple"
+                        aria-label="Anterior"
+                        href="{{ url_for('contable.index_fondo', page=fondos.prev_num) }}"
+                    >
+                        <svg
+                        class="w-4 h-4 fill-current"
+                        aria-hidden="true"
+                        viewBox="0 0 20 20"
+                        >
+                        <path
+                            d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                            clip-rule="evenodd"
+                            fill-rule="evenodd"
+                        ></path>
+                        </svg>
+                    </a>
+                    </li>
+                    {% if fondos.iter_pages() %}
+                    {% for page in fondos.iter_pages() %}
+                        {% if page %}
+                            {% if page != fondos.page %}
+                                <li>
+                                    <a href="{{ url_for('contable.index_fondo', page=page) }}" class="px-3 py-1 text-gray transition-colors duration-150">
+                                        {{ page }}
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li>
+                                    <p class="px-3 py-1 text-white transition-colors duration-150 bg-blue-600 border border-r-0 border-blue-600 rounded-md focus:outline-none focus:shadow-outline-blue">
+                                        {{ page }}
+                                    </p>
+                                </li>
+                            {% endif %}
+                        {% else %}
+                            <li>
+                                <p class="px-3 py-1 text-white transition-colors duration-150">
+                                    ..
+                                </p>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% endif %}
+                    <li>
+                    <a
+                        class="px-3 py-1 rounded-md rounded-r-lg focus:outline-none focus:shadow-outline-purple"
+                        aria-label="Next"
+                        href="{{ url_for('contable.index_fondo', page=fondos.next_num) }}"
+                    >
+                        <svg
+                        class="w-4 h-4 fill-current"
+                        aria-hidden="true"
+                        viewBox="0 0 20 20"
+                        >
+                        <path
+                            d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                            clip-rule="evenodd"
+                            fill-rule="evenodd"
+                        ></path>
+                        </svg>
+                    </a>
+                    </li>
+                </ul>
+                </nav>
+            </span>
+            </div>
+        </div>
 {% endblock %}

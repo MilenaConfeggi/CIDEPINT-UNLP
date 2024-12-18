@@ -4,9 +4,9 @@
 {% endblock %}
 {% block content %}
 
-<h1 class="text-2xl font-bold mb-4">Cambiar Contraseña</h1>
+<h1 class="text-2xl font-bold mb-4 text-center">Cambiar Contraseña y Actualizar Datos</h1>
 
-<form action="{{ url_for('auth.cambiar_contrasena') }}" method="POST" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+<form action="{{ url_for('auth.cambiar_contrasena') }}" method="POST" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 max-w-lg mx-auto">
   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
   
   <div class="mb-4">
@@ -74,7 +74,7 @@
   </div>
   
   <div class="flex items-center justify-between">
-    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Cambiar Contraseña</button>
+    <button type="submit" class="bg-blue-500 text-white px-4 py-2 hover:bg-blue-700 transition duration-300 rounded-full">Guardar Cambios</button>
   </div>
 </form>
 

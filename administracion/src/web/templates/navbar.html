@@ -18,9 +18,13 @@
         <div class="hidden lg:flex lg:gap-x-12">
           <a href="{{ url_for('archivos.index') }}" class="text-sm/6 font-semibold text-gray-900">Archivos</a>
           <a href="{{ url_for('compra.index') }}" class="text-sm/6 font-semibold text-gray-900">Compras</a>
-          <a href="{{url_for('contable.index')}}" class="text-sm/6 font-semibold text-gray-900">Contable</a>
+          {% if current_user.rol == 'Administrador' or current_user.rol == 'Colaborador' %}
+            <a href="{{url_for('contable.index')}}" class="text-sm/6 font-semibold text-gray-900">Contable</a>
+          {% endif %}
           <a href="{{ url_for('patrimonio.index') }}" class="text-sm/6 font-semibold text-gray-900">Patrimonio</a>
-          <a href="{{url_for('personal.index')}}" class="text-sm/6 font-semibold text-gray-900">Personal</a>
+          {% if current_user.rol == 'Administrador' or current_user.rol == 'Colaborador' %}
+            <a href="{{url_for('personal.index')}}" class="text-sm/6 font-semibold text-gray-900">Personal</a>
+          {% endif %}
         </div>
       {% endif %}
       <div class="hidden lg:flex lg:flex-1 lg:justify-end">
@@ -43,9 +47,13 @@
       menu.innerHTML = `
         <a href="{{ url_for('archivos.index') }}" class="block text-sm font-semibold text-gray-900 mb-4">Archivos</a>
         <a href="{{ url_for('compra.index') }}" class="block text-sm font-semibold text-gray-900 mb-4">Compras</a>
-        <a href="{{ url_for('contable.index') }}" class="block text-sm font-semibold text-gray-900 mb-4">Contable</a>
+        {% if current_user.rol == 'Administrador' or current_user.rol == 'Colaborador' %}	
+          <a href="{{ url_for('contable.index') }}" class="block text-sm font-semibold text-gray-900 mb-4">Contable</a>
+        {% endif %}
         <a href="{{ url_for('patrimonio.index') }}" class="block text-sm font-semibold text-gray-900 mb-4">Patrimonio</a>
-        <a href="{{ url_for('personal.index') }}" class="block text-sm font-semibold text-gray-900 mb-4">Personal</a>
+        {% if current_user.rol == 'Administrador' or current_user.rol == 'Colaborador' %}
+          <a href="{{ url_for('personal.index') }}" class="block text-sm font-semibold text-gray-900 mb-4">Personal</a>
+        {% endif %}
         <a href="{{ url_for('personal.ver_perfil', id=current_user.id) }}" class="block text-sm font-semibold text-black mb-4">Mi perfil</a>
         <a href="{{ url_for('auth.logout') }}" class="block text-sm font-semibold text-red-500">Cerrar sesión</a>
       `;

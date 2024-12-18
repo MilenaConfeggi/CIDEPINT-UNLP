@@ -1,3 +1,4 @@
+
 import os
 from werkzeug.utils import secure_filename
 from flask import current_app
@@ -14,7 +15,7 @@ def listar_archivos_de_carpeta(id_carpeta):
 
 
 def listar_carpetas(anio):
-    if current_user.empleado.rol != 'Personal':
+    if current_user.rol != 'Personal':
         return Carpeta.query.filter(
             extract('year', Carpeta.fecha_ingreso) == anio
         ).order_by(Carpeta.nombre.asc()).all()
@@ -82,6 +83,7 @@ def guardar_archivo_en_carpeta(id_carpeta, archivo):
 
     db.session.add(nuevo_archivo)
     db.session.commit()
+    return nuevo_archivo
 
 
 def eliminar_archivo(id_archivo):
@@ -135,3 +137,5 @@ def editar_carpeta(
     db.session.commit()
     
     return carpeta
+def get_carpeta_by_nombre(nombre):
+    return Carpeta.query.filter(Carpeta.nombre == nombre).first()

@@ -9,7 +9,6 @@ from administracion.src.web.controllers.personal.personal_controller import pers
 from administracion.src.web.controllers.personal.ausencia_controller import ausencia_bp
 from administracion.src.web.controllers.auth_controller import auth_bp
 from administracion.src.web.controllers.compra import bp as compra_bp
-
 def registrar_rutas(app):
 
     app.register_blueprint(patrimonio_bp)

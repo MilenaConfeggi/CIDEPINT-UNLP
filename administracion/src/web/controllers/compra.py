@@ -20,7 +20,7 @@ bp = Blueprint("compra",__name__,url_prefix="/compra")
 @bp.get("/")
 @role_required('Administrador', 'Colaborador', 'Personal') 
 def index():
-    return render_template("compras/inicio.html", rol=current_user.empleado.rol)
+    return render_template("compras/inicio.html", rol=current_user.rol)
 
 @bp.get("/lista_proveedores")
 @role_required('Administrador', 'Colaborador') 
@@ -133,10 +133,10 @@ def lista_compras():
     page = request.args.get("page", 1, type=int)
     per_page = 10
     compras = filtrar_compras(
-        fecha_menor, fecha_mayor, estado, current_user.empleado.rol, current_user.empleado.area_id, page, per_page
+        fecha_menor, fecha_mayor, estado, current_user.rol, current_user.empleado.area_id, page, per_page
     )
 
-    return render_template("compras/listado_compras.html", compras=compras, rol=current_user.empleado.rol) 
+    return render_template("compras/listado_compras.html", compras=compras, rol=current_user.rol) 
 
 @bp.get("/ver_compra/<int:id_compra>")
 @role_required('Administrador', 'Colaborador', 'Personal')
@@ -157,7 +157,7 @@ def descargar_compras_excel():
     
     # Fetch all items based on the filters (no pagination)
     compras = filtrar_compras_descargadas(
-        fecha_menor, fecha_mayor, estado, current_user.empleado.rol, current_user.empleado.area_id
+        fecha_menor, fecha_mayor, estado, current_user.rol, current_user.empleado.area_id
     )
 
     # Prepare CSV data
@@ -195,7 +195,7 @@ def descargar_compras_pdf():
     
     # Fetch all items based on the filters (no pagination)
     compras = filtrar_compras_descargadas(
-        fecha_menor, fecha_mayor, estado, current_user.empleado.rol, current_user.empleado.area_id
+        fecha_menor, fecha_mayor, estado, current_user.rol, current_user.empleado.area_id
     )
     
     # Prepare PDF data

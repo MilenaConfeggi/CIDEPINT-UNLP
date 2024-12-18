@@ -22,13 +22,13 @@ class Empleado(db.Model):
     telefono = db.Column(db.String(20), nullable=True)
     domicilio = db.Column(db.String(200), nullable=True)
     fecha_nacimiento = db.Column(db.Date, nullable=True)
+    saldo = db.Column(db.Float, default=0.0)   
     observaciones = db.Column(db.Text, nullable=True)
     archivos = db.relationship('Archivo', back_populates='empleado')
     ausencias = db.relationship('Ausencia', back_populates='empleado')
     distribuciones_asociadas = db.relationship(
         "Empleado_Distribucion", back_populates="empleado"
-    )
-    saldo = db.Column(db.Float, default=0.0)    
+    ) 
     compras = db.relationship('Compra', secondary=compra_empleado ,back_populates='empleados')
     solicitudes = db.relationship('Compra', back_populates='solicitante', cascade='all, delete-orphan')
 

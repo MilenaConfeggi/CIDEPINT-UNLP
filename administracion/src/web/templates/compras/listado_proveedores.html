@@ -77,21 +77,24 @@
                     {{ proveedor.contacto }}
                     </td>
                     <td class="px-4 py-3">
-                    <div class="flex items-center space-x-4 text-sm">
-                        <a href="{{ url_for('compra.editar_proveedor', id_proveedor=proveedor.id) }}"
-                        class="text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                        aria-label="Editar proveedor">
-                        Editar proveedor
-                     </a>
+                    <div class="flex items-center space-x-2">
+                        <a href="{{ url_for('compra.editar_proveedor', id_proveedor=proveedor.id) }}">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+                            </svg>
+                        </a>
                         <form id="eliminar-proveedor-form-{{ proveedor.id }}" action="{{ url_for('compra.eliminar_proveedor', id_proveedor=proveedor.id) }}" method="post" style="display:inline;">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                            <button type="button"
-                                    id="eliminar-proveedor-btn-{{ proveedor.id }}"
-                                    class="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800"
-                                    data-id="{{ proveedor.id }}">
-                                Eliminar proveedor
-                            </button>
-                        </form>
+                            <a href="#" 
+                                id="eliminar-proveedor-btn-{{ proveedor.id }}"
+                                data-id="{{ proveedor.id }}">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M6 2a1 1 0 00-1 1v1H3a1 1 0 100 2h14a1 1 0 100-2h-2V3a1 1 0 00-1-1H6zM4 7v9a2 2 0 002 2h8a2 2 0 002-2V7H4z"/>
+                                </svg>
+                            </a>
+                        <form>
+                    </div>
+                    </form>
                     </div>
                     </td>
                 </tr>

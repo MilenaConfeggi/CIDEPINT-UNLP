@@ -39,7 +39,7 @@ def index_fondo():
     per_page = 10
 
     fondos = fondo.filtrar_fondos(page=page, per_page=per_page)
-    fondos = [f for f in fondos if not f.borrado]
+   # fondos = [f for f in fondos if not f.borrado]
     return render_template("contable/contable.html",fondos = fondos)
 
 @bp.get("/fondos")

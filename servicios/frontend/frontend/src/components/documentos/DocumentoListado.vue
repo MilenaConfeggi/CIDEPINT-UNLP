@@ -4,24 +4,23 @@
     <p v-if="loading">Cargando...</p>
     <p v-if="error">{{ error }}</p>
     <div class="input-group mb-3 d-flex flex-row">
-      <label class="input-group-text" for="documento">Tipo de documento</label>
+      <label class="input-group-text" for="tipo_documento">Tipo de documento</label>
       <select v-model="tipo_documento" class="form-select" id="tipo_documento">
-        <option selected>Choose...</option>
+        <option selected value="" >Todos</option>
         <option v-for="tipo in tipos_documentos" :key="tipo.id" :value="tipo.id">
-          {{ tipo.nombre }}
+          {{ tipo?.nombre }}
         </option>
       </select>
       <label class="input-group-text" for="area">Areas</label>
       <select v-model="area" class="form-select" id="area">
-        <option selected>Choose...</option>
-        <option value="1">One</option>
-        <option value="2">Two</option>
-        <option value="3">Three</option>
+        <option selected value="">Todos</option>
+        <option v-for="area in areas" :key="area.id" :value="area.id">
+          {{ area.nombre }}
+        </option>
       </select>
-      <span class="input-group-text">Empresa</span>
-
-      <input v-model="empresa" type="text" aria-label="nombre del cliente" class="form-control" />
-      <input type="date" v-model="fecha" @input="validateDates" placeholder="Fecha de inicio" />
+      <label class="input-group-text" for="empresa">Empresa</label>
+      <input v-model="empresa" type="text" aria-label="nombre del cliente" class="form-control" id="empresa" />
+      <input type="date" v-model="fecha" @input="validateDates" placeholder="Fecha de inicio" id="fecha" />
     </div>
     <div v-if="documentos.items?.length">
       <div></div>
@@ -36,9 +35,9 @@
         </thead>
         <tbody>
           <tr v-for="documento in documentos.items" :key="documento.id">
-            <th scope="row">{{ documento.nombre_documento }}</th>
-            <td>{{ documento.legajo_id }}</td>
-            <td>{{ documento.tipo_documento.nombre }}</td>
+            <th scope="row">{{ documento?.nombre_documento }}</th>
+            <td>{{ documento?.legajo_id }}</td>
+            <td>{{ documento?.tipo_documento?.nombre }}</td>
             <td>
               <button
                 type="button"
@@ -114,11 +113,13 @@ export default {
 <script setup>
 import { onMounted, watch } from 'vue'
 import { useDocumentosStore } from '../../stores/documentos'
+import { useAreasStore } from '@/stores/areas'
 import { storeToRefs } from 'pinia'
 import axios from 'axios'
 import { ref } from 'vue'
 
 const documentosStore = useDocumentosStore()
+const areasStore = useAreasStore()
 const currentPage = ref(1)
 const actualFile = ref(null)
 const fileUrl = ref(null)
@@ -128,6 +129,7 @@ var empresa = ref('')
 var fecha = ref('')
 
 const { documentos, loading, error, totalPages, tipos_documentos } = storeToRefs(documentosStore)
+const { areas } = storeToRefs(areasStore)
 
 const validateDates = () => {
   if (new Date(this.startDate) > new Date()) {
@@ -142,9 +144,17 @@ const fetchDocumentos = async () => {
     tipo_documento: tipo_documento.value,
     page: currentPage.value,
     per_page: 10,
+    empresa: empresa.value,
+    fecha: fecha.value,
+    area: area.value,
   }
   await documentosStore.getDocumentos(params)
 }
+
+const fetchAreas = async () => {
+  await areasStore.getAreas()
+}
+
 const viewFile = async (doc) => {
   actualFile.value = doc
   const tipo = doc.tipo_documento.nombre
@@ -177,10 +187,13 @@ const nextPage = () => {
 }
 
 onMounted(() => {
+  if (areas.value.length) {
+    fetchAreas()
+  }
   fetchDocumentos()
 })
 
-watch([tipo_documento, currentPage], () => {
+watch([tipo_documento, currentPage, area, empresa, fecha], () => {
   fetchDocumentos()
 })
 </script>

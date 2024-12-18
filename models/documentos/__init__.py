@@ -18,12 +18,19 @@ def create_estado(data):
 
 def listar_documentos(page=1, per_page=10, tipo_documento=None, empresa=None, fecha=None, area=None):
     tipo_documento = tipo_documento.strip()
-    query = db.session.query(Documento).join(Legajo)
+    query = db.session.query(Documento)
+    query = query.join(Legajo.documento)
     if tipo_documento:
         query = query.filter_by(tipo_documento_id=tipo_documento)
-    legajo_query = list_legajos(page=None, per_page=None, empresa=empresa, fecha=fecha, area=area).query
-    result = legajo_query.join(Documento, Legajo.id == Documento.legajo_id)
-    return result.paginate(page=page, per_page=per_page, error_out=False)
+    if empresa:
+        query = query.join(Legajo.cliente).filter(Cliente.nombre.like(f'%{empresa}%'))
+    if fecha:
+        fecha = datetime.strptime(fecha, '%Y-%m-%d')
+        print(fecha)
+        query = query.filter(Legajo.fecha_entrada == fecha)
+    if area:
+        query = query.join(Legajo.area).filter(Area.id == area)
+    return query.paginate(page=page, per_page=per_page, error_out=False)
 
 def list_estados():
     return db.session.query(Estado).all()
@@ -83,4 +90,4 @@ def list_legajos(page=1, per_page=10, empresa=None, fecha=None, area=None):
         query = query.filter(Legajo.fecha_entrada == fecha)
     if area:
         query = query.join(Legajo.area).filter(Area.id == area)
-    return query.paginate(page=page, per_page=per_page, error_out=False)
+    return query

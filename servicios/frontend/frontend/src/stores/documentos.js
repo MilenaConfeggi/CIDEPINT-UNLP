@@ -10,11 +10,24 @@ export const useDocumentosStore = defineStore("documentos", {
         doc: null,
     }),
     actions: {
-        async getDocumentos() {
+        async getDocumentos(params) {
+            console.log(params)
+            const { page, per_page, tipo_documento, empresa, fecha, area } = params
             this.loading = true;
             this.error = null;
             try {
-                const response = await axios.get("http://127.0.0.1:5000/api/documentos/");
+                const response = await axios.get("http://127.0.0.1:5000/api/documentos/",
+                    {
+                        params: {
+                            page,
+                            per_page,
+                            tipo_documento,
+                            empresa,
+                            fecha,
+                            area,
+                        },
+                    }
+                );
                 this.documentos = response.data;
                 return response;
             } catch (error) {
@@ -51,7 +64,7 @@ export const useDocumentosStore = defineStore("documentos", {
                         "Content-Type": "multipart/form-data",
                     },
                 });
-                this.documentos.push(response.data);
+                this.documentos = response.data;
                 return response;
             } catch (error) {
                 this.error = error;

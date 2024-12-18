@@ -5,7 +5,6 @@ INITIAL_ID = 33
 class Legajo(db.Model):
     __tablename__ = 'legajo'
     id = db.Column(db.Integer, primary_key=True)
-    nro_legajo = db.Column(db.String(100))
     fecha_entrada = db.Column(db.DateTime)
     objetivo = db.Column(db.String(100))
     es_juridico = db.Column(db.Boolean)

@@ -53,7 +53,6 @@ const logout = () => {
         
         <RouterLink v-if="estaLogueado && tienePermisoListarStans" to="/stans">Stans</RouterLink>
 
-        <!-- Mostrar el botón de Stans solo si el usuario está logueado y tiene el permiso "listar_stans" -->
         <RouterLink v-if="estaLogueado && tienePermisoListarUsuarios" to="/usuarios">Usuarios</RouterLink>
         
         <RouterLink v-if="!estaLogueado" to="/log-in">Iniciar Sesión</RouterLink>

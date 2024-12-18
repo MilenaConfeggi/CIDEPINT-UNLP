@@ -24,7 +24,10 @@ def get_documentos():
     page = params.get('page', 1, int)
     per_page = params.get('per_page', 10, int)
     tipo_documento = params.get('tipo_documento', '')
-    pagination = listar_documentos(page=page, per_page=per_page, tipo_documento=tipo_documento)
+    empresa = params.get('empresa', '')
+    fecha = params.get('fecha', '')
+    area = params.get('area', '')
+    pagination = listar_documentos(page=page, per_page=per_page, tipo_documento=tipo_documento, empresa=empresa, fecha=fecha, area=area)
     data = pagination_documento_schema.dump(pagination)
     return jsonify(data), 200
 

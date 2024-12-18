@@ -11,6 +11,7 @@ from servicios.backend.src.core.seeds import seedsArea
 from servicios.backend.src.core.seeds import seedsUsuario
 from servicios.backend.src.core.seeds import seedsStans
 from servicios.backend.src.core.seeds import seedsInterarea
+from servicios.backend.src.core.seeds import seedsMedioPago
 from models import db
 from servicios.backend.src.web.controllers.mails import bp as mails_bp
 from servicios.backend.src.web.controllers.muestras import bp as muestras_bp
@@ -22,6 +23,7 @@ from servicios.backend.src.web.api.legajosAPI import bp as legajos_api_bp
 from servicios.backend.src.web.api.documentoAPI import bp as documentos_api_bp
 from servicios.backend.src.web.controllers.interarea import bp as interarea_bp
 from servicios.backend.src.web.api.areaAPI import bp as area_bp
+from servicios.backend.src.web.api.encuesta import bp as encuestas_bp
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
@@ -52,6 +54,7 @@ def create_app(env="development", static_folder=""):
     app.register_blueprint(auth_bp)
     app.register_blueprint(stans_bp)
     app.register_blueprint(interarea_bp)
+    app.register_blueprint(encuestas_bp)
 
     @app.cli.command(name="reset-db")
     def reset_db():
@@ -69,12 +72,16 @@ def create_app(env="development", static_folder=""):
         """
         Comando para crear los seeds de la base de datos
         """
+        seedsMedioPago.seeds_medio_pago()
+        print("Medios de pago creados!")
         seedsArea.seeds_areas()
         print("Areas creados!")
         seedsEstados.seeds_estados()
         print("Estados creados!")
         seedsDocumento.seeds_tipos_documento()
         print("Tipos de documentos creados!")
+        seedsStans.seeds_stans()
+        print("Stans creados!")
         seedsLegajo.seeds_legajos()
         print("Legajos creados!")
         seedsMuestra.seeds_muestras()
@@ -83,8 +90,6 @@ def create_app(env="development", static_folder=""):
         print("Mails creados!")
         seedsCliente.seeds_clientes()
         print("Clientes creados!")
-        seedsStans.seeds_stans()
-        print("Stans creados!")
         seedsUsuario.seeds_usuarios()
         print("Usuarios creados!")
         seedsInterarea.seeds_interarea()

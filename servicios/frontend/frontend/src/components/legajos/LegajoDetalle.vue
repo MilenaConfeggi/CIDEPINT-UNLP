@@ -29,6 +29,7 @@
           <p>{{ legajo.cliente.nombre }}</p>
           <p>CUIT: {{ legajo.cliente.cuit }}</p>
         </div>
+        <EncuestaGenerator />
 
         <div v-if="legajo && tipos_documentos?.length">
           <table class="table">
@@ -196,7 +197,7 @@ import { storeToRefs } from 'pinia'
 import { ref } from 'vue'
 import axios from 'axios'
 import StateBadge from '../StateBadge.vue'
-
+import EncuestaGenerator from '../EncuestaGenerator.vue'
 const route = useRoute()
 const legajosStore = useLegajosStore()
 const documentosStore = useDocumentosStore()

@@ -14,28 +14,18 @@
     <p v-if="loading">Cargando...</p>
     <p v-if="error">{{ error }}</p>
     <div class="input-group mb-3 d-flex flex-row">
-      <label class="input-group-text" for="documento">Ensayos</label>
-      <select v-model="documento" class="form-select" id="documento">
-        <option selected value="">Choose...</option>
-        <option value="1">One</option>
-        <option value="2">Two</option>
-        <option value="3">Three</option>
-      </select>
+      <label class="input-group-text" for="ensayos">Ensayos</label>
+      <input v-model="ensayo" type="text" aria-label="Ensayos" class="form-control" />
       <label class="input-group-text" for="area">Areas</label>
       <select v-if="areas" v-model="area" class="form-select" id="area">
-        <option selected value="">Choose...</option>
+        <option selected value="">Elige un area</option>
         <option v-for="area in areas" :key="area.id" :value="area.id">
           {{ area.nombre }}
         </option>
       </select>
       <span class="input-group-text">Empresa</span>
 
-      <input
-        v-model="empresa"
-        type="text"
-        aria-label="nombre del cliente"
-        class="form-control"
-      />
+      <input v-model="empresa" type="text" aria-label="nombre del cliente" class="form-control" />
       <input type="date" v-model="fecha" @input="validateDates" placeholder="Fecha de inicio" />
     </div>
     <div v-if="legajos.items?.length && !error">
@@ -52,7 +42,15 @@
         <tbody>
           <tr v-for="legajo in legajos.items" :key="legajo.id">
             <th scope="row">{{ legajo.id }}</th>
-            <td>{{ legajo.cliente?.nombre }}</td>
+            <td>
+              <div v-if="legajo.presupuesto_cidepint[0]?.stans">
+                <div v-for="stan in legajo.presupuesto_cidepint[0].stans" :key="stan.id">
+                  <span v-for="ensayo in stan.ensayos" :key="ensayo.id">{{
+                    ensayo.nombre + ' '
+                  }}</span>
+                </div>
+              </div>
+            </td>
             <td>{{ legajo.area.nombre }}</td>
             <td><StateBadge :state="legajo.estado?.nombre" /></td>
             <td>
@@ -60,13 +58,10 @@
                 Ver detalle
               </RouterLink>
               <RouterLink :to="`/legajos/cancelar/${legajo.id}`" class="hover:underline">
-                <button
-                v-if="legajo.estado?.nombre === 'En curso'"
-                class="btn btn-danger"
-                >
-                Cancelar
-              </button>
-            </RouterLink>
+                <button v-if="legajo.estado?.nombre === 'En curso'" class="btn btn-danger">
+                  Cancelar
+                </button>
+              </RouterLink>
             </td>
           </tr>
         </tbody>
@@ -79,9 +74,7 @@
         <button @click="nextPage" :disabled="currentPage === totalPages">Siguiente</button>
       </div>
     </div>
-    <div v-else>
-      No hay legajos
-    </div>
+    <div v-else>No hay legajos</div>
   </div>
 </template>
 <script setup>
@@ -96,7 +89,7 @@ const legajosStore = useLegajosStore()
 const areasStore = useAreasStore()
 const currentPage = ref(1)
 
-var documento = ref('')
+var ensayo = ref('')
 var area = ref('')
 var empresa = ref('')
 var fecha = ref('')
@@ -115,6 +108,7 @@ const fetchLegajos = async () => {
   const params = {
     //documento: documento.value,
     area: area.value,
+    ensayo: ensayo.value,
     empresa: empresa.value,
     fecha: fecha.value,
     page: currentPage.value,
@@ -126,8 +120,6 @@ const fetchLegajos = async () => {
 const fetchAreas = async () => {
   await areasStore.getAreas()
 }
-
-
 
 const prevPage = () => {
   if (currentPage.value > 1) {
@@ -146,8 +138,7 @@ onMounted(() => {
   fetchLegajos()
 })
 
-watch([documento, area, empresa, fecha, currentPage], () => {
+watch([ensayo, area, empresa, fecha, currentPage], () => {
   fetchLegajos()
 })
-
 </script>

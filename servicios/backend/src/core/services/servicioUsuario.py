@@ -25,7 +25,7 @@ def crear_usuario(data):
                 
     nuevo_usuario = Usuario(
         mail=data.get('mail'),
-        contra=bcrypt.generate_password_hash(data.get('contra').encode("utf-8")),
+        contra=bcrypt.generate_password_hash(data.get('contra')),
         rol=data.get('rol'),
     )
     db.session.add(nuevo_usuario)

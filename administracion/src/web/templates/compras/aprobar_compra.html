@@ -1,0 +1,139 @@
+{% extends 'layout.html' %}
+{% block title%} Aprobar compra {% endblock %}
+{% block content%}
+<form id="upload-form" class="px-4" method="POST" enctype="multipart/form-data" action="{{ url_for('compra.aprobando_compra', id_compra=compra.id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    <div class="sm:col-span-4" id="fuentes-financiamiento-container">
+            <div class="my-4 p-4 bg-gray-100 rounded-md shadow-md">
+                <label class="block text-lg font-medium text-gray-900">Importe:</label>
+                <p class="text-xl font-semibold text-gray-700">{{compra.importe}}</p>
+            </div>
+
+            <!-- Lista dinámica para asignar fondos -->
+            <div id="fondos-list">
+                <h3 class="block text-sm/15 font-medium text-gray-900">Asignar fondos</h3>
+
+            </div>
+            
+            <!-- Botón para agregar un nuevo usuario a la lista -->
+            <button type="button" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" onclick="addFondo()">Agregar fondo</button>
+            <!-- Lista dinámica para asignar empleados -->
+            <div id="empleados-list">
+                <h3 class="block text-sm/15 font-medium text-gray-900">Asignar empleados</h3>
+
+            </div>
+            
+            <!-- Botón para agregar un nuevo usuario a la lista -->
+            <button type="button" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" onclick="addEmpleado()">Agregar empleado</button>
+            <!-- Lista dinámica para asignar areas -->
+            <div id="areas-list">
+                <h3 class="block text-sm/15 font-medium text-gray-900">Asignar areas</h3>
+
+            </div>
+            
+            <!-- Botón para agregar un nuevo usuario a la lista -->
+            <button type="button" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" onclick="addArea()">Agregar area</button>
+
+    </div>
+    <div class="mt-6 flex items-center justify-end gap-x-6">
+        <a href="{{ url_for('compra.lista_compras') }}" type="button" class="text-sm/6 font-semibold text-gray-900">Cancelar</a>
+        <button type="submit" class="rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600">Guardar cambios</button>
+    </div>
+</form>
+<script>
+    function addFondo() {
+        const fondosList = document.getElementById("fondos-list");
+        const fondoCount = fondosList.children.length; // Índice basado en la cantidad actual de permisos
+
+        // Crear un nuevo div para el permiso
+        const newFondoDiv = document.createElement("div");
+        newFondoDiv.className = "fondo-item";
+
+        newFondoDiv.innerHTML = `
+        <div class="my-2">
+            <label for="fondos-${fondoCount}-titulo_fondo">Fondo:</label>
+            <select name="fondos-${fondoCount}-titulo_fondo" id="fondos-${fondoCount}-titulo_fondo" class="form-control w-full sm:w-auto">
+                {% for fondo in fondos %}
+                    <option value="{{ fondo.titulo }}">{{ fondo.titulo }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="fondos-${fondoCount}-monto">Monto:</label>
+            <input type="number" step="0.01" name="fondos-${fondoCount}-monto" id="fondos-${fondoCount}-monto" class="form-control w-full sm:w-auto" placeholder="Ingrese monto">
+
+            <button type="button" class="rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600" onclick="removeFondo(this)">Eliminar</button>
+        </div>
+        `;
+
+        fondosList.appendChild(newFondoDiv);
+        }
+
+        function removeFondo(button) {
+            const fondoItem = button.closest(".fondo-item");
+            fondoItem.remove();
+        } 
+
+    function addEmpleado() {
+        const empleadosList = document.getElementById("empleados-list");
+        const empleadoCount = empleadosList.children.length;
+
+        const newEmpleadoDiv = document.createElement("div");
+        newEmpleadoDiv.className = "empleado-item";
+
+        newEmpleadoDiv.innerHTML = `
+        <div class="my-2">
+            <label for="empleados-${empleadoCount}-id_empleado">Empleado:</label>
+            <select name="empleados-${empleadoCount}-id_empleado" id="empleados-${empleadoCount}-id_empleado" class="form-control w-full sm:w-auto">
+                {% for empleado in empleados %}
+                    <option value="{{ empleado.id }}">{{ empleado.nombre }} {{ empleado.apellido }} - {{ empleado.dni }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="empleados-${empleadoCount}-monto">Monto:</label>
+            <input type="number" step="0.01" name="empleados-${empleadoCount}-monto" id="empleados-${empleadoCount}-monto" class="form-control w-full sm:w-auto" placeholder="Ingrese monto">
+
+            <button type="button" class="rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600" onclick="removeEmpleado(this)">Eliminar</button>
+        </div>
+        `;
+
+        empleadosList.appendChild(newEmpleadoDiv);
+    }
+
+    function removeEmpleado(button) {
+        const empleadoItem = button.closest(".empleado-item");
+        empleadoItem.remove();
+    }
+
+    function addArea() {
+        const areasList = document.getElementById("areas-list");
+        const areaCount = areasList.children.length;
+
+        const newAreaDiv = document.createElement("div");
+        newAreaDiv.className = "area-item";
+
+        newAreaDiv.innerHTML = `
+        <div class="my-2">
+            <label for="areas-${areaCount}-id_area">Area:</label>
+            <select name="areas-${areaCount}-id_area" id="areas-${areaCount}-id_area" class="form-control w-full sm:w-auto">
+                {% for area in areas %}
+                    <option value="{{ area.id }}">{{ area.nombre }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="areas-${areaCount}-monto">Monto:</label>
+            <input type="number" step="0.01" name="areas-${areaCount}-monto" id="areas-${areaCount}-monto" class="form-control w-full sm:w-auto" placeholder="Ingrese monto">
+
+
+            <button type="button" class="rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600" onclick="removeArea(this)">Eliminar</button>
+        </div>
+        `;
+
+        areasList.appendChild(newAreaDiv);
+    }
+
+    function removeArea(button) {
+        const areaItem = button.closest(".area-item");
+        areaItem.remove();
+    }
+</script>
+{% endblock %}

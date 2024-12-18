@@ -140,6 +140,12 @@ const routes = [
       component: () => import("../components/usuarios/RecuperarContra.vue"),
       props: true,
     },
+    {
+      path: "/pendientes",
+      name: "pendientes",
+      component: () => import("../views/PendientesView.vue"),
+      meta: { requiresAuth: true }
+    }
 ];
 
 const router = createRouter({

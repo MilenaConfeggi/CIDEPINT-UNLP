@@ -17,7 +17,11 @@
       {% if not topico %}
         <div class="hidden lg:flex lg:gap-x-12">
           <a href="{{ url_for('archivos.index') }}" class="text-sm/6 font-semibold text-gray-900">Archivos</a>
-          <a href="#" class="text-sm/6 font-semibold text-gray-900">Compras</a>
+          {% if current_user.rol == 'Administrador' or current_user.rol == 'Colaborador' %}
+            <a href="{{ url_for('compra.index') }}" class="text-sm/6 font-semibold text-gray-900">Compras</a>
+          {% else %}
+            <a href="{{ url_for('compra.lista_compras') }}" class="text-sm/6 font-semibold text-gray-900">Compras</a>
+          {% endif %}
           {% if current_user.rol == 'Administrador' or current_user.rol == 'Colaborador' %}
             <a href="{{url_for('contable.index')}}" class="text-sm/6 font-semibold text-gray-900">Contable</a>
           {% endif %}
@@ -46,7 +50,11 @@
       menu.className = "lg:hidden bg-white p-6 absolute top-16 left-0 right-0 shadow-md hidden z-10";
       menu.innerHTML = `
         <a href="{{ url_for('archivos.index') }}" class="block text-sm font-semibold text-gray-900 mb-4">Archivos</a>
-        <a href="#" class="block text-sm font-semibold text-gray-900 mb-4">Compras</a>
+        {% if current_user.rol == 'Administrador' or current_user.rol == 'Colaborador' %}
+          <a href="{{ url_for('compra.index') }}" class="block text-sm font-semibold text-gray-900 mb-4">Compras</a>
+        {% else %}
+          <a href="{{ url_for('compra.lista_compras') }}" class="block text-sm font-semibold text-gray-900 mb-4">Compras</a>
+        {% endif %}
         {% if current_user.rol == 'Administrador' or current_user.rol == 'Colaborador' %}	
           <a href="{{ url_for('contable.index') }}" class="block text-sm font-semibold text-gray-900 mb-4">Contable</a>
         {% endif %}

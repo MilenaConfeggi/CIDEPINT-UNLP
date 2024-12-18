@@ -8,6 +8,9 @@ from models.personal.personal import User
 from models.personal.ausencia import Ausencia
 from sqlalchemy import MetaData
 from datetime import datetime
+from models.compras.proveedor import Proveedor
+from models.compras.compra import Compra, estado_compra
+from datetime import datetime
 
 def reset():
     """
@@ -156,6 +159,7 @@ def seed():
         titulo='UNLP',
         saldo=10000
     )
+
     db.session.add_all([bien_1,bien_2,bien_3,bien_4, bien_5, bien_6, bien_7, bien_8, bien_9, bien_10, bien_11, bien_12, bien_13,fondo_1])
 
     carpeta_1 = Carpeta(
@@ -280,6 +284,38 @@ def seed():
     )
     db.session.add(inhabilitado_empleado)
 
+    proveedor_1 = Proveedor(
+        razon_social = "mio",
+        contacto = "123"
+    )
+
+    db.session.add(proveedor_1)
+
+    proveedor_2 = Proveedor(
+        razon_social = "tuyo",
+        contacto = "321"
+    )
+
+    db.session.add(proveedor_2)
+
+    proveedor_3 = Proveedor(
+        razon_social = "nuestro",
+        contacto = "123321"
+    )
+
+    db.session.add(proveedor_3)
+
+    compra_1 = Compra(
+        fecha = datetime.now(),
+        numero_factura = "jamon",
+        importe = 89,
+        descripcion = "es un jamon",
+        estado = estado_compra.ESPERA,      
+        proveedor = proveedor_1,
+        solicitante = admin_empleado
+    )
+
+    db.session.add(compra_1)
 
     usuario_1 = User(
         username='rober',

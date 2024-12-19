@@ -1,4 +1,5 @@
 from models.base import db
+from models.legajos import find_legajo_by_id  
 from models.documentos import (
     listar_tipos_documentos,
     get_tipo_documento,
@@ -58,6 +59,7 @@ def upload():
     file = request.files["file"]
     tipo = request.form["tipo"]
     legajo_id = request.form["legajo_id"]
+    nro_factura = request.form["nro_factura"]
 
     if file.filename == "" or not file.filename.endswith(".pdf"):
         return jsonify({"error": "Por favor, selecciona un archivo PDF válido"}), 400
@@ -80,12 +82,9 @@ def upload():
             "nombre_documento": None,
         }
         old_file = find_documento(data)
-        print(old_file)
         if old_file:
             old_documento_path = documentos_path / old_file.nombre_documento
-            print(old_documento_path)
             if old_documento_path.exists():
-                print(old_documento_path)
                 old_documento_path.unlink()
                 file.save(str(file_path))
                 old_file.nombre_documento = file.filename
@@ -125,6 +124,15 @@ def upload():
                 return jsonify({"error": "No se pudo crear el documento"}), 400
 
             file.save(str(file_path))
+            print(nro_factura)
+            if nro_factura:
+                legajo = find_legajo_by_id(legajo_id)
+                if legajo is None:
+                    return jsonify({"error": "No se encontro el legajo"}), 404
+                legajo.nro_factura = nro_factura
+                db.session.commit()
+            else:
+                return jsonify({"message": "Error al subir el nro de factura"}), 400
             return (
                 jsonify({"message": f"Archivo guardado exitosamente en {file_path}"}),
                 200,

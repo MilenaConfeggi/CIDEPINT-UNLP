@@ -90,15 +90,26 @@
                       </template>
                       <li v-else>
                         <label :for="`upload-pdf-${documento.id}`" class="dropdown-item">
-                          Cargar
-                          <input
-                            :id="`upload-pdf-${documento.id}`"
-                            type="file"
-                            accept="application/pdf"
-                            @change="handleFileUpload($event, documento.id, legajo.id)"
+                          <div v-if="documento.nombre !== 'Factura'" class="dropdown-item">
+                            Cargar
+                            <input
+                              :id="`upload-pdf-${documento.id}`"
+                              type="file"
+                              accept="application/pdf"
+                              @change="handleFileUpload($event, documento.id, legajo.id)"
+                              class="dropdown-item"
+                              hidden
+                            />
+                          </div>
+                          <button
+                            v-if="documento.nombre === 'Factura'"
+                            data-bs-toggle="modal"
+                            data-bs-target="#exampleModal3"
                             class="dropdown-item"
-                            hidden
-                          />
+                            @click="cargarFactura(documento.id)"
+                          >
+                            Cargar
+                          </button>
                         </label>
                       </li>
                     </ul>
@@ -161,6 +172,46 @@
         </div>
       </div>
     </div>
+    <div
+      class="modal fade"
+      id="exampleModal3"
+      tabindex="-1"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="exampleModalLabel">Cargar factura</h1>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <input
+              v-model="nroFactura"
+              :placeholder="`Ingrese el numero de la factura`"
+              class="form-control"
+              type="text"
+            />
+          </div>
+          <div class="modal-footer">
+            <input
+              :id="`upload-pdf-${documentoID}`"
+              type="file"
+              accept="application/pdf"
+              @change="handleFileUpload($event, documentoID, legajo.id)"
+              class="btn btn-primary"
+              :hidden="nroFactura === ''"
+            />
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
     <div v-if="showToast" class="toast-container position-fixed bottom-0 end-0 p-3">
       <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="toast-header">
@@ -208,17 +259,26 @@ const showToast = ref(false)
 const fileName = ref(null)
 const fileUrl = ref(null)
 const actualFile = ref(null)
+const nroFactura = ref('')
+const documentoID = ref('')
 
 const formatDate = (dateString) => {
   const options = { year: 'numeric', day: '2-digit', month: '2-digit' }
   return new Date(dateString).toLocaleDateString('es-ES', options)
 }
+
+const cargarFactura = (id) => {
+  documentoID.value = id
+}
+
 const handleFileUpload = async (event, id, legajoId, editar = false) => {
   const file = event.target.files[0]
+  console.log(id)
   if (file && file.type === 'application/pdf') {
     try {
       fileName.value = file.name
-      const response = await documentosStore.subirArchivo(file, id, legajoId, editar)
+      let facturaNumber = nroFactura.value
+      const response = await documentosStore.subirArchivo(file, id, legajoId, editar, facturaNumber)
       console.log(response)
       if (response.status === 200) {
         window.location.reload()

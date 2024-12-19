@@ -11,8 +11,8 @@
           {{ tipo?.nombre }}
         </option>
       </select>
-      <label class="input-group-text" for="area">Areas</label>
-      <select v-model="area" class="form-select" id="area">
+      <label v-if="area === ''" class="input-group-text" for="area">Areas</label>
+      <select v-model="area" v-if="areas && area === ''" class="form-select" id="area">
         <option selected value="">Todos</option>
         <option v-for="area in areas" :key="area.id" :value="area.id">
           {{ area.nombre }}
@@ -126,7 +126,8 @@ const currentPage = ref(1)
 const actualFile = ref(null)
 const fileUrl = ref(null)
 var tipo_documento = ref('')
-var area = ref('')
+const areaRol = localStorage.getItem('area') == 'null' ? '' : localStorage.getItem('area')
+var area = ref(areaRol)
 var empresa = ref('')
 var fecha = ref('')
 var ensayo = ref('')

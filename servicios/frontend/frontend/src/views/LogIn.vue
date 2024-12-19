@@ -40,6 +40,7 @@ export default {
         });
         authStore.setToken(response.data.access_token);
         localStorage.setItem('permisos', JSON.stringify(response.data.permisos));
+        localStorage.setItem('area', JSON.stringify(response.data.area));
         this.$router.push({ name: 'home' }).then(() => {
           location.reload();
         });

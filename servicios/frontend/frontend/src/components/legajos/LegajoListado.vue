@@ -16,8 +16,8 @@
     <div class="input-group mb-3 d-flex flex-row">
       <label class="input-group-text" for="ensayos">Ensayos</label>
       <input v-model="ensayo" type="text" aria-label="Ensayos" class="form-control" />
-      <label class="input-group-text" for="area">Areas</label>
-      <select v-if="areas" v-model="area" class="form-select" id="area">
+      <label v-if="area === ''" class="input-group-text" for="area">Areas</label>
+      <select v-if="area === '' && areas" v-model="area" class="form-select" id="area">
         <option selected value="">Elige un area</option>
         <option v-for="area in areas" :key="area.id" :value="area.id">
           {{ area.nombre }}
@@ -88,9 +88,9 @@ import { ref } from 'vue'
 const legajosStore = useLegajosStore()
 const areasStore = useAreasStore()
 const currentPage = ref(1)
-
+const areaRol = localStorage.getItem('area') === 'null' ? '' : localStorage.getItem('area')
 var ensayo = ref('')
-var area = ref('')
+var area = ref(areaRol)
 var empresa = ref('')
 var fecha = ref('')
 
@@ -105,8 +105,8 @@ const validateDates = () => {
 }
 
 const fetchLegajos = async () => {
+  console.log(typeof area.value)
   const params = {
-    //documento: documento.value,
     area: area.value,
     ensayo: ensayo.value,
     empresa: empresa.value,

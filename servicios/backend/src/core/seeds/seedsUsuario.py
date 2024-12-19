@@ -1,5 +1,6 @@
 from datetime import datetime
 from servicios.backend.src.core.services.servicioUsuario import crear_usuario, crear_rol, crear_permiso, asignar_permiso
+from models.personal import get_area
 from models.usuarios.rol import Rol
 from models.usuarios.permiso import Permiso
 from models.personal.empleado import Empleado
@@ -25,6 +26,7 @@ def seed_usuarios():
     db.session.commit()
 
     default_area = Area(nombre='Area 2fault', saldo=0)
+    area_1 = get_area(1)
 
     usuario_1 = User(
         username='rober',
@@ -34,7 +36,7 @@ def seed_usuarios():
     personal_1 = Empleado(
         user=usuario_1,
         email='rober@example.com',
-        area=default_area,  # Asigna el área creada
+        area= area_1,  # Asigna el área creada
         dni='204060',
         nombre='Rober',
         apellido='Tito',

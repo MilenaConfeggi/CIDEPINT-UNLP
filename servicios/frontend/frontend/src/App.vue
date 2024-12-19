@@ -36,6 +36,7 @@ const logout = () => {
   authStore.removeToken();
   localStorage.removeItem('access_token'); // Remove the token from localStorage
   localStorage.removeItem('permisos');
+  localStorage.removeItem('area');
   location.reload(); // Recarga la página para que se aplique el guard
   console.log('Logout');
 };

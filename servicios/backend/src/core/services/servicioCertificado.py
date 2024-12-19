@@ -132,3 +132,16 @@ def obtener_certificado(id_legajo):
     if not documento:
         return None
     return documento.nombre_documento
+
+def calcular_suma_participacion(empleados):
+    suma = 0
+    for empleado in empleados:
+        suma += empleado["participacion"]
+    return suma
+
+def chequear_solo_responsable(empleados):
+    cant = 0
+    for empleado in empleados:
+        if empleado["funcion"] == "Responsable del equipo":
+            cant += 1
+    return cant

@@ -1,6 +1,7 @@
 from flask import Blueprint, abort, jsonify, request, send_from_directory
 from servicios.backend.src.core.services import servicioCertificado
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from models.legajos import end_legajo
 import os
 UPLOAD_FOLDER = os.path.abspath("documentos")
 bp = Blueprint("certificado", __name__, url_prefix="/certificado")
@@ -10,7 +11,12 @@ bp = Blueprint("certificado", __name__, url_prefix="/certificado")
 def crear_certificado(id_legajo):
     data = request.get_json()
     empleados = data.get('empleados', [])
+    if servicioCertificado.calcular_suma_participacion(empleados) != 100:
+        return jsonify({"message": "La suma de las participaciones debe ser 100"}), 400
+    if servicioCertificado.chequear_solo_responsable(empleados) != 1:
+        return jsonify({"message": "Debe haber un responsable de equipo"}), 400
     servicioCertificado.generar_certificado(id_legajo, empleados)
+    end_legajo(id_legajo)
     return jsonify({"message": "Certificado generado"})
 
 

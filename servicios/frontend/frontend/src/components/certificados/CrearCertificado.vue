@@ -18,13 +18,16 @@
             <input type="number" v-model="empleado.participacion" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
           </div>
         </div>
-        <div v-if="error" class="alert alert-danger mb-4" role="alert">
-          {{ error }}
+        <div v-if="fetchError" class="alert alert-danger mb-4" role="alert">
+          {{ fetchError }}
+        </div>
+        <div v-if="submitError" class="alert alert-danger mb-4" role="alert">
+          {{ submitError }}
         </div>
         <div v-if="successMessage" class="alert alert-success mb-4" role="alert">
           {{ successMessage }}
         </div>
-        <div class="flex items-center justify-between" v-if="!error">
+        <div class="flex items-center justify-between" v-if="!fetchError">
           <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Generar Certificado</button>
         </div>
       </form>
@@ -39,7 +42,8 @@
   const idLegajo = route.params.id_legajo;
   
   const empleados = ref([]);
-  const error = ref(null);
+  const fetchError = ref(null);
+  const submitError = ref(null);
   const successMessage = ref(null);
   
   const fetchEmpleados = async () => {
@@ -59,12 +63,12 @@
         participacion: 0,
       }));
     } catch (err) {
-      error.value = err.message || 'Error desconocido';
+      fetchError.value = err.message || 'Error desconocido';
     }
   };
   
   const submitForm = async () => {
-    error.value = null;
+    submitError.value = null;
     successMessage.value = null;
   
     const data = {
@@ -89,7 +93,7 @@
   
       successMessage.value = result.message;
     } catch (err) {
-      error.value = err.message || 'Error desconocido';
+      submitError.value = err.message || 'Error desconocido';
     }
   };
   

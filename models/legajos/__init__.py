@@ -42,3 +42,12 @@ def find_legajo_by_id(id):
 
 def find_mail_legajo(id):
     return db.session.query(Legajo).filter_by(id=id).first().cliente.email
+
+def end_legajo(id):
+    legajo = find_legajo_by_id(id)
+    new_estado = find_estado_by_nombre('Terminado')
+    if new_estado is None:
+        return None
+    legajo.estado = new_estado
+    db.session.commit()
+    return legajo

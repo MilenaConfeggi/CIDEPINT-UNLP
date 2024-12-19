@@ -24,7 +24,6 @@
             </select>
           </div>
 
-
           <div class="form-group">
             <div class="form-check">
               <input type="checkbox" v-model="form.investigacion" id="investigacion" class="form-check-input" />
@@ -36,10 +35,10 @@
 
           <div class="form-group" v-if="!form.investigacion">
             <label class="form-label fw-bold">Seleccionar legajo</label>
-            <select v-model="form.legajo" class="form-select">
+            <select v-model="form.legajo" @change="filtrarMuestras" class="form-select">
               <option disabled value="">Legajos</option>
               <option v-for="legajo in legajos" :key="legajo.id" :value="legajo.id">
-                {{ legajo.id }}
+                {{ legajo.nro_legajo }}
               </option>
             </select>
           </div>
@@ -60,27 +59,18 @@
           </div>
 
           <div class="form-group">
-            <label class="form-label fw-bold">Material a ensayar</label>
-            <input v-model="form.material" type="text" class="form-control" placeholder="Ingresar material a ensayar" />
-          </div>
-
-          <div class="form-group">
             <div v-if="form.investigacion">
               <label class="form-label fw-bold">Ingresar identificación de muestras</label>
               <input v-model="form.muestra" type="text" class="form-control" placeholder="Identificación de muestras" />
             </div>
             <div v-if="!form.investigacion">
               <label class="form-label fw-bold">Seleccionar identificación de muestras</label>
-              <select v-model="form.muestra" class="form-select">
+              <select v-model="form.muestra" class="form-select" :disabled="!form.legajo">
                 <option disabled value="">Identificaciones</option>
-                <option v-for="muestra in muestras" :key="muestra.id" :value="muestra.id">
-                  {{ muestra.id }}
+                <option v-for="muestra in muestrasFiltradas" :key="muestra.id" :value="muestra.id">
+                  {{ muestra.nro_muestra }}
                 </option>
               </select>
-            </div>
-            <div class="form-group">
-              <label class="form-label fw-bold">Cantidad de muestras</label>
-              <input v-model="form.cantidad" class="form-control" placeholder="Ingresar cantidad de muestras" />
             </div>
           </div>
 
@@ -102,6 +92,7 @@ export default {
       legajos: [],
       areas: [],
       muestras: [],
+      muestrasFiltradas: [], // Estado para almacenar las muestras filtradas
       form: {
         legajo: "",
         lineaInvestigacion: "",
@@ -132,6 +123,13 @@ export default {
         this.muestras = await muestrasRes.json();
       } catch (error) {
         console.error("Error al cargar los datos:", error);
+      }
+    },
+    filtrarMuestras() {
+      if (this.form.legajo) {
+        this.muestrasFiltradas = this.muestras.filter(muestra => muestra.legajo_id === this.form.legajo);
+      } else {
+        this.muestrasFiltradas = [];
       }
     },
     enviarFormulario() {

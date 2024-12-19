@@ -21,7 +21,11 @@
                 </p>
                 <p>
                     <span class="fw-bold text-secondary">Fecha Solicitud:</span>
-                    <span class="ms-2">{{ formatFecha(interarea.fecha_solicitud_no_firmada) }}</span>
+                    <span class="ms-2">{{ formatFecha(interarea.fecha_creacion) }}</span>
+                </p>
+                <p v-if="mostrarResultado">
+                    <span class="fw-bold text-secondary">Resultado:</span>
+                    <span class="ms-2">{{ interarea.resultados }}</span>
                 </p>
             </div>
         </div>
@@ -30,10 +34,11 @@
         </div>
 
         <div class="text-center mt-4">
-            <button v-if="interarea && interarea.estadoInterarea_id != 3" @click="toggleInputResultado" class="btn btn-primary">Cargar Resultado</button>
-            <button class="btn btn-secondary" @click="mostrarSubirSolicitud = !mostrarSubirSolicitud">Subir Solicitud Firmada</button>
+            <button v-if="interarea && interarea.estadoInterarea_id == 2" @click="toggleInputResultado" class="btn btn-primary">Cargar Resultado</button>
+            <button v-if="interarea && interarea.estadoInterarea_id == 1" class="btn btn-secondary" @click="mostrarSubirSolicitud = !mostrarSubirSolicitud">Subir Solicitud Firmada</button>
+            <button v-if="interarea && interarea.estadoInterarea_id == null" class="btn btn-secondary" @click="mostrarSubirSolicitudCompleta = !mostrarSubirSolicitudCompleta">Cargar solicitud completa</button>
             <button @click="descargarInterarea" class="btn btn-secondary">Descargar solicitud</button>
-            <button v-if="interarea && interarea.estadoInterarea_id == 3" class="btn btn-secondary">Ver resultados</button>
+            <button v-if="interarea && interarea.estadoInterarea_id == 3" @click="toggleResultado" class="btn btn-secondary">Ver resultados</button>
             <button @click="volverAlListado" class="btn btn-secondary">Volver al Listado</button>
         </div>
 
@@ -41,11 +46,22 @@
         <div v-if="mostrarSubirSolicitud" class="mt-4 text-center">
             <input 
                 type="file" 
-                accept="application/pdf" 
+                accept=".doc, .docx"
                 @change="onFileChange" 
                 class="form-control w-50 mx-auto"
             />
             <button @click="subirSolicitudFirmada" class="btn btn-success mt-3">Subir Solicitud</button>
+        </div>
+
+        <!-- Input para subir solicitud completa -->
+        <div v-if="mostrarSubirSolicitudCompleta" class="mt-4 text-center">
+            <input 
+                type="file" 
+                accept=".doc, .docx" 
+                @change="onFileChangeCompleta" 
+                class="form-control w-50 mx-auto"
+            />
+            <button @click="subirSolicitudCompleta" class="btn btn-success mt-3">Subir Solicitud Completa</button>
         </div>
 
         <!-- Input de texto libre que aparece al presionar "Cargar Resultado" -->
@@ -68,8 +84,11 @@ import { useRoute, useRouter } from "vue-router";
 const interarea = ref(null);
 const mostrarInput = ref(false); // Controla si el input de resultado se muestra o no
 const mostrarSubirSolicitud = ref(false); // Controla si el input de subida de solicitud se muestra o no
+const mostrarSubirSolicitudCompleta = ref(false); // Controla si el input de subida de solicitud completa se muestra o no
+const mostrarResultado = ref(false); // Controla si el resultado se muestra o no
 const resultado = ref(""); // Almacena el texto ingresado como resultado
 const archivo = ref(null); // Almacena el archivo seleccionado
+const archivoCompleto = ref(null); // Almacena el archivo de solicitud completa seleccionado
 
 const route = useRoute();
 const router = useRouter();
@@ -175,7 +194,7 @@ const subirSolicitudFirmada = async () => {
     formData.append("id", interarea.value.id);
 
     try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/interareas/cargar_archivo_firmado/${interarea.value.nombre_archivo}`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/interareas/cargar_archivo_firmado/${interarea.value.id}`, {
             method: "POST",
             body: formData,
         });
@@ -191,6 +210,48 @@ const subirSolicitudFirmada = async () => {
         console.error("Error al subir la solicitud firmada:", error);
         alert("Hubo un error al subir la solicitud firmada.");
     }
+};
+
+// Funciones para manejar el archivo de solicitud completa
+const onFileChangeCompleta = (event) => {
+    const files = event.target.files;
+    if (files && files[0]) {
+        archivoCompleto.value = files[0];
+    }
+};
+
+const subirSolicitudCompleta = async () => {
+    if (!archivoCompleto.value) {
+        alert("Por favor selecciona un archivo antes de subir.");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("archivo", archivoCompleto.value);
+    formData.append("id", interarea.value.id);
+
+    try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/interareas/cargar_archivo_completo/${interarea.value.id}`, {
+            method: "POST",
+            body: formData,
+        });
+
+        if (!response.ok) {
+            throw new Error("Error al subir la solicitud completa");
+        }
+
+        alert("Solicitud completa subida con éxito");
+        archivoCompleto.value = null; // Limpiar el archivo
+        mostrarSubirSolicitudCompleta.value = false; // Ocultar el formulario
+    } catch (error) {
+        console.error("Error al subir la solicitud completa:", error);
+        alert("Hubo un error al subir la solicitud completa.");
+    }
+};
+
+// Función para manejar la visualización del resultado
+const toggleResultado = () => {
+    mostrarResultado.value = !mostrarResultado.value;
 };
 </script>
 

@@ -7,7 +7,7 @@ def crear_interarea(data):
     nueva_interarea = Interarea(
         fecha_creacion=datetime.now(),
         fecha_solicitud_firmada=None,
-        nombre_archivo=None,
+        nombre_archivo=data.get('nombre_archivo'),
         investigacion=data.get('investigacion'),
         nro_interarea=generarNroInterarea(),
         nro_investigacion=data.get('nro_investigacion'),
@@ -49,17 +49,16 @@ def guardar_resultado(id, data):
     db.session.commit()
     return interarea
 
-def cargar_solicitud_completa(id, file_name):
+def cargar_solicitud_completa(id):
     interarea = obtener_interarea(id)
-    interarea.nombre_archivo = file_name
     interarea.estadoInterarea_id = 1
     db.session.commit()
     return interarea
 
-def cargar_solicitud_firmada(id, file_name):
+def cargar_solicitud_firmada(id, newFileName):
     interarea = obtener_interarea(id)
     interarea.fecha_solicitud_firmada = datetime.now()
-    interarea.nombre_archivo = file_name
     interarea.estadoInterarea_id = 2
+    interarea.nombre_archivo = newFileName
     db.session.commit()
     return interarea

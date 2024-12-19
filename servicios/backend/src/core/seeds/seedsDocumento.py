@@ -7,7 +7,7 @@ from datetime import datetime
 def seeds_documentos():
     documentos_data = [
         {
-            'nombre_documento': 'Documento 1',
+            'nombre_documento': 'certificado.pdf',
             'fecha_creacion': datetime(2024, 1, 1),
             'estado_id': 1,
             'tipo_documento_id': 1,

@@ -111,22 +111,22 @@
                           </label>
                         </li>
                       </template>
-                      <template v-else-if="documento.nombre === 'Certificado CIDEPINT'">
-                        <li>
+                        <template v-else-if="documento.nombre === 'Certificado CIDEPINT'">
+                        <li v-if="hasPermission('generar_certificado')">
                           <RouterLink :to="`/generar_certificado/${legajo.id}`" class="dropdown-item">
-                            Generar
+                          Generar
                           </RouterLink>
                         </li>
-                        <li v-if="existeDocumento(documento.nombre)">
+                        <li v-if="hasPermission('ver_certificado') && existeDocumento(documento.nombre)">
                           <button
-                            type="button"
-                            class="dropdown-item"
-                            @click="viewFile(documento.id, documento.nombre, legajo.id)"
+                          type="button"
+                          class="dropdown-item"
+                          @click="viewCertificado(documento.id, documento.nombre, legajo.id)"
                           >
-                            Ver
+                          Ver
                           </button>
                         </li>
-                      </template>
+                        </template>
                       <template v-else>
                         <li v-if="existeDocumento(documento.nombre)">
                           <button
@@ -435,7 +435,28 @@ const viewFile = async (id, tipo, legajoId) => {
     showToast.value = true;
   }
 }
-
+const viewCertificado = async (id, tipo, legajoId) => {
+  const token = authStore.getToken();
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/certificado/ver_documento/${legajoId}`, {
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Error al obtener el documento');
+    }
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank');
+  } catch (error) {
+    console.error('Error al obtener el documento:', error);
+    errorMessage.value = error.message || 'Error al obtener el documento';
+    showToast.value = true;
+  }
+}
 const verDocumentacion = async (id) => {
   const token = authStore.getToken();
   try {

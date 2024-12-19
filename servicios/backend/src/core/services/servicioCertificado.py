@@ -4,11 +4,10 @@ from models.legajos.legajo import Legajo
 from models.distribucion import Distribucion
 from models.distribucion import get_distribucion
 from datetime import datetime
-from PyPDF2 import PdfFileWriter, PdfFileReader, PdfWriter
-from PyPDF2.generic import NameObject, TextStringObject
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, Table, TableStyle
 from reportlab.lib.units import inch
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from servicios.backend.src.core.services import servicioDocumento
 import os
 
 UPLOAD_FOLDER = os.path.abspath("documentos")
@@ -108,10 +107,28 @@ def generar_certificado(id_legajo, empleados):
     print(f"PDF generado: {output_filename}")
 
 
+    # Crear el documento en la base de datos
+    data = {
+        "nombre_documento": "certificado.pdf",
+        "estado_id": 5,
+        "legajo_id": id_legajo,
+        "tipo_id": 1
+    }
+    servicioDocumento.crear_documento(data)
+
+
 def obtener_empleados(id_legajo):
     distribucion = Distribucion.query.filter_by(legajo_id=id_legajo).first()
+    if not distribucion:
+        return None
     empleados = distribucion.empleados_asociados
     nombres = []
     for empleado in empleados:
         nombres.append(f"{empleado.empleado.nombre} {empleado.empleado.apellido}")
     return nombres
+
+def obtener_certificado(id_legajo):
+    documento = Documento.query.filter_by(legajo_id=id_legajo, tipo_id=1).first()
+    if not documento:
+        return None
+    return documento.nombre_documento

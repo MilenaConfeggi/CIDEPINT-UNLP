@@ -24,7 +24,7 @@
         <div v-if="successMessage" class="alert alert-success mb-4" role="alert">
           {{ successMessage }}
         </div>
-        <div class="flex items-center justify-between">
+        <div class="flex items-center justify-between" v-if="!error">
           <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Generar Certificado</button>
         </div>
       </form>
@@ -32,71 +32,71 @@
   </template>
   
   <script setup>
-import { ref, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
-
-const route = useRoute();
-const idLegajo = route.params.id_legajo;
-
-const empleados = ref([]);
-const error = ref(null);
-const successMessage = ref(null);
-
-const fetchEmpleados = async () => {
-  try {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/certificado/obtener_empleados/${idLegajo}`, {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-      },
-    });
-    if (!response.ok) {
-      throw new Error('Error al obtener los empleados');
+  import { ref, onMounted } from 'vue';
+  import { useRoute } from 'vue-router';
+  
+  const route = useRoute();
+  const idLegajo = route.params.id_legajo;
+  
+  const empleados = ref([]);
+  const error = ref(null);
+  const successMessage = ref(null);
+  
+  const fetchEmpleados = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/certificado/obtener_empleados/${idLegajo}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result.message || 'Error al obtener los empleados');
+      }
+      empleados.value = result.map(empleado => ({
+        nombre: empleado,
+        funcion: 'Integrante del equipo',
+        participacion: 0,
+      }));
+    } catch (err) {
+      error.value = err.message || 'Error desconocido';
     }
-    empleados.value = await response.json();
-    empleados.value = empleados.value.map(empleado => ({
-      nombre: empleado,
-      funcion: 'Integrante del equipo',
-      participacion: 0,
-    }));
-  } catch (err) {
-    error.value = err.message;
-  }
-};
-
-const submitForm = async () => {
-  error.value = null;
-  successMessage.value = null;
-
-  const data = {
-    empleados: empleados.value,
   };
-
-  try {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/certificado/crear/${idLegajo}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-      },
-      body: JSON.stringify(data),
-    });
-
-    const result = await response.json();
-
-    if (!response.ok) {
-      throw new Error(result.message || 'Error al generar el certificado');
+  
+  const submitForm = async () => {
+    error.value = null;
+    successMessage.value = null;
+  
+    const data = {
+      empleados: empleados.value,
+    };
+  
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/certificado/crear/${idLegajo}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: JSON.stringify(data),
+      });
+  
+      const result = await response.json();
+  
+      if (!response.ok) {
+        throw new Error(result.message || 'Error al generar el certificado');
+      }
+  
+      successMessage.value = result.message;
+    } catch (err) {
+      error.value = err.message || 'Error desconocido';
     }
-
-    successMessage.value = result.message;
-  } catch (err) {
-    error.value = err.message;
-  }
-};
-
-onMounted(() => {
-  fetchEmpleados();
-});
-</script>
+  };
+  
+  onMounted(() => {
+    fetchEmpleados();
+  });
+  </script>
   
   <style scoped>
   .line {

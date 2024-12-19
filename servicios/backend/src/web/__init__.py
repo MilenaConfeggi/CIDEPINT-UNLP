@@ -11,6 +11,7 @@ from servicios.backend.src.core.seeds import seedsUsuario
 from servicios.backend.src.core.seeds import seedsStans
 from servicios.backend.src.core.seeds import seedsInterarea
 from servicios.backend.src.core.seeds import seedsEstadoInterarea
+from servicios.backend.src.core.seeds import seedsPresupuesto
 from models import db
 from servicios.backend.src.web.controllers.mails import bp as mails_bp
 from servicios.backend.src.web.controllers.muestras import bp as muestras_bp
@@ -93,6 +94,8 @@ def create_app(env="development", static_folder=""):
         print("Interareas creadas!")
         seedsDocumento.seeds_documentos()
         print("Documentos creados!")
+        seedsPresupuesto.seeds_presupuesto()
+        print("Presupuestos creados!")
 
     return app
     

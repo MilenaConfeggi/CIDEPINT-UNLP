@@ -7,98 +7,52 @@ from models.legajos.legajo import Legajo
 from models.clientes.cliente import Cliente
 from models.legajos import create_legajo, find_legajo_by_id
 from datetime import datetime
+from models.presupuestos.presupuesto import Presupuesto
+from models.presupuestos.presupuesto_stan import PresupuestoStan
 
-
-def seeds_presupuesto():
-
-    stan4 = crear_stan(
+def seeds_presupuestos():
+    presupuestos_data = [
         {
-            'numero': '4',
-            'precio_pesos': 4001,
-            'precio_dolares': 500,
-            "precio_por_muestra": True
-        }
-    )
-    stan5 = crear_stan(
+            "fecha_creacion": datetime(2024, 1, 1),
+            "precio": 1000,
+            "medio_de_pago_id": 1,
+            "nro_presupuesto": 1,
+            "legajo_id": 33,
+        },
         {
-            'numero': '5',
-            'precio_pesos': 6000,
-            'precio_dolares': 700,
-            "precio_por_muestra": False
-        }
-    )
-    stan6 = crear_stan(
+            "fecha_creacion": datetime(2024, 1, 1),
+            "precio": 2000,
+            "medio_de_pago_id": 2,
+            "nro_presupuesto": 2,
+            "legajo_id": 34,
+        },
         {
-            'numero': '6',
-            'precio_pesos': 900,
-            'precio_dolares': 30,
-            "precio_por_muestra": True
-        }
-    )
-
-    ensayo4 = crear_ensayo('Ensayo 4')
-    ensayo5 = crear_ensayo('Ensayo 5')
-    ensayo6 = crear_ensayo('Ensayo 7')
-
-
-    crear_ensayo_stan(ensayo4.id,stan4.id)
-    crear_ensayo_stan(ensayo5.id,stan5.id)
-    crear_ensayo_stan(ensayo6.id,stan6.id)
-
-    legajo5 = create_legajo(
+            "fecha_creacion": datetime(2024, 2, 1),
+            "precio": 3000,
+            "medio_de_pago_id": 3,
+            "nro_presupuesto": 3,
+            "legajo_id": 35,
+        },
         {
-            'fecha_entrada': datetime.now(),
-            'nro_legajo': 'LEG5',
-            'es_juridico': True,
-            'necesita_facturacion': True,
-            'objetivo': 'Localizado',
-            'area_id': 2,
-        }
-    )
-    legajo6 = create_legajo(
-        {
-            'fecha_entrada': datetime.now(),
-            'nro_legajo': 'LEG6',
-            'es_juridico': True,
-            'necesita_facturacion': True,
-            'objetivo': 'Objetivo de legajo',
-            'area_id': 3,
-        }
-    )
-    legajo7 = create_legajo(
-        {
-            'fecha_entrada': datetime.now(),
-            'nro_legajo': 'LEG8',
-            'es_juridico': False,
-            'necesita_facturacion': False,
-            'objetivo': 'Dominio total del mundo',
-            'area_id': 1,
-        }
-    )
+            "fecha_creacion": datetime(2024, 3, 1),
+            "precio": 4000,
+            "medio_de_pago_id": 1,
+            "nro_presupuesto": 4,
+        },
+    ]
 
-    medio_de_pago1 = crear_medio_pago("Efectivo")
-    medio_de_pago2 = crear_medio_pago("Tarjeta")
+    for data in presupuestos_data:
+        db.session.add(Presupuesto(**data))
+    db.session.commit()
 
-    presupuesto1 = crear_presupuesto(
-        {
-            'precio': 488,
-            'legajo': legajo5,
-            'medio_de_pago_id': medio_de_pago1.id,
-        }
-    )
 
-    presupuesto2 = crear_presupuesto(
-        {
-            'precio': 1656,
-            'legajo': legajo6,
-            'medio_de_pago_id': medio_de_pago2.id,
-        }
-    )
+def seeds_presupuestos_stan():
+    presupuestos_stan_data = [
+        {"presupuesto_id": 1, "stan_id": 1, "precio_carga": 1000},
+        {"presupuesto_id": 2, "stan_id": 2, "precio_carga": 2000},
+        {"presupuesto_id": 3, "stan_id": 3, "precio_carga": 3000},
+    ]
 
-    presupuesto3 = crear_presupuesto(
-        {
-            'precio': 5458,
-            'legajo': legajo7,
-            'medio_de_pago_id': medio_de_pago1.id,
-        }
-    )
+    for data in presupuestos_stan_data:
+        db.session.add(PresupuestoStan(**data))
+    db.session.commit()

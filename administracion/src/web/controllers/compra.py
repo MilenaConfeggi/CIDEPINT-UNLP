@@ -282,7 +282,7 @@ def agregando_compra():
             monto += area["monto"]
         for empleado in form.empleados.data:
             empleado_obj = conseguir_empleado_de_id(empleado["id_empleado"])
-            if empleado["monto"] > empleado_obj.importe:
+            if empleado["monto"] > empleado_obj.saldo:
                 flash("El monto de un empleado no puede ser superior a su saldo", "danger")
                 return render_template("compras/creacion_compra.html", form=form, areas=lista_areas, empleados=lista_empleados, fondos=lista_fondos)
             empleados.append((empleado_obj, empleado["monto"]))
@@ -294,7 +294,7 @@ def agregando_compra():
                 return render_template("compras/creacion_compra.html", form=form, areas=lista_areas, empleados=lista_empleados, fondos=lista_fondos)
             fondos.append((fondo_obj, fondo["monto"]))
             monto += fondo["monto"]
-        if (form.estado.data == "APROBADA" and monto <= form.importe.data) or (form.estado.data == "REALIZADA" and monto == form.importe.data):
+        if (form.estado.data == "APROBADA" and monto <= form.importe.data) or (form.estado.data == "REALIZADA" and monto <= form.importe.data):
             crear_compra(
                 form.fecha.data, form.descripcion.data, form.proveedor.data,
                 form.solicitante.data, form.importe.data, form.observaciones.data,
@@ -365,7 +365,7 @@ def editando_compra(id_compra):
             monto += area["monto"]
         for empleado in form.empleados.data:
             empleado_obj = conseguir_empleado_de_id(empleado["id_empleado"])
-            if empleado["monto"] > empleado_obj.importe:
+            if empleado["monto"] > empleado_obj.saldo:
                 flash("El monto de un empleado no puede ser superior a su saldo", "danger")
                 return render_template("compras/edicion_compra.html", form=form, compra=compra, areas=lista_areas, empleados=lista_empleados, fondos=lista_fondos)
             empleados.append((empleado_obj, empleado["monto"]))
@@ -377,7 +377,7 @@ def editando_compra(id_compra):
                 return render_template("compras/edicion_compra.html", form=form, compra=compra, areas=lista_areas, empleados=lista_empleados, fondos=lista_fondos)
             fondos.append((fondo_obj, fondo["monto"]))
             monto += fondo["monto"]
-        if (form.estado.data == "APROBADA" and monto <= form.importe.data) or (form.estado.data == "REALIZADA" and monto == form.importe.data):
+        if (form.estado.data == "APROBADA" and monto <= form.importe.data) or (form.estado.data == "REALIZADA" and monto <= form.importe.data):
             editar_compra_aprobada_o_realizada(
                 compra,
                 form.fecha.data, form.descripcion.data, form.proveedor.data,
@@ -443,7 +443,7 @@ def aprobando_compra(id_compra):
             monto += area["monto"]
         for empleado in form.empleados.data:
             empleado_obj = conseguir_empleado_de_id(empleado["id_empleado"])
-            if empleado["monto"] > empleado_obj.importe:
+            if empleado["monto"] > empleado_obj.saldo:
                 flash("El monto de un empleado no puede ser superior a su saldo", "danger")
                 return render_template("compras/aprobar_compra.html", form=form, compra=compra, areas=lista_areas, empleados=lista_empleados, fondos=lista_fondos)
             empleados.append((empleado_obj, empleado["monto"]))
@@ -517,7 +517,7 @@ def realizando_compra(id_compra):
             monto += area["monto"]
         for empleado in form.empleados.data:
             empleado_obj = conseguir_empleado_de_id(empleado["id_empleado"])
-            if empleado["monto"] > empleado_obj.importe:
+            if empleado["monto"] > empleado_obj.saldo:
                 flash("El monto de un empleado no puede ser superior a su saldo", "danger")
                 return render_template("compras/realizar_compra.html", form=form, compra=compra, areas=lista_areas, empleados=lista_empleados, fondos=lista_fondos)
             empleados.append((empleado_obj, empleado["monto"]))
@@ -529,7 +529,7 @@ def realizando_compra(id_compra):
                 return render_template("compras/realizar_compra.html", form=form, compra=compra, areas=lista_areas, empleados=lista_empleados, fondos=lista_fondos)
             fondos.append((fondo_obj, fondo["monto"]))
             monto += fondo["monto"]
-        if (monto == compra.importe):
+        if (monto <= compra.importe):
             realizar_compra_aprobada(
                 compra, fondos, empleados, areas
             )

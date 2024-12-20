@@ -15,17 +15,27 @@ UPLOAD_FOLDER = os.path.abspath("documentos")
 def generar_certificado(id_legajo, empleados):
     # Completar con los datos necesarios
     legajo = Legajo.query.filter_by(id=id_legajo).first()
-    ensayo = "ensayo"
     cliente = legajo.cliente.nombre
-    fecha_desde = Legajo.query.filter_by(id=id_legajo).first().fecha_entrada.strftime("%d/%m/%Y")
+    fecha_desde = legajo.fecha_entrada.strftime("%d/%m/%Y")
     fecha_hasta = datetime.now().strftime("%d/%m/%Y")
-    descripcion = "descripcion"
-    presupuesto = 1000
-    monto = 1000
-    if legajo.nro_factura == None:
+    monto = legajo.presupuesto_cidepint[0].precio
+    print(legajo.nro_factura)
+    if legajo.nro_factura is None:
         factura = ""
     else:
         factura = legajo.nro_factura
+
+    # Obtener los ensayos de los STANs del presupuesto del legajo
+    ensayos = []
+    descripcion = []
+    for presupuesto in legajo.presupuesto_cidepint:
+        for stan in presupuesto.stans:
+            descripcion.append(stan.descripcion)
+            for ensayo in stan.ensayos:
+                ensayos.append(ensayo.nombre)
+    ensayo_texto = ", ".join(set(ensayos))  
+    descripcion = ", ".join(set(descripcion))
+    presupuesto = legajo.presupuesto_cidepint[0].nro_presupuesto
 
     # Crear la ruta de destino
     certificado_dir = os.path.join(UPLOAD_FOLDER, "certificados", str(id_legajo))
@@ -63,13 +73,12 @@ def generar_certificado(id_legajo, empleados):
     content.append(Spacer(1, 12))
 
     # Texto principal (contenido existente)
-    content.append(Paragraph(f"La dirección del CIDEPINT certifica que la actividad tecnológica titulada <b>{ensayo}</b> para <b>{cliente}</b> se ejecutó desde "
+    content.append(Paragraph(f"La dirección del CIDEPINT certifica que la actividad tecnológica titulada <b>{ensayo_texto}</b> para <b>{cliente}</b> se ejecutó desde "
                              f"{fecha_desde} al {fecha_hasta}. Conforme a las definiciones de la Gerencia de Vinculación Tecnológica del CONICET y el "
                              "sistema SIGEVA, se tipificó esta actividad como: <b>Servicio</b>", styles["BodyText"]))
     content.append(Spacer(1, 12))  # Espaciador entre párrafos
     content.append(Paragraph("<b>Descripcion de la Actividad Tecnológica.</b>", styles["BodyText"]))
     content.append(Paragraph(f"{descripcion}", styles["BodyText"]))
-    content.append(Spacer(1, 12))
     content.append(Spacer(1, 12))
     content.append(Paragraph("<b>Integrantes del Grupo Ejecutor</b>", styles["BodyText"]))
     content.append(Spacer(1, 6))
@@ -102,15 +111,20 @@ def generar_certificado(id_legajo, empleados):
     content.append(Paragraph(f"<b>Presupuesto NRO:</b> {presupuesto}", styles["BodyText"]))
     content.append(Paragraph(f"<b>Monto:</b> U$S{monto}", styles["BodyText"]))
     content.append(Paragraph(f"<b>Factura C NRO:</b> {factura}", styles["BodyText"]))
-    content.append(Spacer(1, 12))
+    content.append(Spacer(1, 10))
     content.append(Paragraph(f"Por razones de confidencialidad no se incluye el Plan de Trabajo completo, información que queda bajo guarda en el Área de Servicios del CIDEPINT. Todas las actuaciones relacionadas a esta actividad tecnológica han sido informadas al CONICET, CICPBA y UNLP, cumpliendo con la normativa vigente establecida por el convenio CONICET-CICPBA-UNLP (suscripto el 21/10/2015 y la adenda suscripta el 31/08/2017). Esta certificación se extiende el día {fecha_hasta} como documentación probatoria de la ejecución de esta actividad tecnológica realizada por el grupo antes mencionado.", styles["BodyText"]))
+    content.append(Spacer(1, 10))
+    footer_style = ParagraphStyle(
+        'FooterStyle',
+        parent=styles['BodyText'],
+        fontSize=8  # Tamaño de letra más pequeño
+    )
+    content.append(Paragraph(f"Av. 52 y calle 121, B1900AYB La Plata, Buenos Aires, Argentina - Tel.: +54 - (221) 482-11-21 Email: direccion@cidepint.ing.unlp.edu.ar - Web: http://cidepint.ing.unlp.edu.ar", footer_style))
 
-    
     # Construir el PDF
     doc.build(content)
 
     print(f"PDF generado: {output_filename}")
-
 
     # Crear el documento en la base de datos
     data = {

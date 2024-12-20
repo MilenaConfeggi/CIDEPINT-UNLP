@@ -37,5 +37,5 @@ def obtener_certificado(id_legajo):
     print(file_path)
     if not os.path.exists(file_path):
         print("No existe")
-        abort(404, description="Resource not found")
+        abort(404, description="El documento no existe, prueba generar uno primero")
     return send_from_directory(directory, filename)

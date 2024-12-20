@@ -527,16 +527,17 @@ const viewCertificado = async (id, tipo, legajoId) => {
         'Content-Type': 'multipart/form-data',
       },
     });
+    
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.message || 'Error al obtener el documento');
+      throw new Error(errorData.message || 'El documento no existe, prueba generar uno primero');
     }
     const blob = await response.blob();
     const url = URL.createObjectURL(blob);
     window.open(url, '_blank');
   } catch (error) {
     console.error('Error al obtener el documento:', error);
-    errorMessage.value = error.message || 'Error al obtener el documento';
+    errorMessage.value = error.message || 'El documento no existe, prueba generar uno primero';
     showToast.value = true;
   }
 }

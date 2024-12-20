@@ -146,7 +146,7 @@ def obtener_usuario_por_mail(email):
     return usuario
 
 def obtener_empleado_por_mail(email):
-    empleado = Empleado.query.filter_by(email=email, habilitado=True).first()
+    empleado = Empleado.query.filter_by(email=email).first()  
     return empleado
 
 def check_user(usermail, password):

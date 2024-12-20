@@ -13,11 +13,11 @@ def login():
         password = request.form.get('password')
         user = User.query.filter_by(username=username).first()
         if user and check_password_hash(user.password_hash, password):
-            if not user.empleado.habilitado:
+            if not user.habilitado:
                 flash('Usuario no habilitado', 'error')
                 return redirect(url_for('auth.login'))
             login_user(user)
-            if user.empleado.primer_login:
+            if user.primer_login:
                 return redirect(url_for('auth.cambiar_contrasena'))
             return redirect(url_for('home'))  # Cambia 'dashboard' por la ruta que desees
         else:
@@ -34,7 +34,7 @@ def logout():
 @auth_bp.route('/cambiar_contrasena', methods=['GET', 'POST'])
 @login_required
 def cambiar_contrasena():
-    if not current_user.empleado.primer_login:
+    if not current_user.primer_login:
         flash('Ya has cambiado tu contraseña', 'warning')
         return redirect(url_for('home'))
     if request.method == 'POST':
@@ -70,9 +70,9 @@ def cambiar_contrasena():
             empleado.observaciones = observaciones
         
         current_user.set_password(nueva_contrasena)
-        empleado.primer_login = False
+        current_user.primer_login = False
         db.session.commit()
-        flash('Datos actualizados con éxito!', 'success')
+        flash('Datos actualizados con éxito', 'success')
         return redirect(url_for('home'))
     
     return render_template('cambiar_contrasena.html', empleado=current_user.empleado, topico=True)

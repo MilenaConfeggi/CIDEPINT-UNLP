@@ -26,9 +26,6 @@ class Empleado(db.Model):
     domicilio = db.Column(db.String(200), nullable=True)
     fecha_nacimiento = db.Column(db.Date, nullable=True)
     observaciones = db.Column(db.Text, nullable=True)
-    habilitado = db.Column(db.Boolean, default=True)
-    rol = db.Column(db.String(20), nullable=False, default='Personal')
-    primer_login = db.Column(db.Boolean, default=True)
     archivos = db.relationship('Archivo', back_populates='empleado')
     ausencias = db.relationship('Ausencia', back_populates='empleado')
     distribuciones_asociadas = db.relationship(
@@ -65,13 +62,6 @@ class Empleado(db.Model):
         }
         if self.cargo and (self.cargo not in allowed_subdivisiones or value not in allowed_subdivisiones[self.cargo]):
             raise ValueError(f"Subdivisión de cargo '{value}' no es válida para el cargo '{self.cargo}'.")
-        return value
-
-    @validates('rol')
-    def validate_rol(self, key, value):
-        allowed_roles = ['Colaborador', 'Administrador', 'Personal']
-        if value not in allowed_roles:
-            raise ValueError(f"Rol '{value}' no es válido. Debe ser uno de {allowed_roles}.")
         return value
 
     def __init__(self, user, email, area, dni, nombre, apellido, dependencia=None, cargo=None, subdivision_cargo=None, telefono=None, domicilio=None, fecha_nacimiento=None, observaciones=None, habilitado=True, rol='Personal'):

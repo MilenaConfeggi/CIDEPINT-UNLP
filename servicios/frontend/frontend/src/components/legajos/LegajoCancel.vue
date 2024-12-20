@@ -57,6 +57,7 @@ export default {
     return {
       form: {
         motivo: '',
+        estado: '',
       },
       wasValidated: false,
       isSubmitting: false,
@@ -75,7 +76,7 @@ export default {
       this.isSubmitting = true
 
       try {
-        await this.legajosStore.cancelLegajo(this.legajoId, this.form.motivo)
+        await this.legajosStore.cancelLegajo(this.legajoId, this.form.motivo, this.form.estado)
         alert('Legajo cancelado exitosamente')
         this.resetForm()
         this.router.push('/legajos')
@@ -87,7 +88,7 @@ export default {
       }
     },
     resetForm() {
-      this.form.motivo = ''
+      ;(this.form.motivo = ''), (this.form.estado = '')
       this.wasValidated = false
     },
   },

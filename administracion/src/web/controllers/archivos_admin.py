@@ -32,11 +32,11 @@ def ver_carpeta(id_carpeta):
         flash("Carpeta no encontrada", 'error')
         return redirect(url_for('archivos.index'))
     
-    if current_user.empleado.rol == 'Personal' and current_user not in carpeta.usuarios_leen:
+    if current_user.rol == 'Personal' and current_user not in carpeta.usuarios_leen:
         flash("No tienes permisos para ver esta carpeta", 'error')
         return redirect(url_for('archivos.index'))
     
-    if current_user.empleado.rol == 'Personal':
+    if current_user.rol == 'Personal':
         puede_editar = current_user in carpeta.usuarios_editan
     else:
         puede_editar = True
@@ -91,7 +91,7 @@ def agregar_carpeta():
 @bp.post("/carpeta/subir/<int:id_carpeta>")
 @role_required('Administrador', 'Colaborador', 'Personal')
 def subir_archivo(id_carpeta: int):
-    if current_user.empleado.rol == 'Personal' and current_user not in servicio_archivos.conseguir_carpeta_de_id(id_carpeta).usuarios_editan:
+    if current_user.rol == 'Personal' and current_user not in servicio_archivos.conseguir_carpeta_de_id(id_carpeta).usuarios_editan:
         flash("No tienes permisos para editar esta carpeta", 'error')
         return redirect(url_for('archivos.ver_carpeta',id_carpeta=id_carpeta))
 
@@ -111,7 +111,7 @@ def subir_archivo(id_carpeta: int):
 @bp.get("/descargar/<int:id_carpeta>/<int:id_archivo>")
 @role_required('Administrador', 'Colaborador', 'Personal')
 def descargar_archivo(id_carpeta, id_archivo):
-    if current_user.empleado.rol == 'Personal' and current_user not in servicio_archivos.conseguir_carpeta_de_id(id_carpeta).usuarios_leen:
+    if current_user.rol == 'Personal' and current_user not in servicio_archivos.conseguir_carpeta_de_id(id_carpeta).usuarios_leen:
         flash("No tienes permisos para descargar archivos de esta carpeta", 'error')
         return redirect(url_for('archivos.ver_carpeta',id_carpeta=id_carpeta))
     
@@ -129,7 +129,7 @@ def descargar_archivo(id_carpeta, id_archivo):
 @bp.post("/eliminar_archivo/<int:id_carpeta>")
 @role_required('Administrador', 'Colaborador', 'Personal')
 def eliminar_archivo(id_carpeta):
-    if current_user.empleado.rol == 'Personal' and current_user not in servicio_archivos.conseguir_carpeta_de_id(id_carpeta).usuarios_editan:
+    if current_user.rol == 'Personal' and current_user not in servicio_archivos.conseguir_carpeta_de_id(id_carpeta).usuarios_editan:
         flash("No tienes permisos para editar esta carpeta", 'error')
         return redirect(url_for('archivos.ver_carpeta',id_carpeta=id_carpeta))
     

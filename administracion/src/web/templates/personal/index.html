@@ -1,8 +1,8 @@
 {% extends "layout.html" %} {% block title %} Panel de Personal {% endblock %}
 {% block content %}
 <div class="px-4 py-8 sm:mx-3 md:mx-5 xl:mx-20 sm:pt-200  md:pt-20 xl:pt-40 flex flex-col justify-center items-center">
-  <h1 class="text-3xl font-bold mb-8">Seleccione sección</h1>
-  <div class="grid gap-4 mb-8 md:grid-cols-3 xl:grid-cols-3">
+  <h1 class="text-3xl font-bold mb-8 animate-fade">Seleccione sección</h1>
+  <div class="grid gap-4 mb-8 md:grid-cols-3 xl:grid-cols-3 animate-fade-up">
       <a class="flex items-center p-4 bg-white rounded-lg shadow-md"
       href="{{ url_for('area.listar_areas') }}">
           <div class="p-3 mr-4 text-blue-500 bg-blue-100 rounded-full">

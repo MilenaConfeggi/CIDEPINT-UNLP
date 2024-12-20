@@ -14,19 +14,22 @@ def seed_stan():
             'numero': '1',
             'precio_pesos': 1000,
             'precio_dolares': 100,
-            "precio_por_muestra": True
+            "precio_por_muestra": True,
+            "descripcion": "Descripcion 1"
         },
         {
             'numero': '2',
             'precio_pesos': 2000,
             'precio_dolares': 200,
-            "precio_por_muestra": False
+            "precio_por_muestra": False,
+            "descripcion": "Descripcion 2"
         },
         {
             'numero': '3',
             'precio_pesos': 3000,
             'precio_dolares': 300,
-            "precio_por_muestra": True
+            "precio_por_muestra": True,
+            "descripcion": "Descripcion 3"
         }
     ]
 

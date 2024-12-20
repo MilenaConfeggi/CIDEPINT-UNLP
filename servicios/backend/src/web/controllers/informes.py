@@ -60,7 +60,6 @@ def cargar_documentacion(id_legajo):
 @bp.get("/ver_documento/<int:id_legajo>")
 @jwt_required()
 def ver_documento(id_legajo):
-    print(id_legajo)
     folder_path = os.path.normpath(os.path.join(UPLOAD_FOLDER, "informes", str(id_legajo)))
     documentacion = servicioInforme.buscar_documentacion_por_legajo(id_legajo)
     if not documentacion:

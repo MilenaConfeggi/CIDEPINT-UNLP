@@ -11,82 +11,82 @@ const routes = [
   },
   {
     path: '/mails/:legajoId',
-    name: "mails",
-    component: () => import("../views/MailsView.vue"),
+    name: 'mails',
+    component: () => import('../views/MailsView.vue'),
     props: true,
     meta: { requiresAuth: true, checkLegajoPermission: true}
   },
   {
-    path: "/muestras/:legajoId",
-    name: "muestras",
-    component: () => import("../views/MuestrasIdentificadasView.vue"),
+    path: '/muestras/:legajoId',
+    name: 'muestras',
+    component: () => import('../views/MuestrasIdentificadasView.vue'),
     props: true,
     meta: { requiresAuth: true, checkLegajoPermission: true} 
   },
   {
-    path: "/muestras/:legajoId/carpetas",
-    name: "muestrasCarpetas",
-    component: () => import("../views/MuestrasCarpetasView.vue"),
+    path: '/muestras/:legajoId/carpetas',
+    name: 'muestrasCarpetas',
+    component: () => import('../views/MuestrasCarpetasView.vue'),
     props: true,
     meta: { requiresAuth: true, checkLegajoPermission: true } 
   },
   {
-    path: "/informes/:legajoId",
-    name: "informes",
-    component: () => import("../views/InformesView.vue"),
+    path: '/informes/:legajoId',
+    name: 'informes',
+    component: () => import('../views/InformesView.vue'),
     props: true,
-    meta: { requiresAuth: true } 
+    meta: { requiresAuth: true },
   },
   {
-    path: "/legajos",
-    name: "legajos",
-    component: () => import("../views/LegajoView.vue"),
-    meta: { requiresAuth: true }
+    path: '/legajos',
+    name: 'legajos',
+    component: () => import('../views/LegajoView.vue'),
+    meta: { requiresAuth: true },
   },
   {
-    path: "/legajos/:id",
-    name: "legajo",
-    component: () => import("../components/legajos/LegajoDetalle.vue"),
+    path: '/legajos/:id',
+    name: 'legajo',
+    component: () => import('../components/legajos/LegajoDetalle.vue'),
     props: true,
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true },
   },
   {
-    path: "/legajos/cancelar/:id",
-    name: "cancelar",
-    component: () => import("../components/legajos/LegajoCancel.vue"),
-    meta: { requiresAuth: true }
+    path: '/legajos/cancelar/:id',
+    name: 'cancelar',
+    component: () => import('../components/legajos/LegajoCancel.vue'),
+    meta: { requiresAuth: true },
   },
   {
-    path: "/legajos/newLegajo",
-    name: "newLegajo",
-    component: () => import("../components/legajos/LegajoForm.vue"),
-    meta: { requiresAuth: true }
+    path: '/legajos/newLegajo',
+    name: 'newLegajo',
+    component: () => import('../components/legajos/LegajoForm.vue'),
+    meta: { requiresAuth: true },
   },
   {
-    path: "/documentos",
-    name: "documento",
-    component: () => import("../components/documentos/DocumentoListado.vue"),
-    meta: { requiresAuth: true }
+    path: '/documentos',
+    name: 'documento',
+    component: () => import('../components/documentos/DocumentoListado.vue'),
+    meta: { requiresAuth: true },
   },
   {
-    path: "/stans",
-    name: "stans",
-    component: () => import("../views/StansView.vue"),
+    path: '/stans',
+    name: 'stans',
+    component: () => import('../views/StansView.vue'),
     props: true,
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true },
   },
   {
-    path: "/interareas",
-    name: "interareas",
-    component: () => import("../views/InterareasView.vue"),
-    meta: { requiresAuth: true }
+    path: '/interareas',
+    name: 'interareas',
+    component: () => import('../views/InterareasView.vue'),
+    meta: { requiresAuth: true },
   },
   {
-    path: "/interarea-detalle/:id",
-    name: "InterareaDetalle",
-    component: () => import("../components/interareas/DetalleInterarea.vue"),
-    props: true, 
-    meta: { requiresAuth: true }
+    path: '/interarea-detalle/:id',
+    name: 'InterareaDetalle',
+    component: () => import('../components/interareas/DetalleInterarea.vue'),
+    props: true,
+    meta: { requiresAuth: true },
   },
   {
     path: "/nueva-interarea",
@@ -94,9 +94,14 @@ const routes = [
     component: () => import("../components/interareas/NuevaInterarea.vue"),
   },
   {
-    path: "/log-in",
-    name: "logIn",
-    component: () => import("../views/LogIn.vue"),
+    path: "/nueva-interarea",
+    name: "NuevaInterarea",
+    component: () => import("../components/interareas/NuevaInterarea.vue"),
+  },
+  {
+    path: '/log-in',
+    name: 'logIn',
+    component: () => import('../views/LogIn.vue'),
     props: true,
   },
     {
@@ -140,11 +145,23 @@ const routes = [
       component: () => import("../components/usuarios/RecuperarContra.vue"),
       props: true,
     },
+    {
+      path: "/generar_certificado/:id_legajo",
+      name: "generar_certificado",
+      component: () => import("../components/certificados/CrearCertificado.vue"),
+      props: true,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/encuesta',
+      name: 'encuesta',
+      component: () => import('../views/EncuestaView.vue'),
+    }
 ];
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes
+  routes,
 });
 
 // Guardias de navegación global
@@ -188,5 +205,5 @@ router.beforeEach(async (to, from, next) => {
   next();
 });
 
-
 export default router;
+

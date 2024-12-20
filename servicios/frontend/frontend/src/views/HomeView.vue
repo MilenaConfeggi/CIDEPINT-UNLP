@@ -8,7 +8,7 @@
         Bienvenido a la aplicación de gestión de legajos de la Universidad Nacional de La Plata.
       </p>
     </div>
-    <div class="row row-cols-3 row-cols-md-3 g-4">
+    <div v-if="estaLogeado" class="row row-cols-3 row-cols-md-3 g-4">
       <div class="col">
         <div class="card border-danger">
           <img src="/legajos.png" class="card-img-top" alt="legajos" />
@@ -34,28 +34,26 @@
         </div>
       </div>
       <div class="col">
-        <div class="card">
-          <img src="/muestras.png" class="card-img-top" alt="muestras" />
+        <div class="card border-warning">
+          <img src="/informe.png" class="card-img-top" alt="stan" />
           <div class="card-body">
-            <h5 class="card-title">Muestras</h5>
+            <h5 class="card-title">STAN</h5>
             <p class="card-text">
-              Aqui se encuentran las muestras identificadas, que se utilizan para generar los
-              informes.
+              Aqui se encuentran la infomarción referida a los STANs.
             </p>
-            <RouterLink to="/muestras/1" class="btn btn-primary">Ver Muestras</RouterLink>
+            <RouterLink to="/stans" class="btn btn-warning">Ver STAN</RouterLink>
           </div>
         </div>
       </div>
       <div class="col">
-        <div class="card">
-          <img src="/informe.png" class="card-img-top" alt="informes" />
-          <div class="card-body">
-            <h5 class="card-title">Informes</h5>
+        <div class="card border-danger-subtle">
+          <img src="/users.jpg" class="card-img-top" alt="stan" />
+          <div class="card-body text-danger-emphasis">
+            <h5 class="card-title">Usuarios</h5>
             <p class="card-text">
-              Aqui se encuentran los informes de los clientes, que se generan a partir de las
-              muestras identificadas.
+              Listado de los usuarios que se encuentran en el sistema.
             </p>
-            <RouterLink to="/informes/1" class="btn btn-primary">Ver Informes</RouterLink>
+            <RouterLink to="/usuarios" class="btn btn-secondary">Ver Usuarios</RouterLink>
           </div>
         </div>
       </div>
@@ -67,10 +65,17 @@
             <p class="card-text">
               Menejo de interáreas para realizar solicitudes y subir resultados.
             </p>
-            <RouterLink to="/interareas" class="btn btn-primary">Ver Interareas</RouterLink>
+            <RouterLink to="/interareas" class="btn btn-dark">Ver Interareas</RouterLink>
           </div>
         </div>
       </div>
     </div>
   </main>
 </template>
+<script setup>
+import { useAuthStore } from '@/stores/auth'
+import { computed } from 'vue'
+const authStore = useAuthStore()
+
+const estaLogeado = computed(() => authStore.checkLogin())
+</script>

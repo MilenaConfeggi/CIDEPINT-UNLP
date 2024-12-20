@@ -68,3 +68,12 @@ def end_legajo(id):
     legajo.estado = new_estado
     db.session.commit()
     return legajo
+
+def legajo_informado(id):
+    legajo = find_legajo_by_id(id)
+    new_estado = find_estado_by_nombre('Informado')
+    if new_estado is None:
+        return None
+    legajo.estado = new_estado
+    db.session.commit()
+    return legajo

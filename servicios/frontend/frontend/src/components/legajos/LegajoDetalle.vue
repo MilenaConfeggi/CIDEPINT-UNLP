@@ -326,6 +326,7 @@ import axios from 'axios'
 import StateBadge from '../StateBadge.vue'
 import { useAuthStore } from '../../stores/auth'
 import EncuestaGenerator from '../EncuestaGenerator.vue'
+
 const route = useRoute()
 const legajosStore = useLegajosStore()
 const documentosStore = useDocumentosStore()
@@ -353,7 +354,6 @@ const formatDate = (dateString) => {
 const cargarFactura = (id) => {
   documentoID.value = id
 }
-
 
 const uploadDocumentacion = async (event, id, legajoId) => {
   const file = event.target.files[0]
@@ -430,8 +430,18 @@ const uploadInformeFirmado = async (event, id, legajoId) => {
   const token = authStore.getToken();
   if (file && file.type === 'application/pdf') {
     try {
-      fileName.value = file.name
-      const response = await documentosStore.subirArchivo(file, id, legajoId, editar)
+      const formData = new FormData() // Definir formData aquí
+      formData.append('archivo', file)
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/informes/cargar_informe_firmado/${legajoId}`,
+        formData,
+        {
+          headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "multipart/form-data"
+              },
+        },
+      )
       console.log(response)
       if (response.status === 200) {
         successMessage.value = 'Informe firmado subido correctamente';

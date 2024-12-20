@@ -17,7 +17,11 @@ def authenticate():
         usuario = servicioUsuario.check_user(mail, password)
         if not usuario:
             return jsonify({"error": "El usuario y la contraseña no coinciden"}), 406
-
+        print(usuario.rol.nombre)
+        if usuario.rol.nombre == "administrador":
+            area = None
+        else:
+            area = usuario.empleado[0].area_id
         # Generar el token JWT usando el correo como identidad
         access_token = create_access_token(identity=mail)
         permisos = list(servicioUsuario.obtener_permisos(usuario))

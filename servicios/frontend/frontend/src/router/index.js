@@ -162,7 +162,7 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
-})
+});
 
 // Guardias de navegación global
 router.beforeEach(async (to, from, next) => {
@@ -204,4 +204,6 @@ router.beforeEach(async (to, from, next) => {
   // Continuar navegación si no hay restricciones
   next();
 });
+
+export default router;
 

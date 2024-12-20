@@ -76,7 +76,7 @@ def create_app(env="development", static_folder=""):
         """
         Comando para crear los seeds de la base de datos
         """
-        seedsMedioPago.seeds_medio_pago()
+        #seedsMedioPago.seeds_medio_pago()
         print("Medios de pago creados!")
         seedsArea.seeds_areas()
         print("Areas creados!")
@@ -102,7 +102,7 @@ def create_app(env="development", static_folder=""):
         print("Interareas creadas!")
         seedsDocumento.seeds_documentos()
         print("Documentos creados!")
-        seedsPresupuesto.seeds_presupuesto()
+        #seedsPresupuesto.seeds_presupuesto()
         print("Presupuestos creados!")
         seedsCertificado.seed_distribuciones()
         print("Distribuciones creadas!")

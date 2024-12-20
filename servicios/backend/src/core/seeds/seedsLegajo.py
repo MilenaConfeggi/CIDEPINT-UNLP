@@ -7,7 +7,7 @@ from models.base import db
 from models.presupuestos.presupuesto import Presupuesto
 from models.presupuestos.presupuesto_stan import PresupuestoStan
 
-
+"""""
 def seeds_presupuestos():
     presupuestos_data = [
         {
@@ -54,7 +54,7 @@ def seeds_presupuestos_stan():
     for data in presupuestos_stan_data:
         db.session.add(PresupuestoStan(**data))
     db.session.commit()
-
+"""""
 
 def seeds_legajos():
     legajos_data = [
@@ -90,5 +90,5 @@ def seeds_legajos():
     for data in legajos_data:
         create_legajo(data)
     db.session.commit()
-    seeds_presupuestos()
-    seeds_presupuestos_stan()
+    #seeds_presupuestos()
+    #seeds_presupuestos_stan()

@@ -14,14 +14,18 @@ UPLOAD_FOLDER = os.path.abspath("documentos")
 
 def generar_certificado(id_legajo, empleados):
     # Completar con los datos necesarios
+    legajo = Legajo.query.filter_by(id=id_legajo).first()
     ensayo = "ensayo"
-    cliente = Legajo.query.filter_by(id=id_legajo).first().cliente.nombre
+    cliente = legajo.cliente.nombre
     fecha_desde = Legajo.query.filter_by(id=id_legajo).first().fecha_entrada.strftime("%d/%m/%Y")
     fecha_hasta = datetime.now().strftime("%d/%m/%Y")
     descripcion = "descripcion"
     presupuesto = 1000
     monto = 1000
-    factura = 10
+    if legajo.nro_factura == None:
+        factura = ""
+    else:
+        factura = legajo.nro_factura
 
     # Crear la ruta de destino
     certificado_dir = os.path.join(UPLOAD_FOLDER, "certificados", str(id_legajo))
@@ -101,6 +105,7 @@ def generar_certificado(id_legajo, empleados):
     content.append(Spacer(1, 12))
     content.append(Paragraph(f"Por razones de confidencialidad no se incluye el Plan de Trabajo completo, información que queda bajo guarda en el Área de Servicios del CIDEPINT. Todas las actuaciones relacionadas a esta actividad tecnológica han sido informadas al CONICET, CICPBA y UNLP, cumpliendo con la normativa vigente establecida por el convenio CONICET-CICPBA-UNLP (suscripto el 21/10/2015 y la adenda suscripta el 31/08/2017). Esta certificación se extiende el día {fecha_hasta} como documentación probatoria de la ejecución de esta actividad tecnológica realizada por el grupo antes mencionado.", styles["BodyText"]))
 
+    
     # Construir el PDF
     doc.build(content)
 

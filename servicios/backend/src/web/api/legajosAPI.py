@@ -58,14 +58,24 @@ def add_legajo():
 @bp.post("/cancel/<int:id>")
 def cancel_legajo(id):
     motivo = request.get_json().get("motivo")
+    proc = request.get_json().get("proc")
     legajo = find_legajo_by_id(id)
     if legajo is None:
         return jsonify({"error": "No se encontro el legajo"}), 404
     legajo.estado = find_estado_by_nombre("Cancelado")
     legajo.motivo_cancelacion = motivo
+    legajo.parte_del_proceso_cancelado = proc
     db.session.commit()
     return jsonify({"message": "Legajo cancelado"}), 200
 
+@bp.post("/admin/<int:id>")
+def admin_legajo(id):
+    legajo = find_legajo_by_id(id)
+    if legajo is None:
+        return jsonify({"error": "No se encontro el legajo"}), 404
+    legajo.admin_habilitado = True
+    db.session.commit()
+    return jsonify({"message": "Legajo habilitado"}), 200
 
 @bp.get("/all")
 def listado_completo():

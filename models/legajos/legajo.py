@@ -12,6 +12,7 @@ class Legajo(db.Model):
     motivo_cancelacion = db.Column(db.String(100), nullable=True)
     parte_del_proceso_cancelado = db.Column(db.String(100), nullable=True)
     nro_factura = db.Column(db.String(100), nullable=True)
+    admin_habilitado = db.Column(db.Boolean, default=False)
     
     cliente = db.relationship('Cliente', back_populates='legajo', uselist=False)
     

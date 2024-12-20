@@ -30,7 +30,9 @@
           <p>CUIT: {{ legajo.cliente.cuit }}</p>
         </div>
         <EncuestaGenerator />
-
+        <button v-if="!legajo.admin_habilitado" class="btn btn-dark" @click="adminLegajo">
+          Habilitar para administración
+        </button>
         <div v-if="legajo && tipos_documentos?.length">
           <table class="table">
             <thead>
@@ -327,6 +329,10 @@ const viewFile = async (id, tipo) => {
     console.error('Error al obtener el archivo:', error)
     alert('No se pudo cargar el archivo.')
   }
+}
+
+const adminLegajo = async () => {
+  await legajosStore.habilitar(route.params.id)
 }
 
 onMounted(async () => {

@@ -19,11 +19,15 @@
       <p v-if="loading">Cargando...</p>
       <p v-if="error">{{ error }}</p>
       <p v-if="!legajo && !loading">No se encontro el legajo</p>
-      <div v-else>
-        <p>LEG_{{ legajo.id }}</p>
-        <StateBadge v-if="legajo.estado" :state="legajo.estado?.nombre" />
+      <div v-else class="w-100" >
+        <div class="d-flex flex-column justify-content-center align-items-center">
+
+          <h1 class="text-center">LEG_{{ legajo.id }}</h1>
+          <StateBadge v-if="legajo.estado" :state="legajo.estado?.nombre" />
+        </div>
         <p>Fecha entrada: {{ formatDate(legajo.fecha_entrada) }}</p>
         <p>Objetivo: {{ legajo.objetivo }}</p>
+        <hr>
         <div v-if="legajo.cliente">
           <h6>Cliente</h6>
           <p>{{ legajo.cliente.nombre }}</p>
@@ -41,9 +45,9 @@
                 <th scope="col">Acciones</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody class="" >
               <tr v-for="documento in tipos_documentos" :key="documento.id">
-                <td>{{ documento.nombre }}</td>
+                <td colspan="3">{{ documento.nombre }}</td>
                 <td>
                   <div class="dropdown">
                     <button

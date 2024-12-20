@@ -9,7 +9,6 @@
       />
     </svg>
   </RouterLink>
-  <p v-if="legajos">{{ legajos.items?.length }} Legajos</p>
   <div class="flex flex-col justify-center items-center">
     <p v-if="loading">Cargando...</p>
     <p v-if="error">{{ error }}</p>
@@ -26,7 +25,13 @@
       <span class="input-group-text">Empresa</span>
 
       <input v-model="empresa" type="text" aria-label="nombre del cliente" class="form-control" />
-      <input type="date" v-model="fecha" @input="validateDates" placeholder="Fecha de inicio" />
+      <input
+        type="date"
+        v-model="fecha"
+        @input="validateDates"
+        :max="today"
+        placeholder="Fecha de inicio"
+      />
     </div>
     <div v-if="legajos.items?.length && !error">
       <table class="table">
@@ -54,7 +59,7 @@
             <td>{{ legajo.area.nombre }}</td>
             <td><StateBadge :state="legajo.estado?.nombre" /></td>
             <td>
-              <RouterLink :to="`/legajos/${legajo.id}`" class="hover:underline">
+              <RouterLink :to="`/legajos/${legajo.id}`" class="btn btn-primary">
                 Ver detalle
               </RouterLink>
               <RouterLink :to="`/legajos/cancelar/${legajo.id}`" class="hover:underline">
@@ -66,12 +71,36 @@
           </tr>
         </tbody>
       </table>
-      <div v-if="totalPages > 1" class="pagination">
-        <button @click="prevPage" :disabled="currentPage === 1">Anterior</button>
+      <div v-if="totalPages > 1" class="pagination d-flex justify-content-center grid gap-3">
+        <button @click="prevPage" :disabled="currentPage === 1" class="btn" >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="32"
+            height="32"
+            viewBox="0 0 1024 1024"
+          >
+            <path
+              fill="currentColor"
+              d="M685.248 104.704a64 64 0 0 1 0 90.496L368.448 512l316.8 316.8a64 64 0 0 1-90.496 90.496L232.704 557.248a64 64 0 0 1 0-90.496l362.048-362.048a64 64 0 0 1 90.496 0"
+            />
+          </svg>
+        </button>
 
-        <span>Página {{ currentPage }} de {{ totalPages }}</span>
+        <span class="d-flex align-items-center">Página {{ currentPage }} de {{ totalPages }}</span>
 
-        <button @click="nextPage" :disabled="currentPage === totalPages">Siguiente</button>
+        <button @click="nextPage" :disabled="currentPage === totalPages" class="btn" >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="32"
+            height="32"
+            viewBox="0 0 1024 1024"
+          >
+            <path
+              fill="currentColor"
+              d="M338.752 104.704a64 64 0 0 0 0 90.496l316.8 316.8l-316.8 316.8a64 64 0 0 0 90.496 90.496l362.048-362.048a64 64 0 0 0 0-90.496L429.248 104.704a64 64 0 0 0-90.496 0"
+            />
+          </svg>
+        </button>
       </div>
     </div>
     <div v-else>No hay legajos</div>
@@ -84,6 +113,8 @@ import { useLegajosStore } from '../../stores/legajos'
 import { useAreasStore } from '../../stores/areas'
 import { storeToRefs } from 'pinia'
 import { ref } from 'vue'
+
+const today = new Date().toISOString().split('T')[0]
 
 const legajosStore = useLegajosStore()
 const areasStore = useAreasStore()

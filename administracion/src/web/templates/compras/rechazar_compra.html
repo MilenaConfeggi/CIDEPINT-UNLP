@@ -6,16 +6,30 @@
     <h2 style="text-align: center;">Rechazar compra</h2>
     <div style="margin-bottom: 1em;">
         <label for="opciones" style="display: block; margin-bottom: .5em;">Motivo de rechazo:</label>
-        <select id="opciones" name="opciones" style="width: 100%; padding: .5em; border: 1px solid #ccc; border-radius: 4px;" onchange="document.getElementById('customReason').value=''">
+        <select id="opciones" name="opciones" style="width: 100%; padding: .5em; border: 1px solid #ccc; border-radius: 4px;" onchange="toggleCustomReason()">
             <option value="Sin fondos">Sin fondos</option>
             <option value="Por causas del proveedor">Por causas del proveedor</option>
             <option value="Por causas del interesado">Por causas del interesado</option>
+            <option value="Otros">Otros</option>
         </select>
     </div>
-    <div style="margin-bottom: 1em;">
+    <div id="customReasonContainer" style="margin-bottom: 1em; display: none;">
         <label for="customReason" style="display: block; margin-bottom: .5em;">Otro motivo:</label>
-        <input type="text" id="customReason" name="customReason" style="width: 100%; padding: .5em; border: 1px solid #ccc; border-radius: 4px;" placeholder="Escriba su motivo aquí" oninput="document.getElementById('opciones').selectedIndex = -1">
+        <input type="text" id="customReason" name="customReason" style="width: 100%; padding: .5em; border: 1px solid #ccc; border-radius: 4px;" placeholder="Escriba su motivo aquí">
     </div>
     <button type="submit" style="width: 100%; padding: .75em; border: none; border-radius: 4px; background: #007bff; color: white; font-size: 1em;">Rechazar</button>
 </form>
+
+<script>
+function toggleCustomReason() {
+    var select = document.getElementById('opciones');
+    var customReasonContainer = document.getElementById('customReasonContainer');
+    if (select.value === 'Otros') {
+        customReasonContainer.style.display = 'block';
+    } else {
+        customReasonContainer.style.display = 'none';
+        document.getElementById('customReason').value = '';
+    }
+}
+</script>
 {% endblock %}

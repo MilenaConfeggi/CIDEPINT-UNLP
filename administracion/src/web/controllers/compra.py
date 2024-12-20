@@ -505,7 +505,7 @@ def rechazando_compra(id_compra):
 
     motivo_rechazo = request.form.get("opciones")
     otro_motivo = request.form.get("customReason")
-    if otro_motivo:
+    if otro_motivo and motivo_rechazo == "Otros":
         motivo_rechazo = otro_motivo
 
     borrar_compra(compra, motivo_rechazo)

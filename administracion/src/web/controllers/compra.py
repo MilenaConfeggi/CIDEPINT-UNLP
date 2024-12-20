@@ -25,16 +25,13 @@ def index():
 @bp.get("/lista_proveedores")
 @role_required('Administrador', 'Colaborador') 
 def lista_proveedores():
-
     razon_social = request.args.get("razon_social")
     contacto = request.args.get("contacto")
     page = request.args.get("page", 1, type=int)
     per_page = 10
-
     proveedores = filtrar_proveedores(
         razon_social, contacto, page, per_page
     )
-
     return render_template("compras/listado_proveedores.html", proveedores=proveedores)
 
 @bp.get("/agregar_proveedor")
@@ -48,13 +45,11 @@ def agregar_proveedor():
 def agregando_proveedor():
     form = form_agregar_proveedor(request.form)
     if form.validate_on_submit():
-
         if chequeo_razon_social_existente(form.razon_social.data):
             flash(
                 "La razon social ingresada ya se encuentra registrada en el sistema", "danger"
             )
             return render_template("compras/creacion_proveedor.html", form=form)
-
         crear_proveedor(
             form.razon_social.data,
             form.contacto.data,
@@ -87,13 +82,10 @@ def editando_proveedor(id_proveedor):
     if not proveedor:
         flash("Proveedor no encontrado", "danger")
         return redirect(url_for("compra.lista_proveedores"))
-
     form = form_editar_proveedor(request.form, obj=proveedor)
-
     if form.validate_on_submit():
         razon_social = form.razon_social.data
         contacto = form.contacto.data
-
         if razon_social != proveedor.razon_social and chequeo_razon_social_existente(form.razon_social.data):
             flash(
                 "La razon social ingresada ya se encuentra registrada en el sistema", "danger"
@@ -126,7 +118,6 @@ def eliminar_proveedor(id_proveedor):
 @bp.get("/lista_compras")
 @role_required('Administrador', 'Colaborador', 'Personal')
 def lista_compras():
-
     fecha_menor = request.args.get("fecha_menor")
     fecha_mayor = request.args.get("fecha_mayor")
     estado = request.args.get("estado")
@@ -135,7 +126,6 @@ def lista_compras():
     compras = filtrar_compras(
         fecha_menor, fecha_mayor, estado, current_user.rol, current_user.empleado.area_id, page, per_page
     )
-
     return render_template("compras/listado_compras.html", compras=compras, rol=current_user.rol) 
 
 @bp.get("/ver_compra/<int:id_compra>")
@@ -149,20 +139,16 @@ def ver_compra(id_compra):
 @bp.get("/descargar_compras_excel")
 @role_required('Administrador', 'Colaborador')
 def descargar_compras_excel():
-
     # Retrieve filters from the request
     fecha_menor = request.args.get("fecha_menor")
     fecha_mayor = request.args.get("fecha_mayor")
     estado = request.args.get("estado")
-    
     # Fetch all items based on the filters (no pagination)
     compras = filtrar_compras_descargadas(
         fecha_menor, fecha_mayor, estado, current_user.rol, current_user.empleado.area_id
     )
-
     # Prepare CSV data
     def generate_csv():
-
         data = [
             ["Fecha", "Descripcion", "Estado", "Numero de Factura", "Fuentes de financiamiento"]
         ]
@@ -172,11 +158,9 @@ def descargar_compras_excel():
             areas = "; ".join(area.nombre for area in compra.areas)
             fuentes = "; ".join([fondos, empleados, areas])
             data.append([compra.fecha, compra.descripcion, compra.estado.value, compra.numero_factura, fuentes])
-
         # Write CSV rows
         for row in data:
             yield ", ".join(map(str, row)) + "\n"
-
     # Return CSV response
     return Response(
         generate_csv(),
@@ -187,23 +171,19 @@ def descargar_compras_excel():
 @bp.get("/descargar_compras_pdf")
 @role_required('Administrador', 'Colaborador')
 def descargar_compras_pdf():
-    
     # Retrieve filters from the request
     fecha_menor = request.args.get("fecha_menor")
     fecha_mayor = request.args.get("fecha_mayor")
     estado = request.args.get("estado")
-    
     # Fetch all items based on the filters (no pagination)
     compras = filtrar_compras_descargadas(
         fecha_menor, fecha_mayor, estado, current_user.rol, current_user.empleado.area_id
     )
-    
     # Prepare PDF data
     def generate_pdf():
         buffer = BytesIO()
         c = canvas.Canvas(buffer, pagesize=letter)
         width, height = letter
-        
         # Set up the PDF header
         c.setFont("Helvetica-Bold", 12)
         c.drawString(30, height - 30, "Fecha")
@@ -211,9 +191,7 @@ def descargar_compras_pdf():
         c.drawString(250, height - 30, "Estado")
         c.drawString(300, height - 30, "Numero de Factura")
         c.drawString(425, height - 30, "Fuentes de financiamiento")
-        
         y_position = height - 50
-        
         # Write the data to the PDF
         c.setFont("Helvetica", 10)
         for compra in compras:
@@ -227,7 +205,6 @@ def descargar_compras_pdf():
             c.drawString(300, y_position, compra.numero_factura)
             c.drawString(425, y_position, fuentes)
             y_position -= 15
-            
             # Check if the page is full
             if y_position < 40:
                 c.showPage()  # Create a new page
@@ -240,12 +217,10 @@ def descargar_compras_pdf():
                 c.drawString(300, y_position, "Numero de Factura")
                 c.drawString(425, y_position, "Fuentes de financiamiento")
                 y_position -= 20
-        
         # Finalize the PDF
         c.save()
         buffer.seek(0)
         return buffer
-    
     # Return PDF response
     pdf_buffer = generate_pdf()
     return Response(
@@ -253,6 +228,38 @@ def descargar_compras_pdf():
         mimetype="application/pdf",
         headers={"Content-Disposition": "attachment;filename=lista_compras.pdf"},
     )
+
+class ValidationError(Exception):
+    def __init__(self, message):
+        super().__init__(message)
+        self.message = message
+
+def validar_montos_y_acumular(form):
+    monto = 0
+    fondos, empleados, areas = [], [], []
+    
+    for area in form.areas.data:
+        area_obj = conseguir_area_de_id(area["id_area"])
+        if area["monto"] > area_obj.saldo:
+            raise ValidationError("El monto de un área no puede ser superior a su saldo")
+        areas.append((area_obj, area["monto"]))
+        monto += area["monto"]
+
+    for empleado in form.empleados.data:
+        empleado_obj = conseguir_empleado_de_id(empleado["id_empleado"])
+        if empleado["monto"] > empleado_obj.saldo:
+            raise ValidationError("El monto de un empleado no puede ser superior a su saldo")
+        empleados.append((empleado_obj, empleado["monto"]))
+        monto += empleado["monto"]
+    
+    for fondo in form.fondos.data:
+        fondo_obj = conseguir_fondo_de_id(fondo["titulo_fondo"])
+        if fondo["monto"] > fondo_obj.saldo:
+            raise ValidationError("El monto de un fondo no puede ser superior a su saldo")
+        fondos.append((fondo_obj, fondo["monto"]))
+        monto += fondo["monto"]
+
+    return monto, areas, empleados, fondos
 
 @bp.get("/agregar_compra")
 @role_required('Administrador', 'Colaborador')
@@ -271,29 +278,11 @@ def agregando_compra():
     lista_empleados = listar_empleados()
     lista_fondos = listar_fondos()
     if form.validate_on_submit():
-        monto = 0
-        fondos, empleados, areas = [], [], []
-        for area in form.areas.data:
-            area_obj = conseguir_area_de_id(area["id_area"])
-            if area["monto"] > area_obj.saldo:
-                flash("El monto de un área no puede ser superior a su saldo", "danger")
-                return render_template("compras/creacion_compra.html", form=form, areas=lista_areas, empleados=lista_empleados, fondos=lista_fondos)
-            areas.append((area_obj, area["monto"]))
-            monto += area["monto"]
-        for empleado in form.empleados.data:
-            empleado_obj = conseguir_empleado_de_id(empleado["id_empleado"])
-            if empleado["monto"] > empleado_obj.saldo:
-                flash("El monto de un empleado no puede ser superior a su saldo", "danger")
-                return render_template("compras/creacion_compra.html", form=form, areas=lista_areas, empleados=lista_empleados, fondos=lista_fondos)
-            empleados.append((empleado_obj, empleado["monto"]))
-            monto += empleado["monto"]
-        for fondo in form.fondos.data:
-            fondo_obj = conseguir_fondo_de_id(fondo["titulo_fondo"])
-            if fondo["monto"] > fondo_obj.saldo:
-                flash("El monto de un fondo no puede ser superior a su saldo", "danger")
-                return render_template("compras/creacion_compra.html", form=form, areas=lista_areas, empleados=lista_empleados, fondos=lista_fondos)
-            fondos.append((fondo_obj, fondo["monto"]))
-            monto += fondo["monto"]
+        try:
+            monto, areas, empleados, fondos = validar_montos_y_acumular(form)
+        except ValidationError as e:
+            flash(e.message, "danger")
+            return render_template("compras/creacion_compra.html", form=form, areas=lista_areas, empleados=lista_empleados, fondos=lista_fondos)
         if (form.estado.data == "APROBADA" and monto <= form.importe.data) or (form.estado.data == "REALIZADA" and monto <= form.importe.data):
             crear_compra(
                 form.fecha.data, form.descripcion.data, form.proveedor.data,
@@ -317,7 +306,8 @@ def agregando_compra():
         first_error_field = next(iter(form.errors))
         first_error_message = form.errors[first_error_field][0]
         flash(
-            f"Error en el campo {getattr(form, first_error_field).label.text}: {first_error_message}",
+            f"Error en el campo {getattr(form, first_error_field).label.text}: {
+              first_error_message}",
             "danger",
         )
         return render_template("compras/creacion_compra.html", form=form, areas=lista_areas, empleados=lista_empleados, fondos=lista_fondos)
@@ -354,29 +344,11 @@ def editando_compra(id_compra):
     if not compra:
         return redirect(url_for('compra.lista_compras'))
     if form.validate_on_submit():
-        monto = 0
-        fondos, empleados, areas = [], [], []
-        for area in form.areas.data:
-            area_obj = conseguir_area_de_id(area["id_area"])
-            if area["monto"] > area_obj.saldo:
-                flash("El monto de un área no puede ser superior a su saldo", "danger")
-                return render_template("compras/edicion_compra .html", form=form, compra=compra, areas=lista_areas, empleados=lista_empleados, fondos=lista_fondos)
-            areas.append((area_obj, area["monto"]))
-            monto += area["monto"]
-        for empleado in form.empleados.data:
-            empleado_obj = conseguir_empleado_de_id(empleado["id_empleado"])
-            if empleado["monto"] > empleado_obj.saldo:
-                flash("El monto de un empleado no puede ser superior a su saldo", "danger")
-                return render_template("compras/edicion_compra.html", form=form, compra=compra, areas=lista_areas, empleados=lista_empleados, fondos=lista_fondos)
-            empleados.append((empleado_obj, empleado["monto"]))
-            monto += empleado["monto"]
-        for fondo in form.fondos.data:
-            fondo_obj = conseguir_fondo_de_id(fondo["titulo_fondo"])
-            if fondo["monto"] > fondo_obj.saldo:
-                flash("El monto de un fondo no puede ser superior a su saldo", "danger")
-                return render_template("compras/edicion_compra.html", form=form, compra=compra, areas=lista_areas, empleados=lista_empleados, fondos=lista_fondos)
-            fondos.append((fondo_obj, fondo["monto"]))
-            monto += fondo["monto"]
+        try:
+            monto, areas, empleados, fondos = validar_montos_y_acumular(form)
+        except ValidationError as e:
+            flash(e.message, "danger")
+            return render_template("compras/edicion_compra.html", form=form, compra=compra, areas=lista_areas, empleados=lista_empleados, fondos=lista_fondos)
         if (form.estado.data == "APROBADA" and monto <= form.importe.data) or (form.estado.data == "REALIZADA" and monto <= form.importe.data):
             editar_compra_aprobada_o_realizada(
                 compra,
@@ -402,7 +374,8 @@ def editando_compra(id_compra):
         first_error_field = next(iter(form.errors))
         first_error_message = form.errors[first_error_field][0]
         flash(
-            f"Error en el campo {getattr(form, first_error_field).label.text}: {first_error_message}",
+            f"Error en el campo {getattr(form, first_error_field).label.text}: {
+              first_error_message}",
             "danger",
         )
         return render_template("compras/edicion_compra.html", form=form, compra=compra, areas=lista_areas, empleados=lista_empleados, fondos=lista_fondos)
@@ -428,33 +401,15 @@ def aprobando_compra(id_compra):
     lista_empleados = listar_empleados()
     lista_fondos = listar_fondos()
     compra = buscar_compra(id_compra)
+    if not compra:
+        flash("Compra no encontrada", "danger")
+        return redirect(url_for("compra.lista_compras"))
     if form.validate_on_submit():
-        if not compra:
-            flash("Compra no encontrada", "danger")
-            return redirect(url_for("compra.lista_compras"))
-        monto = 0
-        fondos, empleados, areas = [], [], []
-        for area in form.areas.data:
-            area_obj = conseguir_area_de_id(area["id_area"])
-            if area["monto"] > area_obj.saldo:
-                flash("El monto de un área no puede ser superior a su saldo", "danger")
-                return render_template("compras/aprobar_compra.html", form=form, compra=compra, areas=lista_areas, empleados=lista_empleados, fondos=lista_fondos)
-            areas.append((area_obj, area["monto"]))
-            monto += area["monto"]
-        for empleado in form.empleados.data:
-            empleado_obj = conseguir_empleado_de_id(empleado["id_empleado"])
-            if empleado["monto"] > empleado_obj.saldo:
-                flash("El monto de un empleado no puede ser superior a su saldo", "danger")
-                return render_template("compras/aprobar_compra.html", form=form, compra=compra, areas=lista_areas, empleados=lista_empleados, fondos=lista_fondos)
-            empleados.append((empleado_obj, empleado["monto"]))
-            monto += empleado["monto"]
-        for fondo in form.fondos.data:
-            fondo_obj = conseguir_fondo_de_id(fondo["titulo_fondo"])
-            if fondo["monto"] > fondo_obj.saldo:
-                flash("El monto de un fondo no puede ser superior a su saldo", "danger")
-                return render_template("compras/aprobar_compra.html", form=form, compra=compra, areas=lista_areas, empleados=lista_empleados, fondos=lista_fondos)
-            fondos.append((fondo_obj, fondo["monto"]))
-            monto += fondo["monto"]
+        try:
+            monto, areas, empleados, fondos = validar_montos_y_acumular(form)
+        except ValidationError as e:
+            flash(e.message, "danger")
+            return render_template("compras/aprobar_compra.html", form=form, compra=compra, areas=lista_areas, empleados=lista_empleados, fondos=lista_fondos)
         if (monto <= compra.importe):
             agregar_fuentes_a_compra(
                 compra, fondos, empleados, areas
@@ -465,17 +420,21 @@ def aprobando_compra(id_compra):
             flash("El monto de las áreas, empleados y fondos no coincide con el importe de la compra", "danger")
             return render_template("compras/aprobar_compra.html", form=form, compra=compra, areas=lista_areas, empleados=lista_empleados, fondos=lista_fondos)
     else:
-        # Obtener el primer campo con error
         first_error_field = next(iter(form.errors))
-        first_error_message = form.errors[first_error_field][0]  # Primer error del campo
-        # Mostrar el error
-        flash(f"El campo {getattr(form, first_error_field).label.text} {first_error_message}", 'error')
+        first_error_message = form.errors[first_error_field][0]
+        flash(
+            f"Error en el campo {getattr(form, first_error_field).label.text}: {
+              first_error_message}",
+            "danger",
+        )
         return render_template("compras/aprobar_compra.html", form=form, compra=compra, areas=areas, empleados=empleados, fondos=fondos)
 
 @bp.get("/realizar_compra/<int:id_compra>")
 @role_required('Administrador', 'Colaborador')
 def realizar_compra(id_compra):
     compra = buscar_compra(id_compra)
+    if not compra:
+        return redirect(url_for('compra.lista_compras'))
     form = form_realizar_compra(obj=compra)
     form.fondos.entries = []
     form.areas.entries = []
@@ -487,8 +446,6 @@ def realizar_compra(id_compra):
     for empleado in obtener_empleados(id_compra):
         form.empleados.append_entry({'id_empleado': empleado.empleado_id, 'monto': empleado.contribucion})
     compra = buscar_compra(id_compra)
-    if not compra:
-        return redirect(url_for('compra.lista_compras'))
     areas = listar_areas()
     empleados = listar_empleados()
     fondos = listar_fondos()
@@ -502,33 +459,15 @@ def realizando_compra(id_compra):
     lista_empleados = listar_empleados()
     lista_fondos = listar_fondos()
     compra = buscar_compra(id_compra)
+    if not compra:
+        flash("Compra no encontrada", "danger")
+        return redirect(url_for("compra.lista_compras"))
     if form.validate_on_submit():
-        if not compra:
-            flash("Compra no encontrada", "danger")
-            return redirect(url_for("compra.lista_compras"))
-        monto = 0
-        fondos, empleados, areas = [], [], []
-        for area in form.areas.data:
-            area_obj = conseguir_area_de_id(area["id_area"])
-            if area["monto"] > area_obj.saldo:
-                flash("El monto de un área no puede ser superior a su saldo", "danger")
-                return render_template("compras/realizar_compra.html", form=form, compra=compra, areas=lista_areas, empleados=lista_empleados, fondos=lista_fondos)
-            areas.append((area_obj, area["monto"]))
-            monto += area["monto"]
-        for empleado in form.empleados.data:
-            empleado_obj = conseguir_empleado_de_id(empleado["id_empleado"])
-            if empleado["monto"] > empleado_obj.saldo:
-                flash("El monto de un empleado no puede ser superior a su saldo", "danger")
-                return render_template("compras/realizar_compra.html", form=form, compra=compra, areas=lista_areas, empleados=lista_empleados, fondos=lista_fondos)
-            empleados.append((empleado_obj, empleado["monto"]))
-            monto += empleado["monto"]
-        for fondo in form.fondos.data:
-            fondo_obj = conseguir_fondo_de_id(fondo["titulo_fondo"])
-            if fondo["monto"] > fondo_obj.saldo:
-                flash("El monto de un fondo no puede ser superior a su saldo", "danger")
-                return render_template("compras/realizar_compra.html", form=form, compra=compra, areas=lista_areas, empleados=lista_empleados, fondos=lista_fondos)
-            fondos.append((fondo_obj, fondo["monto"]))
-            monto += fondo["monto"]
+        try:
+            monto, areas, empleados, fondos = validar_montos_y_acumular(form)
+        except ValidationError as e:
+            flash(e.message, "danger")
+            return render_template("compras/realizar_compra.html", form=form, compra=compra, areas=lista_areas, empleados=lista_empleados, fondos=lista_fondos)
         if (monto <= compra.importe):
             realizar_compra_aprobada(
                 compra, fondos, empleados, areas
@@ -539,13 +478,14 @@ def realizando_compra(id_compra):
             flash("El monto de las áreas, empleados y fondos no coincide con el importe de la compra", "danger")
             return render_template("compras/realizar_compra.html", form=form, compra=compra, areas=lista_areas, empleados=lista_empleados, fondos=lista_fondos)
     else:
-        # Obtener el primer campo con error
         first_error_field = next(iter(form.errors))
-        first_error_message = form.errors[first_error_field][0]  # Primer error del campo
-        # Mostrar el error
-        flash(f"El campo {getattr(form, first_error_field).label.text} {first_error_message}", 'error')
-        return render_template("compras/aprobar_compra.html", form=form, compra=compra, areas=areas, empleados=empleados, fondos=fondos)
-    return render_template("compras/paso.html")
+        first_error_message = form.errors[first_error_field][0] 
+        flash(
+            f"Error en el campo {getattr(form, first_error_field).label.text}: {
+              first_error_message}",
+            "danger",
+        )
+        return render_template("compras/aprobar_compra.html", form=form, compra=compra, areas=areas, empleados=empleados, fondos=fondos) 
 
 @bp.get("/rechazar_compra/<int:id_compra>")
 @role_required('Administrador', 'Colaborador')
@@ -572,5 +512,3 @@ def rechazando_compra(id_compra):
 
     flash(f"Compra rechazada por el siguiente motivo: {motivo_rechazo}", "success")
     return redirect(url_for("compra.lista_compras"))
-
-

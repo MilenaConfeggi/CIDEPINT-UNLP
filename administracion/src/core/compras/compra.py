@@ -46,13 +46,46 @@ def filtrar_compras_descargadas(fecha_menor, fecha_mayor, estado, tipo, area):
         query = query.filter(Compra.estado == "CANCELADA")
     return query.order_by(Compra.fecha.asc()).all()
 
-def crear_compra(fecha, descripcion, proveedor, solicitante, importe, observaciones, estado, numero_factura, fondos, empleados, areas):
+def procesar_contribuciones(compra_id, entidades, tabla_asociativa, atributo_saldo=None, tipo=None, estado_enum=None):
+    for entidad_obj, contribucion in entidades:
+        if tipo == "fondo":
+            db.session.execute(
+                tabla_asociativa.insert().values(
+                    compra_id=compra_id,
+                    fondo_titulo=entidad_obj.titulo,
+                    contribucion=contribucion
+                )
+            )
+        elif tipo == "empleado":
+            db.session.execute(
+                tabla_asociativa.insert().values(
+                    compra_id=compra_id,
+                    empleado_id=entidad_obj.id,
+                    contribucion=contribucion
+                )
+            )
+        else:
+            db.session.execute(
+                tabla_asociativa.insert().values(
+                    compra_id=compra_id,
+                    area_id=entidad_obj.id,
+                    contribucion=contribucion
+                )
+            )
+        if estado_enum == estado_compra.REALIZADA and atributo_saldo:
+            setattr(entidad_obj, atributo_saldo, getattr(entidad_obj, atributo_saldo) - contribucion)
+            db.session.add(entidad_obj)
+
+def obtener_estado_enum(estado):
     if estado == "REALIZADA":
-        estado_enum = estado_compra.REALIZADA
+        return estado_compra.REALIZADA
     elif estado == "APROBADA":
-        estado_enum = estado_compra.APROBADA
+        return estado_compra.APROBADA
     elif estado == "ESPERA":
-        estado_enum = estado_compra.ESPERA
+        return estado_compra.ESPERA
+
+def crear_compra(fecha, descripcion, proveedor, solicitante, importe, observaciones, estado, numero_factura, fondos, empleados, areas):
+    estado_enum = obtener_estado_enum(estado)
     proveedor_obj = buscar_proveedor(int(proveedor))
     solicitante_obj = conseguir_empleado_de_id(int(solicitante))
     compra = Compra(
@@ -67,39 +100,9 @@ def crear_compra(fecha, descripcion, proveedor, solicitante, importe, observacio
     )
     db.session.add(compra)
     db.session.flush()
-    for fondo_obj, contribucion in fondos:
-        db.session.execute(
-            compra_fondo.insert().values(
-                compra_id=compra.id,
-                fondo_titulo=fondo_obj.titulo,
-                contribucion=contribucion,
-            )
-        )
-        if estado_enum == estado_compra.REALIZADA:
-            fondo_obj.saldo -= contribucion
-            db.session.add(fondo_obj)
-    for empleado_obj, contribucion in empleados:
-        db.session.execute(
-            compra_empleado.insert().values(
-                compra_id=compra.id,
-                empleado_id=empleado_obj.id,
-                contribucion=contribucion,
-            )
-        )
-        if estado_enum == estado_compra.REALIZADA:
-            empleado_obj.saldo -= contribucion
-            db.session.add(empleado_obj)
-    for area_obj, contribucion in areas:
-        db.session.execute(
-            compra_area.insert().values(
-                compra_id=compra.id,
-                area_id=area_obj.id,
-                contribucion=contribucion,
-            )
-        )
-        if estado_enum == estado_compra.REALIZADA:
-            area_obj.saldo -= contribucion
-            db.session.add(area_obj)
+    procesar_contribuciones(compra.id, fondos, compra_fondo, atributo_saldo="saldo", tipo="fondo", estado_enum=estado_enum)
+    procesar_contribuciones(compra.id, empleados, compra_empleado, atributo_saldo="saldo", tipo="empleado", estado_enum=estado_enum)
+    procesar_contribuciones(compra.id, areas, compra_area, atributo_saldo="saldo", estado_enum=estado_enum)
     db.session.commit()
     return compra
 
@@ -125,30 +128,9 @@ def borrar_compra(compra, motivo_rechazo):
 
 def agregar_fuentes_a_compra(compra, fondos, empleados, areas):
     compra.estado = estado_compra.APROBADA
-    for fondo_obj, contribucion in fondos:
-        db.session.execute(
-            compra_fondo.insert().values(
-                compra_id=compra.id,
-                fondo_titulo=fondo_obj.titulo,
-                contribucion=contribucion,
-            )
-        )
-    for empleado_obj, contribucion in empleados:
-        db.session.execute(
-            compra_empleado.insert().values(
-                compra_id=compra.id,
-                empleado_id=empleado_obj.id,
-                contribucion=contribucion,
-            )
-        )
-    for area_obj, contribucion in areas:
-        db.session.execute(
-            compra_area.insert().values(
-                compra_id=compra.id,
-                area_id=area_obj.id,
-                contribucion=contribucion,
-            )
-        )
+    procesar_contribuciones(compra.id, fondos, compra_fondo, tipo="fondo")
+    procesar_contribuciones(compra.id, empleados, compra_empleado, tipo="empleado")
+    procesar_contribuciones(compra.id, areas, compra_area)
     db.session.commit()
     return compra
 
@@ -162,12 +144,7 @@ def obtener_areas(compra_id):
     return db.session.query(compra_area).filter_by(compra_id=compra_id).all()
 
 def editar_compra_espera(compra, fecha, descripcion, proveedor, solicitante, importe, observaciones, estado, numero_factura):
-    if estado == "REALIZADA":
-        estado_enum = estado_compra.REALIZADA
-    elif estado == "APROBADA":
-        estado_enum = estado_compra.APROBADA
-    elif estado == "ESPERA":
-        estado_enum = estado_compra.ESPERA
+    estado_enum = obtener_estado_enum(estado)
     proveedor_obj = buscar_proveedor(int(proveedor))
     solicitante_obj = conseguir_empleado_de_id(int(solicitante))
     compra.fecha = fecha
@@ -191,12 +168,7 @@ def editar_compra_espera(compra, fecha, descripcion, proveedor, solicitante, imp
     return compra
 
 def editar_compra_aprobada_o_realizada(compra, fecha, descripcion, proveedor, solicitante, importe, observaciones, estado, numero_factura, fondos, empleados, areas):
-    if estado == "REALIZADA":
-        estado_enum = estado_compra.REALIZADA
-    elif estado == "APROBADA":
-        estado_enum = estado_compra.APROBADA
-    elif estado == "ESPERA":
-        estado_enum = estado_compra.ESPERA
+    estado_enum = obtener_estado_enum(estado)
     proveedor_obj = buscar_proveedor(int(proveedor))
     solicitante_obj = conseguir_empleado_de_id(int(solicitante))
     compra.fecha = fecha
@@ -216,39 +188,9 @@ def editar_compra_aprobada_o_realizada(compra, fecha, descripcion, proveedor, so
     db.session.execute(
         compra_area.delete().where(compra_area.c.compra_id == compra.id)
     )
-    for fondo_obj, contribucion in fondos:
-        db.session.execute(
-            compra_fondo.insert().values(
-                compra_id=compra.id,
-                fondo_titulo=fondo_obj.titulo,
-                contribucion=contribucion,
-            )
-        )
-        if estado_enum == estado_compra.REALIZADA:
-            fondo_obj.saldo -= contribucion
-            db.session.add(fondo_obj)
-    for empleado_obj, contribucion in empleados:
-        db.session.execute(
-            compra_empleado.insert().values(
-                compra_id=compra.id,
-                empleado_id=empleado_obj.id,
-                contribucion=contribucion,
-            )
-        )
-        if estado_enum == estado_compra.REALIZADA:
-            empleado_obj.saldo -= contribucion
-            db.session.add(empleado_obj)
-    for area_obj, contribucion in areas:
-        db.session.execute(
-            compra_area.insert().values(
-                compra_id=compra.id,
-                area_id=area_obj.id,
-                contribucion=contribucion,
-            )
-        )
-        if estado_enum == estado_compra.REALIZADA:
-            area_obj.saldo -= contribucion
-            db.session.add(area_obj)
+    procesar_contribuciones(compra.id, fondos, compra_fondo, atributo_saldo="saldo", tipo="fondo", estado_enum=estado_enum)
+    procesar_contribuciones(compra.id, empleados, compra_empleado, atributo_saldo="saldo", tipo="empleado", estado_enum=estado_enum)
+    procesar_contribuciones(compra.id, areas, compra_area, atributo_saldo="saldo", estado_enum=estado_enum)
     db.session.commit()
     return compra
 
@@ -263,35 +205,8 @@ def realizar_compra_aprobada(compra, fondos, empleados, areas):
     db.session.execute(
         compra_area.delete().where(compra_area.c.compra_id == compra.id)
     )
-    for fondo_obj, contribucion in fondos:
-        db.session.execute(
-            compra_fondo.insert().values(
-                compra_id=compra.id,
-                fondo_titulo=fondo_obj.titulo,
-                contribucion=contribucion,
-            )
-        )
-        fondo_obj.saldo -= contribucion
-        db.session.add(fondo_obj)
-    for empleado_obj, contribucion in empleados:
-        db.session.execute(
-            compra_empleado.insert().values(
-                compra_id=compra.id,
-                empleado_id=empleado_obj.id,
-                contribucion=contribucion,
-            )
-        )
-        empleado_obj.saldo -= contribucion
-        db.session.add(empleado_obj)
-    for area_obj, contribucion in areas:
-        db.session.execute(
-            compra_area.insert().values(
-                compra_id=compra.id,
-                area_id=area_obj.id,
-                contribucion=contribucion,
-            )
-        )
-        area_obj.saldo -= contribucion
-        db.session.add(area_obj)
+    procesar_contribuciones(compra.id, fondos, compra_fondo, atributo_saldo="saldo", tipo="fondo", estado_enum=estado_compra.REALIZADA)
+    procesar_contribuciones(compra.id, empleados, compra_empleado, atributo_saldo="saldo", tipo="empleado", estado_enum=estado_compra.REALIZADA)
+    procesar_contribuciones(compra.id, areas, compra_area, atributo_saldo="saldo", estado_enum=estado_compra.REALIZADA)
     db.session.commit()
     return compra

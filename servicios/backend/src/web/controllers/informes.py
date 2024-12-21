@@ -5,6 +5,7 @@ import os
 from werkzeug.utils import secure_filename
 from models.base import db
 from models.documentos.documento import Documento
+from models.legajos import legajo_informado
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 bp = Blueprint("informes", __name__, url_prefix="/informes")
@@ -60,7 +61,6 @@ def cargar_documentacion(id_legajo):
 @bp.get("/ver_documento/<int:id_legajo>")
 @jwt_required()
 def ver_documento(id_legajo):
-    print(id_legajo)
     folder_path = os.path.normpath(os.path.join(UPLOAD_FOLDER, "informes", str(id_legajo)))
     documentacion = servicioInforme.buscar_documentacion_por_legajo(id_legajo)
     if not documentacion:
@@ -174,6 +174,7 @@ def cargar_informe_firmado(id_legajo):
                     'legajo_id': id_legajo,
                     'tipo_id': 4
                 }
+                legajo_informado(id_legajo)
             else:
                 return jsonify({"error": "No tienes permisos para realizar esta acción"}), 403
         # Guardar el archivo en el servidor

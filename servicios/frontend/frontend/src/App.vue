@@ -36,6 +36,7 @@ const logout = () => {
   authStore.removeToken();
   localStorage.removeItem('access_token'); // Remove the token from localStorage
   localStorage.removeItem('permisos');
+  localStorage.removeItem('area');
   location.reload(); // Recarga la página para que se aplique el guard
   console.log('Logout');
 };
@@ -54,7 +55,6 @@ const logout = () => {
         <RouterLink v-if="estaLogueado" to="/pendientes">Pendientes</RouterLink>
         <RouterLink v-if="estaLogueado && tienePermisoListarStans" to="/stans">Stans</RouterLink>
 
-        <!-- Mostrar el botón de Stans solo si el usuario está logueado y tiene el permiso "listar_stans" -->
         <RouterLink v-if="estaLogueado && tienePermisoListarUsuarios" to="/usuarios">Usuarios</RouterLink>
         
         <RouterLink v-if="!estaLogueado" to="/log-in">Iniciar Sesión</RouterLink>

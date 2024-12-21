@@ -49,7 +49,7 @@
             <label for="permisos-${permissionCount}-user_id">Usuario:</label>
             <select name="permisos-${permissionCount}-user_id" id="permisos-${permissionCount}-user_id" class="form-control w-full sm:w-auto">
                 {% for user in users %}
-                    <option value="{{ user.id }}">{{ user.empleado.nombre }} {{ user.empleado.apellido }} - {{ user.empleado.email }}</option>
+                    <option value="{{ user.id }}">{{ user.empleado.nombre }} {{ user.empleado.apellido }} - {{ user.empleado.dni }}</option>
                 {% endfor %}
             </select>
 

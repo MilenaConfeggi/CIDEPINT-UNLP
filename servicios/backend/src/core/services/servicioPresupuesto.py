@@ -5,6 +5,7 @@ from models.presupuestos.ensayo import Ensayo
 from models.presupuestos.ensayo_stan import EnsayoStan
 from models.presupuestos.presupuesto_stan import PresupuestoStan
 from models.presupuestos.presupuesto import Presupuesto
+from models.presupuestos.mediodepago import MedioPago
 import re
 
 def buscar_stan(id):
@@ -16,6 +17,7 @@ def crear_stan(data):
         precio_pesos=data.get('precio_pesos'),
         precio_dolares=data.get('precio_dolares'),
         precio_por_muestra=data.get('precio_por_muestra'),
+        descripcion=data.get('descripcion')
     )
 
     if validar_numero_stan(stan.numero) == False:
@@ -75,3 +77,31 @@ def modificar_precio_stan(id_stan, data):
     stan.precio_pesos = data.get('precio_pesos')
     stan.precio_dolares = data.get('precio_dolares')
     db.session.commit()
+
+def crear_presupuesto(data):
+    presupuesto = Presupuesto(
+        precio=data.get('precio'),
+        legajo=data.get('legajo'),
+        medio_de_pago_id=data.get('medio_de_pago_id'),
+    )
+    db.session.add(presupuesto)
+    db.session.commit()
+    return presupuesto
+
+def crear_presupuesto_stan(presupuesto, stan_id):
+    presupuesto_stan = PresupuestoStan(
+        presupuesto_id=presupuesto_id,
+        stan_id=stan_id
+    )
+
+    db.session.add(presupuesto_stan)
+    db.session.commit()
+    return presupuesto
+
+def crear_medio_pago(name):
+    medio_pago = MedioPago(
+        medio_de_pago = name
+    )
+    db.session.add(medio_pago)
+    db.session.commit()
+    return medio_pago

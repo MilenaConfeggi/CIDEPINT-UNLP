@@ -18,8 +18,8 @@
         <tr v-for="interarea in interareas" :key="interarea.id">
           <td class="text-center">{{ interarea.nro_interarea }}</td>
           <td>
-            <span v-if="interarea.investigacion">Legajo {{ interarea.legajo_id }}</span>
-            <span v-else>Linea {{ interarea.legajo_id }}</span>
+            <span v-if="!interarea.investigacion">Legajo {{ interarea.legajo_id }}</span>
+            <span v-else>Linea {{ interarea.nro_investigacion }}</span>
           </td>
           <td>{{ interarea.muestra_id }}</td>
           <td>{{ interarea.area_receptora || "Sin área asignada" }}</td>

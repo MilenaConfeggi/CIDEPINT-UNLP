@@ -23,7 +23,7 @@ def obtener_interarea(id):
 @bp.post("/crear")
 def crear_interarea():
     try:
-        
+        print("data", request.json)
         tipo = request.json.get("tipo")
         archivo = servicioInterareaArchivos.generar_solicitud(tipo)
 

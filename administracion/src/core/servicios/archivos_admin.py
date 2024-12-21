@@ -7,6 +7,7 @@ from models.base import db
 from models.archivos_admin.archivo import Archivo
 from models.archivos_admin.carpeta import Carpeta, usuarios_leen_carpeta
 from flask_login import current_user
+from datetime import datetime
 
 def listar_archivos_de_carpeta(id_carpeta):
     query = Archivo.query.filter(Archivo.id_carpeta == id_carpeta)
@@ -114,7 +115,8 @@ def eliminar_carpeta(id_carpeta):
 
 def chequear_nombre_carpeta_existente(nombre):
     carpeta = Carpeta.query.filter(
-        Carpeta.nombre == nombre
+        Carpeta.nombre == nombre,
+        extract('year', Carpeta.fecha_ingreso) == datetime.now().year
     ).first()
     if carpeta:
         return True

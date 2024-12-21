@@ -3,6 +3,14 @@
     Fondos
 {% endblock %}
 {% block content %}
+<a href="{{url_for('contable.index')}}"
+  class="inline-flex items-center px-3 py-4 rounded-md text-black-500 hover:bg-black-50">
+  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-6 w-6">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h18">
+      </path>
+  </svg>
+  <span class="ml-1 font-bold text-lg">Volver</span>
+</a>
         <div class="px-4 py-3 mx-8 mt-2 mb-8 bg-white rounded-lg shadow-md animate-fade-right animate-once">
                 <div class="mb-4 flex flex-wrap justify-between items-end">
                     <h3 class="mb-1 text-lg font-semibold text-gray-600">Fondos</h3>
@@ -58,9 +66,7 @@
                                     ></path>
                                 </svg>
                             </a>
-                            <form action="{{ url_for('contable.delete_fondo', fondo_id=fondo.titulo) }}" method="POST" style="display:inline;">
-                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                <button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('¿Estás seguro de que deseas eliminar este fondo?');"
+                            <button data-id="{{ fondo.titulo }}"
                                 class="open-modal-btn flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-black-600 rounded-lg focus:outline-none focus:shadow-outline-gray"
                                 aria-label="Borrar"
                                 >
@@ -76,11 +82,12 @@
                                     clip-rule="evenodd"
                                     ></path>
                                 </svg>
-                            </form>
+                            </button>
                         </div>
                         </td>
                     </tr>
                 {% endfor %}
+                </tbody>
             </table>
             </div>
             <div
@@ -162,4 +169,61 @@
             </span>
             </div>
         </div>
+        <form id="modals" method="POST" action="{{ url_for('contable.delete_fondo') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="modal hidden" id="modal-borrar" data-id="1" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+                    <div class="fixed inset-0 bg-gray-500/75 transition-opacity" aria-hidden="true"></div>
+                        <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+                            <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                                <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+                                    <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                                        <h3 class="text-base font-semibold text-gray-900" id="modal-title">¿Eliminar fondo?</h3>
+                                            <input type="hidden" id="fondo_id" name="fondo_id" value="" />
+                                    </div>
+                                    <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                                    <button type="submit" class="px-3 py-2 text-white bg-green-600 rounded hover:bg-green-500 sm:ml-3 sm:w-auto">Confirmar</button>
+                                    <button type="button" class="close-modal px-3 py-2 text-white bg-red-600 rounded hover:bg-red-500 sm:ml-3 sm:w-auto">Cancelar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </form>
+    <script>
+        // Manejo de modales dinámicos
+    document.addEventListener('DOMContentLoaded', () => {
+        // Selecciona todos los botones para abrir modales
+        const openModalButtons = document.querySelectorAll('.open-modal-btn');
+        
+        // Función para abrir el modal correspondiente
+        const openModal = (id) => {
+            const modal = document.querySelector(`#modal-borrar`);
+            document.querySelector('#fondo_id').value = id;
+            modal.classList.remove('hidden'); // Muestra el modal
+        };
+        
+        // Asocia evento de clic a los botones de abrir modal
+        openModalButtons.forEach((button) => {
+            button.addEventListener('click', () => {
+                const id = button.getAttribute('data-id');
+                openModal(id);
+            });
+        });
+        
+        document.querySelector('.close-modal').addEventListener('click', () => {
+            const modal = document.querySelector(`#modal-borrar`);
+            modal.classList.add('hidden');
+        });
+        
+        // Cierra el modal al hacer clic fuera del contenido
+        document.querySelectorAll('.modal').forEach((modal) => {
+            modal.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                const id = modal.getAttribute('data-id');
+                closeModal(id);
+            }
+            });
+        });
+        });  
+    </script>
 {% endblock %}

@@ -164,6 +164,7 @@ def seed():
 
     carpeta_1 = Carpeta(
         nombre="Formularios",
+        fecha_ingreso=datetime.strptime('2023-01-01', '%Y-%m-%d')
     )
     carpeta_2 = Carpeta(
         nombre="Informes",

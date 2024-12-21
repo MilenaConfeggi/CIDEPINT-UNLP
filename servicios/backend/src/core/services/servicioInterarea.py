@@ -14,7 +14,8 @@ def crear_interarea(data):
         estadoInterarea_id=None,
         legajo_id=data.get('legajo_id'),
         area_id=data.get('area_id'),
-        muestra_id=data.get('muestra_id')
+        muestra_id=data.get('muestra_id'),
+        muestra_investigacion=data.get('muestra_investigacion')
     )
     db.session.add(nueva_interarea)
     db.session.commit()

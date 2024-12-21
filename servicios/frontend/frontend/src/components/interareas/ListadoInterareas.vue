@@ -21,8 +21,8 @@
             <span v-if="!interarea.investigacion">Legajo {{ interarea.legajo_id }}</span>
             <span v-else>Linea {{ interarea.nro_investigacion }}</span>
           </td>
-          <td>{{ interarea.muestra_id }}</td>
-          <td>{{ interarea.area_receptora || "Sin área asignada" }}</td>
+          <td>{{ "Sin área asignada" }}</td>
+          <td>{{ interarea.area_id || "Sin área asignada" }}</td>
           <td class="text-center">{{ formatFecha(interarea.fecha_creacion) }}</td>
           <td class="text-center">
             <button @click="showInfo(interarea)" class="btn btn-primary btn-sm me-2">Ver interárea</button>

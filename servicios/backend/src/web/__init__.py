@@ -89,8 +89,8 @@ def create_app(env="development", static_folder=""):
         print("Usuarios creados!")
         seedsEstadoInterarea.seeds_estados()
         print("Estados de interareas creados!")
-        seedsInterarea.seeds_interarea()
-        print("Interareas creadas!")
+        #seedsInterarea.seeds_interarea()
+        #print("Interareas creadas!")
         seedsDocumento.seeds_documentos()
         print("Documentos creados!")
 

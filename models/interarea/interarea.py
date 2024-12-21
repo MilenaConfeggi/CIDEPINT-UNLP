@@ -12,6 +12,7 @@ class Interarea(db.Model):
     nro_investigacion = db.Column(db.String(40), nullable=True)
     nro_interarea = db.Column(db.String(40), nullable=False)
     resultados = db.Column(db.String(255), nullable=True)
+    muestra_investigacion = db.Column(db.String(255), nullable=True)
 
     # Relaciones
     estadoInterarea_id = db.Column(db.Integer, db.ForeignKey('estadoInterarea.id'), nullable=True)

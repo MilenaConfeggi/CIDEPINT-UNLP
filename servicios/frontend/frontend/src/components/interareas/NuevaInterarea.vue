@@ -69,7 +69,7 @@
           <div class="form-group">
             <div v-if="form.investigacion">
               <label class="form-label fw-bold">Ingresar identificación de muestras</label>
-              <input v-model="form.muestra" type="text" class="form-control" placeholder="Identificación de muestras" />
+              <input v-model="form.muestra_investigacion" type="text" class="form-control" placeholder="Identificación de muestras" />
             </div>
             <div v-if="!form.investigacion">
               <label class="form-label fw-bold">Seleccionar identificación de muestras</label>
@@ -115,6 +115,7 @@ export default {
         lineaInvestigacion: "",
         area: "",
         muestra: "",
+        muestra_investigacion: "",
         investigacion: false,
         identificacion: "",
         tipo: "",
@@ -157,9 +158,15 @@ export default {
         this.errores.area = "El área es obligatoria.";
       }
 
-      if (!this.form.muestra) {
+      if (!this.form.muestra && !this.form.investigacion) {
         this.errores.muestra = "La muestra es obligatoria.";
       } else if (this.form.muestra.length > 255) {
+        this.errores.muestra = "La muestra no puede superar los 255 caracteres.";
+      }
+
+      if (!this.form.muestra_investigacion && this.form.investigacion) {
+        this.errores.muestra = "La muestra es obligatoria.";
+      } else if (this.form.muestra_investigacion.length > 255) {
         this.errores.muestra = "La muestra no puede superar los 255 caracteres.";
       }
 

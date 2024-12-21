@@ -11,7 +11,6 @@ bp = Blueprint("interarea", __name__, url_prefix="/interareas")
 def listar_interareas():
     interareas = servicioInterarea.listar_interareas()
     data = interareasSchema.dump(interareas)
-    print("data:", data)
     return jsonify(data), 200
 
 @bp.get("/<int:id>")
@@ -30,10 +29,11 @@ def crear_interarea():
         dataInterarea = {
             "nombre_archivo": archivo,
             "investigacion": request.json.get("investigacion"),
-            "nro_investigacion": request.json.get("nro_Investigacion"),
-            "legajo_id": request.json.get("legajo"),
+            "nro_investigacion": request.json.get("lineaInvestigacion"),
+            "legajo_id": None if request.json.get("legajo") == "" else request.json.get("legajo"),
             "area_id": request.json.get("area"),
-            "muestra_id": request.json.get("muestra"),
+            "muestra_id": None if request.json.get("muestra") == "" else request.json.get("muestra"),
+            "muestra_investigacion": request.json.get("muestra_investigacion")
         }
 
         servicioInterarea.crear_interarea(dataInterarea)

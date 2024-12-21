@@ -156,6 +156,11 @@ const routes = [
       path: '/encuesta',
       name: 'encuesta',
       component: () => import('../views/EncuestaView.vue'),
+    },
+    {
+      path: '/presupuesto',
+      name: 'presupuesto',
+      component: () => import('../views/PresupuestosView.vue'),
     }
 ];
 

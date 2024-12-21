@@ -6,10 +6,13 @@ from models.presupuestos.ensayo_stan import EnsayoStan
 from models.presupuestos.presupuesto_stan import PresupuestoStan
 from models.presupuestos.presupuesto import Presupuesto
 from models.presupuestos.mediodepago import MedioPago
+from models.legajos.legajo import Legajo
 import re
 
 def buscar_stan(id):
     return STAN.query.get(id)
+def buscar_legajo(id):
+    return Legajo.query.get(id)
 
 def crear_stan(data):
     stan = STAN(
@@ -105,3 +108,30 @@ def crear_medio_pago(name):
     db.session.add(medio_pago)
     db.session.commit()
     return medio_pago
+
+def crear_presupuesto_con_stans(data):
+    legajo = buscar_legajo(data.get('legajo'))
+    presupuesto = Presupuesto(
+        precio=-1,
+        legajo=legajo,
+        medio_de_pago_id=data.get('medioDePago'),
+    )
+    db.session.add(presupuesto)
+    db.session.flush()
+
+    acu=0
+    for dupla in data.get('seleccionados'):
+        aux = buscar_stan(dupla.get('id')).precio_dolares
+        presupuesto_stan = PresupuestoStan(
+            presupuesto_id=presupuesto.id,
+            stan_id=dupla.get('id'),
+            precio_carga = aux,
+        )
+        acu += aux * dupla.get('cantidad')
+        db.session.add(presupuesto_stan)
+    presupuesto.precio = acu
+    db.session.commit()
+    return presupuesto
+    
+def listar_medios_de_pago():
+    return MedioPago.query.all()

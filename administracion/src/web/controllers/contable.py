@@ -138,9 +138,12 @@ def crear_ingreso(fondo_id):
         first_error_field = next(iter(form.errors))
         first_error_message = form.errors[first_error_field][0]
     return redirect(url_for("contable.mostrar_fondo",fondo_id=fondo_id))
-@bp.post("/ingreso/delete/<int:id>")
+
+
+@bp.post("/ingreso/delete")
 @role_required('Administrador', 'Colaborador')
-def delete_ingreso(id):
+def delete_ingreso():
+    id = request.form.get("ingreso_id")
     ingreso = ingresoDB.conseguir_ingreso_de_id(id)
     if not ingreso:
         return redirect(url_for("contable.index"))

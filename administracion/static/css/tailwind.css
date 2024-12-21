@@ -2660,11 +2660,6 @@ input:checked + .toggle-bg {
   color: rgb(224 36 36 / var(--tw-text-opacity, 1));
 }
 
-.text-red-700 {
-  --tw-text-opacity: 1;
-  color: rgb(200 30 30 / var(--tw-text-opacity, 1));
-}
-
 .text-red-900 {
   --tw-text-opacity: 1;
   color: rgb(119 29 29 / var(--tw-text-opacity, 1));
@@ -2976,11 +2971,6 @@ input:checked + .toggle-bg {
 .hover\:text-indigo-600:hover {
   --tw-text-opacity: 1;
   color: rgb(88 80 236 / var(--tw-text-opacity, 1));
-}
-
-.hover\:text-red-600:hover {
-  --tw-text-opacity: 1;
-  color: rgb(224 36 36 / var(--tw-text-opacity, 1));
 }
 
 .hover\:text-red-700:hover {

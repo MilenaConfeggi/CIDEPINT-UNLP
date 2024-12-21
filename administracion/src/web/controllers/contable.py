@@ -87,9 +87,12 @@ def mostrar_fondo(fondo_id):
     #ingresos = ingresoDB.listar_ingresos()
     #print(ingresos[1].receptor_id)
     return render_template("contable/detalle_fondo.html", fondo=fond,ingresos=ingresos,form=form)
-@bp.post("/fondos/eliminar/<string:fondo_id>")
+
+
+@bp.post("/fondos/eliminar")
 @role_required('Administrador', 'Colaborador')
-def delete_fondo(fondo_id):
+def delete_fondo():
+    fondo_id = request.form.get("fondo_id")
     fond = fondo.conseguir_fondo_de_id(fondo_id)
     if not fond:
         return redirect(url_for('contable.index'))
@@ -106,7 +109,9 @@ def delete_fondo(fondo_id):
     
     fondo.delete_fondo(fondo_id)
     flash("Fondo eliminado correctamente", "success")
-    return redirect(url_for('contable.index'))
+    return redirect(url_for('contable.index_fondo'))
+
+
 @bp.post("/ingreso/<string:fondo_id>")
 @role_required('Administrador', 'Colaborador')
 def crear_ingreso(fondo_id):
@@ -408,9 +413,10 @@ def upload():
         return jsonify({"error": str(e)}), 500
 
 
-@bp.post('/delete_document/<int:documento_id>')
+@bp.post('/delete_document')
 @role_required('Administrador', 'Colaborador')
-def delete_document(documento_id):
+def delete_document():
+    documento_id = request.form.get("documento_id")
     documento = get_documento(documento_id)
     if documento is None:
         return jsonify({"error": "No se encontro el archivo"}), 404

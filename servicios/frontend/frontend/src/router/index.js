@@ -158,6 +158,11 @@ const routes = [
       component: () => import('../views/EncuestaView.vue'),
     },
     {
+      path: '/presupuesto',
+      name: 'presupuesto',
+      component: () => import('../views/PresupuestosView.vue'),
+    },
+    {
       path: "/pendientes",
       name: "pendientes",
       component: () => import("../views/PendientesView.vue"),

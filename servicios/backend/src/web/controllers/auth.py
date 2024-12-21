@@ -18,7 +18,8 @@ def authenticate():
         if not usuario:
             return jsonify({"error": "El usuario y la contraseña no coinciden"}), 406
         print(usuario.rol.nombre)
-        if usuario.rol.nombre == "Secretario" or "Director":
+        if usuario.rol.nombre in ["Secretario", "Director"]:
+            print('entre')
             area = None
         else:
             area = usuario.empleado[0].area_id

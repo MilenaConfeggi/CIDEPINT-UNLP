@@ -100,7 +100,7 @@ def crear_presupuesto_stan(presupuesto, stan_id):
 
 def crear_medio_pago(name):
     medio_pago = MedioPago(
-        nombre = name
+        medio_de_pago = name
     )
     db.session.add(medio_pago)
     db.session.commit()

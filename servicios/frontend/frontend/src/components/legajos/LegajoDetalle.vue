@@ -330,6 +330,7 @@ import axios from 'axios'
 import StateBadge from '../StateBadge.vue'
 import { useAuthStore } from '../../stores/auth'
 import EncuestaGenerator from '../EncuestaGenerator.vue'
+
 const route = useRoute()
 const legajosStore = useLegajosStore()
 const documentosStore = useDocumentosStore()
@@ -357,7 +358,6 @@ const formatDate = (dateString) => {
 const cargarFactura = (id) => {
   documentoID.value = id
 }
-
 
 const uploadDocumentacion = async (event, id, legajoId) => {
   const file = event.target.files[0]
@@ -434,8 +434,18 @@ const uploadInformeFirmado = async (event, id, legajoId) => {
   const token = authStore.getToken();
   if (file && file.type === 'application/pdf') {
     try {
-      fileName.value = file.name
-      const response = await documentosStore.subirArchivo(file, id, legajoId, editar)
+      const formData = new FormData() // Definir formData aquí
+      formData.append('archivo', file)
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/informes/cargar_informe_firmado/${legajoId}`,
+        formData,
+        {
+          headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "multipart/form-data"
+              },
+        },
+      )
       console.log(response)
       if (response.status === 200) {
         successMessage.value = 'Informe firmado subido correctamente';
@@ -521,16 +531,17 @@ const viewCertificado = async (id, tipo, legajoId) => {
         'Content-Type': 'multipart/form-data',
       },
     });
+    
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.message || 'Error al obtener el documento');
+      throw new Error(errorData.message || 'El documento no existe, prueba generar uno primero');
     }
     const blob = await response.blob();
     const url = URL.createObjectURL(blob);
     window.open(url, '_blank');
   } catch (error) {
     console.error('Error al obtener el documento:', error);
-    errorMessage.value = error.message || 'Error al obtener el documento';
+    errorMessage.value = error.message || 'El documento no existe, prueba generar uno primero';
     showToast.value = true;
   }
 }

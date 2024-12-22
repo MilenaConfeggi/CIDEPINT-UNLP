@@ -22,7 +22,6 @@ def obtener_interarea(id):
 @bp.post("/crear")
 def crear_interarea():
     try:
-        print("data", request.json)
         tipo = request.json.get("tipo")
         archivo = servicioInterareaArchivos.generar_solicitud(tipo)
 
@@ -31,7 +30,8 @@ def crear_interarea():
             "investigacion": request.json.get("investigacion"),
             "nro_investigacion": request.json.get("lineaInvestigacion"),
             "legajo_id": None if request.json.get("legajo") == "" else request.json.get("legajo"),
-            "area_id": request.json.get("area"),
+            "area_solicitante_id": request.json.get("area_solicitante_id"),
+            "area_receptora_id": request.json.get("area_receptora_id"),
             "muestra_id": None if request.json.get("muestra") == "" else request.json.get("muestra"),
             "muestra_investigacion": request.json.get("muestra_investigacion")
         }

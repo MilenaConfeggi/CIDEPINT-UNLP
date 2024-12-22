@@ -293,6 +293,7 @@ def seed_usuarios():
             "listar_muestras_identificadas",
             "cargar_fotos",
             "listar_fotos",
+            "cargar_interarea"
         ],
     }
 

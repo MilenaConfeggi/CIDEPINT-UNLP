@@ -43,7 +43,7 @@
             <select v-model="form.legajo" @change="filtrarMuestras" class="form-select">
               <option disabled value="">Legajos</option>
               <option v-for="legajo in legajos" :key="legajo.id" :value="legajo.id">
-                {{ legajo.nro_legajo }}
+                {{ legajo.id }}
               </option>
             </select>
             <div v-if="errores.legajo" class="text-danger">{{ errores.legajo }}</div>
@@ -95,34 +95,35 @@
 </template>
 
 <script>
-import { useRouter } from 'vue-router';
+import { useRouter } from "vue-router";
 
 export default {
   setup() {
     const router = useRouter();
-    return { router };
+    return { router};
   },
   data() {
-    return {
-      legajos: [],
-      areas: [],
-      muestras: [],
-      muestrasFiltradas: [], // Estado para almacenar las muestras filtradas
-      errores: {}, // Estado para almacenar los mensajes de error
-      mensajeExito: "", // Estado para almacenar el mensaje de éxito
-      form: {
-        legajo: "",
-        lineaInvestigacion: "",
-        area: "",
-        muestra: "",
-        muestra_investigacion: "",
-        investigacion: false,
-        identificacion: "",
-        tipo: "",
-        solicitante: ""
-      },
-    };
-  },
+  return {
+    legajos: [],
+    areas: [],
+    muestras: [],
+    muestrasFiltradas: [],
+    errores: {},
+    mensajeExito: "",
+    form: {
+      legajo: "",
+      lineaInvestigacion: "",
+      area_receptora: "",
+      area_solicitante: localStorage.getItem("area"), // Recupera el área desde localStorage
+      muestra: "",
+      muestra_investigacion: "",
+      investigacion: false,
+      identificacion: "",
+      tipo: "",
+    },
+  };
+},
+
   methods: {
     async fetchData() {
       try {
@@ -142,7 +143,9 @@ export default {
     },
     filtrarMuestras() {
       if (this.form.legajo) {
-        this.muestrasFiltradas = this.muestras.filter(muestra => muestra.legajo_id === this.form.legajo);
+        this.muestrasFiltradas = this.muestras.filter(
+          (muestra) => muestra.legajo_id === this.form.legajo
+        );
       } else {
         this.muestrasFiltradas = [];
       }
@@ -171,11 +174,13 @@ export default {
       }
 
       if (this.form.lineaInvestigacion.length > 255) {
-        this.errores.lineaInvestigacion = "La línea de investigación no puede superar los 255 caracteres.";
+        this.errores.lineaInvestigacion =
+          "La línea de investigación no puede superar los 255 caracteres.";
       }
 
       if (this.form.investigacion && !this.form.lineaInvestigacion) {
-        this.errores.lineaInvestigacion = "La línea de investigación es obligatoria.";
+        this.errores.lineaInvestigacion =
+          "La línea de investigación es obligatoria.";
       } else if (!this.form.investigacion && !this.form.legajo) {
         this.errores.legajo = "El legajo es obligatorio.";
       }
@@ -192,12 +197,12 @@ export default {
       const datosFormulario = {
         legajo: this.form.legajo,
         lineaInvestigacion: this.form.lineaInvestigacion,
-        area: this.form.area,
+        area_receptora_id: this.form.area,
+        area_solicitante_id: this.form.area_solicitante, // Reutilizado desde data
         muestra: this.form.muestra,
         investigacion: this.form.investigacion,
         tipo: this.form.tipo,
-        solicitante: this.form.solicitante // aca deberia sacar el area de la sesion
-      };
+    };
 
       try {
         const response = await fetch(`${baseUrl}/interareas/crear`, {

@@ -13,11 +13,11 @@
                 </p>
                 <p>
                     <span class="fw-bold text-secondary">Área Solicitante:</span>
-                    <span class="ms-2">{{ interarea.muestra_id }}</span>
+                    <span class="ms-2">{{ interarea.area_solicitante_id }}</span>
                 </p>
                 <p>
                     <span class="fw-bold text-secondary">Área Receptora:</span>
-                    <span class="ms-2">{{ interarea.area_receptora }}</span>
+                    <span class="ms-2">{{ interarea.area_receptora_id }}</span>
                 </p>
                 <p>
                     <span class="fw-bold text-secondary">Fecha Solicitud:</span>
@@ -34,6 +34,8 @@
         </div>
 
         <div class="text-center mt-4">
+            <!-- Mostrar el botón "Cargar Resultado" solo si el área del localStorage es igual a area_receptora_id -->
+            <button v-if="mostrarCargarResultado()" @click="toggleInputResultado" class="btn btn-primary">Cargar Resultado</button>
             <button v-if="interarea && interarea.estadoInterarea_id == 2" @click="toggleInputResultado" class="btn btn-primary">Cargar Resultado</button>
             <button v-if="interarea && interarea.estadoInterarea_id == 1" class="btn btn-secondary" @click="mostrarSubirSolicitud = !mostrarSubirSolicitud">Subir Solicitud Firmada</button>
             <button v-if="interarea && interarea.estadoInterarea_id == null" class="btn btn-secondary" @click="mostrarSubirSolicitudCompleta = !mostrarSubirSolicitudCompleta">Cargar solicitud completa</button>
@@ -89,6 +91,7 @@ const mostrarResultado = ref(false); // Controla si el resultado se muestra o no
 const resultado = ref(""); // Almacena el texto ingresado como resultado
 const archivo = ref(null); // Almacena el archivo seleccionado
 const archivoCompleto = ref(null); // Almacena el archivo de solicitud completa seleccionado
+const area = localStorage.getItem("area"); // Obtener área desde el localStorage
 
 const route = useRoute();
 const router = useRouter();
@@ -105,35 +108,14 @@ const fetchInterarea = async (id) => {
     }
 };
 
-const fetchDescargarSolicitud = async (nombreSolicitud) => {
-    try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/interareas/descargar/${nombreSolicitud}`);
-        if (!response.ok) {
-            throw new Error("Error al descargar la solicitud");
-        }
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = nombreSolicitud;
-        a.click();
-        window.URL.revokeObjectURL(url);
-    } catch (error) {
-        console.error("Error al descargar la solicitud:", error);
-    }
-};
-
 onMounted(() => {
     const id = route.params.id;
     fetchInterarea(id);
 });
 
-const volverAlListado = () => {
-    router.push({ name: "interareas" });
-};
-
-const descargarInterarea = () => {
-    fetchDescargarSolicitud(interarea.value.nombre_archivo);
+// Lógica para verificar si el botón de "Cargar Resultado" se debe mostrar
+const mostrarCargarResultado = () => {
+    return interarea && interarea.estadoInterarea_id == 3 && interarea.value.area_receptora_id === parseInt(area);
 };
 
 const formatFecha = (fecha) => {
@@ -253,10 +235,12 @@ const subirSolicitudCompleta = async () => {
 const toggleResultado = () => {
     mostrarResultado.value = !mostrarResultado.value;
 };
-</script>
 
-<style scoped>
-.container {
-    max-width: 800px;
-}
-</style>
+const volverAlListado = () => {
+    router.push({ name: "interareas" });
+};
+
+const descargarInterarea = () => {
+    fetchDescargarSolicitud(interarea.value.nombre_archivo);
+};
+</script>

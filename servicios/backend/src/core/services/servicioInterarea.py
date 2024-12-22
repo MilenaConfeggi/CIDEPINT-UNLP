@@ -13,7 +13,8 @@ def crear_interarea(data):
         nro_investigacion=data.get('nro_investigacion'),
         estadoInterarea_id=None,
         legajo_id=data.get('legajo_id'),
-        area_id=data.get('area_id'),
+        area_receptora_id=data.get('area_receptora_id'),
+        area_solicitante_id=data.get('area_solicitante_id'),
         muestra_id=data.get('muestra_id'),
         muestra_investigacion=data.get('muestra_investigacion')
     )

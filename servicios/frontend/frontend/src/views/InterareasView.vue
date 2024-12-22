@@ -1,8 +1,9 @@
 <template>
   <div class="container mt-4">
-    <h1 class="text-center mb-4">Interareas</h1>
-    <button v-if="tienePermisoCargarInterarea" class="btn btn-success mb-4" @click="redirigirANuevaInterarea">Nueva Interarea</button>
     <ListadoInterareas @interareasFetched="setInterareas" />
+    <div class="text-center mt-4">
+      <button v-if="tienePermisoCargarInterarea" class="btn btn-success" @click="redirigirANuevaInterarea">Nueva Interarea</button>
+    </div>
   </div>
 </template>
 

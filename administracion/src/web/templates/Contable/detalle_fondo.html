@@ -20,7 +20,7 @@
           <dt class="text-sm/6 font-medium text-gray-900">Saldo</dt>
           <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">${{ '{:,.0f}'.format(fondo.saldo) }}</dd>
         </div>
-        <form method="POST" action="{{ url_for('contable.crear_ingreso', fondo_id = fondo.titulo) }}" enctype="multipart/form-data">
+        <form method="POST" action="{{ url_for('contable.crear_ingreso', fondo_id = fondo.id) }}" enctype="multipart/form-data">
             <input type="text" name="csrf_token" value="{{ csrf_token() }}" hidden>
         
             <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">

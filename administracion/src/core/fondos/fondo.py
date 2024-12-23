@@ -13,6 +13,15 @@ def filtrar_fondos(page, per_page):
 def conseguir_fondo_de_id(fondo_id):
 
     return Fondo.query.get(fondo_id)
+def conseguir_fondo_por_nombre(nombre):
+    """
+    Obtiene un fondo por su nombre.
+    Args:
+        nombre (string): El nombre del fondo a buscar.
+    Returns:
+        Fondo: El objeto Fondo si se encuentra, de lo contrario, None.
+    """
+    return Fondo.query.filter_by(titulo=nombre, borrado=False).first()
 
 def create_fondo(**kwargs):
     """

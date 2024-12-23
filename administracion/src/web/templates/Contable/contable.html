@@ -51,7 +51,7 @@
                         </td>
                         <td class="px-4 py-3">
                         <div class="flex items-center space-x-4 text-sm">
-                            <a href="{{ url_for('contable.mostrar_fondo', fondo_id=fondo.titulo) }}"
+                            <a href="{{ url_for('contable.mostrar_fondo', fondo_id=fondo.id) }}"
                             class="flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-black-600 rounded-lg focus:outline-none focus:shadow-outline-gray"
                             aria-label="Ver"
                             >
@@ -66,7 +66,7 @@
                                     ></path>
                                 </svg>
                             </a>
-                            <button data-id="{{ fondo.titulo }}"
+                            <button data-id="{{ fondo.id }}"
                                 class="open-modal-btn flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-black-600 rounded-lg focus:outline-none focus:shadow-outline-gray"
                                 aria-label="Borrar"
                                 >
@@ -177,7 +177,7 @@
                             <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
                                 <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
                                     <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
-                                        <h3 class="text-base font-semibold text-gray-900" id="modal-title">¿Eliminar fondo?</h3>
+                                        <h3 class="text-base font-semibold text-gray-900" id="modal-title">¿Seguro que quieres Eliminar el Fondo, esto tambien borrara la carpeta asociada a este y todos los archivos que contiene?</h3>
                                             <input type="hidden" id="fondo_id" name="fondo_id" value="" />
                                     </div>
                                     <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">

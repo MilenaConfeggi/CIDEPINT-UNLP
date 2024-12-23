@@ -8,4 +8,5 @@ class Fondo(db.Model):
     saldo = db.Column(db.Float)
     borrado = db.Column(db.Boolean(), default=False)
     compras = db.relationship('Compra', secondary=compra_fondo, back_populates='fondos')
+    carpeta_id = db.Column(db.Integer, db.ForeignKey('carpetas.id'),)
     carpeta = db.relationship('Carpeta', back_populates='fondo')

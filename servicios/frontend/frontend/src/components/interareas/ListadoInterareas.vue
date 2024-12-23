@@ -16,10 +16,10 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-if="interareas.length === 0">
+          <tr v-if="paginatedInterareas.length === 0">
             <td colspan="6" class="text-center">No hay solicitudes de interáreas disponibles.</td>
           </tr>
-          <tr v-for="interarea in interareas" :key="interarea.id" @click="highlightRow(interarea.id)" :class="{ 'table-active': selectedInterarea === interarea.id }">
+          <tr v-for="interarea in paginatedInterareas" :key="interarea.id" @click="highlightRow(interarea.id)" :class="{ 'table-active': selectedInterarea === interarea.id }">
             <td class="text-center">{{ interarea.nro_interarea }}</td>
             <td>
               <span v-if="!interarea.investigacion">Legajo {{ interarea.legajo.id }}</span>
@@ -35,16 +35,46 @@
         </tbody>
       </table>
     </div>
+    <nav aria-label="Paginación" class="mt-3">
+      <ul class="pagination justify-content-center">
+        <li class="page-item" :class="{ disabled: currentPage === 1 }">
+          <button class="page-link" @click="changePage(currentPage - 1)" :disabled="currentPage === 1">Anterior</button>
+        </li>
+        <li v-for="page in totalPages" :key="page" class="page-item" :class="{ active: currentPage === page }">
+          <button class="page-link" @click="changePage(page)">{{ page }}</button>
+        </li>
+        <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+          <button class="page-link" @click="changePage(currentPage + 1)" :disabled="currentPage === totalPages">Siguiente</button>
+        </li>
+      </ul>
+    </nav>
   </div>
 </template>
 
+
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 
 const interareas = ref([]);
+const currentPage = ref(1); 
+const itemsPerPage = ref(8); 
 const router = useRouter();
 const area = localStorage.getItem("area");
+
+const paginatedInterareas = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage.value;
+  const end = start + itemsPerPage.value;
+  return interareas.value.slice(start, end);
+});
+
+const totalPages = computed(() => Math.ceil(interareas.value.length / itemsPerPage.value));
+
+const changePage = (page) => {
+  if (page >= 1 && page <= totalPages.value) {
+    currentPage.value = page;
+  }
+};
 
 const fetchInterareas = async () => {
   try {
@@ -55,8 +85,8 @@ const fetchInterareas = async () => {
     const data = await response.json(); 
     if (area !== "null") {
       interareas.value = data.filter((interarea) => 
-          interarea.area_solicitante.id === parseInt(area) || 
-          interarea.area_receptora.id === parseInt(area)
+        interarea.area_solicitante.id === parseInt(area) || 
+        interarea.area_receptora.id === parseInt(area)
       );
     } else {
       interareas.value = data; 
@@ -71,57 +101,55 @@ const showInfo = (interarea) => {
 };
 
 onMounted(async () => {
-  fetchInterareas(); 
+  await fetchInterareas();
 });
-
 </script>
 
 <style scoped>
-.table {
-  width: 100%;
-  margin: auto;
-  border-collapse: collapse;
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
 }
 
-.table th, .table td {
-  text-align: center;
-  vertical-align: middle;
-  padding: 10px;
+.page-item {
+  list-style: none;
 }
 
-.table-hover tbody tr:hover {
-  background-color: #f1f1f1;
-  cursor: pointer;
+.page-link {
+  display: inline-block;
+  padding: 8px 12px;
+  margin: 0 5px;
+  border: 1px solid #007bff;
+  border-radius: 4px;
+  color: #007bff;
+  background-color: white; 
+  text-decoration: none;
+  transition: all 0.3s ease;
 }
 
-.table-active {
-  background-color: #d1ecf1;
-}
-
-.thead-dark th {
-  background-color: #343a40;
-  color: white;
-}
-
-.line {
-  border: 0;
-  height: 1px;
-  background: #333;
-  background-image: linear-gradient(to right, #ccc, #333, #ccc);
-}
-
-button {
+.page-link:hover {
   background-color: #007bff;
   color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background-color 0.3s ease;
 }
 
-button:hover {
+.page-item.active .page-link {
   background-color: #0056b3;
+  color: white;
+  border-color: #0056b3;
 }
+
+.page-item.disabled .page-link {
+  color: #ccc;
+  cursor: not-allowed;
+  background-color: #f8f9fa;
+  border-color: #ddd;
+}
+
+.page-item.previous .page-link,
+.page-item.next .page-link {
+  padding: 8px 16px;
+  font-weight: bold;
+}
+
 </style>

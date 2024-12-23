@@ -149,32 +149,32 @@ def seed_stan():
         {
             'numero': '571',
             'precio_dolares': 0.5,
-            "precio_por_muestra": True,
+            "precio_por_muestra": False,
         },
         {
             'numero': '570',
             'precio_dolares': 0.3,
-            "precio_por_muestra": True,
+            "precio_por_muestra": False,
         },
         {
             'numero': '569',
             'precio_dolares': 4,
-            "precio_por_muestra": True,
+            "precio_por_muestra": False,
         },
         {
             'numero': '4692',
             'precio_dolares': 0.5,
-            "precio_por_muestra": True,
+            "precio_por_muestra": False,
         },
         {
             'numero': '572',
             'precio_dolares': 2,
-            "precio_por_muestra": True,
+            "precio_por_muestra": False,
         },
         {
             'numero': '4670',
             'precio_dolares': 2,
-            "precio_por_muestra": True,
+            "precio_por_muestra": False,
         },
         {
             'numero': '1142',
@@ -220,7 +220,7 @@ def seed_stan():
         {
             'numero': '4672',
             'precio_dolares': 19,
-            "precio_por_muestra": False,
+            "precio_por_muestra": True,
         },
         {
             'numero': '4769',

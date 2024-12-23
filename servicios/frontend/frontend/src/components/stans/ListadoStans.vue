@@ -6,26 +6,26 @@
     <table class="table table-hover table-bordered">
       <thead class="thead-dark">
         <tr>
-          <th>Número</th>
-          <th>Precio en Pesos</th>
-          <th>Precio en Dólares</th>
-          <th>Precio por</th>
-          <th>Ensayos Asociados</th>
-          <th>Acciones</th>
+          <th class="col-numero">Número</th>
+          <th class="col-ensayos">Ensayos Asociados</th>
+          <th class="col-precio-por">Precio por</th>
+          <th class="col-precio-pesos">Precio en Pesos</th>
+          <th class="col-precio-dolares">Precio en Dólares</th>
+          <th class="col-acciones">Acciones</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="stan in stans" :key="stan.id" @click="highlightRow(stan.id)" :class="{ 'table-active': selectedStan === stan.id }">
-          <td>{{ stan.numero }}</td>
-          <td>${{ stan.precio_pesos }}</td>
-          <td>${{ stan.precio_dolares }}</td>
-          <td>{{ stan.precio_por_muestra ? 'muestra' : 'hora' }}</td>
-          <td>
+          <td class="col-numero">{{ stan.numero }}</td>
+          <td class="col-ensayos">
             <ul>
               <li v-for="ensayo in stan.ensayos" :key="ensayo.id">{{ ensayo.nombre }}</li>
             </ul>
           </td>
-          <td>
+          <td class="col-precio-por">{{ stan.precio_por_muestra ? 'muestra' : 'hora' }}</td>
+          <td class="col-precio-pesos">${{ stan.precio_pesos }}</td>
+          <td class="col-precio-dolares">${{ stan.precio_dolares }}</td>
+          <td class="col-acciones">
             <button @click.stop="modificarStan(stan.id)" class="btn-modificar">
               <i class="fas fa-pencil-alt"></i>
             </button>
@@ -269,5 +269,28 @@ button:hover {
   border-radius: 50%; /* Botones redondos */
 }
 
-/* ...existing code... */
+/* Definir anchos fijos para las columnas */
+.col-numero {
+  width: 10%;
+}
+
+.col-ensayos {
+  width: 50%;
+}
+
+.col-precio-por {
+  width: 10%;
+}
+
+.col-precio-pesos {
+  width: 10%;
+}
+
+.col-precio-dolares {
+  width: 10%;
+}
+
+.col-acciones {
+  width: 10%;
+}
 </style>

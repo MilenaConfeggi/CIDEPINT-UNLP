@@ -2,7 +2,7 @@ from servicios.backend.src.core.services import servicioPresupuesto
 from flask import Blueprint, jsonify, abort, request, send_file, send_from_directory
 from servicios.backend.src.web.schemas.stan import stansSchema, stanSchema, ensayoSchema, EnsayosSchema
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from web.helpers.auth import is_authenticated, check_permission
+from servicios.backend.src.web.helpers.auth import is_authenticated, check_permission
 bp = Blueprint('stans', __name__, url_prefix='/stans')
 
 @bp.route("/", methods=["GET"])
@@ -10,9 +10,19 @@ bp = Blueprint('stans', __name__, url_prefix='/stans')
 def listar_stans():
     if not check_permission("listar_stans"):
         return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
-    stans = servicioPresupuesto.listar_stans()  
-    data = stansSchema.dump(stans)  
-    return jsonify(data), 200
+    
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 10, type=int)
+    
+    stans_paginated = servicioPresupuesto.listar_stans_paginados(page, per_page)
+    data = stansSchema.dump(stans_paginated.items)
+    
+    return jsonify({
+        'stans': data,
+        'total': stans_paginated.total,
+        'pages': stans_paginated.pages,
+        'current_page': stans_paginated.page
+    }), 200
 
 @bp.post("/subir_stan")
 def cargar_stan():

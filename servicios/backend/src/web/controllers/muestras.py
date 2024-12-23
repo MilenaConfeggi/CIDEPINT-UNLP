@@ -9,7 +9,7 @@ import os
 from werkzeug.utils import secure_filename
 from marshmallow import ValidationError
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from web.helpers.auth import is_authenticated, check_permission
+from servicios.backend.src.web.helpers.auth import is_authenticated, check_permission
 import smtplib
 import zipfile
 from io import BytesIO

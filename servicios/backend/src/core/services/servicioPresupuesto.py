@@ -68,6 +68,9 @@ def listar_stans():
     stans.sort(key=extract_number)
     return stans
 
+def listar_stans_paginados(page, per_page):
+    return STAN.query.paginate(page=page, per_page=per_page)
+
 def listar_ensayos():
     return Ensayo.query.all()
 

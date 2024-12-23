@@ -15,7 +15,7 @@ def seed_stan():
             'precio_pesos': 1000,
             'precio_dolares': 100,
             "precio_por_muestra": True,
-            "descripcion": "Descripcion 1"
+            
         },
         {
             'numero': '2',

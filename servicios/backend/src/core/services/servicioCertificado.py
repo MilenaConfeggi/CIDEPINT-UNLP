@@ -12,7 +12,7 @@ import os
 
 UPLOAD_FOLDER = os.path.abspath("documentos")
 
-def generar_certificado(id_legajo, empleados):
+def generar_certificado(id_legajo, empleados, descripcion):
     # Completar con los datos necesarios
     legajo = Legajo.query.filter_by(id=id_legajo).first()
     cliente = legajo.cliente.nombre
@@ -27,14 +27,11 @@ def generar_certificado(id_legajo, empleados):
 
     # Obtener los ensayos de los STANs del presupuesto del legajo
     ensayos = []
-    descripcion = []
     for presupuesto in legajo.presupuesto_cidepint:
         for stan in presupuesto.stans:
-            descripcion.append(stan.descripcion)
             for ensayo in stan.ensayos:
                 ensayos.append(ensayo.nombre)
     ensayo_texto = ", ".join(set(ensayos))  
-    descripcion = ", ".join(set(descripcion))
     presupuesto = legajo.presupuesto_cidepint[0].nro_presupuesto
 
     # Crear la ruta de destino

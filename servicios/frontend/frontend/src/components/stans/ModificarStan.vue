@@ -16,15 +16,11 @@
       </div>
       <div class="mb-4">
         <label for="precio_pesos" class="block text-gray-700 text-sm font-bold mb-2">Precio en Pesos:</label>
-        <input type="number" id="precio_pesos" v-model="stan.precio_pesos" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+        <input type="number" id="precio_pesos" v-model="stan.precio_pesos" min="0" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
       </div>
       <div class="mb-4">
         <label for="precio_dolares" class="block text-gray-700 text-sm font-bold mb-2">Precio en Dólares:</label>
-        <input type="number" id="precio_dolares" v-model="stan.precio_dolares" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-      </div>
-      <div class="mb-4">
-        <label for="descripcion" class="block text-gray-700 text-sm font-bold mb-2">Descripción de la actividad tecnológica:</label>
-        <textarea id="descripcion" v-model="stan.descripcion" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 descripcion-input" rows="5" disabled></textarea>
+        <input type="number" id="precio_dolares" v-model="stan.precio_dolares" min="0" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
       </div>
       <div class="flex items-center justify-between">
         <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Modificar Stan</button>
@@ -48,7 +44,6 @@ const stan = ref({
   precio_pesos: null,
   precio_dolares: null,
   precio_por_muestra: true,
-  descripcion: '', // Añadir la propiedad descripción
 });
 
 const error = ref(null);
@@ -108,13 +103,6 @@ onMounted(() => {
 .form-container {
   max-height: 400px; 
   overflow-y: auto;
-}
-
-.descripcion-input {
-  height: 100px; /* Ajusta la altura según sea necesario */
-  padding: 10px; 
-  width: 100%; 
-  box-sizing: border-box; 
 }
 
 button {

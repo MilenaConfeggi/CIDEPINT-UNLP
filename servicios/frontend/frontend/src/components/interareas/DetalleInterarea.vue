@@ -147,6 +147,7 @@ const guardarResultado = async () => {
         setTimeout(() => {
             mensajeExito.value = "";
         }, 3000);
+        window.location.reload();
     } catch (error) {
         console.error("Error al guardar el resultado:", error);
     }
@@ -182,6 +183,7 @@ const subirSolicitudFirmada = async () => {
 
         archivo.value = null; 
         mostrarSubirSolicitud.value = false; 
+        window.location.reload();
     } catch (error) {
         console.error("Error al subir la solicitud firmada:", error);
     }
@@ -217,6 +219,7 @@ const subirSolicitudCompleta = async () => {
 
         archivo.value = null; 
         mostrarSubirSolicitudCompleta.value = false;
+        window.location.reload();
     } catch (error) {
         console.error("Error al subir la solicitud completa:", error);
     }
@@ -231,7 +234,7 @@ const debeMostrarSubirSolicitudFirmada = () => {
 };
 
 const debeMostrarCargarSolicitudCompleta = () => {
-    return interarea.value && interarea.value.estadoInterarea_id == null;
+    return interarea.value && interarea.value.estadoInterarea_id == null && interarea.value.area_solicitante.id === parseInt(area);
 };
 
 const debeMostrarVerResultados = () => {

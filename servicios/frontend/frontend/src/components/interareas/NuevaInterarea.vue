@@ -123,7 +123,9 @@ export default {
           fetch(`${baseUrl}/muestras/`),
         ]);
         this.legajos = await legajosRes.json();
-        this.areas = await areasRes.json();
+        const data = await areasRes.json();
+        const area = localStorage.getItem("area");
+        this.areas = data.filter((a) => a.id != area);
         this.muestras = await muestrasRes.json();
       } catch (error) {
         console.error("Error al cargar los datos:", error);

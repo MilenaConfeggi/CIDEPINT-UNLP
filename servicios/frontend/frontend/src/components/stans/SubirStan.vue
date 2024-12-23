@@ -63,6 +63,12 @@ const submitForm = async () => {
   error.value = null;
   successMessage.value = null;
 
+  // Validar que el número de STAN sea un número y no sea negativo
+  if (isNaN(stan.value.numero) || stan.value.numero < 0) {
+    error.value = 'El número de STAN debe ser un número no negativo';
+    return;
+  }
+
   // Validar que los precios no sean negativos
   if (stan.value.precio_pesos < 0 || stan.value.precio_dolares < 0) {
     error.value = 'Los precios no pueden ser negativos';

@@ -26,7 +26,12 @@
             </ul>
           </td>
           <td>
-            <button @click.stop="modificarStan(stan.id)" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Modificar</button>
+            <button @click.stop="modificarStan(stan.id)" class="btn-modificar">
+              <i class="fas fa-pencil-alt"></i>
+            </button>
+            <button @click.stop="eliminarStan(stan.id)" class="btn-eliminar">
+              <i class="fas fa-trash-alt"></i>
+            </button>
           </td>
         </tr>
       </tbody>
@@ -91,6 +96,31 @@ const modificarStan = (id) => {
   emit('modificar-stan', id);
 };
 
+const eliminarStan = async (id) => {
+  if (!confirm("¿Estás seguro de que deseas eliminar este STAN?")) {
+    return;
+  }
+
+  try {
+    const token = authStore.getToken();
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/stans/eliminar_stan/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Error al eliminar el STAN");
+    }
+
+    await fetchStans(currentPage.value);
+  } catch (error) {
+    console.error("Error al eliminar el STAN:", error);
+  }
+};
+
 onMounted(() => {
   fetchStans();
 });
@@ -101,12 +131,15 @@ onMounted(() => {
   width: 100%;
   margin: auto;
   border-collapse: collapse;
+  background-color: #f9f9f9; /* Fondo claro para la tabla */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra para la tabla */
 }
 
 .table th, .table td {
   text-align: center;
   vertical-align: middle;
   padding: 10px;
+  border: 1px solid #ddd; /* Bordes ligeros para las celdas */
 }
 
 .table-hover tbody tr:hover {
@@ -138,11 +171,12 @@ button {
   border-radius: 5px;
   cursor: pointer;
   font-size: 16px;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Transición para el fondo y la sombra */
 }
 
 button:hover {
   background-color: #0056b3;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra al pasar el ratón */
 }
 
 .pagination {
@@ -190,4 +224,50 @@ button:hover {
   padding: 8px 16px;
   font-weight: bold;
 }
+
+.btn-icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  margin-left: 10px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+}
+
+.btn-modificar {
+  background-color: #ffc107; /* Color amarillo */
+  color: #000; /* Color negro */
+  transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Transición para el fondo y la sombra */
+}
+
+.btn-modificar:hover {
+  background-color: #e0a800; /* Color amarillo oscuro */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra al pasar el ratón */
+}
+
+.btn-eliminar {
+  background-color: #dc3545; /* Color rojo */
+  color: #fff; /* Color blanco */
+  transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Transición para el fondo y la sombra */
+}
+
+.btn-eliminar:hover {
+  background-color: #a71d2a; /* Color rojo oscuro */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra al pasar el ratón */
+}
+
+.btn-modificar, .btn-eliminar {
+  font-size: 0.8rem; /* Tamaño de fuente más pequeño */
+  padding: 5px 10px; /* Menor padding */
+  width: 30px; /* Ancho más pequeño */
+  height: 30px; /* Alto más pequeño */
+  border-radius: 50%; /* Botones redondos */
+}
+
+/* ...existing code... */
 </style>

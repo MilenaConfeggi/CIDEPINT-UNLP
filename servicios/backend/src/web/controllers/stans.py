@@ -63,3 +63,12 @@ def editar_stan(id):
         return jsonify({"message": "El stan no existe"}), 400
     servicioPresupuesto.modificar_precio_stan(id, data)
     return jsonify({"message": "Stan modificado correctamente"}), 200
+
+@bp.get("/eliminar_stan/<int:id>")
+@jwt_required()
+def eliminar_stan(id):
+    stan = servicioPresupuesto.buscar_stan(id)
+    if stan is None:
+        return jsonify({"message": "El stan no existe"}), 400
+    servicioPresupuesto.eliminar_stan(id)
+    return jsonify({"message": "Stan eliminado correctamente"}), 200

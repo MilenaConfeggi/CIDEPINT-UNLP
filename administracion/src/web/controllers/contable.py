@@ -55,7 +55,7 @@ def crear_fondo():
     if form.validate_on_submit():
         data = request.form.to_dict()
         csrf_token = data.pop("csrf_token", None)
-        if fondo.conseguir_fondo_de_id(data["titulo"]):
+        if fondo.conseguir_fondo_por_nombre(data["titulo"]):
             flash("Ya existe un fondo con ese título", 'error')
             return render_template("contable/crear_fondo.html", form=form)
         #Crear carpeta
@@ -104,8 +104,8 @@ def delete_fondo():
         return redirect(url_for('contable.mostrar_fondo', fondo_id=fondo_id))
     
     # Delete the folder associated with the fondo
-    if archivos_adminDB.chequear_nombre_carpeta_existente(fond.titulo):
-        archivos_adminDB.eliminar_carpeta(fond.titulo)
+    #if archivos_adminDB.chequear_nombre_carpeta_existente(fond.titulo):
+    #    archivos_adminDB.eliminar_carpeta(fond.titulo)
     
     fondo.delete_fondo(fondo_id)
     flash("Fondo eliminado correctamente", "success")
@@ -118,8 +118,15 @@ def crear_ingreso(fondo_id):
     fond = fondo.conseguir_fondo_de_id(fondo_id)
     if not fond:
         return redirect(url_for('contable.index'))
+
     if True:
         data = request.form.to_dict()
+        if data["monto"] == "0":
+            flash("El monto no puede ser 0", "error")
+            return redirect(url_for("contable.mostrar_fondo",fondo_id=fondo_id))
+        if not data["monto"]:
+            flash("El monto no puede estar vacio", "error")
+            return redirect(url_for("contable.mostrar_fondo",fondo_id=fondo_id))
         data["receptor_id"] = fondo_id
         csrf_token = data.pop("csrf_token", None)
         file = data.pop("file", None)
@@ -158,8 +165,11 @@ def delete_ingreso():
     fondo.modificar_fondo(fondo_id, saldo=fond.saldo)
     
     # Eliminar archivo asociado si existe
-
+    if ingreso.archivo_id:
+        archivo_id = ingreso.archivo_id
     ingresoDB.delete_ingreso(id)
+    if archivo_id:
+        archivos_adminDB.eliminar_archivo(archivo_id)
     flash("Ingreso eliminado correctamente", "success")
     return redirect(url_for("contable.mostrar_fondo", fondo_id=fondo_id))
 @bp.get("/ingreso/descargar/<int:id>")

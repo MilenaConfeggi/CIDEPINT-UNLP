@@ -51,7 +51,7 @@
                         </td>
                         <td class="px-4 py-3">
                         <div class="flex items-center space-x-4 text-sm">
-                            <a href="{{ url_for('contable.mostrar_fondo', fondo_id=fondo.titulo) }}"
+                            <a href="{{ url_for('contable.mostrar_fondo', fondo_id=fondo.id) }}"
                             class="flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-black-600 rounded-lg focus:outline-none focus:shadow-outline-gray"
                             aria-label="Ver"
                             >
@@ -66,7 +66,7 @@
                                     ></path>
                                 </svg>
                             </a>
-                            <button data-id="{{ fondo.titulo }}"
+                            <button data-id="{{ fondo.id }}"
                                 class="open-modal-btn flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-black-600 rounded-lg focus:outline-none focus:shadow-outline-gray"
                                 aria-label="Borrar"
                                 >

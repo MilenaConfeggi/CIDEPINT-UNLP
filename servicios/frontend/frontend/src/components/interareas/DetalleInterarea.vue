@@ -1,94 +1,92 @@
 <template>
     <div class="container my-5">
         <h1 class="text-center mb-4">Detalles de la Interárea</h1>
-        <div v-if="interarea" class="card shadow-sm">
+        <div v-if="interarea" class="card shadow-sm border-0">
             <div class="card-body">
-                <p class="fw-bold">
-                    <span class="text-secondary">Nro Interarea:</span>
+                <p class="mb-3">
+                    <span class="fw-bold text-secondary">Nro Interarea:</span>
                     <span class="ms-2">{{ interarea.nro_interarea }}</span>
                 </p>
-                <p>
-                    <span class="fw-bold text-secondary">Legajo/Investigación:</span>
-                    <span class="ms-2">{{ interarea.legajo_id }}</span>
+                <p class="mb-3">
+                    <span v-if="!interarea.investigacion">
+                        <span class="fw-bold text-secondary">Legajo:</span>
+                        <span class="ms-2">{{ interarea.legajo.id }}</span>
+                    </span>
+                    <span v-else>
+                        <span class="fw-bold text-secondary">Línea de Investigación:</span>
+                        <span class="ms-2">{{ interarea.nro_investigacion }}</span>
+                    </span>
                 </p>
-                <p>
+                <p class="mb-3">
                     <span class="fw-bold text-secondary">Área Solicitante:</span>
-                    <span class="ms-2">{{ interarea.muestra_id }}</span>
+                    <span class="ms-2">{{ interarea.area_solicitante.nombre }}</span>
                 </p>
-                <p>
+                <p class="mb-3">
                     <span class="fw-bold text-secondary">Área Receptora:</span>
-                    <span class="ms-2">{{ interarea.area_receptora }}</span>
+                    <span class="ms-2">{{ interarea.area_receptora.nombre }}</span>
                 </p>
-                <p>
+                <p class="mb-3">
                     <span class="fw-bold text-secondary">Fecha Solicitud:</span>
-                    <span class="ms-2">{{ formatFecha(interarea.fecha_creacion) }}</span>
+                    <span class="ms-2">{{ interarea.fecha_creacion }}</span>
                 </p>
-                <p v-if="mostrarResultado">
+                <p v-if="mostrarResultado" class="mb-3">
                     <span class="fw-bold text-secondary">Resultado:</span>
                     <span class="ms-2">{{ interarea.resultados }}</span>
                 </p>
             </div>
         </div>
-        <div v-else class="alert alert-warning text-center mt-4">
-            No se ha encontrado la interárea.
-        </div>
 
+        <div v-else class="alert alert-warning text-center mt-4">No se ha encontrado la interárea.</div>
+      
         <div class="text-center mt-4">
-            <button v-if="interarea && interarea.estadoInterarea_id == 2" @click="toggleInputResultado" class="btn btn-primary">Cargar Resultado</button>
-            <button v-if="interarea && interarea.estadoInterarea_id == 1" class="btn btn-secondary" @click="mostrarSubirSolicitud = !mostrarSubirSolicitud">Subir Solicitud Firmada</button>
-            <button v-if="interarea && interarea.estadoInterarea_id == null" class="btn btn-secondary" @click="mostrarSubirSolicitudCompleta = !mostrarSubirSolicitudCompleta">Cargar solicitud completa</button>
-            <button @click="descargarInterarea" class="btn btn-secondary">Descargar solicitud</button>
-            <button v-if="interarea && interarea.estadoInterarea_id == 3" @click="toggleResultado" class="btn btn-secondary">Ver resultados</button>
+            <button v-if="debeMostrarCargarResultado()" @click="toggleInputResultado" class="btn btn-success me-2">Cargar Resultado</button>
+            <button v-if="debeMostrarSubirSolicitudFirmada() && tienePermisoCargarFirma" @click="toggleSubirSolicitudFirmada" class="btn btn-secondary me-2">Subir Solicitud Firmada</button>
+            <button v-if="debeMostrarCargarSolicitudCompleta()" @click="toggleSubirSolicitudCompleta" class="btn btn-secondary me-2">Cargar Solicitud Completa</button>
+            <button v-if="debeMostrarVerResultados()" @click="toggleResultado" class="btn btn-secondary me-2">Ver Resultados</button>
+            <button @click="descargarInterarea" class="btn btn-secondary me-2">Descargar Solicitud</button>
             <button @click="volverAlListado" class="btn btn-secondary">Volver al Listado</button>
         </div>
-
-        <!-- Input para subir solicitud firmada -->
+      
+        <div v-if="mensajeExito" class="alert alert-success mt-4 text-center">
+            {{ mensajeExito }}
+        </div>
+      
         <div v-if="mostrarSubirSolicitud" class="mt-4 text-center">
-            <input 
-                type="file" 
-                accept=".doc, .docx"
-                @change="onFileChange" 
-                class="form-control w-50 mx-auto"
-            />
+            <input type="file" accept=".doc, .docx" @change="onFileChange" class="form-control w-50 mx-auto"/>
             <button @click="subirSolicitudFirmada" class="btn btn-success mt-3">Subir Solicitud</button>
+            <div v-if="errorArchivo" class="text-danger mt-2">{{ errorArchivo }}</div>
         </div>
-
-        <!-- Input para subir solicitud completa -->
+      
         <div v-if="mostrarSubirSolicitudCompleta" class="mt-4 text-center">
-            <input 
-                type="file" 
-                accept=".doc, .docx" 
-                @change="onFileChangeCompleta" 
-                class="form-control w-50 mx-auto"
-            />
+            <input type="file" accept=".doc, .docx" @change="onFileChange" class="form-control w-50 mx-auto"/>
             <button @click="subirSolicitudCompleta" class="btn btn-success mt-3">Subir Solicitud Completa</button>
+            <div v-if="errorArchivo" class="text-danger mt-2">{{ errorArchivo }}</div>
         </div>
-
-        <!-- Input de texto libre que aparece al presionar "Cargar Resultado" -->
-        <div v-if="mostrarInput" class="mt-4 text-center">
-            <input 
-                type="text" 
-                class="form-control w-50 mx-auto" 
-                placeholder="Escribe el resultado aquí..." 
-                v-model="resultado"
-            />
-            <button @click="guardarResultado" class="btn btn-success mt-3">Guardar Resultado</button>
-        </div>
+      
+      <div v-if="mostrarInput" class="mt-4 text-center">
+        <input type="text" class="form-control w-50 mx-auto" placeholder="Escribe el resultado aquí..." v-model="resultado"/>
+        <button @click="guardarResultado" class="btn btn-success mt-3">Guardar Resultado</button>
+        <div v-if="errorResultado" class="text-danger mt-2">{{ errorResultado }}</div>
+      </div>
     </div>
 </template>
-
+  
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 const interarea = ref(null);
-const mostrarInput = ref(false); // Controla si el input de resultado se muestra o no
-const mostrarSubirSolicitud = ref(false); // Controla si el input de subida de solicitud se muestra o no
-const mostrarSubirSolicitudCompleta = ref(false); // Controla si el input de subida de solicitud completa se muestra o no
-const mostrarResultado = ref(false); // Controla si el resultado se muestra o no
-const resultado = ref(""); // Almacena el texto ingresado como resultado
-const archivo = ref(null); // Almacena el archivo seleccionado
-const archivoCompleto = ref(null); // Almacena el archivo de solicitud completa seleccionado
+const mostrarInput = ref(false);
+const mostrarSubirSolicitud = ref(false);
+const mostrarSubirSolicitudCompleta = ref(false);
+const mostrarResultado = ref(false);
+const resultado = ref("");
+const archivo = ref(null);
+const area = localStorage.getItem("area");
+const errorArchivo = ref("");
+const errorResultado = ref("");
+const mensajeExito = ref("");
+const permisos = JSON.parse(localStorage.getItem('permisos')) || [];
 
 const route = useRoute();
 const router = useRouter();
@@ -99,7 +97,7 @@ const fetchInterarea = async (id) => {
         if (!response.ok) {
             throw new Error("Error al obtener los detalles de la interárea");
         }
-        interarea.value = await response.json();
+            interarea.value = await response.json();
     } catch (error) {
         console.error("Error al obtener la interárea:", error);
     }
@@ -117,39 +115,15 @@ const fetchDescargarSolicitud = async (nombreSolicitud) => {
         a.href = url;
         a.download = nombreSolicitud;
         a.click();
-        window.URL.revokeObjectURL(url);
     } catch (error) {
         console.error("Error al descargar la solicitud:", error);
     }
 };
 
-onMounted(() => {
-    const id = route.params.id;
-    fetchInterarea(id);
-});
-
-const volverAlListado = () => {
-    router.push({ name: "interareas" });
-};
-
-const descargarInterarea = () => {
-    fetchDescargarSolicitud(interarea.value.nombre_archivo);
-};
-
-const formatFecha = (fecha) => {
-    if (!fecha) return "Sin fecha";
-    const options = { year: "numeric", month: "long", day: "numeric" };
-    return new Date(fecha).toLocaleDateString("es-ES", options);
-};
-
-// Funciones para manejar el input de resultado
-const toggleInputResultado = () => {
-    mostrarInput.value = !mostrarInput.value;
-};
-
 const guardarResultado = async () => {
+    errorResultado.value = "";
     if (!resultado.value) {
-        alert("El campo de resultado está vacío.");
+        errorResultado.value = "El campo de resultado está vacío.";
         return;
     }
     try {
@@ -166,26 +140,21 @@ const guardarResultado = async () => {
             throw new Error("Error al guardar el resultado");
         }
 
-        alert("Resultado guardado con éxito");
-        resultado.value = ""; // Limpiar el campo
-        mostrarInput.value = false; // Ocultar el input después de guardar
+        mensajeExito.value = "Resultado guardado con éxito"; 
+        resultado.value = ""; 
+        mostrarInput.value = false;
+
+        setTimeout(() => {
+            mensajeExito.value = "";
+        }, 3000);
     } catch (error) {
         console.error("Error al guardar el resultado:", error);
-        alert("Hubo un error al guardar el resultado.");
-    }
-};
-
-// Funciones para manejar el archivo de solicitud firmada
-const onFileChange = (event) => {
-    const files = event.target.files;
-    if (files && files[0]) {
-        archivo.value = files[0];
     }
 };
 
 const subirSolicitudFirmada = async () => {
     if (!archivo.value) {
-        alert("Por favor selecciona un archivo antes de subir.");
+        errorArchivo.value = "Por favor selecciona un archivo antes de subir.";
         return;
     }
 
@@ -203,31 +172,29 @@ const subirSolicitudFirmada = async () => {
             throw new Error("Error al subir la solicitud firmada");
         }
 
-        alert("Solicitud firmada subida con éxito");
-        archivo.value = null; // Limpiar el archivo
-        mostrarSubirSolicitud.value = false; // Ocultar el formulario
+        mensajeExito.value = "Archivo cargado con éxito"; 
+        resultado.value = ""; 
+        mostrarInput.value = false;
+
+        setTimeout(() => {
+            mensajeExito.value = "";
+        }, 3000);
+
+        archivo.value = null; 
+        mostrarSubirSolicitud.value = false; 
     } catch (error) {
         console.error("Error al subir la solicitud firmada:", error);
-        alert("Hubo un error al subir la solicitud firmada.");
-    }
-};
-
-// Funciones para manejar el archivo de solicitud completa
-const onFileChangeCompleta = (event) => {
-    const files = event.target.files;
-    if (files && files[0]) {
-        archivoCompleto.value = files[0];
     }
 };
 
 const subirSolicitudCompleta = async () => {
-    if (!archivoCompleto.value) {
-        alert("Por favor selecciona un archivo antes de subir.");
+    if (!archivo.value) {
+        errorArchivo.value = "Por favor selecciona un archivo antes de subir.";
         return;
     }
 
     const formData = new FormData();
-    formData.append("archivo", archivoCompleto.value);
+    formData.append("archivo", archivo.value);
     formData.append("id", interarea.value.id);
 
     try {
@@ -240,23 +207,179 @@ const subirSolicitudCompleta = async () => {
             throw new Error("Error al subir la solicitud completa");
         }
 
-        alert("Solicitud completa subida con éxito");
-        archivoCompleto.value = null; // Limpiar el archivo
-        mostrarSubirSolicitudCompleta.value = false; // Ocultar el formulario
+        mensajeExito.value = "Archivo cargado con éxito"; 
+        resultado.value = ""; 
+        mostrarInput.value = false;
+
+        setTimeout(() => {
+            mensajeExito.value = "";
+        }, 3000);
+
+        archivo.value = null; 
+        mostrarSubirSolicitudCompleta.value = false;
     } catch (error) {
         console.error("Error al subir la solicitud completa:", error);
-        alert("Hubo un error al subir la solicitud completa.");
     }
 };
 
-// Función para manejar la visualización del resultado
+const debeMostrarCargarResultado = () => {
+    return interarea.value && (interarea.value.estadoInterarea_id == 2 && interarea.value.area_receptora.id === parseInt(area));
+};
+
+const debeMostrarSubirSolicitudFirmada = () => {
+    return interarea.value && interarea.value.estadoInterarea_id == 1;
+};
+
+const debeMostrarCargarSolicitudCompleta = () => {
+    return interarea.value && interarea.value.estadoInterarea_id == null;
+};
+
+const debeMostrarVerResultados = () => {
+    return interarea.value && interarea.value.estadoInterarea_id == 3;
+};
+
+const toggleInputResultado = () => {
+    mostrarInput.value = !mostrarInput.value;
+};
+
+const onFileChange = (event) => {
+    const files = event.target.files;
+    errorArchivo.value = "";
+    if (files && files[0]) {
+        const file = files[0];
+        const fileType = file.name.split('.').pop().toLowerCase();
+        if (fileType !== 'doc' && fileType !== 'docx') {
+            errorArchivo.value = "El archivo debe ser de tipo .doc o .docx.";
+            archivo.value = null;
+        } else {
+            archivo.value = file;
+        }
+    }
+};
+
+
 const toggleResultado = () => {
     mostrarResultado.value = !mostrarResultado.value;
 };
+
+const volverAlListado = () => {
+    router.push({ name: "interareas" });
+};
+
+const descargarInterarea = () => {
+    fetchDescargarSolicitud(interarea.value.nombre_archivo);
+};
+
+const toggleSubirSolicitudFirmada = () => {
+    mostrarSubirSolicitud.value = !mostrarSubirSolicitud.value;
+};
+
+const toggleSubirSolicitudCompleta = () => {
+    mostrarSubirSolicitudCompleta.value = !mostrarSubirSolicitudCompleta.value;
+};
+
+const tienePermisoCargarFirma = computed(() => {
+  return permisos.includes('cargar_interarea_firmada');
+});
+
+onMounted(() => {
+    const id = route.params.id;
+    fetchInterarea(id);
+});
 </script>
 
 <style scoped>
+h1 {
+    font-weight: bold;
+}
+
+.card {
+    border-radius: 10px;
+    background: linear-gradient(145deg, #ffffff, #f3f3f3);
+}
+
+.card-body {
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.card-body span.fw-bold {
+    color: #343a40;
+}
+
+.btn-primary {
+    background-color: #4a90e2;
+    border-color: #4a90e2;
+}
+
+.btn-primary:hover {
+    background-color: #357abd;
+    border-color: #357abd;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+    border-color: #5a6268;
+}
+
+.alert {
+    border-radius: 8px;
+}
+
+.form-control {
+    border-radius: 5px;
+}
+
+.form-control:focus {
+    box-shadow: 0 0 5px rgba(74, 144, 226, 0.5);
+    border-color: #4a90e2;
+}
+
 .container {
     max-width: 800px;
+}
+
+.mt-3 button {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    border-color: #c3e6cb;
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    color: #856404;
+    border-color: #ffeeba;
+}
+
+input[type="file"] {
+    padding: 10px;
+    border: 2px dashed #ddd;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    outline: none;
+    transition: border-color 0.3s ease-in-out;
+}
+
+input[type="file"]:hover {
+    border-color: #4a90e2;
+}
+
+input[type="text"] {
+    border: 2px solid #ddd;
+    padding: 10px;
+}
+
+input[type="text"]:focus {
+    border-color: #4a90e2;
+    box-shadow: 0 0 5px rgba(74, 144, 226, 0.5);
 }
 </style>

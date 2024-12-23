@@ -161,6 +161,12 @@ const routes = [
       path: '/presupuesto',
       name: 'presupuesto',
       component: () => import('../views/PresupuestosView.vue'),
+    },
+    {
+      path: "/pendientes",
+      name: "pendientes",
+      component: () => import("../views/PendientesView.vue"),
+      meta: { requiresAuth: true }
     }
 ];
 

@@ -119,3 +119,6 @@ def list_legajos(page=1, per_page=10, empresa=None, fecha=None, area=None):
     if area:
         query = query.join(Legajo.area).filter(Area.id == area)
     return query
+
+def list_documentos_by_tipo(tipo):
+    return db.session.query(Documento).filter_by(tipo_documento_id=tipo).all()

@@ -21,9 +21,12 @@ class Interarea(db.Model):
     legajo_id = db.Column(db.Integer, db.ForeignKey('legajo.id'), nullable=True)
     legajo = db.relationship('Legajo', backref=db.backref('interareas', lazy=True))
 
-    area_id = db.Column(db.Integer, db.ForeignKey('area.id'), nullable=False)
-    area = db.relationship('Area', backref=db.backref('interareas', lazy=True))
+    # Áreas solicitante y receptora
+    area_solicitante_id = db.Column(db.Integer, db.ForeignKey('area.id'), nullable=False)
+    area_solicitante = db.relationship('Area', foreign_keys=[area_solicitante_id], backref=db.backref('interareas_solicitadas', lazy=True))
+
+    area_receptora_id = db.Column(db.Integer, db.ForeignKey('area.id'), nullable=False)
+    area_receptora = db.relationship('Area', foreign_keys=[area_receptora_id], backref=db.backref('interareas_recibidas', lazy=True))
 
     muestra_id = db.Column(db.Integer, db.ForeignKey('muestra.id'), nullable=True)
     muestra = db.relationship('Muestra', backref=db.backref('interareas', lazy=True))
-    

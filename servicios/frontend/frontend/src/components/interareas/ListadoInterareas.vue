@@ -44,7 +44,7 @@ import { useRouter } from "vue-router";
 
 const interareas = ref([]);
 const router = useRouter();
-const area = localStorage.getItem("area"); // Obtener el área directamente del localStorage
+const area = localStorage.getItem("area");
 
 const fetchInterareas = async () => {
   try {
@@ -53,42 +53,27 @@ const fetchInterareas = async () => {
       throw new Error("Error al obtener las interáreas");
     }
     const data = await response.json(); 
-
     if (area !== "null") {
-      interareas.value = data.filter(
-        (interarea) => 
+      interareas.value = data.filter((interarea) => 
           interarea.area_solicitante.id === parseInt(area) || 
           interarea.area_receptora.id === parseInt(area)
       );
     } else {
-      interareas.value = data; // Si no hay área, mostrar todas las interáreas
+      interareas.value = data; 
     }
-
-    console.log("Interáreas filtradas:", interareas.value.length);
   } catch (error) {
     console.error("Error al obtener las interáreas:", error);
   }
-};
-
-
-const formatFecha = (fecha) => {
-  if (!fecha) return "Sin fecha";
-  const options = { year: "numeric", month: "long", day: "numeric" };
-  return new Date(fecha).toLocaleDateString("es-ES", options);
 };
 
 const showInfo = (interarea) => {
   router.push({ name: "InterareaDetalle", params: { id: interarea.id } });
 };
 
-// Ejecutar cuando el componente se monta
 onMounted(async () => {
-  try {
-    await fetchInterareas(); 
-  } catch (error) {
-    console.error("Error al inicializar el componente:", error);
-  }
+  fetchInterareas(); 
 });
+
 </script>
 
 <style scoped>

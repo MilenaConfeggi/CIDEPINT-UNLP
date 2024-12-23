@@ -1,4 +1,4 @@
-from core.services.servicioInterarea import crear_estadoInterarea
+from servicios.backend.src.core.services.servicioInterarea import crear_estadoInterarea
 
 def seeds_estados():
     estados_data = [

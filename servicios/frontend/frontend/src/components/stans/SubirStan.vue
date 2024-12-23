@@ -10,11 +10,11 @@
       </div>
       <div class="mb-4">
         <label for="precio_pesos" class="block text-gray-700 text-sm font-bold mb-2">Precio en Pesos:</label>
-        <input type="number" id="precio_pesos" v-model="stan.precio_pesos" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+        <input type="number" id="precio_pesos" v-model="stan.precio_pesos" min="0" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
       </div>
       <div class="mb-4">
         <label for="precio_dolares" class="block text-gray-700 text-sm font-bold mb-2">Precio en Dólares:</label>
-        <input type="number" id="precio_dolares" v-model="stan.precio_dolares" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+        <input type="number" id="precio_dolares" v-model="stan.precio_dolares" min="0" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
       </div>
       <div class="mb-4">
         <label for="precio_por" class="block text-gray-700 text-sm font-bold mb-2">Precio por:</label>
@@ -26,21 +26,6 @@
       <div class="mb-4">
         <label for="ensayos" class="block text-gray-700 text-sm font-bold mb-2">Ensayos Asociados:</label>
         <input type="text" id="ensayos" v-model="ensayos" placeholder="Ingrese nombres de ensayo separados por comas" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ensayos-input">
-      </div>
-      <div class="mb-4">
-        <input type="checkbox" id="mostrar_ensayos" v-model="mostrarEnsayos" class="mr-2">
-        <label for="mostrar_ensayos">Mostrar Ensayos Existentes</label>
-        <div v-if="mostrarEnsayos" class="ensayos-list">
-          <label for="mostrar_ensayos" class="block text-gray-700 text-sm font-bold mb-2">Seleccionar Ensayos Existentes:</label>
-          <div v-for="ensayo in ensayosExistentes" :key="ensayo.id" class="ensayo-item">
-            <input type="checkbox" :id="`ensayo-${ensayo.id}`" :value="ensayo.nombre" v-model="selectedEnsayos" class="mr-2">
-            <label :for="`ensayo-${ensayo.id}`">{{ ensayo.nombre }}</label>
-          </div>
-        </div>
-        <div class="mb-4">
-          <label for="descripcion" class="block text-gray-700 text-sm font-bold mb-2">Descripción de la actividad tecnológica:</label>
-          <textarea id="descripcion" v-model="stan.descripcion" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 descripcion-input" rows="5"></textarea>
-        </div>
       </div>
       <div v-if="error" class="alert alert-danger mb-4" role="alert">
         {{ error }}
@@ -63,36 +48,32 @@ const stan = ref({
   precio_pesos: null,
   precio_dolares: null,
   precio_por_muestra: true,
-  descripcion: '', // Añadir la propiedad descripción
 });
 
 const ensayos = ref('');
-const ensayosExistentes = ref([]);
-const selectedEnsayos = ref([]);
-const mostrarEnsayos = ref(false);
 const error = ref(null);
 const successMessage = ref(null);
-
-const fetchEnsayos = async () => {
-  try {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/stans/ensayos`);
-    if (!response.ok) {
-      throw new Error('Error al obtener los ensayos');
-    }
-    ensayosExistentes.value = await response.json();
-  } catch (error) {
-    console.error('Error al obtener los ensayos:', error);
-  }
-};
 
 const submitForm = async () => {
   error.value = null;
   successMessage.value = null;
 
+  // Validar que el número de STAN sea un número y no sea negativo
+  if (isNaN(stan.value.numero) || stan.value.numero < 0) {
+    error.value = 'El número de STAN debe ser un número no negativo';
+    return;
+  }
+
+  // Validar que los precios no sean negativos
+  if (stan.value.precio_pesos < 0 || stan.value.precio_dolares < 0) {
+    error.value = 'Los precios no pueden ser negativos';
+    return;
+  }
+
   const ensayosArray = ensayos.value.split(',').map(ensayo => ensayo.trim()).filter(ensayo => ensayo);
   const data = {
     ...stan.value,
-    ensayos: [...ensayosArray, ...selectedEnsayos.value],
+    ensayos: ensayosArray,
   };
 
   try {
@@ -117,7 +98,7 @@ const submitForm = async () => {
 };
 
 onMounted(() => {
-  fetchEnsayos();
+  // No es necesario cargar ensayos existentes
 });
 </script>
 
@@ -134,34 +115,8 @@ onMounted(() => {
   overflow-y: auto;
 }
 
-.ensayos-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  background-color: #f9f9f9;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-}
-
-.ensayo-item {
-  display: flex;
-  align-items: center;
-  background-color: #fff;
-  padding: 5px 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
-
 .ensayos-input {
   height: 50px; 
-  padding: 10px; 
-  width: 100%; 
-  box-sizing: border-box; 
-}
-
-.descripcion-input {
-  height: 100px; /* Ajusta la altura según sea necesario */
   padding: 10px; 
   width: 100%; 
   box-sizing: border-box; 

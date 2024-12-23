@@ -30,6 +30,11 @@ def crear_stan(data):
     db.session.commit()
     return stan
 
+def eliminar_stan(id):
+    stan = STAN.query.get(id)
+    db.session.delete(stan)
+    db.session.commit()
+
 def validar_numero_stan(numero):
     stan = STAN.query.filter_by(numero=numero).first()
     if stan is not None:
@@ -67,6 +72,9 @@ def listar_stans():
     stans = STAN.query.all()
     stans.sort(key=extract_number)
     return stans
+
+def listar_stans_paginados(page, per_page):
+    return STAN.query.paginate(page=page, per_page=per_page)
 
 def listar_ensayos():
     return Ensayo.query.all()

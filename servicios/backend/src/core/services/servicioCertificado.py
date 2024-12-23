@@ -31,6 +31,7 @@ def generar_certificado(id_legajo, empleados, descripcion):
     ensayos = []
     for presupuesto in legajo.presupuesto_cidepint:
         for stan in presupuesto.stans:
+            stan.descripcion = descripcion
             for ensayo in stan.ensayos:
                 ensayos.append(ensayo.nombre)
     ensayo_texto = ", ".join(set(ensayos))  

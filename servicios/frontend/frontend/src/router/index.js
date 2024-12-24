@@ -158,9 +158,11 @@ const routes = [
       component: () => import('../views/EncuestaView.vue'),
     },
     {
-      path: '/presupuesto',
-      name: 'presupuesto',
-      component: () => import('../views/PresupuestosView.vue'),
+      path: "/generar_presupuesto/:id_legajo",
+      name: "generar_presupuesto",
+      component: () => import("../components/presupuestos/GenerarPresupuesto.vue"),
+      props: true,
+      meta: { requiresAuth: true }
     },
     {
       path: "/pendientes",

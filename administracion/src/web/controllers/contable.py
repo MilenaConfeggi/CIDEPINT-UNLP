@@ -62,9 +62,9 @@ def crear_fondo():
         if archivos_adminDB.chequear_nombre_carpeta_existente(data["titulo"]):
             flash("Ya existe una carpeta con ese título", 'error')
             return render_template("contable/crear_fondo.html", form=form)
-        carpeta = archivos_adminDB.crear_carpeta(data["titulo"],[],[])
-        data["carpeta_id"] = carpeta.id
-        fondo.create_fondo(**data)
+        x = fondo.create_fondo(**data)
+        carpeta = archivos_adminDB.crear_carpeta(data["titulo"],[],[],x.id)
+        
         flash("Fondo creado correctamente","success")
         return redirect(url_for("contable.index_fondo"))
     else:
@@ -165,6 +165,7 @@ def delete_ingreso():
     fondo.modificar_fondo(fondo_id, saldo=fond.saldo)
     
     # Eliminar archivo asociado si existe
+    archivo_id = None
     if ingreso.archivo_id:
         archivo_id = ingreso.archivo_id
     ingresoDB.delete_ingreso(id)

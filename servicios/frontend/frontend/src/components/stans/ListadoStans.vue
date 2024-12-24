@@ -3,7 +3,10 @@
     <hr class="line">
     <h1 class="text-center mb-4">Listado de STAN</h1>
     <hr class="line">
-    <table class="table table-hover table-bordered">
+    <div v-if="loading" class="spinner-border text-primary" role="status">
+      <span class="sr-only">Loading...</span>
+    </div>
+    <table v-else class="table table-hover table-bordered">
       <thead class="thead-dark">
         <tr>
           <th class="col-numero">Número</th>
@@ -15,7 +18,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="stan in stans" :key="stan.id" @click="highlightRow(stan.id)" :class="{ 'table-active': selectedStan === stan.id }">
+        <tr v-for="(stan, index) in stans" :key="stan.id" @click="highlightRow(stan.id)" :class="{ 'table-active': selectedStan === stan.id }" :style="{ animationDelay: `${index * 0.1}s` }" class="fade-in">
           <td class="col-numero">{{ stan.numero }}</td>
           <td class="col-ensayos">
             <ul>
@@ -60,13 +63,14 @@ const stans = ref([]);
 const selectedStan = ref(null);
 const currentPage = ref(1);
 const totalPages = ref(1);
+const loading = ref(true);
 const emit = defineEmits(['modificar-stan']);
 const authStore = useAuthStore();
 
 const fetchStans = async (page = 1) => {
+  loading.value = true;
   try {
     const token = authStore.getToken();
-    console.log('Token:', token);
     const response = await fetch(`${import.meta.env.VITE_API_URL}/stans?page=${page}&per_page=10`, {
       method: "GET",
       headers: {
@@ -85,6 +89,8 @@ const fetchStans = async (page = 1) => {
     totalPages.value = data.pages;
   } catch (error) {
     console.error("Error al obtener los stans:", error);
+  } finally {
+    loading.value = false;
   }
 };
 
@@ -292,5 +298,16 @@ button:hover {
 
 .col-acciones {
   width: 10%;
+}
+
+.fade-in {
+  opacity: 0;
+  animation: fadeIn 0.5s forwards;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
 }
 </style>

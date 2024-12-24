@@ -50,6 +50,7 @@ const logout = () => {
       </RouterLink>
       <div class="nav-links">
         <RouterLink v-if="estaLogueado" to="/ver_perfil">Mi Perfil</RouterLink>
+        <RouterLink v-if="estaLogueado" to="/estadisticas">Estadísticas</RouterLink>
         <RouterLink v-if="estaLogueado" to="/legajos">Legajos</RouterLink>
         <RouterLink v-if="estaLogueado" to="/documentos">Documentos</RouterLink>
         <RouterLink v-if="estaLogueado" to="/pendientes">Pendientes</RouterLink>

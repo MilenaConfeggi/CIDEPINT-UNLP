@@ -15,7 +15,8 @@ def index():
     anio_actual = datetime.now().year
     anio = request.args.get("anio", anio_actual)
     carpetas = servicio_archivos.listar_carpetas(anio)
-
+    for carpeta in carpetas:
+        print(carpeta.fondo)
     anios = list(range(2024,  anio_actual + 1))
     anios.reverse()
     return render_template("archivos_admin/lista_carpetas.html",carpetas=carpetas,anios=anios)
@@ -145,6 +146,10 @@ def eliminar_archivo(id_carpeta):
 @role_required('Administrador', 'Colaborador') 
 def eliminar_carpeta():
     data = request.form
+    carpeta = servicio_archivos.conseguir_carpeta_de_id(data.get('id_carpeta'))
+    if carpeta.fondo != []:
+        flash('Para eliminar una carpeta asociada a un fondo, por favor elimine el fondo en la parte de contable', 'error')
+        return redirect(url_for('archivos.index'))
     if servicio_archivos.eliminar_carpeta(id_carpeta=data.get('id_carpeta')):
         flash('Carpeta eliminada correctamente', 'success')
     else:

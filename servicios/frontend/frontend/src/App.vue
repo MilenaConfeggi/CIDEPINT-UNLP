@@ -45,21 +45,40 @@ const logout = () => {
 <template>
   <div>
     <nav class="navbar">
-      <RouterLink to="/">
+      <RouterLink to="/" class="navbar-brand">
         <img alt="Vue logo" class="logo" src="@/assets/Logo.png" width="50" height="50" />
       </RouterLink>
       <div class="nav-links">
-        <RouterLink v-if="estaLogueado" to="/ver_perfil">Mi Perfil</RouterLink>
-        <RouterLink v-if="estaLogueado" to="/estadisticas">Estadísticas</RouterLink>
-        <RouterLink v-if="estaLogueado" to="/legajos">Legajos</RouterLink>
-        <RouterLink v-if="estaLogueado" to="/documentos">Documentos</RouterLink>
-        <RouterLink v-if="estaLogueado" to="/pendientes">Pendientes</RouterLink>
-        <RouterLink v-if="estaLogueado && tienePermisoListarStans" to="/stans">Stans</RouterLink>
-
-        <RouterLink v-if="estaLogueado && tienePermisoListarUsuarios" to="/usuarios">Usuarios</RouterLink>
-        
-        <RouterLink v-if="!estaLogueado" to="/log-in">Iniciar Sesión</RouterLink>
-        <button v-if="estaLogueado" @click="logout">Cerrar Sesión</button>
+        <RouterLink to="/" class="nav-item">
+          <i class="fas fa-home"></i> Home
+        </RouterLink>
+        <RouterLink v-if="estaLogueado" to="/ver_perfil" class="nav-item">
+          <i class="fas fa-user"></i> Mi Perfil
+        </RouterLink>
+        <RouterLink v-if="estaLogueado && tienePermisoListarUsuarios" to="/usuarios" class="nav-item">
+          <i class="fas fa-users"></i> Usuarios
+        </RouterLink>
+        <RouterLink v-if="estaLogueado" to="/legajos" class="nav-item">
+          <i class="fas fa-folder"></i> Legajos
+        </RouterLink>
+        <RouterLink v-if="estaLogueado" to="/documentos" class="nav-item">
+          <i class="fas fa-file-alt"></i> Documentos
+        </RouterLink>
+        <RouterLink v-if="estaLogueado && tienePermisoListarStans" to="/stans" class="nav-item">
+          <i class="fas fa-list"></i> Stans
+        </RouterLink>
+        <RouterLink v-if="estaLogueado" to="/estadisticas" class="nav-item">
+          <i class="fas fa-chart-bar"></i> Estadísticas
+        </RouterLink>
+        <RouterLink v-if="estaLogueado" to="/pendientes" class="nav-item">
+          <i class="fas fa-bell"></i> Pendientes
+        </RouterLink>
+        <RouterLink v-if="!estaLogueado" to="/log-in" class="nav-item">
+          <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+        </RouterLink>
+        <button v-if="estaLogueado" @click="logout" class="nav-item logout-button">
+          <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+        </button>
       </div>
     </nav>
     <main>
@@ -72,8 +91,17 @@ const logout = () => {
 .navbar {
   display: flex;
   align-items: center;
-  background-color: darkred;
+  justify-content: space-between;
+  background-color: #962929;
   padding: 1rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: white;
 }
 
 .logo {
@@ -85,27 +113,43 @@ const logout = () => {
   gap: 1rem;
 }
 
-.nav-links a {
+.nav-item {
   color: white;
   text-decoration: none;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.nav-links a:hover {
-  text-decoration: underline;
+.nav-item:hover {
+  background-color: #391111;
+  color: #f8f9fa;
 }
 
-.nav-links button {
+.logout-button {
   background: none;
   border: none;
   color: white;
   cursor: pointer;
   text-decoration: none;
   font-size: 1rem;
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.nav-links button:hover {
-  text-decoration: underline;
+.logout-button:hover {
+  background-color: #3d1313;
+  color: #f8f9fa;
+}
+
+.nav-links i {
+  margin-right: 0.5rem;
 }
 
 main {

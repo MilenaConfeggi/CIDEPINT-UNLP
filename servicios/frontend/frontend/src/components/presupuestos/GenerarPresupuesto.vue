@@ -35,11 +35,21 @@
         <br>
         <button type="submit">Aceptar</button>
       </form>
+        <div v-if="fetchError" class="alert alert-danger mb-4" role="alert">
+          {{ fetchError }}
+        </div>
+        <div v-if="submitError" class="alert alert-danger mb-4" role="alert">
+          {{ submitError }}
+        </div>
+        <div v-if="successMessage" class="alert alert-success mb-4" role="alert">
+          {{ successMessage }}
+        </div>
     </div>
   </template>
   
   <script setup>
   import { ref, onMounted } from 'vue';
+  import { useRoute } from 'vue-router';
   import { useAuthStore } from '@/stores/auth';
   
   const stans = ref([]);
@@ -50,6 +60,13 @@
 
   const mediosDePago = ref([]);
   const medioDePagoSeleccionado = ref("")
+
+  const route = useRoute();
+  const idLegajo = route.params.id_legajo;
+
+  const fetchError = ref(null);
+  const submitError = ref(null);
+  const successMessage = ref(null);
   
   
   const fetchStans = async () => {
@@ -98,13 +115,39 @@
 
   const enviarSeleccion = async () => {
     // Crear un arreglo con los datos a enviar: id y cantidad
-    const datosSeleccionados = seleccionados.value.map(id => ({
-        id,
-        cantidad: cantidadSeleccionada.value[id] || 0, // Usar 0 si no se ingresó cantidad
+
+    submitError.value = null; // Limpia errores previos
+    successMessage.value = null; // Limpia mensajes previos
+
+    // Validar que se haya seleccionado al menos un stan
+    if (seleccionados.value.length === 0) {
+      submitError.value = 'Debes seleccionar al menos un stan.';
+      return;
+    }
+
+    // Validar que se haya seleccionado un método de pago
+    if (!medioDePagoSeleccionado.value) {
+      submitError.value = 'Debes seleccionar un método de pago.';
+      return;
+    }
+
+    // Crear un arreglo con los datos a enviar: id y cantidad
+    const datosSeleccionados = seleccionados.value.map((id) => ({
+      id,
+      cantidad: cantidadSeleccionada.value[id] || 0, // Usar 0 si no se ingresó cantidad
     }));
 
+    // Validar que todas las cantidades sean mayores a 0
+    const cantidadesInvalidas = datosSeleccionados.some(
+      (item) => item.cantidad <= 0
+    );
+    if (cantidadesInvalidas) {
+      submitError.value = 'Todos los stans seleccionados deben tener una cantidad mayor a 0.';
+      return;
+    }
+
     try {
-        const respuesta = await fetch(`${import.meta.env.VITE_API_URL}/presupuestos/crear`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/presupuestos/crear/${idLegajo}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -120,10 +163,14 @@
         medioDePago: medioDePagoSeleccionado.value,
         legajo: 1,
         });
-        const datos = await respuesta.json();
-        console.log('Respuesta del backend:', datos);
-    } catch (error) {
-        console.error('Error al enviar la selección:', error);
+        const result = await response.json();
+        if (!response.ok) {
+          throw new Error(result.message || 'Error al generar el certificado');
+        }
+  
+        successMessage.value = result.message;
+    } catch (err) {
+      submitError.value = err.message || 'Error desconocido';
     }
   };
   

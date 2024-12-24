@@ -143,6 +143,29 @@
                           </button>
                         </li>
                       </template>
+                      <template v-else-if="documento.nombre === 'Presupuesto CIDEPINT'">
+                        <li v-if="hasPermission('generar_presupuesto')">
+                          <RouterLink
+                            :to="`/generar_presupuesto/${legajo.id}`"
+                            class="dropdown-item"
+                          >
+                            Generar
+                          </RouterLink>
+                        </li>
+                        <li
+                          v-if="
+                            hasPermission('ver_presupuesto') && existeDocumento(documento.nombre)
+                          "
+                        >
+                          <button
+                            type="button"
+                            class="dropdown-item"
+                            @click="viewPresupuesto(documento.id, documento.nombre, legajo.id)"
+                          >
+                            Ver
+                          </button>
+                        </li>
+                      </template>
                       <template v-else>
                         <li v-if="existeDocumento(documento.nombre)">
                           <button
@@ -536,6 +559,32 @@ const viewCertificado = async (id, tipo, legajoId) => {
   try {
     const response = await fetch(
       `${import.meta.env.VITE_API_URL}/certificado/ver_documento/${legajoId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
+        },
+      },
+    )
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'El documento no existe, prueba generar uno primero')
+    }
+    const blob = await response.blob()
+    const url = URL.createObjectURL(blob)
+    window.open(url, '_blank')
+  } catch (error) {
+    console.error('Error al obtener el documento:', error)
+    errorMessage.value = error.message || 'El documento no existe, prueba generar uno primero'
+    showToast.value = true
+  }
+}
+const viewPresupuesto = async (id, tipo, legajoId) => {
+  const token = authStore.getToken()
+  try {
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL}/presupuestos/ver_documento/${legajoId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,

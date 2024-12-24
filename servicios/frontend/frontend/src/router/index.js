@@ -175,6 +175,12 @@ const routes = [
       name: "estadisticas",
       component: () => import("../views/EstadisticasView.vue"),
       meta: { requiresAuth: true }
+    },
+    {
+      path: "/jefe_de_area",
+      name: "jefe_de_area",
+      component: () => import("../components/areas/CambiarJefeArea.vue"),
+      meta: { requiresAuth: true }
     }
 ];
 

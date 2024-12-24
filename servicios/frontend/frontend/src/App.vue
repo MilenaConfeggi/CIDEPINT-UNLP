@@ -73,6 +73,9 @@ const logout = () => {
         <RouterLink v-if="estaLogueado" to="/pendientes" class="nav-item">
           <i class="fas fa-bell"></i> Pendientes
         </RouterLink>
+        <RouterLink v-if="estaLogueado" to="/jefe_de_area" class="nav-item">
+          <i class="fas fa-users"></i> Cambiar Jefe de Area
+        </RouterLink>
         <RouterLink v-if="!estaLogueado" to="/log-in" class="nav-item">
           <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
         </RouterLink>

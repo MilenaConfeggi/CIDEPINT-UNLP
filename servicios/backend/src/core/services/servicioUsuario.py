@@ -1,5 +1,6 @@
 from models import db
 from models.usuarios.permiso import Permiso
+from models.personal.area import Area
 from models.usuarios.rol import Rol
 from models.usuarios.rol_permiso import RolPermiso
 from models.usuarios.usuario import Usuario
@@ -133,6 +134,40 @@ def asignar_permiso(data):
 def listar_usuarios():
     usuarios = Usuario.query.filter_by(esta_borrado=False).all()
     return usuarios
+
+def listar_areas():
+    areas = Area.query.all()
+    return areas
+
+def listar_usuarios_por_area(area_id):
+    usuarios = (
+        Usuario.query
+        .join(Empleado, Empleado.usuario_servicio_id == Usuario.id)  # Unir las tablas Usuario y Empleado
+        .filter(
+            Empleado.area_id == area_id,  # Filtrar por el área específica
+            Usuario.esta_borrado == False  # Asegurarse de que el usuario no está borrado
+        )
+        .all()
+    )
+    return usuarios
+
+def cambiar_jefe_area(data):
+    ja = buscar_rol_por_id(2)
+    esclavo = buscar_rol_por_id(1)
+    jefeAnterior = (
+        Usuario.query
+        .join(Empleado, Empleado.usuario_servicio_id == Usuario.id)  # Unir las tablas Usuario y Empleado
+        .filter(
+            Empleado.area_id == data.get('area_id'),  # Filtrar por el área específica
+            Usuario.esta_borrado == False,  # Asegurarse de que el usuario no está borrado
+            Usuario.rol_id == ja.id
+        )
+        .first()
+    )
+    jefeNuevo = Usuario.query.filter_by(id=data.get('usuario_id')).first()
+    jefeAnterior.rol = esclavo
+    jefeNuevo.rol = ja
+    db.session.commit()
 
 def eliminar_usuario(id_usuario):
     usuario = Usuario.query.get(id_usuario)

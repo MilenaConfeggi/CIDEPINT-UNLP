@@ -19,4 +19,4 @@ class Usuario(db.Model):
     empleado = db.relationship("Empleado", back_populates="usuario_servicio")
     
     def __repr__(self):
-        return f"<Usuario {self.mail}, {self.contra}>"
+        return f"<Usuario {self.mail}>"

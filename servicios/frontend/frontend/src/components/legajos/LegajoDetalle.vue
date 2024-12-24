@@ -26,16 +26,18 @@
         </div>
         <p>Fecha entrada: {{ formatDate(legajo.fecha_entrada) }}</p>
         <p>Objetivo: {{ legajo.objetivo }}</p>
-        <hr />
+        <hr class="">
         <div v-if="legajo.cliente">
           <h1 class="text-center">Cliente</h1>
           <p>{{ legajo.cliente.nombre }}</p>
           <p>CUIT: {{ legajo.cliente.cuit }}</p>
         </div>
-        <EncuestaGenerator />
-        <button v-if="!legajo.admin_habilitado" class="btn btn-dark" @click="adminLegajo">
-          Habilitar para administración
-        </button>
+        <div class="d-flex justify-content-end gap-3 mb-2">
+          <EncuestaGenerator />
+          <button v-if="!legajo.admin_habilitado" class="btn btn-dark" @click="adminLegajo">
+            Habilitar para administración
+          </button>
+        </div>
         <div v-if="legajo && tipos_documentos?.length">
           <table class="table w-100">
             <thead>
@@ -46,7 +48,7 @@
             </thead>
             <tbody>
               <tr v-for="documento in tipos_documentos" :key="documento.id">
-                <td >{{ documento.nombre }}</td>
+                <td>{{ documento.nombre }}</td>
                 <td>
                   <div class="dropdown">
                     <button
@@ -180,7 +182,7 @@
                       </template>
                       <li v-if="!existeDocumento(documento.nombre)">
                         <label :for="`upload-pdf-${documento.id}`" class="dropdown-item">
-                          <div v-if="documento.nombre !== 'Factura'" class="dropdown-item">
+                          <div v-if="documento.nombre !== 'Factura' && documento.nombre !== 'Certificado CIDEPINT'" class="dropdown-item">
                             Cargar
                             <input
                               :id="`upload-pdf-${documento.id}`"
@@ -224,41 +226,6 @@
               </tr>
             </tbody>
           </table>
-        </div>
-      </div>
-    </div>
-    <div
-      class="modal fade"
-      id="exampleModal"
-      tabindex="-1"
-      aria-labelledby="exampleModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h1 class="modal-title fs-5" id="exampleModalLabel">
-              {{ actualFile?.nombre_documento }}
-            </h1>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
-          </div>
-          <div class="modal-body">
-            <div v-if="fileUrl" style="height: 100vh">
-              <vue-pdf-app :pdf="fileUrl" :page-number="1"></vue-pdf-app>
-            </div>
-            <div v-else>
-              <p>No se encontro el archivo</p>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary">Descargar</button>
-          </div>
         </div>
       </div>
     </div>
@@ -318,16 +285,6 @@
     </div>
   </main>
 </template>
-
-<script>
-import VuePdfApp from 'vue3-pdf-app'
-import 'vue3-pdf-app/dist/icons/main.css'
-export default {
-  components: {
-    VuePdfApp,
-  },
-}
-</script>
 
 <script setup>
 import { onMounted, ref } from 'vue'
@@ -483,7 +440,6 @@ const handleFileUpload = async (event, id, legajoId, editar = false) => {
       fileName.value = file.name
       let facturaNumber = nroFactura.value
       const response = await documentosStore.subirArchivo(file, id, legajoId, editar, facturaNumber)
-      console.log(response)
       if (response.status === 200) {
         window.location.reload()
       } else {
@@ -526,6 +482,7 @@ const viewFile = async (id, tipo) => {
     const blob = new Blob([response.data], { type: response.headers['content-type'] })
     console.log(response.data)
     fileUrl.value = URL.createObjectURL(blob)
+    window.open(fileUrl.value, '_blank')
   } catch (error) {
     console.error('Error al obtener el archivo:', error)
     alert('No se pudo cargar el archivo.')

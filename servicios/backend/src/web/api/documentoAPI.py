@@ -131,8 +131,6 @@ def upload():
                     return jsonify({"error": "No se encontro el legajo"}), 404
                 legajo.nro_factura = nro_factura
                 db.session.commit()
-            else:
-                return jsonify({"message": "Error al subir el nro de factura"}), 400
             return (
                 jsonify({"message": f"Archivo guardado exitosamente en {file_path}"}),
                 200,

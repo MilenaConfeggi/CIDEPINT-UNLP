@@ -10,13 +10,12 @@
     </svg>
   </RouterLink>
   <div class="flex flex-col justify-center items-center">
-    <p v-if="loading">Cargando...</p>
     <p v-if="error">{{ error }}</p>
     <div class="input-group mb-3 d-flex flex-row">
       <label class="input-group-text" for="ensayos">Ensayos</label>
       <input v-model="ensayo" type="text" aria-label="Ensayos" class="form-control" />
-      <label v-if="area === ''" class="input-group-text" for="area">Areas</label>
-      <select v-if="area === '' && areas" v-model="area" class="form-select" id="area">
+      <label v-if="userRol === ''" class="input-group-text" for="area">Areas</label>
+      <select v-if="userRol === '' && areas" v-model="area" class="form-select" id="area">
         <option selected value="">Elige un area</option>
         <option v-for="area in areas" :key="area.id" :value="area.id">
           {{ area.nombre }}
@@ -25,7 +24,9 @@
       <span class="input-group-text">Empresa</span>
 
       <input v-model="empresa" type="text" aria-label="nombre del cliente" class="form-control" />
+      <label class="input-group-text" for="date">Fecha de carga</label>
       <input
+        id="date"
         type="date"
         v-model="fecha"
         @input="validateDates"
@@ -72,13 +73,8 @@
         </tbody>
       </table>
       <div v-if="totalPages > 1" class="pagination d-flex justify-content-center grid gap-3">
-        <button @click="prevPage" :disabled="currentPage === 1" class="btn" >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="32"
-            height="32"
-            viewBox="0 0 1024 1024"
-          >
+        <button @click="prevPage" :disabled="currentPage === 1" class="btn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 1024 1024">
             <path
               fill="currentColor"
               d="M685.248 104.704a64 64 0 0 1 0 90.496L368.448 512l316.8 316.8a64 64 0 0 1-90.496 90.496L232.704 557.248a64 64 0 0 1 0-90.496l362.048-362.048a64 64 0 0 1 90.496 0"
@@ -88,13 +84,8 @@
 
         <span class="d-flex align-items-center">Página {{ currentPage }} de {{ totalPages }}</span>
 
-        <button @click="nextPage" :disabled="currentPage === totalPages" class="btn" >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="32"
-            height="32"
-            viewBox="0 0 1024 1024"
-          >
+        <button @click="nextPage" :disabled="currentPage === totalPages" class="btn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 1024 1024">
             <path
               fill="currentColor"
               d="M338.752 104.704a64 64 0 0 0 0 90.496l316.8 316.8l-316.8 316.8a64 64 0 0 0 90.496 90.496l362.048-362.048a64 64 0 0 0 0-90.496L429.248 104.704a64 64 0 0 0-90.496 0"
@@ -103,7 +94,8 @@
         </button>
       </div>
     </div>
-    <div v-else>No hay legajos</div>
+    <p v-else-if="loading" class="font-bold text-center">Cargando...</p>
+    <p v-else class="font-bold text-center">No hay legajos</p>
   </div>
 </template>
 <script setup>
@@ -121,7 +113,8 @@ const areasStore = useAreasStore()
 const currentPage = ref(1)
 const areaRol = localStorage.getItem('area') === 'null' ? '' : localStorage.getItem('area')
 var ensayo = ref('')
-var area = ref(areaRol)
+var userRol = ref(areaRol)
+var area = ref('')
 var empresa = ref('')
 var fecha = ref('')
 
@@ -136,7 +129,6 @@ const validateDates = () => {
 }
 
 const fetchLegajos = async () => {
-  console.log(typeof area.value)
   const params = {
     area: area.value,
     ensayo: ensayo.value,

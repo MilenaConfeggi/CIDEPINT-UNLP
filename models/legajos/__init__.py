@@ -77,3 +77,6 @@ def legajo_informado(id):
     legajo.estado = new_estado
     db.session.commit()
     return legajo
+
+def cant_legajos_estado(estado):
+    return db.session.query(Legajo).filter_by(estado_id=estado).count()

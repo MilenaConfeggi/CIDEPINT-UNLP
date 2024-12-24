@@ -135,3 +135,15 @@ def crear_presupuesto_con_stans(data):
     
 def listar_medios_de_pago():
     return MedioPago.query.all()
+
+
+def ensayos_mas_solicitados(fecha_desde, fecha_hasta):
+    return db.session.query(Ensayo.nombre, db.func.count(Ensayo.id).label('cantidad')) \
+        .join(EnsayoStan, Ensayo.id == EnsayoStan.ensayo_id) \
+        .join(STAN, STAN.id == EnsayoStan.stan_id) \
+        .join(PresupuestoStan, STAN.id == PresupuestoStan.stan_id) \
+        .join(Presupuesto, Presupuesto.id == PresupuestoStan.presupuesto_id) \
+        .filter(Presupuesto.fecha_creacion.between(fecha_desde, fecha_hasta)) \
+        .group_by(Ensayo.id) \
+        .order_by(db.desc('cantidad')) \
+        .all()

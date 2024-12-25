@@ -6,6 +6,7 @@ from flask_login import current_user
 from administracion.src.web.forms.carpeta_nueva import FormularioNuevaCarpeta
 from administracion.src.web.controllers.roles import role_required
 from administracion.src.core.servicios import personal as servicio_personal
+from administracion.src.core.ingresos import ingreso as ingresoDB
 
 bp = Blueprint("archivos",__name__,url_prefix="/archivos")
 
@@ -135,6 +136,10 @@ def eliminar_archivo(id_carpeta):
         return redirect(url_for('archivos.ver_carpeta',id_carpeta=id_carpeta))
     
     data = request.form
+    if ingresoDB.get_ingreso_con_archivo(data.get('id_archivo')):
+        flash('No se puede eliminar el archivo, ya que está asociado a un ingreso', 'error')
+        return redirect(url_for('archivos.ver_carpeta',id_carpeta=id_carpeta))
+
     if servicio_archivos.eliminar_archivo(id_archivo=data.get('id_archivo')):
         flash('Archivo eliminado correctamente', 'success')
     else:

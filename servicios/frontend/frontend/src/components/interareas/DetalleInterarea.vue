@@ -29,10 +29,20 @@
                     <span class="fw-bold text-secondary">Fecha Solicitud:</span>
                     <span class="ms-2">{{ interarea.fecha_creacion }}</span>
                 </p>
+                <p class="mb-3">
+                    <span class="fw-bold text-secondary">Muestras:</span>
+                    <ul>
+                        <li v-for="muestra in interarea.muestras" :key="muestra.id">
+                            Iden: {{ muestra.iden_cliente }} - N°: {{ muestra.nro_muestra }}
+                        </li>
+                    </ul>
+                </p>
                 <p v-if="mostrarResultado" class="mb-3">
                     <span class="fw-bold text-secondary">Resultado:</span>
-                    <span class="ms-2">{{ interarea.resultados }}</span>
                 </p>
+                <div v-if="mostrarResultado" class="ms-4 text-break">
+                    {{ interarea.resultados }}
+                </div>
             </div>
         </div>
 
@@ -64,7 +74,7 @@
         </div>
       
       <div v-if="mostrarInput" class="mt-4 text-center">
-        <input type="text" class="form-control w-50 mx-auto" placeholder="Escribe el resultado aquí..." v-model="resultado"/>
+        <textarea class="form-control w-50 mx-auto" placeholder="Escribe el resultado aquí..." v-model="resultado"rows="5"></textarea>
         <button @click="guardarResultado" class="btn btn-success mt-3">Guardar Resultado</button>
         <div v-if="errorResultado" class="text-danger mt-2">{{ errorResultado }}</div>
       </div>

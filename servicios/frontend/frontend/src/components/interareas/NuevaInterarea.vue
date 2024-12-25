@@ -36,7 +36,7 @@
             <select v-model="form.legajo" @change="filtrarMuestras" class="form-select">
               <option disabled value="">Legajos</option>
               <option v-for="legajo in legajos" :key="legajo.id" :value="legajo.id">
-                {{ legajo.id }}
+                Legajo: {{ legajo.id }}
               </option>
             </select>
             <div v-if="errores.legajo" class="text-danger mt-1">{{ errores.legajo }}</div>
@@ -63,7 +63,7 @@
             </div>
             <div v-if="!form.investigacion">
               <label class="form-label fw-bold">Seleccionar identificación de muestras</label>
-              <select v-model="form.muestra" class="form-select" :disabled="!form.legajo">
+              <select v-model="form.muestra" class="form-select" :disabled="!form.legajo" multiple>
                 <option disabled value="">Identificaciones</option>
                 <option v-for="muestra in muestrasFiltradas" :key="muestra.id" :value="muestra.id">
                   {{ muestra.nro_muestra }}

@@ -24,7 +24,7 @@ def crear_interarea():
     try:
         tipo = request.json.get("tipo")
         archivo = servicioInterareaArchivos.generar_solicitud(tipo)
-
+        print(request.json)
         dataInterarea = {
             "nombre_archivo": archivo,
             "investigacion": request.json.get("investigacion"),
@@ -35,7 +35,7 @@ def crear_interarea():
             "muestra_id": None if request.json.get("muestra") == "" else request.json.get("muestra"),
             "muestra_investigacion": request.json.get("muestra_investigacion")
         }
-
+        print(dataInterarea)
         servicioInterarea.crear_interarea(dataInterarea)
             
         return jsonify({"path": archivo}), 200
@@ -95,3 +95,4 @@ def guardar_resultado(id):
     except Exception as e:
         print(f"Error: {str(e)}")
         return jsonify({"error": f"Error: {str(e)}"}), 500
+    

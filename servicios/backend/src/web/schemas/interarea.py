@@ -3,7 +3,6 @@ from .area import AreaSchema
 from .legajos import LegajoSchema
 from .muestras import MuestraSchema
 
-
 class InterareaSchema(Schema):
     id = fields.Int(dump_only=True)
     fecha_creacion = fields.Date(required=True)
@@ -17,7 +16,7 @@ class InterareaSchema(Schema):
     legajo = fields.Nested(LegajoSchema, dump_only=True)
     area_solicitante = fields.Nested(AreaSchema, dump_only=True)
     area_receptora = fields.Nested(AreaSchema, dump_only=True)
-    muestra = fields.Nested(MuestraSchema, dump_only=True)
+    muestras = fields.Nested(MuestraSchema, many=True, dump_only=True)  # Cambiado para manejar múltiples muestras
 
 interareaSchema = InterareaSchema()
 interareasSchema = InterareaSchema(many=True)

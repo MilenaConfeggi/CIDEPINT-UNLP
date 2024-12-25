@@ -21,7 +21,7 @@
         return 'badge text-bg-success';
       case 'Cancelado':
         return 'badge text-bg-danger';
-      case 'Inforamado':
+      case 'Informado':
         return 'badge text-bg-info';
       case 'Terminado':
         return 'badge text-bg-dark';

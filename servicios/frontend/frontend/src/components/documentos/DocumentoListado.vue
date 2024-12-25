@@ -34,6 +34,7 @@
         type="text"
         aria-label="nombre del ensayo"
       />
+      <label class="input-group-text" for="date">Fecha de carga</label>
       <input
         type="date"
         v-model="fecha"
@@ -48,6 +49,8 @@
         <thead>
           <tr>
             <th scope="col">Nombre</th>
+            <th scope="col">Fecha de carga</th>
+            <th scope="col">Tipo de documento</th>
             <th scope="col">Nro de legajo</th>
             <th scope="col">Nro de presupuesto</th>
             <th scope="col">Acciones</th>
@@ -56,8 +59,16 @@
         <tbody>
           <tr v-for="documento in documentos.items" :key="documento.id">
             <th scope="row">{{ documento?.nombre_documento }}</th>
-            <td>{{ documento?.legajo_id }}</td>
+            <td>{{ new Date(documento?.fecha_creacion).toLocaleDateString() }}</td>
             <td>{{ documento?.tipo_documento?.nombre }}</td>
+            <td>{{ documento?.legajo_id }}</td>
+            <td>
+              {{
+                documento.tipo_documento.nombre === 'Presupuesto CIDEPINT'
+                  ? documento?.legajo.presupuesto_cidepint[0]?.id
+                  : ''
+              }}
+            </td>
             <td>
               <button
                 type="button"
@@ -90,52 +101,8 @@
     </div>
     <div v-else>No hay Documentos</div>
   </div>
-  <div
-    class="modal fade"
-    id="exampleModal"
-    tabindex="-1"
-    aria-labelledby="exampleModalLabel"
-    aria-hidden="true"
-  >
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h1 class="modal-title fs-5" id="exampleModalLabel">
-            {{ actualFile?.nombre_documento }}
-          </h1>
-          <button
-            type="button"
-            class="btn-close"
-            data-bs-dismiss="modal"
-            aria-label="Close"
-          ></button>
-        </div>
-        <div class="modal-body">
-          <div v-if="fileUrl" style="height: 100vh">
-            <vue-pdf-app :pdf="fileUrl" :page-number="1" :page-scale="page - fit"></vue-pdf-app>
-          </div>
-          <div v-else>
-            <p>No se encontro el archivo</p>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Descargar</button>
-        </div>
-      </div>
-    </div>
-  </div>
 </template>
 
-<script>
-import VuePdfApp from 'vue3-pdf-app'
-import 'vue3-pdf-app/dist/icons/main.css'
-export default {
-  components: {
-    VuePdfApp,
-  },
-}
-</script>
 
 <script setup>
 import { onMounted, watch } from 'vue'
@@ -190,7 +157,7 @@ const viewFile = async (doc) => {
   const tipo = doc.tipo_documento.nombre
   try {
     const response = await axios.get(
-      `http://127.0.0.1:5000/api/documentos/view/${actualFile.value.nombre_documento}`,
+      `${import.meta.env.VITE_API_URL}/api/documentos/view/${actualFile.value.nombre_documento}`,
       {
         params: { tipo },
         responseType: 'blob',
@@ -200,6 +167,7 @@ const viewFile = async (doc) => {
     // Crear una URL para visualizar el archivo
     const blob = new Blob([response.data], { type: response.headers['content-type'] })
     fileUrl.value = URL.createObjectURL(blob)
+    window.open(fileUrl.value, '_blank')
   } catch (error) {
     console.error('Error al obtener el archivo:', error)
     alert('No se pudo cargar el archivo.')

@@ -33,7 +33,6 @@
           <p>CUIT: {{ legajo.cliente.cuit }}</p>
         </div>
         <div class="d-flex justify-content-end gap-3 mb-2">
-          <EncuestaGenerator />
           <button v-if="!legajo.admin_habilitado" class="btn btn-dark" @click="adminLegajo">
             Habilitar para administración
           </button>
@@ -120,6 +119,15 @@
                               hidden
                             />
                           </label>
+                        </li>
+                        <li v-if="legajo?.estado?.nombre === 'Informado'">
+                          <button
+                            type="button"
+                            class="dropdown-item"
+                            @click="enviarInforme(documento.id)"
+                          >
+                            Enviar Informe
+                          </button>
                         </li>
                       </template>
                       <template v-else-if="documento.nombre === 'Certificado CIDEPINT'">
@@ -291,15 +299,16 @@ import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useLegajosStore } from '../../stores/legajos'
 import { useDocumentosStore } from '../../stores/documentos'
+import { useEncuestasStore } from '../../stores/encuestas'
 import { storeToRefs } from 'pinia'
 import axios from 'axios'
 import StateBadge from '../StateBadge.vue'
 import { useAuthStore } from '../../stores/auth'
-import EncuestaGenerator from '../EncuestaGenerator.vue'
 
 const route = useRoute()
 const legajosStore = useLegajosStore()
 const documentosStore = useDocumentosStore()
+const encuestasStore = useEncuestasStore()
 
 const { legajo, loading, error } = storeToRefs(legajosStore)
 const { tipos_documentos } = storeToRefs(documentosStore)
@@ -558,6 +567,23 @@ const verInforme = async (id) => {
     errorMessage.value = error.message || 'Error al obtener el informe'
     showToast.value = true
   }
+}
+
+const enviarInforme = async (id) => {
+  let archivo = legajo.value.documento.find((doc) => doc.tipo_documento_id === id)
+  const legajoId = route.params.id
+  try {
+    await encuestasStore.createEncuestas()
+    const link = encuestasStore.link
+    await encuestasStore.mandarMail(legajo.value.cliente.email, link, archivo.id, legajoId)
+    successMessage.value = 'Correo enviado con éxito'
+    showToast.value = true
+  } catch (error) {
+    console.error('Error al enviar el correo:', error)
+    errorMessage.value = error.message || 'Error al enviar el correo'
+    showToast.value = true
+  }
+  
 }
 
 const adminLegajo = async () => {

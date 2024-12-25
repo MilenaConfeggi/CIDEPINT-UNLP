@@ -84,7 +84,7 @@
           id="es_juridico"
           v-model="form.es_juridico"
         />
-        <label class="form-check-label" for="es_juridico"> Es juridico </label>
+        <label class="form-check-label" for="es_juridico"> No requiere presupuesto </label>
       </div>
       <div class="form-check">
         <input

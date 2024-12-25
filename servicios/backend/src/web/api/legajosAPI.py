@@ -6,11 +6,18 @@ from models.legajos import (
     create_legajo,
     list_legajos_all,
 )
-from models.documentos import find_estado_by_nombre
+from models.documentos import find_estado_by_nombre, get_documento
 from models.clientes import create_cliente
 from ..schemas.legajos import legajos_schema, legajo_schema, pagination_legajos_schema
 from models.base import db
-
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email import encoders
+import smtplib
+import os
+from pathlib import Path
+from servicios.backend.src.core.config import config
 bp = Blueprint("legajos", __name__, url_prefix="/api/legajos")
 
 
@@ -82,3 +89,69 @@ def listado_completo():
     legajos = list_legajos_all()
     data = legajos_schema.dump(legajos)
     return jsonify(data), 200
+
+@bp.post("/mandar_informe")
+def enviar_correo_con_link_y_pdf():
+    mail = request.get_json().get("mail")
+    link = request.get_json().get("link")
+    legajo_id = request.get_json().get("legajo_id")
+    doc_id = request.get_json().get("arch")
+    print(doc_id)
+    doc = get_documento(doc_id)
+    if doc is None:
+        return jsonify({"error": "No se encontro el documento"}), 404
+    
+    if doc.estado_id != 6 and doc.estado_id != 8:
+        return jsonify({"error": "El documento no está en estado Firmado"}), 404
+    
+    current_file = Path(__file__).resolve()
+    project_root = current_file.parents[5]
+    documentos_path = project_root / "documentos" / "informes" / legajo_id
+    file_path = documentos_path / doc.nombre_documento
+    try:
+        # Configuración del servidor SMTP
+        servidor = smtplib.SMTP('smtp.gmail.com', 587)
+        servidor.starttls()
+        servidor.login(config["development"].MAIL_USER, config["development"].MAIL_PASSWORD)
+        
+        # Crear el mensaje
+        msg = MIMEMultipart()
+        msg["From"] = config["development"].MAIL_USER
+        msg["To"] = mail
+        msg["Subject"] = "Correo con enlace y archivo adjunto"
+
+        # Cuerpo del mensaje con un enlace
+        body = f"""
+        Buen día,
+
+        Gracias por hacer uso de nuestro servicio. a continuación, puede acceder a la siguiente encuesta para poder darnos un feedback: 
+        {link}
+
+        Además, hemos adjuntado, en formato PDF el Informe.
+
+        Saludos,
+        Equipo CIDEPINT
+        """
+        msg.attach(MIMEText(body, 'plain'))
+
+        # Adjuntar el archivo PDF
+        if os.path.exists(file_path):
+            with open(file_path, "rb") as adjunto:
+                parte_adjunto = MIMEBase('application', 'octet-stream')
+                parte_adjunto.set_payload(adjunto.read())
+                encoders.encode_base64(parte_adjunto)
+                parte_adjunto.add_header(
+                    'Content-Disposition',
+                    f'attachment; filename={os.path.basename(file_path)}'
+                )
+                msg.attach(parte_adjunto)
+        else:
+            return jsonify({"error": "El archivo PDF no existe en la ruta especificada"}), 500
+
+        # Enviar el correo
+        servidor.sendmail(config["development"].MAIL_USER, mail, msg.as_string())
+        servidor.quit()
+        return jsonify({"message": "Correo enviado con exito"}), 200
+    except Exception as e:
+        print(f"Error al enviar el correo: {e}")
+        return jsonify({"error": "Error al enviar el correo"}), 500

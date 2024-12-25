@@ -1,9 +1,11 @@
 <script setup>
-import { RouterLink, RouterView } from 'vue-router';
+import { RouterLink, RouterView, useRoute } from 'vue-router';
 import { useAuthStore } from '@/stores/auth'; // Importa tu store de autenticación
 import { ref, computed, watchEffect } from 'vue';
 
+
 const authStore = useAuthStore();
+const route = useRoute();
 
 // Recuperar el token desde el store o localStorage
 const token = ref(authStore.getToken() || localStorage.getItem('access_token'));
@@ -20,11 +22,15 @@ const tienePermisoListarStans = computed(() => {
 const tienePermisoListarUsuarios = computed(() => {
   return permisos.value.includes('listar_usuarios');
 });
-
+``
 // Computada para verificar si el usuario está logueado
 const estaLogueado = computed(() => {
   console.log(token.value);
   return !!token.value; // Si el token existe, significa que el usuario está logueado
+});
+
+const showNavbar = computed(() => {
+  return route.meta.showNavbar
 });
 
 // WatchEffect para actualizar los permisos cuando cambien en localStorage
@@ -44,7 +50,7 @@ const logout = () => {
 
 <template>
   <div>
-    <nav class="navbar">
+    <nav v-if="showNavbar" class="navbar">
       <RouterLink to="/">
         <img alt="Vue logo" class="logo" src="@/assets/Logo.png" width="50" height="50" />
       </RouterLink>

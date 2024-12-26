@@ -106,7 +106,7 @@ const routes = [
     name: 'logIn',
     component: () => import('../views/LogIn.vue'),
     props: true,
-    meta: {showNavbar: true}
+    meta: { showNavbar: true },
   },
   {
     path: '/usuarios',
@@ -164,30 +164,29 @@ const routes = [
     meta: { showNavbar: false },
   },
   {
-    path: "/generar_presupuesto/:id_legajo",
-    name: "generar_presupuesto",
-    component: () => import("../components/presupuestos/GenerarPresupuesto.vue"),
-      props: true,
-      meta: { requiresAuth: true }
-    },
-    {
-      path: "/pendientes",
-      name: "pendientes",
-      component: () => import("../views/PendientesView.vue"),
-      meta: { requiresAuth: true }
-    },
-    {
-      path: "/estadisticas",
-      name: "estadisticas",
-      component: () => import("../views/EstadisticasView.vue"),
-      meta: { requiresAuth: true }
-    },
-    {
-      path: "/jefe_de_area",
-      name: "jefe_de_area",
-      component: () => import("../components/areas/CambiarJefeArea.vue"),
-      meta: { requiresAuth: true }
-    meta: { showNavbar: true },
+    path: '/generar_presupuesto/:id_legajo',
+    name: 'generar_presupuesto',
+    component: () => import('../components/presupuestos/GenerarPresupuesto.vue'),
+    props: true,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/pendientes',
+    name: 'pendientes',
+    component: () => import('../views/PendientesView.vue'),
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/estadisticas',
+    name: 'estadisticas',
+    component: () => import('../views/EstadisticasView.vue'),
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/jefe_de_area',
+    name: 'jefe_de_area',
+    component: () => import('../components/areas/CambiarJefeArea.vue'),
+    meta: { requiresAuth: true, showNavbar: true },
   },
 ]
 

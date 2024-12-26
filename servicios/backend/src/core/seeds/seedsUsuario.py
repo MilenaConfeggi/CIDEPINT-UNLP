@@ -242,6 +242,9 @@ def seed_usuarios():
         "cargar_interarea_firmada",
         "generar_presupuesto",
         "ver_presupuesto",
+        "ver_pendientes",
+        "ver_presupuesto_pendiente",
+        "ver_estadisticas"
     ]
     PERMISSIONS = { #Acá van los permisos que tiene cada rol
         "Director": [ #Tienen que ser declarados previamente en todosLosPermisos
@@ -265,6 +268,9 @@ def seed_usuarios():
             "cargar_interarea_firmada",
             "generar_presupuesto",
             "ver_presupuesto",
+            "ver_pendientes",
+            "ver_presupuesto_pendiente",
+            "ver_estadisticas"
         ],
         "Secretaria": [
             "listar_usuarios",
@@ -286,6 +292,9 @@ def seed_usuarios():
             "cargar_interarea_firmada",
             "generar_presupuesto",
             "ver_presupuesto",
+            "ver_presupuesto_pendiente",
+            "ver_pendientes",
+            "ver_estadisticas"
         ],
         "Jefe de area": [
             "listar_muestras_identificadas",
@@ -297,6 +306,7 @@ def seed_usuarios():
             "ver informe",
             "listar_interareas",
             "cargar_interarea",
+            "ver_pendientes"
         ],
         "Trabajador": [
             "listar_muestras_identificadas",

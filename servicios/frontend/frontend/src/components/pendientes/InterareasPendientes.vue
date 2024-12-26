@@ -1,12 +1,12 @@
 <template>
   <div class="container my-5">
     <div v-if="interareas.length === 0" class="no-interareas text-center">
-      <h3>No hay interareas para mostrar</h3>
+      <h3>No hay interáreas para mostrar</h3>
     </div>
     <div v-else>
       <h1 v-if="userRole.includes('cargar_interarea_firmada')" class="text-center">Interáreas por firmar</h1>
       <h1 v-else class="text-center">Interáreas por cargar</h1>
-      <div v-for="interarea in interareas" :key="interarea.id" class="card mb-3 shadow-sm interarea-card">
+      <div v-for="interarea in paginatedInterareas" :key="interarea.id" class="card mb-3 shadow-sm interarea-card">
         <div class="card-body d-flex align-items-center">
           <div class="left-content me-auto">
             <h5 class="card-title mb-1">Interarea: {{ interarea.nro_interarea }}</h5>
@@ -17,6 +17,15 @@
             <RouterLink :to="`/interarea-detalle/${interarea.id}`" class="btn btn-success">Ver</RouterLink>
           </div>
         </div>
+      </div>
+      <div class="pagination">
+        <button :disabled="currentPage === 1" @click="changePage(currentPage - 1)" class="btn btn-primary">
+          Anterior
+        </button>
+        <span>Página {{ currentPage }} de {{ totalPages }}</span>
+        <button :disabled="currentPage === totalPages" @click="changePage(currentPage + 1)" class="btn btn-primary">
+          Siguiente
+        </button>
       </div>
     </div>
   </div>
@@ -31,14 +40,25 @@ export default {
       interareas: [],
       userRole: JSON.parse(localStorage.getItem('permisos')) || [],
       area: JSON.parse(localStorage.getItem('area')) || 0,
+      currentPage: 1,
+      itemsPerPage: 5, 
     };
+  },
+  computed: {
+    totalPages() {
+      return Math.ceil(this.interareas.length / this.itemsPerPage);
+    },
+    paginatedInterareas() {
+      const start = (this.currentPage - 1) * this.itemsPerPage;
+      const end = start + this.itemsPerPage;
+      return this.interareas.slice(start, end);
+    },
   },
   methods: {
     async fetchInterareas() {
       try {
         const status = this.userRole.includes('cargar_interarea_firmada') ? 1 : 2;
         const response = await axios.get(`${import.meta.env.VITE_API_URL}/interareas`);
-
         if (status === 1) {
           this.interareas = response.data.filter((interarea) => interarea.estadoInterarea_id === 1);
         } else {
@@ -46,6 +66,11 @@ export default {
         }
       } catch (error) {
         console.error("Error al obtener las interareas:", error);
+      }
+    },
+    changePage(page) {
+      if (page >= 1 && page <= this.totalPages) {
+        this.currentPage = page;
       }
     },
   },
@@ -96,5 +121,16 @@ export default {
 
 .btn-success {
   margin-right: 10px;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.pagination button {
+  margin: 0 10px;
 }
 </style>

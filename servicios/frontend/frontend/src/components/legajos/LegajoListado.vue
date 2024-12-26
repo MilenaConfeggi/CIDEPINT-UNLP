@@ -10,13 +10,12 @@
     </svg>
   </RouterLink>
   <div class="flex flex-col justify-center items-center">
-    <p v-if="loading">Cargando...</p>
     <p v-if="error">{{ error }}</p>
     <div class="input-group mb-3 d-flex flex-row">
       <label class="input-group-text" for="ensayos">Ensayos</label>
       <input v-model="ensayo" type="text" aria-label="Ensayos" class="form-control" />
-      <label v-if="area === ''" class="input-group-text" for="area">Areas</label>
-      <select v-if="area === '' && areas" v-model="area" class="form-select" id="area">
+      <label v-if="userRol === ''" class="input-group-text" for="area">Areas</label>
+      <select v-if="userRol === '' && areas" v-model="area" class="form-select" id="area">
         <option selected value="">Elige un area</option>
         <option v-for="area in areas" :key="area.id" :value="area.id">
           {{ area.nombre }}
@@ -25,7 +24,9 @@
       <span class="input-group-text">Empresa</span>
 
       <input v-model="empresa" type="text" aria-label="nombre del cliente" class="form-control" />
+      <label class="input-group-text" for="date">Fecha de carga</label>
       <input
+        id="date"
         type="date"
         v-model="fecha"
         @input="validateDates"
@@ -34,8 +35,8 @@
       />
     </div>
     <div v-if="legajos.items?.length && !error">
-      <table class="table">
-        <thead>
+      <table class="table table-hover table-bordered">
+        <thead class="thead-dark">
           <tr>
             <th scope="col">Nro interno</th>
             <th scope="col">Ensayos</th>
@@ -59,10 +60,10 @@
             <td>{{ legajo.area.nombre }}</td>
             <td><StateBadge :state="legajo.estado?.nombre" /></td>
             <td>
-              <RouterLink :to="`/legajos/${legajo.id}`" class="btn btn-primary">
+              <RouterLink :to="`/legajos/${legajo.id}`" class="btn btn-primary mr-3">
                 Ver detalle
               </RouterLink>
-              <RouterLink :to="`/legajos/cancelar/${legajo.id}`" class="hover:underline">
+              <RouterLink :to="`/legajos/cancelar/${legajo.id}`">
                 <button v-if="legajo.estado?.nombre === 'En curso'" class="btn btn-danger">
                   Cancelar
                 </button>
@@ -72,13 +73,8 @@
         </tbody>
       </table>
       <div v-if="totalPages > 1" class="pagination d-flex justify-content-center grid gap-3">
-        <button @click="prevPage" :disabled="currentPage === 1" class="btn" >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="32"
-            height="32"
-            viewBox="0 0 1024 1024"
-          >
+        <button @click="prevPage" :disabled="currentPage === 1" class="btn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 1024 1024">
             <path
               fill="currentColor"
               d="M685.248 104.704a64 64 0 0 1 0 90.496L368.448 512l316.8 316.8a64 64 0 0 1-90.496 90.496L232.704 557.248a64 64 0 0 1 0-90.496l362.048-362.048a64 64 0 0 1 90.496 0"
@@ -88,13 +84,8 @@
 
         <span class="d-flex align-items-center">Página {{ currentPage }} de {{ totalPages }}</span>
 
-        <button @click="nextPage" :disabled="currentPage === totalPages" class="btn" >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="32"
-            height="32"
-            viewBox="0 0 1024 1024"
-          >
+        <button @click="nextPage" :disabled="currentPage === totalPages" class="btn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 1024 1024">
             <path
               fill="currentColor"
               d="M338.752 104.704a64 64 0 0 0 0 90.496l316.8 316.8l-316.8 316.8a64 64 0 0 0 90.496 90.496l362.048-362.048a64 64 0 0 0 0-90.496L429.248 104.704a64 64 0 0 0-90.496 0"
@@ -103,7 +94,8 @@
         </button>
       </div>
     </div>
-    <div v-else>No hay legajos</div>
+    <p v-else-if="loading" class="font-bold text-center">Cargando...</p>
+    <p v-else class="font-bold text-center">No hay legajos</p>
   </div>
 </template>
 <script setup>
@@ -121,7 +113,8 @@ const areasStore = useAreasStore()
 const currentPage = ref(1)
 const areaRol = localStorage.getItem('area') === 'null' ? '' : localStorage.getItem('area')
 var ensayo = ref('')
-var area = ref(areaRol)
+var userRol = ref(areaRol)
+var area = ref('')
 var empresa = ref('')
 var fecha = ref('')
 
@@ -136,7 +129,6 @@ const validateDates = () => {
 }
 
 const fetchLegajos = async () => {
-  console.log(typeof area.value)
   const params = {
     area: area.value,
     ensayo: ensayo.value,
@@ -173,3 +165,125 @@ watch([ensayo, area, empresa, fecha, currentPage], () => {
   fetchLegajos()
 })
 </script>
+
+<style scoped>
+.table {
+  width: 100%;
+  margin: auto;
+  border-collapse: collapse;
+  background-color: #f9f9f9; /* Fondo claro para la tabla */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra para la tabla */
+}
+
+.table th,
+.table td {
+  text-align: center;
+  vertical-align: middle;
+  padding: 10px;
+  border: 1px solid #ddd; /* Bordes ligeros para las celdas */
+}
+
+.table-hover tbody tr:hover {
+  background-color: #f1f1f1;
+  cursor: pointer;
+}
+
+.table-active {
+  background-color: #d1ecf1;
+}
+
+.thead-dark th {
+  background-color: #343a40;
+  color: white;
+}
+
+.line {
+  border: 0;
+  height: 1px;
+  background: #333;
+  background-image: linear-gradient(to right, #ccc, #333, #ccc);
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.page-item {
+  list-style: none;
+}
+
+.page-link {
+  display: inline-block;
+  padding: 8px 12px;
+  margin: 0 5px;
+  border: 1px solid #007bff;
+  border-radius: 4px;
+  color: #007bff;
+  background-color: white;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.page-link:hover {
+  background-color: #007bff;
+  color: white;
+}
+
+.page-item.active .page-link {
+  background-color: #0056b3;
+  color: white;
+  border-color: #0056b3;
+}
+
+.page-item.disabled .page-link {
+  color: #ccc;
+  cursor: not-allowed;
+  background-color: #f8f9fa;
+  border-color: #ddd;
+}
+
+.page-item.previous .page-link,
+.page-item.next .page-link {
+  padding: 8px 16px;
+  font-weight: bold;
+}
+
+
+/* Definir anchos fijos para las columnas */
+.col-numero {
+  width: 10%;
+}
+
+.col-ensayos {
+  width: 50%;
+}
+
+.col-precio-por {
+  width: 10%;
+}
+
+.col-precio-pesos {
+  width: 10%;
+}
+
+.col-precio-dolares {
+  width: 10%;
+}
+
+.col-acciones {
+  width: 10%;
+}
+
+.fade-in {
+  opacity: 0;
+  animation: fadeIn 0.5s forwards;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+</style>

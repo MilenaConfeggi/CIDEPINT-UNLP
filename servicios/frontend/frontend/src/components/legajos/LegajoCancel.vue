@@ -10,12 +10,8 @@
       <h2 class="mb-3 col-md-6">Cancelar Legajo</h2>
       <div class="mb-3">
         <label for="estado" class="form-label">Estado del proceso:</label>
-        <select v-model="form.estado" class="form-select" id="estado">
-          <option selected>Seleccione...</option>
-          <option value="En curso">En curso</option>
-          <option value="Terminado">Terminado</option>
-          <option value="Informado">Informado</option>
-        </select>
+        <input type="text" class="form-control" id="motivo" placeholder="Motivo" required v-model="form.estado" />
+        <div class="invalid-feedback">Por favor, ingrese un estado.</div>
         <label for="motivo" class="form-label">Motivo de cancelación</label>
         <textarea
           class="form-control"

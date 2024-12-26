@@ -84,7 +84,7 @@
           id="es_juridico"
           v-model="form.es_juridico"
         />
-        <label class="form-check-label" for="es_juridico"> Es juridico </label>
+        <label class="form-check-label" for="es_juridico"> No requiere presupuesto </label>
       </div>
       <div class="form-check">
         <input
@@ -188,7 +188,6 @@ export default {
           es_juridico: this.form.es_juridico,
           necesita_facturacion: this.form.necesita_facturacion,
           fecha_entrada: new Date().toISOString().replace('T', ' ').replace('Z', ''),
-          nro_legajo: 'LEG' + Math.floor(Math.random() * 1000),
           area_id: this.form.area,
         }
         const data = {

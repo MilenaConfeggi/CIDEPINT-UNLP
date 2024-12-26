@@ -19,7 +19,6 @@
     "chart.js": "^4.4.7",
     "js-cookie": "^3.0.5",
     "pdf-lib": "^1.17.1",
-    "pdfjs-dist": "^4.9.155",
     "pdfvuer": "^2.0.1",
     "pinia": "^2.2.6",
     "survey-vue3-ui": "^1.12.14",

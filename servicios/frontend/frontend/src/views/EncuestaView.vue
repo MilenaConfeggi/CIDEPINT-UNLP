@@ -173,7 +173,7 @@ onMounted(() => {
 
 <template>
   <SurveyComponent v-if="!surveyCompleted" :survey="survey" />
-  <div v-else>
-    <p>Gracias por completar la encuesta.</p>
+  <div v-else class="d-flex justify-content-center align-items-center p-3 mb-2 bg-secondary-subtle">
+    <h1 calss="text-center">Gracias por completar la encuesta.</h1>
   </div>
 </template>

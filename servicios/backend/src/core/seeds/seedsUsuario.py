@@ -245,6 +245,12 @@ def seed_usuarios():
         "ver_pendientes",
         "ver_presupuesto_pendiente",
         "ver_estadisticas"
+        "listar_legajos",
+        "cancelar_legajo",
+        "ver_legajo",
+        "crear_legajo",
+        "listar_documentos",
+        "subir_documento",
     ]
     PERMISSIONS = { #Acá van los permisos que tiene cada rol
         "Director": [ #Tienen que ser declarados previamente en todosLosPermisos
@@ -271,6 +277,12 @@ def seed_usuarios():
             "ver_pendientes",
             "ver_presupuesto_pendiente",
             "ver_estadisticas"
+            "listar_legajos",
+            "cancelar_legajo",
+            "ver_legajo",
+            "crear_legajo",
+            "listar_documentos",
+            "subir_documento",
         ],
         "Secretaria": [
             "listar_usuarios",
@@ -295,6 +307,12 @@ def seed_usuarios():
             "ver_presupuesto_pendiente",
             "ver_pendientes",
             "ver_estadisticas"
+            "listar_legajos",
+            "cancelar_legajo",
+            "ver_legajo",
+            "crear_legajo",
+            "listar_documentos",
+            "subir_documento",
         ],
         "Jefe de area": [
             "listar_muestras_identificadas",
@@ -307,12 +325,19 @@ def seed_usuarios():
             "listar_interareas",
             "cargar_interarea",
             "ver_pendientes"
+            "listar_legajos",
+            "ver_legajo",
+            "listar_documentos",
+            "subir_documento",
         ],
         "Trabajador": [
             "listar_muestras_identificadas",
             "cargar_fotos",
             "listar_fotos",
             "cargar_interarea"
+            "listar_legajos",
+            "ver_legajo",
+            "listar_documentos",
         ],
     }
 

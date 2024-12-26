@@ -244,13 +244,14 @@ def seed_usuarios():
         "ver_presupuesto",
         "ver_pendientes",
         "ver_presupuesto_pendiente",
-        "ver_estadisticas"
+        "ver_estadisticas",
         "listar_legajos",
         "cancelar_legajo",
         "ver_legajo",
         "crear_legajo",
         "listar_documentos",
         "subir_documento",
+        "cargar_presupuesto_firmado",
     ]
     PERMISSIONS = { #Acá van los permisos que tiene cada rol
         "Director": [ #Tienen que ser declarados previamente en todosLosPermisos
@@ -276,13 +277,14 @@ def seed_usuarios():
             "ver_presupuesto",
             "ver_pendientes",
             "ver_presupuesto_pendiente",
-            "ver_estadisticas"
+            "ver_estadisticas",
             "listar_legajos",
             "cancelar_legajo",
             "ver_legajo",
             "crear_legajo",
             "listar_documentos",
             "subir_documento",
+            "cargar_presupuesto_firmado",
         ],
         "Secretaria": [
             "listar_usuarios",
@@ -306,7 +308,7 @@ def seed_usuarios():
             "ver_presupuesto",
             "ver_presupuesto_pendiente",
             "ver_pendientes",
-            "ver_estadisticas"
+            "ver_estadisticas",
             "listar_legajos",
             "cancelar_legajo",
             "ver_legajo",
@@ -324,7 +326,7 @@ def seed_usuarios():
             "ver informe",
             "listar_interareas",
             "cargar_interarea",
-            "ver_pendientes"
+            "ver_pendientes",
             "listar_legajos",
             "ver_legajo",
             "listar_documentos",
@@ -334,7 +336,7 @@ def seed_usuarios():
             "listar_muestras_identificadas",
             "cargar_fotos",
             "listar_fotos",
-            "cargar_interarea"
+            "cargar_interarea",
             "listar_legajos",
             "ver_legajo",
             "listar_documentos",

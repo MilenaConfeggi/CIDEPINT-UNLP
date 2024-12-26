@@ -17,6 +17,7 @@ from reportlab.lib import colors
 from reportlab.pdfgen import canvas
 from datetime import datetime
 from servicios.backend.src.core.services import servicioDocumento
+from models.documentos.documento import Documento
 
 
 UPLOAD_FOLDER = os.path.abspath("documentos")
@@ -250,10 +251,10 @@ def generar_presupuesto(data):
     i=0
     for stan in estans:
         if estans[i].precio_por_muestra:
-            content.append(Paragraph(f"• {estans[i].descripcion} de {cantidades[i]} muestras", normal_style))
+            content.append(Paragraph(f"• {estans[i].numero} de {cantidades[i]} muestras", normal_style))
         else:
-            content.append(Paragraph(f"• {estans[i].descripcion} por {cantidades[i]} horas", normal_style))
-        content.append(Paragraph(f"<b>Costo: U$S {estans_presu[i].precio_carga * cantidades[i]}</b>", normal_style))
+            content.append(Paragraph(f"• {estans[i].numero} por {cantidades[i]} horas", normal_style))
+        content.append(Paragraph(f"<b>Costo: U$S {round(estans_presu[i].precio_carga * cantidades[i],2)}</b>", normal_style))
         content.append(Spacer(1, 6))
         i+=1
 
@@ -466,3 +467,7 @@ def ensayos_mas_solicitados(fecha_desde, fecha_hasta):
         .group_by(Ensayo.id) \
         .order_by(db.desc('cantidad')) \
         .all()
+
+def buscar_presupuesto_por_legajo(id_legajo):
+    presupuesto = Documento.query.filter_by(legajo_id=id_legajo, tipo_documento_id=2).filter(Documento.estado_id != 8).first()
+    return presupuesto

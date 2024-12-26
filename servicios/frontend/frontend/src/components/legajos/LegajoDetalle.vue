@@ -175,6 +175,35 @@
                             Ver
                           </button>
                         </li>
+                        <li v-if="hasPermission('cargar_presupuesto_firmado') && existeDocumento(documento.nombre)">
+                          <label
+                            :for="`upload-presupuesto-firmado-${documento.id}`"
+                            class="dropdown-item"
+                          >
+                            Subir Presupuesto Firmado
+                            <input
+                              :id="`upload-presupuesto-firmado-${documento.id}`"
+                              type="file"
+                              accept="application/pdf"
+                              @change="uploadPresupuestoFirmado($event, documento.id, legajo.id)"
+                              class="dropdown-item"
+                              hidden
+                            />
+                          </label>
+                        </li>
+                        <li
+                          v-if="
+                            hasPermission('ver_presupuesto') && existeDocumento(documento.nombre)
+                          "
+                        >
+                          <button
+                            type="button"
+                            class="dropdown-item"
+                            @click="viewPresupuestoFirmado(documento.id, documento.nombre, legajo.id)"
+                          >
+                            Ver presupuesto Firmado
+                          </button>
+                        </li>
                       </template>
                       <template v-else>
                         <li v-if="existeDocumento(documento.nombre)">
@@ -213,7 +242,7 @@
                       </template>
                       <li v-if="!existeDocumento(documento.nombre)">
                         <label :for="`upload-pdf-${documento.id}`" class="dropdown-item">
-                          <div v-if="documento.nombre !== 'Factura' && documento.nombre !== 'Certificado CIDEPINT'" class="dropdown-item">
+                          <div v-if="documento.nombre !== 'Factura' && documento.nombre !== 'Certificado CIDEPINT' && documento.nombre !== 'Presupuesto CIDEPINT'" class="dropdown-item">
                             Cargar
                             <input
                               :id="`upload-pdf-${documento.id}`"
@@ -464,6 +493,41 @@ const uploadInformeFirmado = async (event, id, legajoId) => {
   }
 }
 
+const uploadPresupuestoFirmado = async (event, id, legajoId) => {
+  const file = event.target.files[0]
+  const token = authStore.getToken()
+  if (file && file.type === 'application/pdf') {
+    try {
+      const formData = new FormData() // Definir formData aquí
+      formData.append('archivo', file)
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/presupuestos/cargar_presupuesto_firmado/${legajoId}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data',
+          },
+        },
+      )
+      console.log(response)
+      if (response.status === 200) {
+        successMessage.value = 'Presupuesto firmado subido correctamente'
+        showToast.value = true
+        setTimeout(() => window.location.reload(), 2000)
+      } else {
+        throw new Error(response.data.error || 'No se pudo subir el archivo')
+      }
+    } catch (error) {
+      console.error('Error al subir el archivo:', error)
+      errorMessage.value = error.response?.data?.error || 'Error al subir el archivo'
+      showToast.value = true
+    }
+  } else {
+    alert('Por favor selecciona un archivo PDF.')
+  }
+}
+
 const handleFileUpload = async (event, id, legajoId, editar = false) => {
   const file = event.target.files[0]
   console.log(id)
@@ -569,6 +633,32 @@ const viewPresupuesto = async (id, tipo, legajoId) => {
   } catch (error) {
     console.error('Error al obtener el documento:', error)
     errorMessage.value = error.message || 'El documento no existe, prueba generar uno primero'
+    showToast.value = true
+  }
+}
+const viewPresupuestoFirmado = async (id, tipo, legajoId) => {
+  const token = authStore.getToken()
+  try {
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL}/presupuestos/ver_documento_firmado/${legajoId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
+        },
+      },
+    )
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'El documento no existe, prueba generar uno primero')
+    }
+    const blob = await response.blob()
+    const url = URL.createObjectURL(blob)
+    window.open(url, '_blank')
+  } catch (error) {
+    console.error('Error al obtener el documento:', error)
+    errorMessage.value = 'El documento no existe, prueba generar uno primero'
     showToast.value = true
   }
 }

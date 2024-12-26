@@ -8,7 +8,7 @@
             :value="stan.id"
             v-model="seleccionados"
           />
-          <label>{{ stan.numero }} Desc: {{ stan.descripcion }}</label>
+          <label>{{ stan.numero }} Descripción: {{ stan.descripcion }}</label>
           <div v-if="seleccionados.includes(stan.id)">
             
             <div v-if="stan.precio_por_muestra">

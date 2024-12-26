@@ -2,7 +2,7 @@
   <div class="app container my-5">
     <div class="nav-container">
       <nav class="nav">
-        <button @click="currentSection = 'DocumentosPendientes'" :class="['nav-btn', currentSection === 'DocumentosPendientes' ? 'active' : '']">
+        <button v-if="permisos.includes('ver_presupuesto_pendiente')" @click="currentSection = 'PresupuestosPendientes'" :class="['nav-btn', currentSection === 'PresupuestosPendientes' ? 'active' : '']">
           Presupuestos
         </button>
         <button @click="currentSection = 'InformesPendientes'" :class="['nav-btn', currentSection === 'InformesPendientes' ? 'active' : '']">
@@ -14,22 +14,34 @@
       </nav>
     </div>
     <div>
-      <DocumentosPendientes v-if="currentSection === 'DocumentosPendientes'" />
+      <PresupuestosPendientes
+        v-if="currentSection === 'PresupuestosPendientes' && permisos.includes('ver_presupuesto_pendiente')"
+      />
+      <InformesPendientes v-if="currentSection === 'InformesPendientes'" />
       <InterareasPendientes v-if="currentSection === 'InterareasPendientes'" />
     </div>
   </div>
 </template>
 
 <script>
-import DocumentosPendientes from "@/components/pendientes/DocumentosPendientes.vue";
+import InformesPendientes from "@/components/pendientes/InformesPendientes.vue";
 import InterareasPendientes from "@/components/pendientes/InterareasPendientes.vue";
+import PresupuestosPendientes from "@/components/pendientes/PresupuestosPendientes.vue";
 
 export default {
-  components: { DocumentosPendientes, InterareasPendientes },
+  components: { InformesPendientes, InterareasPendientes, PresupuestosPendientes },
   data() {
     return {
-      currentSection: "DocumentosPendientes",
+      permisos: JSON.parse(localStorage.getItem("permisos")) || [],
+      currentSection: null,
     };
+  },
+  created() {
+    if (this.permisos.includes("ver_presupuesto_pendiente")) {
+      this.currentSection = "PresupuestosPendientes";
+    } else {
+      this.currentSection = "InformesPendientes";
+    }
   },
 };
 </script>

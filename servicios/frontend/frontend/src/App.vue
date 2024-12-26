@@ -21,6 +21,14 @@ const tienePermisoListarUsuarios = computed(() => {
   return permisos.value.includes('listar_usuarios');
 });
 
+const tienePermisoPendientes = computed(() => {
+  return permisos.value.includes('ver_pendientes');
+});
+
+const tienePermisoVerEstadisticas = computed(() => {
+  return permisos.value.includes('ver_estadisticas');
+});
+
 // Computada para verificar si el usuario está logueado
 const estaLogueado = computed(() => {
   console.log(token.value);
@@ -67,10 +75,10 @@ const logout = () => {
         <RouterLink v-if="estaLogueado && tienePermisoListarStans" to="/stans" class="nav-item">
           <i class="fas fa-list"></i> Stans
         </RouterLink>
-        <RouterLink v-if="estaLogueado" to="/estadisticas" class="nav-item">
+        <RouterLink v-if="estaLogueado && tienePermisoVerEstadisticas" to="/estadisticas" class="nav-item">
           <i class="fas fa-chart-bar"></i> Estadísticas
         </RouterLink>
-        <RouterLink v-if="estaLogueado" to="/pendientes" class="nav-item">
+        <RouterLink v-if="estaLogueado && tienePermisoPendientes" to="/pendientes" class="nav-item">
           <i class="fas fa-bell"></i> Pendientes
         </RouterLink>
         <RouterLink v-if="estaLogueado" to="/jefe_de_area" class="nav-item">

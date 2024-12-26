@@ -53,13 +53,27 @@
             <td class="px-4 py-3 text-sm">
                 <!-- Descargar -->
                 <a href="{{ url_for('contable.download', documento_id=documento.id) }}" class="text-blue-600 hover:underline">
-                    Descargar
+                    <svg viewBox="0 0 384 512" class="size-5 shrink-0 text-indigo-600 hover:text-indigo-500" fill="currentColor" aria-hidden="true" data-slot="icon">
+                        <path d="M320 464c8.8 0 16-7.2 16-16l0-288-80 0c-17.7 0-32-14.3-32-32l0-80L64 48c-8.8 0-16 7.2-16 16l0 384c0 8.8 7.2 16 16 16l256 0zM0 64C0 28.7 28.7 0 64 0L229.5 0c17 0 33.3 6.7 45.3 18.7l90.5 90.5c12 12 18.7 28.3 18.7 45.3L384 448c0 35.3-28.7 64-64 64L64 512c-35.3 0-64-28.7-64-64L0 64z"/>
+                    </svg>
                 </a>
                 <div>
-                <form method="POST" action="{{ url_for('contable.delete_document', documento_id=documento.id) }}" style="display:inline;">
-                    {{ delete_form.hidden_tag() }}
+                <form method="POST" action="{{ url_for('contable.delete_document') }}" style="display:inline;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="documento_id" value="{{ documento.id }}">
                     <button type="submit" class="text-red-600 hover:underline" onclick="return confirm('¿Estás seguro de que deseas eliminar este documento?');">
-                        Eliminar
+                                                <svg
+                            class="w-5 h-5"
+                            aria-hidden="true"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                        >
+                            <path
+                            fill-rule="evenodd"
+                            d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                            clip-rule="evenodd"
+                            ></path>
+                        </svg>
                     </button>
                 </form>
             </div>

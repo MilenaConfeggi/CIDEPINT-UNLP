@@ -431,6 +431,7 @@ def upload():
 @role_required('Administrador', 'Colaborador')
 def delete_document():
     documento_id = request.form.get("documento_id")
+    print(documento_id)
     documento = get_documento(documento_id)
     if documento is None:
         return jsonify({"error": "No se encontro el archivo"}), 404

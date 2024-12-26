@@ -1,15 +1,10 @@
 <template>
-  <div class="container">
+  <div class="container py-5">
     <div class="card shadow">
       <div class="card-body">
         <h4 class="card-title text-center mb-4">Solicitar Interarea</h4>
-
-        <div v-if="mensajeExito" class="alert alert-success">
-          {{ mensajeExito }}
-        </div>
-
         <form @submit.prevent="enviarFormulario">
-          <div class="form-group">
+          <div class="form-group mb-3">
             <label class="form-label fw-bold">Seleccionar tipo de interarea</label>
             <select v-model="form.tipo" class="form-select">
               <option disabled value="">Tipo</option>
@@ -26,10 +21,9 @@
               <option value="Molino Horizontal de Perlas de Alta Velocidad">Molino de Perlas Horizontal de Alta Velocidad</option>
               <option value="TGA">TGA</option>
             </select>
-            <div v-if="errores.tipo" class="text-danger">{{ errores.tipo }}</div>
+            <div v-if="errores.tipo" class="text-danger mt-1">{{ errores.tipo }}</div>
           </div>
-
-          <div class="form-group">
+          <div class="form-group mb-3">
             <div class="form-check">
               <input type="checkbox" v-model="form.investigacion" id="investigacion" class="form-check-input" />
               <label class="form-check-label fw-bold" for="investigacion">
@@ -37,56 +31,50 @@
               </label>
             </div>
           </div>
-
-          <div class="form-group" v-if="!form.investigacion">
+          <div class="form-group mb-3" v-if="!form.investigacion">
             <label class="form-label fw-bold">Seleccionar legajo</label>
             <select v-model="form.legajo" @change="filtrarMuestras" class="form-select">
               <option disabled value="">Legajos</option>
               <option v-for="legajo in legajos" :key="legajo.id" :value="legajo.id">
-                {{ legajo.nro_legajo }}
+                Legajo: {{ legajo.id }}
               </option>
             </select>
-            <div v-if="errores.legajo" class="text-danger">{{ errores.legajo }}</div>
+            <div v-if="errores.legajo" class="text-danger mt-1">{{ errores.legajo }}</div>
           </div>
-
-          <div class="form-group" v-if="form.investigacion">
+          <div class="form-group mb-3" v-if="form.investigacion">
             <label class="form-label fw-bold">Ingresar línea de investigación</label>
             <input v-model="form.lineaInvestigacion" type="text" class="form-control" placeholder="Línea de investigación" />
-            <div v-if="errores.lineaInvestigacion" class="text-danger">{{ errores.lineaInvestigacion }}</div>
+            <div v-if="errores.lineaInvestigacion" class="text-danger mt-1">{{ errores.lineaInvestigacion }}</div>
           </div>
-
-          <div class="form-group">
+          <div class="form-group mb-3">
             <label class="form-label fw-bold">Seleccionar área</label>
-            <select v-model="form.area" class="form-select">
+            <select v-model="form.area_receptora" class="form-select">
               <option disabled value="">Áreas</option>
               <option v-for="area in areas" :key="area.id" :value="area.id">
                 {{ area.nombre }}
               </option>
             </select>
-            <div v-if="errores.area" class="text-danger">{{ errores.area }}</div>
+            <div v-if="errores.area" class="text-danger mt-1">{{ errores.area }}</div>
           </div>
-
-          <div class="form-group">
+          <div class="form-group mb-3">
             <div v-if="form.investigacion">
               <label class="form-label fw-bold">Ingresar identificación de muestras</label>
               <input v-model="form.muestra_investigacion" type="text" class="form-control" placeholder="Identificación de muestras" />
             </div>
             <div v-if="!form.investigacion">
               <label class="form-label fw-bold">Seleccionar identificación de muestras</label>
-              <select v-model="form.muestra" class="form-select" :disabled="!form.legajo">
+              <select v-model="form.muestra" class="form-select" :disabled="!form.legajo" multiple>
                 <option disabled value="">Identificaciones</option>
                 <option v-for="muestra in muestrasFiltradas" :key="muestra.id" :value="muestra.id">
                   {{ muestra.nro_muestra }}
                 </option>
               </select>
             </div>
-            <div v-if="errores.muestra" class="text-danger">{{ errores.muestra }}</div>
+            <div v-if="errores.muestra" class="text-danger mt-1">{{ errores.muestra }}</div>
           </div>
-
-          <div class="text-center">
-            <button type="submit" class="btn btn-primary btn-lg w-50">
-              Enviar
-            </button>
+          <div class="d-flex justify-content-between">
+            <button type="button" class="btn btn-secondary btn-lg" @click="cancelar">Cancelar</button>
+            <button type="submit" class="btn btn-primary btn-lg">Enviar</button>
           </div>
         </form>
       </div>
@@ -94,35 +82,37 @@
   </div>
 </template>
 
+
 <script>
-import { useRouter } from 'vue-router';
+import { useRouter } from "vue-router";
 
 export default {
   setup() {
     const router = useRouter();
-    return { router };
+    return { router};
   },
   data() {
     return {
       legajos: [],
       areas: [],
       muestras: [],
-      muestrasFiltradas: [], // Estado para almacenar las muestras filtradas
-      errores: {}, // Estado para almacenar los mensajes de error
-      mensajeExito: "", // Estado para almacenar el mensaje de éxito
+      muestrasFiltradas: [],
+      errores: {},
+      mensajeExito: "",
       form: {
         legajo: "",
         lineaInvestigacion: "",
-        area: "",
+        area_receptora: "",
+        area_solicitante: localStorage.getItem("area"),
         muestra: "",
         muestra_investigacion: "",
         investigacion: false,
         identificacion: "",
         tipo: "",
-        solicitante: ""
       },
     };
   },
+
   methods: {
     async fetchData() {
       try {
@@ -132,17 +122,56 @@ export default {
           fetch(`${baseUrl}/api/area/`),
           fetch(`${baseUrl}/muestras/`),
         ]);
-
         this.legajos = await legajosRes.json();
-        this.areas = await areasRes.json();
+        const data = await areasRes.json();
+        const area = localStorage.getItem("area");
+        this.areas = data.filter((a) => a.id != area);
         this.muestras = await muestrasRes.json();
       } catch (error) {
         console.error("Error al cargar los datos:", error);
       }
     },
+    async enviarFormulario() {
+      if (!this.validarFormulario()) {
+        return;
+      }
+
+      const baseUrl = import.meta.env.VITE_API_URL;
+
+      const datosFormulario = {
+        legajo: this.form.legajo,
+        lineaInvestigacion: this.form.lineaInvestigacion,
+        area_receptora_id: this.form.area_receptora,
+        area_solicitante_id: this.form.area_solicitante, 
+        muestra: this.form.muestra,
+        investigacion: this.form.investigacion,
+        tipo: this.form.tipo,
+      };
+
+      try {
+        const response = await fetch(`${baseUrl}/interareas/crear`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(datosFormulario),
+        });
+
+        if (!response.ok) {
+          throw new Error("Error al enviar el formulario");
+        }
+
+        this.mensajeExito = "Se ha creado la interárea correctamente.";
+        this.router.push({ name: "interareas" });
+      } catch (error) {
+        console.error("Error al enviar el formulario:", error);
+      }
+    },
     filtrarMuestras() {
       if (this.form.legajo) {
-        this.muestrasFiltradas = this.muestras.filter(muestra => muestra.legajo_id === this.form.legajo);
+        this.muestrasFiltradas = this.muestras.filter(
+          (muestra) => muestra.legajo_id === this.form.legajo
+        );
       } else {
         this.muestrasFiltradas = [];
       }
@@ -154,7 +183,7 @@ export default {
         this.errores.tipo = "El tipo de interarea es obligatorio.";
       }
 
-      if (!this.form.area) {
+      if (!this.form.area_receptora) {
         this.errores.area = "El área es obligatoria.";
       }
 
@@ -182,42 +211,8 @@ export default {
 
       return Object.keys(this.errores).length === 0;
     },
-    async enviarFormulario() {
-      if (!this.validarFormulario()) {
-        return;
-      }
-
-      const baseUrl = import.meta.env.VITE_API_URL;
-
-      const datosFormulario = {
-        legajo: this.form.legajo,
-        lineaInvestigacion: this.form.lineaInvestigacion,
-        area: this.form.area,
-        muestra: this.form.muestra,
-        investigacion: this.form.investigacion,
-        tipo: this.form.tipo,
-        solicitante: this.form.solicitante // aca deberia sacar el area de la sesion
-      };
-
-      try {
-        const response = await fetch(`${baseUrl}/interareas/crear`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(datosFormulario),
-        });
-
-        if (!response.ok) {
-          throw new Error("Error al enviar el formulario");
-        }
-
-        this.mensajeExito = "Se ha creado la interárea correctamente.";
-        this.router.push({ name: "interareas" });
-      } catch (error) {
-        console.error("Error al enviar el formulario:", error);
-        alert("Hubo un error al enviar el formulario.");
-      }
+    cancelar() {
+      this.router.push({ name: "interareas" });
     },
   },
   mounted() {
@@ -225,3 +220,26 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.container {
+  max-width: 700px;
+  margin: auto;
+}
+
+.card {
+  border-radius: 10px;
+}
+
+.form-label {
+  margin-bottom: 5px;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+}
+
+.btn-primary {
+  background-color: #007bff;
+}
+</style>

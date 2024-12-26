@@ -1,9 +1,11 @@
 from models import db
 from models.interarea.interarea import Interarea
 from models.interarea.estadoInterarea import EstadoInterarea
+from models.muestras.muestra import Muestra
 from datetime import datetime
 
 def crear_interarea(data):
+    # Crear la instancia de Interarea
     nueva_interarea = Interarea(
         fecha_creacion=datetime.now(),
         fecha_solicitud_firmada=None,
@@ -11,15 +13,23 @@ def crear_interarea(data):
         investigacion=data.get('investigacion'),
         nro_interarea=generarNroInterarea(),
         nro_investigacion=data.get('nro_investigacion'),
-        estadoInterarea_id=None,
+        estadoInterarea_id=data.get('estadoInterarea_id'),
         legajo_id=data.get('legajo_id'),
-        area_id=data.get('area_id'),
-        muestra_id=data.get('muestra_id'),
+        area_receptora_id=data.get('area_receptora_id'),
+        area_solicitante_id=data.get('area_solicitante_id'),
         muestra_investigacion=data.get('muestra_investigacion')
     )
+
+    muestra_ids = data.get('muestra_id', []) 
+    if muestra_ids:
+        muestras = Muestra.query.filter(Muestra.id.in_(muestra_ids)).all()
+        nueva_interarea.muestras.extend(muestras)
+
     db.session.add(nueva_interarea)
     db.session.commit()
+
     return nueva_interarea
+
 
 def crear_estadoInterarea(nombre):
     nuevo_estado = EstadoInterarea(

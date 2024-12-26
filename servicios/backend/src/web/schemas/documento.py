@@ -3,6 +3,8 @@ from .tipoDocumento import TipoDocumentoSchema
 from .estado import EstadoSchema
 from .cliente import ClienteSchema
 from .presupuesto import PresupuestoSchema
+from .area import AreaSchema
+
 class LDSchema(Schema):
     id = fields.Integer(dump_only=True)
     nro_legajo = fields.String(required=True)
@@ -15,6 +17,7 @@ class LDSchema(Schema):
     documento_id = fields.Integer(allow_none=True)
     estado_id = fields.Integer(dump_only=True)
     estado = fields.Nested(EstadoSchema, dump_only=True)
+    area = fields.Nested(AreaSchema, dump_only=True)
     presupuesto_cidepint = fields.List(fields.Nested(PresupuestoSchema, dump_only=True, allow_none=True))
 
 class DocumentoSchema(Schema):

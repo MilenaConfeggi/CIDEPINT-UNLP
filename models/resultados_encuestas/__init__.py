@@ -15,3 +15,6 @@ def find_resultado_encuesta_by_id(id):
 def find_resultado_encuesta_by_unique_key(unique_key):
     return ResultadoEncuesta.query.filter_by(unique_key=unique_key).first()
 
+def cant_conformidad(puntuacion):
+    return ResultadoEncuesta.query.filter_by(calificacion_general=puntuacion).count()
+

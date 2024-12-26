@@ -2,6 +2,7 @@ from servicios.backend.src.core.config import Config
 from flask import jsonify, abort, Blueprint, request
 from servicios.backend.src.core.services import servicioUsuario
 from servicios.backend.src.web.schemas.usuarios import usuariosSchema, usuarioSchema, rolesSchema, empleadosSchema, empleadoSchema
+from servicios.backend.src.web.schemas.area import area_schemas
 from servicios.backend.src.web.helpers.auth import is_authenticated, check_permission
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from administracion.src.core.Empleado import get_empleado
@@ -14,6 +15,12 @@ def listar_usuarios():
     if not check_permission("listar_usuarios"):
         return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
     usuarios = servicioUsuario.listar_usuarios()
+    data = area_schemas.dump(usuarios, many=True)
+    return jsonify(data), 200
+
+@bp.get("/<int:id_area>")
+def listar_usuarios_de_un_area(id_area):
+    usuarios = servicioUsuario.listar_usuarios_por_area(id_area)
     data = usuariosSchema.dump(usuarios, many=True)
     return jsonify(data), 200
 
@@ -27,6 +34,12 @@ def listar_roles():
 def listar_empleados():
     empleados = servicioUsuario.listar_empleados()
     data = empleadosSchema.dump(empleados, many=True)
+    return jsonify(data), 200
+
+@bp.get("/areas")
+def listar_areas():
+    areas = servicioUsuario.listar_areas()
+    data = empleadosSchema.dump(areas, many=True)
     return jsonify(data), 200
 
 @bp.get("/ver_perfil")
@@ -83,5 +96,11 @@ def recuperar_contra():
         return jsonify({"message": "Se envió un mail con una contraseña provisional a la dirección de correo del usuario"}), 200
     except ValueError as e:
         return jsonify({"message": str(e)}), 400
+    
+@bp.post("/cambiar_jefe_area")
+def cambiar_jefe_area():
+    data = request.get_json()
+    servicioUsuario.cambiar_jefe_area(data)
+    return jsonify({"message": "Se cambió el jefe de área exitosamente"}), 200
 
 

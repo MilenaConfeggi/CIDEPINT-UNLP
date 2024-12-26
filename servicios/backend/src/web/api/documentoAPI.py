@@ -6,6 +6,7 @@ from models.documentos import (
     create_documento,
     find_documento,
     find_documento_by_id,
+    list_documentos_by_tipo, 
 )
 from models.documentos import find_estado_by_nombre, listar_documentos
 from models.documentos import create_estado
@@ -200,4 +201,10 @@ def get_documento(id):
     data = documento_schema.dump(find_documento_by_id(id))
     if data is None:
         return jsonify({"error": "No se encontro el documento"}), 404
+    return jsonify(data), 200
+
+@bp.get("/list/<int:tipo>")
+def get_documentos_by_tipo(tipo):
+    print("entra")
+    data = documentos_schema.dump(list_documentos_by_tipo(tipo))
     return jsonify(data), 200

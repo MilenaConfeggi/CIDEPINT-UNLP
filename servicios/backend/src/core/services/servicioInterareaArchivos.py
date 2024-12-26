@@ -59,28 +59,22 @@ def subir_archivo_completo(file, id):
         print(f"Error en servicio interarea: {str(e)}")
         return None
 
-import os
-
 def subir_archivo_firmado(file, id):
     try:
         interarea = obtener_interarea(id)
 
         base_name, ext = os.path.splitext(interarea.nombre_archivo)
         
-        # Crear el nuevo nombre del archivo agregando "firmado" al final
         new_file_name = f"{base_name}_firmado{ext}"
         
-        # Definir la ruta completa del archivo original y el nuevo archivo
         original_file_path = os.path.join("documentos/interareas/solicitudes", interarea.nombre_archivo)
-        new_file_path = os.path.join("documentos/interareas/solicitudes", new_file_name)
         
-        # Renombrar el archivo original
         if os.path.exists(original_file_path):
+            file.save(original_file_path)
+            
+            new_file_path = os.path.join("documentos/interareas/solicitudes", new_file_name)
             os.rename(original_file_path, new_file_path)
         
-        # Guardar el nuevo archivo en la ruta del archivo original
-        file.save(original_file_path)
-
         return new_file_name
     except Exception as e:
         print(f"Error en servicio interarea: {str(e)}")

@@ -164,9 +164,29 @@ const routes = [
     meta: { showNavbar: false },
   },
   {
-    path: '/presupuesto',
-    name: 'presupuesto',
-    component: () => import('../views/PresupuestosView.vue'),
+    path: "/generar_presupuesto/:id_legajo",
+    name: "generar_presupuesto",
+    component: () => import("../components/presupuestos/GenerarPresupuesto.vue"),
+      props: true,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: "/pendientes",
+      name: "pendientes",
+      component: () => import("../views/PendientesView.vue"),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: "/estadisticas",
+      name: "estadisticas",
+      component: () => import("../views/EstadisticasView.vue"),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: "/jefe_de_area",
+      name: "jefe_de_area",
+      component: () => import("../components/areas/CambiarJefeArea.vue"),
+      meta: { requiresAuth: true }
     meta: { showNavbar: true },
   },
 ]

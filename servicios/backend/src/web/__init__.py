@@ -28,6 +28,7 @@ from servicios.backend.src.web.api.areaAPI import bp as area_bp
 from servicios.backend.src.web.controllers.certificado import bp as certificado_bp
 from servicios.backend.src.web.api.encuesta import bp as encuestas_bp
 from servicios.backend.src.web.controllers.presupuesto import bp as presupuesto_bp
+from servicios.backend.src.web.controllers.estadisticas import bp as estadisticas
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
@@ -61,6 +62,7 @@ def create_app(env="development", static_folder=""):
     app.register_blueprint(certificado_bp)
     app.register_blueprint(encuestas_bp)
     app.register_blueprint(presupuesto_bp)
+    app.register_blueprint(estadisticas)
 
     @app.cli.command(name="reset-db")
     def reset_db():

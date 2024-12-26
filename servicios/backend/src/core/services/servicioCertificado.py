@@ -3,16 +3,18 @@ from models.documentos.documento import Documento
 from models.legajos.legajo import Legajo
 from models.distribucion import Distribucion
 from models.distribucion import get_distribucion
+from models.presupuestos.STAN import STAN
 from datetime import datetime
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, Table, TableStyle
 from reportlab.lib.units import inch
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from servicios.backend.src.core.services import servicioDocumento
+from servicios.backend.src.core.services import servicioPresupuesto
 import os
 
 UPLOAD_FOLDER = os.path.abspath("documentos")
 
-def generar_certificado(id_legajo, empleados):
+def generar_certificado(id_legajo, empleados, descripcion):
     # Completar con los datos necesarios
     legajo = Legajo.query.filter_by(id=id_legajo).first()
     cliente = legajo.cliente.nombre
@@ -27,14 +29,12 @@ def generar_certificado(id_legajo, empleados):
 
     # Obtener los ensayos de los STANs del presupuesto del legajo
     ensayos = []
-    descripcion = []
     for presupuesto in legajo.presupuesto_cidepint:
         for stan in presupuesto.stans:
-            descripcion.append(stan.descripcion)
+            stan.descripcion = descripcion
             for ensayo in stan.ensayos:
                 ensayos.append(ensayo.nombre)
     ensayo_texto = ", ".join(set(ensayos))  
-    descripcion = ", ".join(set(descripcion))
     presupuesto = legajo.presupuesto_cidepint[0].nro_presupuesto
 
     # Crear la ruta de destino
@@ -164,3 +164,12 @@ def chequear_solo_responsable(empleados):
         if empleado["funcion"] == "Responsable del equipo":
             cant += 1
     return cant
+
+def chequear_descripcion_existente(id_legajo):
+    descrip = ""
+    legajo = Legajo.query.filter_by(id=id_legajo).first()
+    for presupuesto in legajo.presupuesto_cidepint:
+        for stan in presupuesto.stans:
+            if stan.descripcion:
+                descrip = descrip + stan.descripcion + " "
+    return descrip.strip()

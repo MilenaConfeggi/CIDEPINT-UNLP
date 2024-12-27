@@ -24,12 +24,12 @@ class FormularioArea(FlaskForm):
         self.id_area.choices = [(area.id, area.nombre) for area in listar_areas()]
 
 class FormularioFondo(FlaskForm):
-    titulo_fondo = SelectField('Fondo', choices=[], coerce=str, validators=[DataRequired()])
+    id_fondo = SelectField('Fondo', choices=[], coerce=str, validators=[DataRequired()])
     monto = FloatField('Monto', validators=[DataRequired()])
 
     def __init__(self, *args, **kwargs):
         super(FormularioFondo, self).__init__(*args, **kwargs)
-        self.titulo_fondo.choices = [fondo.titulo for fondo in listar_fondos()]
+        self.id_fondo.choices = [(fondo.id, fondo.titulo) for fondo in listar_fondos()]
 
 
 class form_agregar_compra(FlaskForm):
@@ -67,7 +67,7 @@ class form_agregar_compra(FlaskForm):
     def __init__(self, *args, **kwargs):
         super(form_agregar_compra, self).__init__(*args, **kwargs)
 
-        empleados_choices = [(empleado.id, f"{empleado.nombre} {empleado.apellido}") 
+        empleados_choices = [(empleado.id, f"{empleado.nombre} {empleado.apellido} - {empleado.dni}") 
                              for empleado in listar_empleados()]
         proveedores_choices = [(proveedor.id, proveedor.razon_social) for proveedor in listar_proveedores()]
 

@@ -81,8 +81,8 @@
                                 {% for fondos_form in form.fondos %}
                                 <div class="my-2">
                                     <div class="fondo-item">
-                                        <label for="fondos-{{ loop.index0 }}-titulo_fondo">Fondo:</label>
-                                        {{ fondos_form.titulo_fondo(class="form-control") }}
+                                        <label for="fondos-{{ loop.index0 }}-id_fondo">Fondo:</label>
+                                        {{ fondos_form.id_fondo(class="form-control") }}
                         
                                         <label for="fondos-{{ loop.index0 }}-monto">Monto:</label>
                                         {{ fondos_form.monto(class="form-control") }}
@@ -146,8 +146,8 @@
                                 {% for fondos_form in form.fondos %}
                                 <div class="my-2">
                                     <div class="fondo-item">
-                                        <label for="fondos-{{ loop.index0 }}-titulo_fondo">Fondo:</label>
-                                        {{ fondos_form.titulo_fondo(class="form-control") }}
+                                        <label for="fondos-{{ loop.index0 }}-id_fondo">Fondo:</label>
+                                        {{ fondos_form.id_fondo(class="form-control") }}
                         
                                         <label for="fondos-{{ loop.index0 }}-monto">Monto:</label>
                                         {{ fondos_form.monto(class="form-control") }}
@@ -241,10 +241,10 @@
     
             newFondoDiv.innerHTML = `
             <div class="my-2">
-                <label for="fondos-${fondoCount}-titulo_fondo">Fondo:</label>
-                <select name="fondos-${fondoCount}-titulo_fondo" id="fondos-${fondoCount}-titulo_fondo" class="form-control w-full sm:w-auto">
+                <label for="fondos-${fondoCount}-id_fondo">Fondo:</label>
+                <select name="fondos-${fondoCount}-id_fondo" id="fondos-${fondoCount}-id_fondo" class="form-control w-full sm:w-auto">
                     {% for fondo in fondos %}
-                        <option value="{{ fondo.titulo }}">{{ fondo.titulo }}</option>
+                        <option value="{{ fondo.id }}">{{ fondo.titulo }}</option>
                     {% endfor %}
                 </select>
     

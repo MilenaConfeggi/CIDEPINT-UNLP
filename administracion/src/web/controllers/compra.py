@@ -47,7 +47,7 @@ def agregando_proveedor():
     if form.validate_on_submit():
         if chequeo_razon_social_existente(form.razon_social.data):
             flash(
-                "La razon social ingresada ya se encuentra registrada en el sistema", "danger"
+                "La razon social ingresada ya se encuentra registrada en el sistema", "error"
             )
             return render_template("compras/creacion_proveedor.html", form=form)
         crear_proveedor(
@@ -62,7 +62,7 @@ def agregando_proveedor():
         flash(
             f"Error en el campo {getattr(form, first_error_field).label.text}: {
               first_error_message}",
-            "danger",
+            "error",
         )
         return render_template("compras/creacion_proveedor.html", form=form)
     
@@ -80,7 +80,7 @@ def editar_proveedor(id_proveedor):
 def editando_proveedor(id_proveedor):
     proveedor = buscar_proveedor(id_proveedor)
     if not proveedor:
-        flash("Proveedor no encontrado", "danger")
+        flash("Proveedor no encontrado", "error")
         return redirect(url_for("compra.lista_proveedores"))
     form = form_editar_proveedor(request.form, obj=proveedor)
     if form.validate_on_submit():
@@ -88,7 +88,7 @@ def editando_proveedor(id_proveedor):
         contacto = form.contacto.data
         if razon_social != proveedor.razon_social and chequeo_razon_social_existente(form.razon_social.data):
             flash(
-                "La razon social ingresada ya se encuentra registrada en el sistema", "danger"
+                "La razon social ingresada ya se encuentra registrada en el sistema", "error"
             )
             return render_template("compras/edicion_proveedor.html", form=form, proveedor=proveedor)
 
@@ -102,7 +102,7 @@ def editando_proveedor(id_proveedor):
         flash(
             f"Error en el campo {getattr(form, first_error_field).label.text}: {
               first_error_message}",
-            "danger",
+            "error",
         )
         return render_template("compras/edicion_proveedor.html", form=form, proveedor=proveedor)
 
@@ -253,7 +253,7 @@ def validar_montos_y_acumular(form):
         monto += empleado["monto"]
     
     for fondo in form.fondos.data:
-        fondo_obj = conseguir_fondo_de_id(fondo["titulo_fondo"])
+        fondo_obj = conseguir_fondo_de_id(fondo["id_fondo"])
         if fondo["monto"] > fondo_obj.saldo:
             raise ValidationError("El monto de un fondo no puede ser superior a su saldo")
         fondos.append((fondo_obj, fondo["monto"]))
@@ -281,7 +281,7 @@ def agregando_compra():
         try:
             monto, areas, empleados, fondos = validar_montos_y_acumular(form)
         except ValidationError as e:
-            flash(e.message, "danger")
+            flash("Compra no agregada", "error")
             return render_template("compras/creacion_compra.html", form=form, areas=lista_areas, empleados=lista_empleados, fondos=lista_fondos)
         if (form.estado.data == "APROBADA" and monto <= form.importe.data) or (form.estado.data == "REALIZADA" and monto <= form.importe.data):
             crear_compra(
@@ -298,7 +298,7 @@ def agregando_compra():
             )
             flash("Compra agregada correctamente", "success")
         else:
-            flash("El monto de las áreas, empleados y fondos no coincide con el importe de la compra", "danger")
+            flash("El monto de las áreas, empleados y fondos no coincide con el importe de la compra", "error")
             return render_template("compras/creacion_compra.html", form=form, areas=lista_areas, empleados=lista_empleados, fondos=lista_fondos)
         
         return redirect(url_for("compra.lista_compras"))
@@ -308,7 +308,7 @@ def agregando_compra():
         flash(
             f"Error en el campo {getattr(form, first_error_field).label.text}: {
               first_error_message}",
-            "danger",
+            "error",
         )
         return render_template("compras/creacion_compra.html", form=form, areas=lista_areas, empleados=lista_empleados, fondos=lista_fondos)
 
@@ -326,7 +326,7 @@ def editar_compra(id_compra):
     form.areas.entries = []
     form.empleados.entries = []
     for fondo in obtener_fondos(id_compra):
-        form.fondos.append_entry({'titulo_fondo': fondo.fondo_titulo, 'monto': fondo.contribucion})
+        form.fondos.append_entry({'id_fondo': fondo.fondo_id, 'monto': fondo.contribucion})
     for area in obtener_areas(id_compra):
         form.areas.append_entry({'id_area': area.area_id, 'monto': area.contribucion})
     for empleado in obtener_empleados(id_compra):
@@ -347,7 +347,7 @@ def editando_compra(id_compra):
         try:
             monto, areas, empleados, fondos = validar_montos_y_acumular(form)
         except ValidationError as e:
-            flash(e.message, "danger")
+            flash(e.message, "error")
             return render_template("compras/edicion_compra.html", form=form, compra=compra, areas=lista_areas, empleados=lista_empleados, fondos=lista_fondos)
         if (form.estado.data == "APROBADA" and monto <= form.importe.data) or (form.estado.data == "REALIZADA" and monto <= form.importe.data):
             editar_compra_aprobada_o_realizada(
@@ -366,7 +366,7 @@ def editando_compra(id_compra):
             )
             flash("Compra editada correctamente", "success")
         else:
-            flash("El monto de las áreas, empleados y fondos no coincide con el importe de la compra", "danger")
+            flash("El monto de las áreas, empleados y fondos no coincide con el importe de la compra", "error")
             return render_template("compras/edicion_compra.html", form=form, compra=compra, areas=lista_areas, empleados=lista_empleados, fondos=lista_fondos)
         
         return redirect(url_for("compra.lista_compras"))
@@ -376,7 +376,7 @@ def editando_compra(id_compra):
         flash(
             f"Error en el campo {getattr(form, first_error_field).label.text}: {
               first_error_message}",
-            "danger",
+            "error",
         )
         return render_template("compras/edicion_compra.html", form=form, compra=compra, areas=lista_areas, empleados=lista_empleados, fondos=lista_fondos)
 
@@ -402,13 +402,13 @@ def aprobando_compra(id_compra):
     lista_fondos = listar_fondos()
     compra = buscar_compra(id_compra)
     if not compra:
-        flash("Compra no encontrada", "danger")
+        flash("Compra no encontrada", "error")
         return redirect(url_for("compra.lista_compras"))
     if form.validate_on_submit():
         try:
             monto, areas, empleados, fondos = validar_montos_y_acumular(form)
         except ValidationError as e:
-            flash(e.message, "danger")
+            flash(e.message, "error")
             return render_template("compras/aprobar_compra.html", form=form, compra=compra, areas=lista_areas, empleados=lista_empleados, fondos=lista_fondos)
         if (monto <= compra.importe):
             agregar_fuentes_a_compra(
@@ -417,7 +417,7 @@ def aprobando_compra(id_compra):
             flash("Compra editada correctamente", "success")
             return redirect(url_for("compra.lista_compras"))
         else:
-            flash("El monto de las áreas, empleados y fondos no coincide con el importe de la compra", "danger")
+            flash("El monto de las áreas, empleados y fondos no coincide con el importe de la compra", "error")
             return render_template("compras/aprobar_compra.html", form=form, compra=compra, areas=lista_areas, empleados=lista_empleados, fondos=lista_fondos)
     else:
         first_error_field = next(iter(form.errors))
@@ -425,7 +425,7 @@ def aprobando_compra(id_compra):
         flash(
             f"Error en el campo {getattr(form, first_error_field).label.text}: {
               first_error_message}",
-            "danger",
+            "error",
         )
         return render_template("compras/aprobar_compra.html", form=form, compra=compra, areas=areas, empleados=empleados, fondos=fondos)
 
@@ -440,7 +440,7 @@ def realizar_compra(id_compra):
     form.areas.entries = []
     form.empleados.entries = []
     for fondo in obtener_fondos(id_compra):
-        form.fondos.append_entry({'titulo_fondo': fondo.fondo_titulo, 'monto': fondo.contribucion})
+        form.fondos.append_entry({'id_fondo': fondo.fondo_id, 'monto': fondo.contribucion})
     for area in obtener_areas(id_compra):
         form.areas.append_entry({'id_area': area.area_id, 'monto': area.contribucion})
     for empleado in obtener_empleados(id_compra):
@@ -460,13 +460,13 @@ def realizando_compra(id_compra):
     lista_fondos = listar_fondos()
     compra = buscar_compra(id_compra)
     if not compra:
-        flash("Compra no encontrada", "danger")
+        flash("Compra no encontrada", "error")
         return redirect(url_for("compra.lista_compras"))
     if form.validate_on_submit():
         try:
             monto, areas, empleados, fondos = validar_montos_y_acumular(form)
         except ValidationError as e:
-            flash(e.message, "danger")
+            flash(e.message, "error")
             return render_template("compras/realizar_compra.html", form=form, compra=compra, areas=lista_areas, empleados=lista_empleados, fondos=lista_fondos)
         if (monto <= compra.importe):
             realizar_compra_aprobada(
@@ -475,7 +475,7 @@ def realizando_compra(id_compra):
             flash("Compra realizada correctamente", "success")
             return redirect(url_for("compra.lista_compras"))
         else:
-            flash("El monto de las áreas, empleados y fondos no coincide con el importe de la compra", "danger")
+            flash("El monto de las áreas, empleados y fondos no coincide con el importe de la compra", "error")
             return render_template("compras/realizar_compra.html", form=form, compra=compra, areas=lista_areas, empleados=lista_empleados, fondos=lista_fondos)
     else:
         first_error_field = next(iter(form.errors))
@@ -483,7 +483,7 @@ def realizando_compra(id_compra):
         flash(
             f"Error en el campo {getattr(form, first_error_field).label.text}: {
               first_error_message}",
-            "danger",
+            "error",
         )
         return render_template("compras/aprobar_compra.html", form=form, compra=compra, areas=areas, empleados=empleados, fondos=fondos) 
 
@@ -500,7 +500,7 @@ def rechazar_compra(id_compra):
 def rechazando_compra(id_compra):
     compra = buscar_compra(id_compra)
     if not compra:
-        flash("Compra no encontrada", "danger")
+        flash("Compra no encontrada", "error")
         return redirect(url_for("compra.lista_compras"))
 
     motivo_rechazo = request.form.get("opciones")

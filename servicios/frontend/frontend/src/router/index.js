@@ -174,13 +174,13 @@ const routes = [
     path: '/pendientes',
     name: 'pendientes',
     component: () => import('../views/PendientesView.vue'),
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, showNavbar: true },
   },
   {
     path: '/estadisticas',
     name: 'estadisticas',
     component: () => import('../views/EstadisticasView.vue'),
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, showNavbar: true },
   },
   {
     path: '/jefe_de_area',

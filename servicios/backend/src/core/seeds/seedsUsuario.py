@@ -252,6 +252,7 @@ def seed_usuarios():
         "listar_documentos",
         "subir_documento",
         "cargar_presupuesto_firmado",
+        "informes_pendientes_cargar",
     ]
     PERMISSIONS = { #Acá van los permisos que tiene cada rol
         "Director": [ #Tienen que ser declarados previamente en todosLosPermisos
@@ -284,7 +285,6 @@ def seed_usuarios():
             "crear_legajo",
             "listar_documentos",
             "subir_documento",
-            "cargar_presupuesto_firmado",
         ],
         "Secretaria": [
             "listar_usuarios",
@@ -315,6 +315,8 @@ def seed_usuarios():
             "crear_legajo",
             "listar_documentos",
             "subir_documento",
+            "cargar_presupuesto_firmado",
+            "informes_pendientes_cargar",
         ],
         "Jefe de area": [
             "listar_muestras_identificadas",

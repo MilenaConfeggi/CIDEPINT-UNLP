@@ -156,6 +156,13 @@ def generar_presupuesto(data):
     # Crear la ruta de destino
     certificado_dir = os.path.join(UPLOAD_FOLDER, "presupuestos", str(legajo.id))
     os.makedirs(certificado_dir, exist_ok=True)  # Crear el directorio si no existe
+
+    # Eliminar archivos que comienzan con "presupuesto"
+    for archivo in os.listdir(certificado_dir):
+        archivo_path = os.path.join(certificado_dir, archivo)
+        if os.path.isfile(archivo_path) and archivo.startswith("fpresupuesto_firmado_"):
+            os.remove(archivo_path)
+
     timestamp = datetime.now().strftime("%Y%m%d")
     output_filename = os.path.join(certificado_dir, f"presupuesto_{timestamp}.pdf")
 

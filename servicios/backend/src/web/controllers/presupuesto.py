@@ -57,7 +57,11 @@ def ver_presupuesto(id_legajo):
         abort(404, description="El documento no existe, prueba generar uno primero")
 
     # Filtra los archivos que coinciden con el formato de nombre
-    archivos = [f for f in os.listdir(directory) if f.startswith("presupuesto_") and f.endswith(".pdf")]
+    #PRIORIZO LOS FIRMADOS
+    archivos = [f for f in os.listdir(directory) if f.startswith("fpresupuesto_firmado_") and f.endswith(".pdf")]
+
+    if not archivos:
+        archivos = [f for f in os.listdir(directory) if f.startswith("presupuesto_") and f.endswith(".pdf")]
 
     # Si no hay archivos que coincidan
     if not archivos:
@@ -74,35 +78,35 @@ def ver_presupuesto(id_legajo):
     # Enviar el archivo
     return send_from_directory(directory, archivo_mas_reciente)
 
-@bp.get("/ver_documento_firmado/<int:id_legajo>")
-@jwt_required()
-def ver_presupuesto_firmado(id_legajo):
-    if not check_permission("ver_presupuesto_firmado"):
-        return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
-    directory = os.path.normpath(os.path.join(UPLOAD_FOLDER, "presupuestos_firmados", str(id_legajo)))
+#@bp.get("/ver_documento_firmado/<int:id_legajo>")
+#@jwt_required()
+#def ver_presupuesto_firmado(id_legajo):
+#    if not check_permission("ver_presupuesto_firmado"):
+#        return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
+#    directory = os.path.normpath(os.path.join(UPLOAD_FOLDER, "presupuestos_firmados", str(id_legajo)))
 
     # Verifica si el directorio existe
-    if not os.path.exists(directory) or not os.path.isdir(directory):
-        print("El directorio no existe")
-        abort(404, description="El documento no existe, prueba generar uno primero")
+#    if not os.path.exists(directory) or not os.path.isdir(directory):
+#        print("El directorio no existe")
+#        abort(404, description="El documento no existe, prueba generar uno primero")
 
     # Filtra los archivos que coinciden con el formato de nombre
-    archivos = [f for f in os.listdir(directory) if f.startswith("presupuesto_") and f.endswith(".pdf")]
+#    archivos = [f for f in os.listdir(directory) if f.startswith("presupuesto_") and f.endswith(".pdf")]
 
     # Si no hay archivos que coincidan
-    if not archivos:
-        print("No hay archivos de presupuesto")
-        abort(404, description="No se encontraron documentos de presupuesto para este legajo")
+#    if not archivos:
+#        print("No hay archivos de presupuesto")
+#        abort(404, description="No se encontraron documentos de presupuesto para este legajo")
 
     # Encuentra el archivo más reciente basado en el timestamp
-    archivos.sort(reverse=True)  # Ordenar por nombre en orden descendente (timestamps más recientes primero)
-    archivo_mas_reciente = archivos[0]
+#    archivos.sort(reverse=True)  # Ordenar por nombre en orden descendente (timestamps más recientes primero)
+#    archivo_mas_reciente = archivos[0]
 
     # Ruta completa al archivo
-    file_path = os.path.join(directory, archivo_mas_reciente)
+ #   file_path = os.path.join(directory, archivo_mas_reciente)
 
     # Enviar el archivo
-    return send_from_directory(directory, archivo_mas_reciente)
+#    return send_from_directory(directory, archivo_mas_reciente)
 
 def permitir_pdf(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in {"pdf"}
@@ -134,10 +138,17 @@ def cargar_presupuesto_firmado(id_legajo):
         if not servicioUsuario.es_director(usuario):
             return jsonify({"error": "No tienes permisos para realizar esta acción"}), 403
         
-        folder_path = os.path.join(UPLOAD_FOLDER, "presupuestos_firmados", str(id_legajo))
+        folder_path = os.path.join(UPLOAD_FOLDER, "presupuestos", str(id_legajo))
         os.makedirs(folder_path, exist_ok=True)
+
+        # Eliminar archivos que comienzan con "presupuesto"
+        for archiv in os.listdir(folder_path):
+            archivo_path = os.path.join(folder_path, archiv)
+            if os.path.isfile(archivo_path) and archiv.startswith("fpresupuesto_firmado_"):
+                os.remove(archivo_path)
+
         timestamp = datetime.now().strftime("%Y%m%d")
-        filename = os.path.join(folder_path, f"presupuesto_firmado_{timestamp}.pdf")
+        filename = os.path.join(folder_path, f"fpresupuesto_firmado_{timestamp}.pdf")
 
         doc_data = {
             'nombre_documento': filename,

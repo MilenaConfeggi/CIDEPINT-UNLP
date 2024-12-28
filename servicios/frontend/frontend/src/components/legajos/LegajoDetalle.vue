@@ -191,7 +191,7 @@
                             />
                           </label>
                         </li>
-                        <li
+                        <!--<li
                           v-if="
                             hasPermission('ver_presupuesto_firmado') && existeDocumento(documento.nombre)
                           "
@@ -204,6 +204,7 @@
                             Ver presupuesto Firmado
                           </button>
                         </li>
+                        -->
                       </template>
                       <template v-else>
                         <li v-if="existeDocumento(documento.nombre)">

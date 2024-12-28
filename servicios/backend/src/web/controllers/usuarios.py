@@ -48,8 +48,10 @@ def listar_empleados():
 @bp.get("/areas")
 @jwt_required()
 def listar_areas():
+    print("llegué")
     if not check_permission("listar_areas"):
         return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
+    print("llegué2")
     areas = servicioUsuario.listar_areas()
     data = empleadosSchema.dump(areas, many=True)
     return jsonify(data), 200

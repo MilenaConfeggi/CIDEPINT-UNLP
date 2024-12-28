@@ -48,7 +48,13 @@ const isSubmitting = ref(false);
 
 const fetchRoles = async () => {
   try {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/usuarios/roles`);
+    const token = authStore.getToken();const response = await fetch(`${import.meta.env.VITE_API_URL}/usuarios/roles`, {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`, // Token JWT en el header
+        "Content-Type": "application/json", // Header opcional para el tipo de contenido
+      },
+      });
     if (!response.ok) {
       throw new Error('Error al obtener los roles');
     }

@@ -59,7 +59,8 @@ def crear_usuario(data):
 
     usuario = Usuario.query.filter_by(mail=data.get('mail'), esta_borrado=True).first()
     if usuario is not None:
-        usuario.contra=bcrypt.generate_password_hash(data.get('contra').encode("utf-8"))
+        contrasena = generar_contrasena_aleatoria()
+        usuario.contra=bcrypt.generate_password_hash(contrasena.encode("utf-8"))
         usuario.rol=data.get('rol')
         usuario.esta_borrado=False
         usuario.cambiar_contra=True

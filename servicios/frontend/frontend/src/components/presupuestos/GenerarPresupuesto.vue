@@ -147,9 +147,12 @@
     }
 
     try {
+
+        const token = authStore.getToken();
         const response = await fetch(`${import.meta.env.VITE_API_URL}/presupuestos/crear/${idLegajo}`, {
         method: 'POST',
         headers: {
+            "Authorization": `Bearer ${token}`,
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({

@@ -48,10 +48,18 @@
   const error = ref(null);
   const successMessage = ref(null);
   const isSubmitting = ref(false);
+
+  const token = authStore.getToken();
   
   const fetchAreas = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/usuarios/areas`);
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/usuarios/areas`, {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`, // Token JWT en el header
+        "Content-Type": "application/json", // Header opcional para el tipo de contenido
+      },
+      });
       if (!response.ok) {
         throw new Error('Error al obtener las áreas');
       }
@@ -64,7 +72,13 @@
   const fetchUsuarios = async () => {
     try {
       if (!area.value) return; // Verifica que haya un área seleccionada
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/usuarios/${area.value}`);
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/usuarios/${area.value}`, {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`, // Token JWT en el header
+        "Content-Type": "application/json", // Header opcional para el tipo de contenido
+      },
+      });
       if (!response.ok) {
         throw new Error('Error al obtener los usuarios de un área');
       }

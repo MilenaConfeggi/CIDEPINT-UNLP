@@ -15,7 +15,7 @@ def listar_usuarios():
     if not check_permission("listar_usuarios"):
         return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
     usuarios = servicioUsuario.listar_usuarios()
-    data = area_schemas.dump(usuarios, many=True)
+    data = usuariosSchema.dump(usuarios, many=True)
     return jsonify(data), 200
 
 @bp.get("/<int:id_area>")

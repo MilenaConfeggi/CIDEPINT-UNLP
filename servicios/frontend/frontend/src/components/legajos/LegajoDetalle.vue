@@ -193,7 +193,7 @@
                         </li>
                         <li
                           v-if="
-                            hasPermission('ver_presupuesto') && existeDocumento(documento.nombre)
+                            hasPermission('ver_presupuesto_firmado') && existeDocumento(documento.nombre)
                           "
                         >
                           <button

@@ -1,6 +1,7 @@
 <template>
   <div>
     <button @click="mostrarFormularioCrear" class="stans-button right">Crear Usuario</button>
+    <button @click="mostrarJefeArea" class="stans-button right">Cambiar Jefe de Área</button>
     <ListadoUsuarios />
 
     <!-- Modal de CrearUsuario -->
@@ -10,6 +11,12 @@
         <CrearUsuario />
       </div>
     </div>
+    <div v-if="mostrarCambiarJefe" class="modal-overlay" @click="cerrarJefeArea">
+      <div class="modal-content" @click.stop>
+        <button class="close-button" @click="cerrarJefeArea">&times;</button>
+        <CambiarJefeArea />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -17,6 +24,7 @@
 import { ref } from 'vue';
 import ListadoUsuarios from '../components/usuarios/ListadoUsuarios.vue';
 import CrearUsuario from '../components/usuarios/CrearUsuario.vue';
+import CambiarJefeArea from '../components/areas/CambiarJefeArea.vue';
 
 const mostrarCrearUsuario = ref(false);
 
@@ -26,6 +34,16 @@ const mostrarFormularioCrear = () => {
 
 const cerrarFormularioCrear = () => {
   mostrarCrearUsuario.value = false;
+};
+
+const mostrarCambiarJefe = ref(false);
+
+const mostrarJefeArea = () => {
+  mostrarCambiarJefe.value = true;
+};
+
+const cerrarJefeArea = () => {
+  mostrarCambiarJefe.value = false;
 };
 </script>
 

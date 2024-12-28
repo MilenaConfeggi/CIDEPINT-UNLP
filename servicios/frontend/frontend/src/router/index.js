@@ -168,7 +168,7 @@ const routes = [
     name: 'generar_presupuesto',
     component: () => import('../components/presupuestos/GenerarPresupuesto.vue'),
     props: true,
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, showNavbar: true },
   },
   {
     path: '/pendientes',
@@ -180,12 +180,6 @@ const routes = [
     path: '/estadisticas',
     name: 'estadisticas',
     component: () => import('../views/EstadisticasView.vue'),
-    meta: { requiresAuth: true, showNavbar: true },
-  },
-  {
-    path: '/jefe_de_area',
-    name: 'jefe_de_area',
-    component: () => import('../components/areas/CambiarJefeArea.vue'),
     meta: { requiresAuth: true, showNavbar: true },
   },
 ]

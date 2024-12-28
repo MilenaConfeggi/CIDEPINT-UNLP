@@ -106,9 +106,7 @@
       }
   
       successMessage.value = result.message;
-      setTimeout(() => {
-        router.push({ name: 'home' });
-      }, 1500);
+      
     } catch (err) {
       error.value = err.message;
     } finally {

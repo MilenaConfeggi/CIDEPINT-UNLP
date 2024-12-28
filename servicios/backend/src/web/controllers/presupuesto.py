@@ -23,17 +23,17 @@ def listarStans():
     data = stansSchema.dump(STANS, many=True)
     return jsonify(data), 200
 
-@bp.get("/medios_de_pago")
-def listarMediosDePago():
-    mp = servicioPresupuesto.listar_medios_de_pago()
-    data = mediosPagoSchema.dump(mp, many=True)
-    return jsonify(data), 200
+#@bp.get("/medios_de_pago")
+#def listarMediosDePago():
+#    mp = servicioPresupuesto.listar_medios_de_pago()
+#    data = mediosPagoSchema.dump(mp, many=True)
+#    return jsonify(data), 200
 
 @bp.post("/crear/<int:id_legajo>")
 def crearPresupuesto(id_legajo):
     data = request.get_json()
-    if data['medioDePago'] == []:
-        return jsonify({"error": "No se seleccionó medio de pago"}), 400
+    #if data['medioDePago'] == []:
+    #    return jsonify({"error": "No se seleccionó medio de pago"}), 400
     data['legajo'] = id_legajo
     servicioPresupuesto.crear_presupuesto_con_stans(data)
     return jsonify({"message": "Presupuesto creado correctamente"}), 200
@@ -129,7 +129,7 @@ def cargar_presupuesto_firmado(id_legajo):
             'nombre_documento': filename,
             'estado_id': 6,
             'legajo_id': id_legajo,
-            'tipo_id': 4
+            'tipo_id': 2
         }
         
         print("llegué2")

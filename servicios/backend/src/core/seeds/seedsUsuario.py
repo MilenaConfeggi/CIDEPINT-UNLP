@@ -242,6 +242,8 @@ def seed_usuarios():
         "cargar_interarea_firmada",
         "generar_presupuesto",
         "ver_presupuesto",
+        "cargar_presupuesto_firmado",
+        "ver_presupuesto_firmado",
         "ver_pendientes",
         "ver_presupuesto_pendiente",
         "ver_estadisticas",
@@ -251,7 +253,6 @@ def seed_usuarios():
         "crear_legajo",
         "listar_documentos",
         "subir_documento",
-        "cargar_presupuesto_firmado",
         "informes_pendientes_cargar",
     ]
     PERMISSIONS = { #Acá van los permisos que tiene cada rol
@@ -276,6 +277,8 @@ def seed_usuarios():
             "cargar_interarea_firmada",
             "generar_presupuesto",
             "ver_presupuesto",
+            "cargar_presupuesto_firmado",
+            "ver_presupuesto_firmado",
             "ver_pendientes",
             "ver_presupuesto_pendiente",
             "ver_estadisticas",
@@ -306,6 +309,7 @@ def seed_usuarios():
             "cargar_interarea_firmada",
             "generar_presupuesto",
             "ver_presupuesto",
+            "ver_presupuesto_firmado",
             "ver_presupuesto_pendiente",
             "ver_pendientes",
             "ver_estadisticas",

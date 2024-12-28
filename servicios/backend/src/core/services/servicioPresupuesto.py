@@ -403,7 +403,7 @@ def crear_presupuesto(data):
     presupuesto = Presupuesto(
         precio=data.get('precio'),
         legajo=data.get('legajo'),
-        medio_de_pago_id=data.get('medio_de_pago_id'),
+        #medio_de_pago_id=data.get('medio_de_pago_id'),
     )
     db.session.add(presupuesto)
     db.session.commit()
@@ -432,7 +432,7 @@ def crear_presupuesto_con_stans(data):
     presupuesto = Presupuesto(
         precio=-1,
         legajo=legajo,
-        medio_de_pago_id=data.get('medioDePago'),
+        #medio_de_pago_id=data.get('medioDePago'),
     )
     db.session.add(presupuesto)
     db.session.flush()

@@ -54,6 +54,9 @@
       }
   
       usuarios.value = await response.json();
+      console.log(usuarios.value);
+      
+      
     } catch (error) {
       console.error("Error al obtener los usuarios:", error);
     }

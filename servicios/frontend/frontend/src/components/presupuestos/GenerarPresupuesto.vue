@@ -1,51 +1,51 @@
 <template>
-    <div>
-      <h3>Selecciona los Stans</h3>
-      <form @submit.prevent="enviarSeleccion">
-        <div v-for="stan in stans" :key="stan.id">
+  <div>
+    <h3>Selecciona los Stans</h3>
+    <form @submit.prevent="enviarSeleccion">
+      <div class="checkbox-grid">
+        <div v-for="stan in stans" :key="stan.id" class="checkbox-item">
           <input
             type="checkbox"
             :value="stan.id"
             v-model="seleccionados"
+            id="stan-{{ stan.id }}"
+            class="styled-checkbox"
           />
-          <label>{{ stan.numero }} Descripción: {{ stan.descripcion }}</label>
-          <div v-if="seleccionados.includes(stan.id)">
-            
+          <label :for="'stan-' + stan.id">
+            {{ stan.numero }} - {{ stan.descripcion }}
+          </label>
+          <div v-if="seleccionados.includes(stan.id)" class="quantity-input">
             <div v-if="stan.precio_por_muestra">
-                Cantidad de muestras: 
+              Cantidad de muestras:
             </div>
             <div v-else>
-                Cantidad de horas:
+              Cantidad de horas:
             </div>
-          <input
-            v-model="cantidadSeleccionada[stan.id]"
-            type="number"
-            min="1"
-            placeholder="Cantidad"
-          />
+            <input
+              v-model="cantidadSeleccionada[stan.id]"
+              type="number"
+              min="1"
+              placeholder="Cantidad"
+            />
+          </div>
         </div>
-        </div>
-        <h3>Selecciona un medio de pago</h3>
-        <select v-model="medioDePagoSeleccionado">
-          <option value="" disabled>Elige un medio de pago</option>
-          <option v-for="medio in mediosDePago" :key="medio.id" :value="medio.id">
-          {{ medio.medio_de_pago }}
-          </option>
-        </select>
-        <br>
-        <button type="submit">Aceptar</button>
-      </form>
-        <div v-if="fetchError" class="alert alert-danger mb-4" role="alert">
-          {{ fetchError }}
-        </div>
-        <div v-if="submitError" class="alert alert-danger mb-4" role="alert">
-          {{ submitError }}
-        </div>
-        <div v-if="successMessage" class="alert alert-success mb-4" role="alert">
-          {{ successMessage }}
-        </div>
+      </div>
+
+      <br>
+      <button type="submit">Aceptar</button>
+    </form>
+
+    <div v-if="fetchError" class="alert alert-danger mb-4" role="alert">
+      {{ fetchError }}
     </div>
-  </template>
+    <div v-if="submitError" class="alert alert-danger mb-4" role="alert">
+      {{ submitError }}
+    </div>
+    <div v-if="successMessage" class="alert alert-success mb-4" role="alert">
+      {{ successMessage }}
+    </div>
+  </div>
+</template>
   
   <script setup>
   import { ref, onMounted } from 'vue';
@@ -58,8 +58,8 @@
   const seleccionados = ref([]);
   const cantidadSeleccionada = ref({});
 
-  const mediosDePago = ref([]);
-  const medioDePagoSeleccionado = ref("")
+  //const mediosDePago = ref([]);
+  //const medioDePagoSeleccionado = ref("")
 
   const route = useRoute();
   const idLegajo = route.params.id_legajo;
@@ -126,10 +126,10 @@
     }
 
     // Validar que se haya seleccionado un método de pago
-    if (!medioDePagoSeleccionado.value) {
-      submitError.value = 'Debes seleccionar un método de pago.';
-      return;
-    }
+    //if (!medioDePagoSeleccionado.value) {
+    //  submitError.value = 'Debes seleccionar un método de pago.';
+    //  return;
+    //}
 
     // Crear un arreglo con los datos a enviar: id y cantidad
     const datosSeleccionados = seleccionados.value.map((id) => ({
@@ -154,18 +154,18 @@
         },
         body: JSON.stringify({
             seleccionados: datosSeleccionados,
-            medioDePago: medioDePagoSeleccionado.value,
-            legajo: 33,
+            //medioDePago: medioDePagoSeleccionado.value,
+            legajo: idLegajo,
         }),
         });
         console.log("Datos enviados:", {
         seleccionados: datosSeleccionados,
-        medioDePago: medioDePagoSeleccionado.value,
-        legajo: 1,
+        //medioDePago: medioDePagoSeleccionado.value,
+        legajo: idLegajo,
         });
         const result = await response.json();
         if (!response.ok) {
-          throw new Error(result.message || 'Error al generar el certificado');
+          throw new Error(result.message || 'Error al generar el presupuesto');
         }
   
         successMessage.value = result.message;
@@ -176,17 +176,44 @@
   
   onMounted(() => {
     fetchStans();
-    fetchMediosDePago();
+    //fetchMediosDePago();
   });
   </script>
   
   <style scoped>
-  form {
+  .checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* Acomoda 4 elementos por fila */
+    gap: 0.5rem; /* Espaciado reducido */
     margin-top: 1rem;
   }
-  div {
-    margin-bottom: 0.5rem;
+  
+  .checkbox-item {
+    display: flex;
+    align-items: center; /* Alinea checkbox y texto horizontalmente */
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    gap: 0.5rem; /* Espaciado entre checkbox y texto */
   }
+  
+  .custom-checkbox {
+    width: 1.5rem; /* Tamaño más grande */
+    height: 1.5rem;
+    accent-color: #00c8ff; /* Color celeste */
+    cursor: pointer;
+  }
+  
+  .checkbox-item label {
+    font-size: 0.9rem; /* Tamaño más pequeño para el texto */
+    line-height: 1.2;
+  }
+  
+  .checkbox-item:hover {
+    background-color: #e6f7ff; /* Fondo celeste claro al pasar el mouse */
+  }
+  
   button {
     margin-top: 1rem;
     padding: 0.5rem 1rem;
@@ -196,7 +223,14 @@
     border-radius: 5px;
     cursor: pointer;
   }
+  
   button:hover {
     background-color: #0056b3;
   }
+  input[type="checkbox"].styled-checkbox {
+  width: 15px;
+  height: 15px;
+  accent-color: #007bff; /* Color azul */
+  cursor: pointer;
+}
   </style>

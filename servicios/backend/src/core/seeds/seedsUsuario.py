@@ -220,8 +220,16 @@ def seed_usuarios():
 
     todosLosPermisos = [ #Acá van todos los permisos a insertar (todos los posibles permisos que hay en el sistema)
         "listar_usuarios", #Por favor, ponerle el mismo nombre que el nombre del método del controlador
+        "listar_usuarios_de_un_area",
+        "listar_roles",
+        "listar_empleados",
+        "listar_areas",
+        "ver_perfil",
+        "crear_usuario",
         "borrar_usuario",
-        "listar_stans",
+        "recuperar_contra",
+        "cambiar_jefe_area",
+        "listar_stans", #este es el de usuarios
         "cargar_stan",
         "cargar_muestra",
         "listar_muestras_identificadas",
@@ -240,6 +248,7 @@ def seed_usuarios():
         "generar_certificado",
         "ver_certificado",
         "cargar_interarea_firmada",
+        "listarStans", #este es el de presupuestos
         "generar_presupuesto",
         "ver_presupuesto",
         "cargar_presupuesto_firmado",
@@ -258,7 +267,15 @@ def seed_usuarios():
     PERMISSIONS = { #Acá van los permisos que tiene cada rol
         "Director": [ #Tienen que ser declarados previamente en todosLosPermisos
             "listar_usuarios",
+            "listar_usuarios_de_un_area",
+            "listar_roles",
+            "listar_empleados",
+            "listar_areas",
+            "ver_perfil",
+            "crear_usuario",
             "borrar_usuario",
+            "recuperar_contra",
+            "cambiar_jefe_area",
             "listar_stans",
             "cargar_stan",
             "cargar_muestra",
@@ -275,6 +292,7 @@ def seed_usuarios():
             "generar_certificado",
             "ver_certificado",
             "cargar_interarea_firmada",
+            "listarStans",
             "generar_presupuesto",
             "ver_presupuesto",
             "cargar_presupuesto_firmado",
@@ -291,7 +309,15 @@ def seed_usuarios():
         ],
         "Secretaria": [
             "listar_usuarios",
+            "listar_usuarios_de_un_area",
+            "listar_roles",
+            "listar_empleados",
+            "listar_areas",
+            "ver_perfil",
+            "crear_usuario",
             "borrar_usuario",
+            "recuperar_contra",
+            "cambiar_jefe_area",
             "listar_stans",
             "cargar_stan",
             "cargar_muestra",
@@ -307,6 +333,7 @@ def seed_usuarios():
             "generar_certificado",
             "ver_certificado",
             "cargar_interarea_firmada",
+            "listarStans",
             "generar_presupuesto",
             "ver_presupuesto",
             "ver_presupuesto_firmado",
@@ -337,6 +364,8 @@ def seed_usuarios():
             "ver_legajo",
             "listar_documentos",
             "subir_documento",
+            "ver_perfil",
+            "recuperar_contra",
         ],
         "Trabajador": [
             "listar_muestras_identificadas",
@@ -346,6 +375,8 @@ def seed_usuarios():
             "listar_legajos",
             "ver_legajo",
             "listar_documentos",
+            "ver_perfil",
+            "recuperar_contra",
         ],
     }
 

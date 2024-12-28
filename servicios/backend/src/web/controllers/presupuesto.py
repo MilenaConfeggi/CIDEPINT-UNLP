@@ -18,7 +18,10 @@ ALLOWED_EXTENSIONS = {'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'}
 bp = Blueprint('presupuestos', __name__, url_prefix='/presupuestos')
 
 @bp.get("/stans")
+@jwt_required()
 def listarStans():
+    if not check_permission("listarStans"):
+        return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
     STANS = servicioPresupuesto.listar_stans()
     data = stansSchema.dump(STANS, many=True)
     return jsonify(data), 200
@@ -30,7 +33,10 @@ def listarStans():
 #    return jsonify(data), 200
 
 @bp.post("/crear/<int:id_legajo>")
-def crearPresupuesto(id_legajo):
+@jwt_required()
+def generar_presupuesto(id_legajo):
+    if not check_permission("generar_presupuesto"):
+        return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
     data = request.get_json()
     #if data['medioDePago'] == []:
     #    return jsonify({"error": "No se seleccionó medio de pago"}), 400
@@ -39,7 +45,10 @@ def crearPresupuesto(id_legajo):
     return jsonify({"message": "Presupuesto creado correctamente"}), 200
 
 @bp.get("/ver_documento/<int:id_legajo>")
-def obtener_presupuesto(id_legajo):
+@jwt_required()
+def ver_presupuesto(id_legajo):
+    if not check_permission("ver_presupuesto"):
+        return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
     directory = os.path.normpath(os.path.join(UPLOAD_FOLDER, "presupuestos", str(id_legajo)))
 
     # Verifica si el directorio existe
@@ -66,7 +75,10 @@ def obtener_presupuesto(id_legajo):
     return send_from_directory(directory, archivo_mas_reciente)
 
 @bp.get("/ver_documento_firmado/<int:id_legajo>")
-def obtener_presupuesto_firmado(id_legajo):
+@jwt_required()
+def ver_presupuesto_firmado(id_legajo):
+    if not check_permission("ver_presupuesto_firmado"):
+        return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
     directory = os.path.normpath(os.path.join(UPLOAD_FOLDER, "presupuestos_firmados", str(id_legajo)))
 
     # Verifica si el directorio existe
@@ -98,6 +110,8 @@ def permitir_pdf(filename):
 @bp.post("/cargar_presupuesto_firmado/<int:id_legajo>")
 @jwt_required()
 def cargar_presupuesto_firmado(id_legajo):
+    if not check_permission("cargar_presupuesto_firmado"):
+        return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
     if 'archivo' not in request.files:
         return jsonify({"error": "Debes seleccionar un archivo"}), 400
 

@@ -19,25 +19,37 @@ def listar_usuarios():
     return jsonify(data), 200
 
 @bp.get("/<int:id_area>")
+@jwt_required()
 def listar_usuarios_de_un_area(id_area):
+    if not check_permission("listar_usuarios_de_un_area"):
+        return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
     usuarios = servicioUsuario.listar_usuarios_por_area(id_area)
     data = usuariosSchema.dump(usuarios, many=True)
     return jsonify(data), 200
 
 @bp.get("/roles")
+@jwt_required()
 def listar_roles():
+    if not check_permission("listar_roles"):
+        return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
     roles = servicioUsuario.listar_roles()
     data = rolesSchema.dump(roles, many=True)
     return jsonify(data), 200
 
 @bp.get("/empleados")
+@jwt_required()
 def listar_empleados():
+    if not check_permission("listar_empleados"):
+        return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
     empleados = servicioUsuario.listar_empleados()
     data = empleadosSchema.dump(empleados, many=True)
     return jsonify(data), 200
 
 @bp.get("/areas")
+@jwt_required()
 def listar_areas():
+    if not check_permission("listar_areas"):
+        return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
     areas = servicioUsuario.listar_areas()
     data = empleadosSchema.dump(areas, many=True)
     return jsonify(data), 200
@@ -45,12 +57,17 @@ def listar_areas():
 @bp.get("/ver_perfil")
 @jwt_required()
 def ver_perfil():
+    if not check_permission("ver_perfil"):
+        return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
     empleado = servicioUsuario.obtener_empleado_por_mail(get_jwt_identity())
     data = empleadoSchema.dump(empleado)
     return jsonify(data), 200
 
 @bp.post("/crear")
+@jwt_required()
 def crear_usuario():
+    if not check_permission("crear_usuario"):
+        return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
     try:
         data = request.get_json()
 
@@ -72,7 +89,10 @@ def crear_usuario():
         return jsonify({"message": str(e)}), 401
 
 @bp.post("/borrar")
+@jwt_required()
 def borrar_usuario():
+    if not check_permission("borrar_usuario"):
+        return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
     data = request.get_json()
     id_usuario = data.get('id')
     try:
@@ -84,7 +104,10 @@ def borrar_usuario():
         return jsonify({"message": str(e)}), 406
 
 @bp.post("/recuperar_contra")
+@jwt_required()
 def recuperar_contra():
+    if not check_permission("recuperar_contra"):
+        return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
     try:
         data = request.get_json()
 
@@ -98,7 +121,10 @@ def recuperar_contra():
         return jsonify({"message": str(e)}), 400
     
 @bp.post("/cambiar_jefe_area")
+@jwt_required()
 def cambiar_jefe_area():
+    if not check_permission("cambiar_jefe_area"):
+        return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
     data = request.get_json()
     servicioUsuario.cambiar_jefe_area(data)
     return jsonify({"message": "Se cambió el jefe de área exitosamente"}), 200

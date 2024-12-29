@@ -52,7 +52,7 @@ def procesar_contribuciones(compra_id, entidades, tabla_asociativa, atributo_sal
             db.session.execute(
                 tabla_asociativa.insert().values(
                     compra_id=compra_id,
-                    fondo_titulo=entidad_obj.titulo,
+                    fondo_id=entidad_obj.id,
                     contribucion=contribucion
                 )
             )

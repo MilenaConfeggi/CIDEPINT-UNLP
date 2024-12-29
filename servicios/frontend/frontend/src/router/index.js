@@ -36,7 +36,7 @@ const routes = [
     name: 'informes',
     component: () => import('../views/InformesView.vue'),
     props: true,
-    meta: { requiresAuth: true, showNavbar: true },
+    meta: { requiresAuth: true, checkLegajoPermission: true, showNavbar: true },
   },
   {
     path: '/legajos',
@@ -49,13 +49,13 @@ const routes = [
     name: 'legajo',
     component: () => import('../components/legajos/LegajoDetalle.vue'),
     props: true,
-    meta: { requiresAuth: true, showNavbar: true },
+    meta: { requiresAuth: true, checkLegajoPermission: true, showNavbar: true },
   },
   {
     path: '/legajos/cancelar/:id',
     name: 'cancelar',
     component: () => import('../components/legajos/LegajoCancel.vue'),
-    meta: { requiresAuth: true, showNavbar: true },
+    meta: { requiresAuth: true, checkLegajoPermission: true, showNavbar: true },
   },
   {
     path: '/legajos/newLegajo',
@@ -87,12 +87,6 @@ const routes = [
     name: 'InterareaDetalle',
     component: () => import('../components/interareas/DetalleInterarea.vue'),
     props: true,
-    meta: { requiresAuth: true, showNavbar: true },
-  },
-  {
-    path: '/nueva-interarea',
-    name: 'NuevaInterarea',
-    component: () => import('../components/interareas/NuevaInterarea.vue'),
     meta: { requiresAuth: true, showNavbar: true },
   },
   {
@@ -155,7 +149,7 @@ const routes = [
     name: 'generar_certificado',
     component: () => import('../components/certificados/CrearCertificado.vue'),
     props: true,
-    meta: { requiresAuth: true, showNavbar: true },
+    meta: { requiresAuth: true, requiresPermission: 'generar_certificado', showNavbar: true },
   },
   {
     path: '/encuesta',
@@ -201,7 +195,7 @@ router.beforeEach(async (to, from, next) => {
 
   // Verificar permiso para rutas que tienen checkLegajoPermission
   if (to.matched.some((record) => record.meta.checkLegajoPermission)) {
-    const legajoId = to.params.legajoId
+    const legajoId = to.params.legajoId || to.params.id
 
     if (!legajoId) {
       console.error('Falta legajoId para verificar permisos')
@@ -226,6 +220,17 @@ router.beforeEach(async (to, from, next) => {
         console.warn('No tiene permiso para acceder a esta muestra')
         return next({ name: 'home' })
       }
+    }
+  }
+
+  // Verificar permiso específico para rutas que requieren permisos adicionales
+  if (to.matched.some((record) => record.meta.requiresPermission)) {
+    const requiredPermission = to.meta.requiresPermission
+    const permisos = JSON.parse(localStorage.getItem('permisos')) || []
+
+    if (!permisos.includes(requiredPermission)) {
+      console.warn(`No tiene el permiso requerido: ${requiredPermission}`)
+      return next({ name: 'home' })
     }
   }
 

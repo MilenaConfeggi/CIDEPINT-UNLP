@@ -32,13 +32,6 @@ const routes = [
     meta: { requiresAuth: true, checkLegajoPermission: true, showNavbar: true },
   },
   {
-    path: '/informes/:legajoId',
-    name: 'informes',
-    component: () => import('../views/InformesView.vue'),
-    props: true,
-    meta: { requiresAuth: true, checkLegajoPermission: true, showNavbar: true },
-  },
-  {
     path: '/legajos',
     name: 'legajos',
     component: () => import('../views/LegajoView.vue'),

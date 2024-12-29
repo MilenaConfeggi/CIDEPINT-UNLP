@@ -129,7 +129,7 @@ export default {
                 this.informes = data.filter((informe) => informe.estado.id === 7);
                 this.informes_pendientes_cargar = data.filter((informe) => informe.estado.id === 8);
             } else {
-                this.informes = data.filter((informe) => informe.estado.id === 5 && informe.area_id === this.area);
+                this.informes = data.filter((informe) => informe.estado.id === 5 && informe.legajo.area.id === this.area);
             }
         },
         formatFecha(fecha) {

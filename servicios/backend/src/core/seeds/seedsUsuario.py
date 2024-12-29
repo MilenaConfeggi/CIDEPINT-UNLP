@@ -422,6 +422,7 @@ def seed_usuarios():
             "subir_documento",
             "ver_perfil",
             "recuperar_contra",
+            "ver_certificado",
         ],
         "Trabajador": [
             "listar_muestras_identificadas",
@@ -433,6 +434,8 @@ def seed_usuarios():
             "listar_documentos",
             "ver_perfil",
             "recuperar_contra",
+            "ver informe",
+            "ver_certificado",
         ],
     }
 

@@ -2,6 +2,9 @@ import axios from 'axios'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { useAuthStore } from './auth'
+import { useEncuestasStore } from './encuestas'
+import { useRoute } from 'vue-router'
+import { useLegajosStore } from './legajos'
 
 export const useInformeStore = defineStore('informe', {
   state: () => ({
@@ -132,6 +135,47 @@ export const useInformeStore = defineStore('informe', {
         }
       } else {
         alert('Por favor selecciona un archivo PDF.')
+      }
+    },
+    async verDocumentacion(id) {
+      const token = useAuthStore().getToken()
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/informes/ver_documento/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data',
+          },
+        })
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(errorData.message || 'Error al obtener el documento')
+        }
+        const blob = await response.blob()
+        const url = URL.createObjectURL(blob)
+        window.open(url, '_blank')
+      } catch (error) {
+        console.error('Error al obtener el documento:', error)
+        this.errorMessage = error.message || 'Error al obtener el documento'
+        this.showToast = true
+      }
+    },
+    async enviarInforme(id) {
+      const legajosStore = useLegajosStore()
+      const encuestasStore = useEncuestasStore()
+      const route = useRoute()
+      const legajo = legajosStore.legajo
+      let archivo = legajo.value.documento.find((doc) => doc.tipo_documento_id === id)
+      const legajoId = route.params.id
+      try {
+        await encuestasStore.createEncuestas()
+        const link = encuestasStore.link
+        await encuestasStore.mandarMail(legajo.value.cliente.email, link, archivo.id, legajoId)
+        this.successMessage = 'Correo enviado con éxito'
+        this.showToast = true
+      } catch (error) {
+        console.error('Error al enviar el correo:', error)
+        this.errorMessage = error.message || 'Error al enviar el correo'
+        this.showToast = true
       }
     },
   },

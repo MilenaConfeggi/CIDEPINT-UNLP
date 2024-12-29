@@ -92,6 +92,8 @@ def cargar_informe(id_legajo):
     if not servicioInforme.buscar_documentacion_por_legajo(id_legajo):
         return jsonify({"error": "No hay documentación para este legajo"}), 404
     
+    servicioInforme.cambiar_estado_documentacion(id_legajo)
+    
     try:
         filename = secure_filename(archivo.filename).replace(" ", "_")  # Reemplazar espacios con guion bajo
         user = get_jwt_identity()

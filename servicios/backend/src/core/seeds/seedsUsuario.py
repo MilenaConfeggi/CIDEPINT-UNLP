@@ -26,6 +26,8 @@ def seed_usuarios():
 
     default_area = Area(nombre='Area 2fault', saldo=0)
     area_1 = get_area(1)
+    area_2 = get_area(2)
+    area_3 = get_area(3)
 
     usuario_1 = User(
         username='rober',
@@ -58,7 +60,7 @@ def seed_usuarios():
     personal_2 = Empleado(
         user=usuario_2,
         email='moniquita@example.com',
-        area=default_area,
+        area=area_1,
         dni='204061',
         nombre='Maria',
         apellido='Lopez',
@@ -81,7 +83,7 @@ def seed_usuarios():
     personal_3 = Empleado(
         user=usuario_3,
         email='pepito@example.com',
-        area=default_area,
+        area=area_1,
         dni='204062',
         nombre='Juan',
         apellido='Perez',
@@ -150,7 +152,7 @@ def seed_usuarios():
     personal_6 = Empleado(
         user=usuario_6,
         email='laura@example.com',
-        area=default_area,
+        area=area_2,
         dni='204065',
         nombre='Laura',
         apellido='Fernandez',
@@ -165,12 +167,38 @@ def seed_usuarios():
         rol='Personal'
     )
 
+    usuario_7 = User(
+        username='lucas',
+        password='lucas'
+    )
+
+    personal_7 = Empleado(
+        user=usuario_6,
+        email='lucas@example.com',
+        area=area_3,
+        dni='2040095',
+        nombre='Lucas',
+        apellido='Fernandez',
+        dependencia='UNLP',
+        cargo='Administrativo',
+        subdivision_cargo='Ley 10430',
+        telefono='123456784',
+        domicilio='Laura Address',
+        fecha_nacimiento=datetime.strptime('1992-06-01', '%Y-%m-%d'),
+        observaciones='Usuario personal',
+        habilitado=True,
+        rol='Personal'
+    )
+
+
+
     db.session.add(usuario_1)
     db.session.add(usuario_2)
     db.session.add(usuario_3)
     db.session.add(usuario_4)
     db.session.add(usuario_5)
     db.session.add(usuario_6)
+    db.session.add(usuario_7)
 
     db.session.add(personal_1)
     db.session.add(personal_2)
@@ -178,6 +206,7 @@ def seed_usuarios():
     db.session.add(personal_4)
     db.session.add(personal_5)
     db.session.add(personal_6)
+    db.session.add(personal_7)
 
     usuario1 = crear_usuario(
         {
@@ -213,10 +242,37 @@ def seed_usuarios():
             "cambiar_contra": False,
         }
     )
+    usuario5 = crear_usuario(
+        {
+            "mail": "rober@example.com",
+            "contra": "123",
+            "rol": rol_trabajador,
+            "cambiar_contra": False,
+        }
+    )
+    usuario6 = crear_usuario(
+        {
+            "mail": "laura@example.com",
+            "contra": "123",
+            "rol": rol_jefe_de_area,
+            "cambiar_contra": False,
+        }
+    )
+    usuario7 = crear_usuario(
+        {
+            "mail": "lucas@example.com",
+            "contra": "123",
+            "rol": rol_jefe_de_area,
+            "cambiar_contra": False,
+        }
+    )
     db.session.add(usuario1)
     db.session.add(usuario2)
     db.session.add(usuario3)
     db.session.add(usuario4)
+    db.session.add(usuario5)
+    db.session.add(usuario6)
+    db.session.add(usuario7)
 
     todosLosPermisos = [ #Acá van todos los permisos a insertar (todos los posibles permisos que hay en el sistema)
         "listar_usuarios", #Por favor, ponerle el mismo nombre que el nombre del método del controlador

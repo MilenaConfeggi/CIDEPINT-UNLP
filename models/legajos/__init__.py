@@ -5,12 +5,14 @@ from models.clientes import Cliente
 from datetime import datetime
 
 def list_legajos(page=1, per_page=10, empresa=None, fecha=None):
-    empresa = empresa.strip()
-    fecha = fecha.strip()
+    
+    
     query = Legajo.query
     if empresa:
+        empresa = empresa.strip()
         query = query.join(Legajo.cliente).filter(Cliente.email.like(f'%{empresa}%'))
     if fecha:
+        fecha = fecha.strip()
         fecha = datetime.strptime(fecha, '%Y-%m-%d')
         query = query.filter(Legajo.fecha_entrada == fecha)
     return query.paginate(page=page, per_page=per_page, error_out=False)

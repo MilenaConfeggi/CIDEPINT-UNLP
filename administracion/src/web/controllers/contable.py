@@ -199,8 +199,10 @@ def descargar_ingreso(id):
 @role_required('Administrador', 'Colaborador')
 def get_legajos():
     params = request.args.to_dict()
-    legajos = legajoDB.list_legajos_all()
-    legajos = [legajo for legajo in legajos if legajo.necesita_facturacion]
+    page = request.args.get("page", 1, type=int)
+    per_page = 10
+    legajos = legajoDB.list_legajos(page, per_page,None,None)
+    #legajos = [legajo for legajo in legajos if legajo.necesita_facturacion]
     forms = {}
     for legajo in legajos:
         forms[legajo.id] = UploadDocumentoForm(legajo_id=legajo.id)
@@ -219,7 +221,7 @@ def get_legajos():
                 "distribuciones" : distribuciones
             })
     form = DownloadForm()
-    return render_template("contable/legajos.html",legajos = resultado, forms=forms,formDescarga = form)
+    return render_template("contable/legajos.html",legajos = resultado, forms=forms,formDescarga = form,paginacion = legajos)
 
 
 @bp.get("/distribuciones/crear/<int:id>")

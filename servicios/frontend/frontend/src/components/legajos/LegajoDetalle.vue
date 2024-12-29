@@ -51,7 +51,7 @@
                         <li v-if="hasPermission('cargar_documentacion')">
                           <label :for="`upload-doc-${documento.id}`" class="dropdown-item">
                             Subir Documentación
-                            <input :id="`upload-doc-${documento.id}`" type="file" accept="application/pdf" @change="uploadDocumentacion($event, documento.id, legajo.id)" hidden />
+                            <input :id="`upload-doc-${documento.id}`" type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx" @change="uploadDocumentacion($event, documento.id, legajo.id)" hidden />
                           </label>
                         </li>
                         <li v-if="hasPermission('ver documentacion')">

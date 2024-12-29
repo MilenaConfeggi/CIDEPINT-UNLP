@@ -106,7 +106,16 @@ export const useInformeStore = defineStore('informe', {
     async uploadDocumentacion(event, id, legajoId) {
       const file = event.target.files[0]
       const token = useAuthStore().getToken()
-      if (file && file.type === 'application/pdf') {
+      const allowedTypes = [
+        'application/pdf',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'application/vnd.ms-excel',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'application/vnd.ms-powerpoint',
+        'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      ]
+      if (file && allowedTypes.includes(file.type)) {
         try {
           const formData = new FormData()
           formData.append('archivo', file)
@@ -134,7 +143,7 @@ export const useInformeStore = defineStore('informe', {
           this.showToast = true
         }
       } else {
-        alert('Por favor selecciona un archivo PDF.')
+        alert('Por favor selecciona un archivo PDF, Word, Excel o PowerPoint.')
       }
     },
     async verDocumentacion(id) {

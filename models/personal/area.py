@@ -1,4 +1,5 @@
 from models.base import db
+from models.compras.compra_area import compra_area
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 class Area(db.Model):
@@ -7,6 +8,7 @@ class Area(db.Model):
     saldo = db.Column(db.Float, nullable=False)
 
     bienes = db.relationship('Bien', back_populates='area')
+    compras = db.relationship('Compra', secondary=compra_area, back_populates='areas')
     
     def __init__(self, nombre, saldo):
         self.nombre = nombre

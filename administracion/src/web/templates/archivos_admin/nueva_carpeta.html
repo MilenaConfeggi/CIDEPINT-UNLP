@@ -23,7 +23,19 @@
             <!-- Lista dinámica para asignar permisos -->
             <div id="permissions-list">
                 <h3 class="block text-sm/15 font-medium text-gray-900">Asignar permisos</h3>
-
+                {% for permission_form in form.permisos %}
+                <div class="my-2">
+                    <div class="permission-item">
+                        <label for="permissions-{{ loop.index0 }}-user_id">Usuario:</label>
+                        {{ permission_form.user_id(class="form-control") }}
+        
+                        <label for="permissions-{{ loop.index0 }}-permission">Permiso:</label>
+                        {{ permission_form.permiso(class="form-control") }}
+        
+                        <button type="button" class="rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600" onclick="removePermission(this)">Eliminar</button>
+                    </div>
+                </div>
+            {% endfor %}
             </div>
             
             <!-- Botón para agregar un nuevo usuario a la lista -->
@@ -49,7 +61,7 @@
             <label for="permisos-${permissionCount}-user_id">Usuario:</label>
             <select name="permisos-${permissionCount}-user_id" id="permisos-${permissionCount}-user_id" class="form-control w-full sm:w-auto">
                 {% for user in users %}
-                    <option value="{{ user.id }}">{{ user.empleado.nombre }} {{ user.empleado.apellido }} - {{ user.empleado.dni }}</option>
+                    <option value="{{ user.id }}">{{ user.empleado.nombre }} {{ user.empleado.apellido }} - {{ user.empleado.email }}</option>
                 {% endfor %}
             </select>
 

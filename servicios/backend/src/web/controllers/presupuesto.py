@@ -78,6 +78,37 @@ def ver_presupuesto(id_legajo):
     # Enviar el archivo
     return send_from_directory(directory, archivo_mas_reciente)
 
+@bp.get("/ver_legajo/<int:id_legajo>")
+@jwt_required()
+def ver_legajo(id_legajo):
+    if not check_permission("ver_legajo"):
+        return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
+    directory = os.path.normpath(os.path.join(UPLOAD_FOLDER, "legajos", str(id_legajo)))
+
+    # Verifica si el directorio existe
+    if not os.path.exists(directory) or not os.path.isdir(directory):
+        print("El directorio no existe")
+        abort(404, description="El documento no existe, prueba generar uno primero")
+
+    # Filtra los archivos que coinciden con el formato de nombre
+    #PRIORIZO LOS FIRMADOS
+    archivos = [f for f in os.listdir(directory) if f.startswith("legajo_") and f.endswith(".pdf")]
+
+    # Si no hay archivos que coincidan
+    if not archivos:
+        print("No hay archivos de legajos")
+        abort(404, description="No se encontraron documentos de legajo para este legajo")
+
+    # Encuentra el archivo más reciente basado en el timestamp
+    archivos.sort(reverse=True)  # Ordenar por nombre en orden descendente (timestamps más recientes primero)
+    archivo_mas_reciente = archivos[0]
+
+    # Ruta completa al archivo
+    file_path = os.path.join(directory, archivo_mas_reciente)
+
+    # Enviar el archivo
+    return send_from_directory(directory, archivo_mas_reciente)
+
 #@bp.get("/ver_documento_firmado/<int:id_legajo>")
 #@jwt_required()
 #def ver_presupuesto_firmado(id_legajo):
@@ -159,6 +190,7 @@ def cargar_presupuesto_firmado(id_legajo):
         
         archivo.save(os.path.join(folder_path, filename))
         servicioDocumento.crear_documento(doc_data)
+        servicioPresupuesto.generar_documento_de_legajo(id_legajo)
         return jsonify({"message": "Presupuesto subido con éxito"}), 200
     except ValidationError as err:
         print(err.messages)  # Imprime los mensajes de error de validación

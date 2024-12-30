@@ -301,8 +301,9 @@ def get_distribuciones(id):
     return render_template("contable/listar_distribuciones.html",distribuciones = data, legajo = legajo)
 
 
-@bp.post("/distribuciones/delete/<int:id>")
-def delete_distribucion(id):
+@bp.post("/distribuciones/delete")
+def delete_distribucion():
+    id = request.form.get("distribucion_id")
     distribucion = distribucionDB.get_distribucion(id)
     if not distribucion:
         return redirect(url_for("contable.get_legajos"))

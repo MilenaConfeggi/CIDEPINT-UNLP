@@ -101,7 +101,7 @@
                           </RouterLink>
                         </li>
                         <li v-if="hasPermission('ver_presupuesto') && existeDocumento(documento.nombre)">
-                          <button type="button" class="dropdown-item" @click="viewPresupuesto(legajo.id)">
+                          <button type="button" class="dropdown-item" @click="viewPresupuesto(documento.id, documento.nombre, legajo.id)">
                             Ver
                           </button>
                         </li>
@@ -110,6 +110,18 @@
                             Subir Presupuesto Firmado
                             <input :id="`upload-presupuesto-firmado-${documento.id}`" type="file" accept="application/pdf" @change="uploadPresupuestoFirmado($event, documento.id, legajo.id)" hidden />
                           </label>
+                        </li>
+                      </template>
+                      <template v-else-if="documento.nombre === 'Legajo'">
+                        <li>
+                          <button type="button" class="dropdown-item" @click="viewLegajo(legajo.id)">
+                            Ver
+                          </button>
+                        </li>
+                      </template>
+                      <template v-else-if="documento.nombre === 'adicional'">
+                        <li v-for="adicional in adicionales" :key="adicional.id" class="dropdown-item" @click="viewAdicional(adicional.id)">
+                          {{ adicional.nombre_documento }}
                         </li>
                       </template>
                       <template v-else>
@@ -130,7 +142,7 @@
                           </label>
                         </li>
                       </template>
-                      <template v-if="documento.nombre !== 'Informe' && documento.nombre !== 'Certificado CIDEPINT' && documento.nombre !== 'Presupuesto CIDEPINT' && documento.nombre !== 'Factura'">
+                      <template v-if="documento.nombre !== 'Informe' && documento.nombre !== 'Certificado CIDEPINT' && documento.nombre !== 'Presupuesto CIDEPINT' && documento.nombre !== 'Factura' && documento.nombre !== 'adicional' && documento.nombre !== 'Legajo'">
                         <li v-if="!existeDocumento(documento.nombre)">
                           <label :for="`upload-pdf-${documento.id}`" class="dropdown-item">
                             Cargar
@@ -162,7 +174,7 @@
                 </td>
               </tr>
             </tbody>
-          </table>otra opción es
+          </table>
         </div>
       </div>
     </div>
@@ -231,6 +243,7 @@ const hasPermission = (permiso) => {
 }
 const nroFactura = ref('')
 const documentoID = ref('')
+const adicionales = ref([])
 
 const formatDate = (dateString) => {
   const options = { year: 'numeric', day: '2-digit', month: '2-digit' }
@@ -324,6 +337,65 @@ const viewCertificado = async (id, tipo, legajoId) => {
   }
 }
 
+const fetchAdicionales = async (legajoId) => {
+  const token = authStore.getToken()
+  try {
+    const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/documentos/adicionales/${legajoId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    adicionales.value = response.data
+  } catch (error) {
+    console.error('Error al obtener los documentos adicionales:', error)
+  }
+}
+
+const viewAdicional = async (adicionalId) => {
+  const token = authStore.getToken()
+  try {
+    const response = await axios.get(
+      `${import.meta.env.VITE_API_URL}/api/documentos/view_adicional/${adicionalId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        responseType: 'blob',
+      },
+    )
+
+    // Crear una URL para visualizar el archivo
+    const blob = new Blob([response.data], { type: response.headers['content-type'] })
+    const fileUrl = URL.createObjectURL(blob)
+    window.open(fileUrl, '_blank')
+  } catch (error) {
+    console.error('Error al obtener el archivo adicional:', error)
+    alert('No se pudo cargar el archivo adicional.')
+  }
+}
+
+const viewLegajo = async (legajoId) => {
+  const token = authStore.getToken()
+  try {
+    const response = await axios.get(
+      `${import.meta.env.VITE_API_URL}/presupuestos/ver_legajo/${legajoId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        responseType: 'blob',
+      },
+    )
+
+    // Crear una URL para visualizar el archivo
+    const blob = new Blob([response.data], { type: response.headers['content-type'] })
+    const fileUrl = URL.createObjectURL(blob)
+    window.open(fileUrl, '_blank')
+  } catch (error) {
+    console.error('Error al obtener el archivo del legajo:', error)
+    alert('No se pudo cargar el archivo del legajo.')
+  }
+}
 
 const adminLegajo = async () => {
   await legajosStore.habilitar(route.params.id)
@@ -333,6 +405,7 @@ onMounted(async () => {
   try {
     await legajosStore.getLegajo(route.params.id)
     await documentosStore.getTiposDocumentos()
+    await fetchAdicionales(route.params.id)
   } catch (err) {
     console.error('Error al cargar el legajo:', err)
     errorMessage.value = err.message || 'Error al cargar el legajo'

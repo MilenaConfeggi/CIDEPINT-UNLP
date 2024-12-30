@@ -27,3 +27,10 @@ def modificar_ingreso(id, **kwargs):
 
 def get_ingresos_del_fondo(fondo_id):
     return Ingreso.query.filter_by(receptor_id=fondo_id).all()
+def delete_ingreso(id):
+    ingreso = conseguir_ingreso_de_id(id)
+    if ingreso:
+        db.session.delete(ingreso)
+        db.session.commit()
+        return True
+    return False

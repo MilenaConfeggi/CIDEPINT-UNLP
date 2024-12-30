@@ -67,6 +67,8 @@ def listar_areas():
 def listar_usuarios_personal():
     return User.query.filter(User.rol == 'Personal', User.habilitado == True).all()
 
+def listar_empleados():
+    return Empleado.query.join(User).filter(User.habilitado == True).all()
 
 def eliminar_ausencia(id_ausencia):
     

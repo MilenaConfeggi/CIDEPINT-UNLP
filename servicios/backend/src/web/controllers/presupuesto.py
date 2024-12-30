@@ -84,14 +84,13 @@ def ver_legajo(id_legajo):
     if not check_permission("ver_legajo"):
         return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
     directory = os.path.normpath(os.path.join(UPLOAD_FOLDER, "legajos", str(id_legajo)))
-
+    print(directory)
     # Verifica si el directorio existe
     if not os.path.exists(directory) or not os.path.isdir(directory):
         print("El directorio no existe")
         abort(404, description="El documento no existe, prueba generar uno primero")
 
     # Filtra los archivos que coinciden con el formato de nombre
-    #PRIORIZO LOS FIRMADOS
     archivos = [f for f in os.listdir(directory) if f.startswith("legajo_") and f.endswith(".pdf")]
 
     # Si no hay archivos que coincidan

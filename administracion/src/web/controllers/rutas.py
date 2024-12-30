@@ -8,6 +8,7 @@ from administracion.src.web.controllers.personal.area_controller import area_bp
 from administracion.src.web.controllers.personal.personal_controller import personal_bp
 from administracion.src.web.controllers.personal.ausencia_controller import ausencia_bp
 from administracion.src.web.controllers.auth_controller import auth_bp
+from administracion.src.web.controllers.compra import bp as compra_bp
 def registrar_rutas(app):
 
     app.register_blueprint(patrimonio_bp)
@@ -17,6 +18,8 @@ def registrar_rutas(app):
     app.register_blueprint(personal_bp)
     app.register_blueprint(ausencia_bp)
     app.register_blueprint(auth_bp)
+    app.register_blueprint(compra_bp)
+
     @app.route("/")
     def landing_page():
         if not current_user.is_authenticated:

@@ -1,3 +1,4 @@
+from flask_jwt_extended import jwt_required
 from models.base import db
 from models.legajos import find_legajo_by_id  
 from models.documentos import (
@@ -7,6 +8,7 @@ from models.documentos import (
     find_documento,
     find_documento_by_id,
     list_documentos_by_tipo, 
+    list_documentos_adicionales_by_legajo
 )
 from models.documentos import find_estado_by_nombre, listar_documentos
 from models.documentos import create_estado
@@ -16,7 +18,7 @@ from ..schemas.documento import (
     pagination_documento_schema,
 )
 from ..schemas.tipoDocumento import tipos_documentos_schema, tipo_documento_schema
-from flask import Blueprint, request, jsonify, send_file
+from flask import Blueprint, abort, request, jsonify, send_file, send_from_directory
 from flask import current_app as app
 from datetime import datetime
 from pathlib import Path
@@ -208,3 +210,22 @@ def get_documentos_by_tipo(tipo):
     print("entra")
     data = documentos_schema.dump(list_documentos_by_tipo(tipo))
     return jsonify(data), 200
+
+@bp.get("/adicionales/<int:id>")
+@jwt_required()
+def get_documentos_adicionales(id):
+    data = documentos_schema.dump(list_documentos_adicionales_by_legajo(id))
+    return jsonify(data), 200
+
+@bp.get("/view_adicional/<int:id>")
+@jwt_required()
+def view_adicional(id):
+    UPLOAD_FOLDER = os.path.abspath("documentos")
+    documento = find_documento_by_id(id)
+    directory = os.path.normpath(os.path.join(UPLOAD_FOLDER, "adicional"))
+    filename = documento.nombre_documento
+    file_path = os.path.join(directory, filename)
+    if not os.path.exists(file_path):
+        print("No existe")
+        abort(404, description="El documento no existe, prueba generar uno primero")
+    return send_from_directory(directory, filename)

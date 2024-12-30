@@ -63,7 +63,7 @@ def agregar_carpeta():
 
         if servicio_archivos.chequear_nombre_carpeta_existente(data.get('nombre')):
             flash('Ya existe una carpeta con ese nombre', 'error')
-            return render_template("archivos_admin/nueva_carpeta.html", form=form)
+            return render_template("archivos_admin/nueva_carpeta.html", form=form, users=servicio_personal.listar_usuarios_personal())
         
         usuarios_leen = set()
         usuarios_editan = set()
@@ -187,7 +187,7 @@ def actualizar_carpeta(id_carpeta):
         if carpeta.nombre != data.get('nombre'):
             if servicio_archivos.chequear_nombre_carpeta_existente(data.get('nombre')):
                 flash('Ya existe una carpeta con ese nombre', 'error')
-                return render_template("archivos_admin/editar_carpeta.html", form=form,id_carpeta=id_carpeta)
+                return render_template("archivos_admin/editar_carpeta.html", form=form,id_carpeta=id_carpeta, users=servicio_personal.listar_usuarios_personal())
         
         usuarios_leen = set()
         usuarios_editan = set()

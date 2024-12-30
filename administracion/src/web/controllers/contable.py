@@ -31,32 +31,42 @@ from administracion.src.web.forms.documento_legajo_nuevo import UploadDocumentoF
 @role_required('Administrador', 'Colaborador')
 def index():
     return render_template("contable/home.html")
+
 @bp.get("/fondo")
+@role_required('Administrador', 'Colaborador')
 def index_fondo():
-    fondos = fondo.listar_fondos()
+    page = request.args.get("page", 1, type=int)
+    per_page = 10
+
+    fondos = fondo.filtrar_fondos(page=page, per_page=per_page)
+   # fondos = [f for f in fondos if not f.borrado]
     return render_template("contable/contable.html",fondos = fondos)
+
 @bp.get("/fondos")
+@role_required('Administrador', 'Colaborador')
 def get_crear_fondo():
     form = FormularioNuevoFondo()
     return render_template("contable/crear_fondo.html", form = form)
+
 @bp.post("/fondos")
+@role_required('Administrador', 'Colaborador')
 def crear_fondo():
     form = FormularioNuevoFondo(request.form)
     if form.validate_on_submit():
         data = request.form.to_dict()
         csrf_token = data.pop("csrf_token", None)
-        if fondo.conseguir_fondo_de_id(data["titulo"]):
+        if fondo.conseguir_fondo_por_nombre(data["titulo"]):
             flash("Ya existe un fondo con ese título", 'error')
             return render_template("contable/crear_fondo.html", form=form)
         #Crear carpeta
         if archivos_adminDB.chequear_nombre_carpeta_existente(data["titulo"]):
             flash("Ya existe una carpeta con ese título", 'error')
             return render_template("contable/crear_fondo.html", form=form)
-        archivos_adminDB.crear_carpeta(data["titulo"],[],[])
-
+        carpeta = archivos_adminDB.crear_carpeta(data["titulo"],[],[])
+        data["carpeta_id"] = carpeta.id
         fondo.create_fondo(**data)
         flash("Fondo creado correctamente","success")
-        return redirect(url_for("contable.index"))
+        return redirect(url_for("contable.index_fondo"))
     else:
         # Obtener el primer campo con error
         first_error_field = next(iter(form.errors))
@@ -64,7 +74,10 @@ def crear_fondo():
         # Mostrar el error
         flash(f"El campo {getattr(form, first_error_field).label.text} {first_error_message}", 'danger')
         return render_template("contable/crear_fondo.html", form=form)
+
+
 @bp.get("/fondos/<string:fondo_id>")
+@role_required('Administrador', 'Colaborador')
 def mostrar_fondo(fondo_id):
     form = FormularioNuevoIngreso()
     fond = fondo.conseguir_fondo_de_id(fondo_id)
@@ -74,13 +87,46 @@ def mostrar_fondo(fondo_id):
     #ingresos = ingresoDB.listar_ingresos()
     #print(ingresos[1].receptor_id)
     return render_template("contable/detalle_fondo.html", fondo=fond,ingresos=ingresos,form=form)
+
+
+@bp.post("/fondos/eliminar")
+@role_required('Administrador', 'Colaborador')
+def delete_fondo():
+    fondo_id = request.form.get("fondo_id")
+    fond = fondo.conseguir_fondo_de_id(fondo_id)
+    if not fond:
+        return redirect(url_for('contable.index'))
+    
+    # Check if there are any associated ingresos
+    ingresos = ingresoDB.get_ingresos_del_fondo(fondo_id)
+    if ingresos:
+        flash("No se puede eliminar el fondo porque tiene ingresos asociados", "error")
+        return redirect(url_for('contable.mostrar_fondo', fondo_id=fondo_id))
+    
+    # Delete the folder associated with the fondo
+    if fond.carpeta:
+        archivos_adminDB.eliminar_carpeta(fond.carpeta.id)
+    
+    fondo.delete_fondo(fondo_id)
+    flash("Fondo eliminado correctamente", "success")
+    return redirect(url_for('contable.index_fondo'))
+
+
 @bp.post("/ingreso/<string:fondo_id>")
+@role_required('Administrador', 'Colaborador')
 def crear_ingreso(fondo_id):
     fond = fondo.conseguir_fondo_de_id(fondo_id)
     if not fond:
         return redirect(url_for('contable.index'))
+
     if True:
         data = request.form.to_dict()
+        if data["monto"] == "0":
+            flash("El monto no puede ser 0", "error")
+            return redirect(url_for("contable.mostrar_fondo",fondo_id=fondo_id))
+        if not data["monto"]:
+            flash("El monto no puede estar vacio", "error")
+            return redirect(url_for("contable.mostrar_fondo",fondo_id=fondo_id))
         data["receptor_id"] = fondo_id
         csrf_token = data.pop("csrf_token", None)
         file = data.pop("file", None)
@@ -99,7 +145,35 @@ def crear_ingreso(fondo_id):
         first_error_field = next(iter(form.errors))
         first_error_message = form.errors[first_error_field][0]
     return redirect(url_for("contable.mostrar_fondo",fondo_id=fondo_id))
+
+
+@bp.post("/ingreso/delete")
+@role_required('Administrador', 'Colaborador')
+def delete_ingreso():
+    id = request.form.get("ingreso_id")
+    ingreso = ingresoDB.conseguir_ingreso_de_id(id)
+    if not ingreso:
+        return redirect(url_for("contable.index"))
+    
+    fondo_id = ingreso.receptor_id
+    fond = fondo.conseguir_fondo_de_id(fondo_id)
+    if not fond:
+        return redirect(url_for('contable.index'))
+    
+    # Restar el monto del ingreso del saldo del fondo
+    fond.saldo -= float(ingreso.monto)
+    fondo.modificar_fondo(fondo_id, saldo=fond.saldo)
+    
+    # Eliminar archivo asociado si existe
+    if ingreso.archivo_id:
+        archivo_id = ingreso.archivo_id
+    ingresoDB.delete_ingreso(id)
+    if archivo_id:
+        archivos_adminDB.eliminar_archivo(archivo_id)
+    flash("Ingreso eliminado correctamente", "success")
+    return redirect(url_for("contable.mostrar_fondo", fondo_id=fondo_id))
 @bp.get("/ingreso/descargar/<int:id>")
+@role_required('Administrador', 'Colaborador')
 def descargar_ingreso(id):
     ingreso = ingresoDB.conseguir_ingreso_de_id(id)
     if not ingreso:
@@ -118,8 +192,12 @@ def descargar_ingreso(id):
         return redirect(url_for('contable.mostrar_fondo',fondo_id=ingreso.receptor_id))
 
     return send_from_directory(directorio, archivo.nombre, as_attachment=True)
+
+
 @bp.get("/legajos")
+@role_required('Administrador', 'Colaborador')
 def get_legajos():
+    params = request.args.to_dict()
     legajos = legajoDB.list_legajos_all()
     legajos = [legajo for legajo in legajos if legajo.necesita_facturacion]
     forms = {}
@@ -131,16 +209,20 @@ def get_legajos():
     for legajo in legajos:
         documentos = {doc.tipo_documento.nombre: doc for doc in legajo.documento}
         distribuciones = distribucionDB.list_distribuciones_by_legajo(legajo.id)
-        resultado.append({
-            "id": legajo.id,
-            "nro_legajo": legajo.nro_legajo,
-            "cliente": legajo.cliente,
-            "documentos": documentos,
-            "distribuciones" : distribuciones
-        })
+        if((params.get('filtro') and params['filtro'] =="SinDistribucion" and distribuciones == [] )or not params.get('filtro')):
+            resultado.append({
+                "id": legajo.id,
+                "nro_legajo": legajo.nro_legajo,
+                "cliente": legajo.cliente,
+                "documentos": documentos,
+                "distribuciones" : distribuciones
+            })
     form = DownloadForm()
     return render_template("contable/legajos.html",legajos = resultado, forms=forms,formDescarga = form)
+
+
 @bp.get("/distribuciones/crear/<int:id>")
+@role_required('Administrador', 'Colaborador')
 def get_crear_distribucion(id):
     form = FormularioNuevaDistribucion()
     empleados = empleadoDB.list_empleados()
@@ -151,7 +233,10 @@ def get_crear_distribucion(id):
         empleados_por_area.setdefault(empleado.area_id, []).append(empleado.id)
     distribucion_max_id = distribucionDB.get_max_id()
     return render_template("contable/crear_distribucion.html", form = form,empleados_por_area=empleados_por_area, id_legajo = id, distribucion_max_id = distribucion_max_id)
+
+
 @bp.post("/distribuciones/crear/<int:id>")
+@role_required('Administrador', 'Colaborador')
 def crear_distribucion(id):
     form = FormularioNuevaDistribucion(request.form)
     if form.validate_on_submit():
@@ -203,11 +288,16 @@ def crear_distribucion(id):
         first_error_field = next(iter(form.errors))
         first_error_message = form.errors[first_error_field][0]
         return render_template("contable/crear_distribucion.html", form = form)
+
+
 @bp.get("/distribuciones/<int:id>")
+@role_required('Administrador', 'Colaborador')
 def get_distribuciones(id):
     data = distribucionDB.list_distribuciones_by_legajo(id)
     legajo = legajoDB.find_legajo_by_id(id)
     return render_template("contable/listar_distribuciones.html",distribuciones = data, legajo = legajo)
+
+
 @bp.post("/distribuciones/delete/<int:id>")
 def delete_distribucion(id):
     distribucion = distribucionDB.get_distribucion(id)
@@ -253,7 +343,10 @@ def delete_distribucion(id):
     db.session.commit()
     distribucionDB.delete_distribucion(id)
     return redirect(url_for("contable.get_distribuciones",id=legajo_id))
+
+
 @bp.get("/legajos/<int:id>/documentos")
+@role_required('Administrador', 'Colaborador')
 def get_documentosAdd(id):
     form = UploadDocumentoForm(legajo_id=id)
     form.tipo.data = "adicional"
@@ -261,7 +354,10 @@ def get_documentosAdd(id):
     documentos = [doc for doc in legajo.documento if doc.tipo_documento.nombre == "adicional"]
     delete_form = DeleteForm()
     return render_template("contable/legajo_adicionales.html",form = form,legajo = legajo,documentos = documentos, delete_form=delete_form)
+
+
 @bp.post('/upload')
+@role_required('Administrador', 'Colaborador')
 def upload():
     file = request.files['file']
     tipo = request.form['tipo']
@@ -328,8 +424,12 @@ def upload():
             return redirect(url_for("contable.get_legajos"))
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-@bp.post('/delete_document/<int:documento_id>')
-def delete_document(documento_id):
+
+
+@bp.post('/delete_document')
+@role_required('Administrador', 'Colaborador')
+def delete_document():
+    documento_id = request.form.get("documento_id")
     documento = get_documento(documento_id)
     if documento is None:
         return jsonify({"error": "No se encontro el archivo"}), 404
@@ -356,7 +456,10 @@ def delete_document(documento_id):
         return redirect(url_for("contable.get_documentosAdd",id=documento.legajo_id))
     else:
         return redirect(url_for("contable.get_legajos"))
+
+
 @bp.get('/download/<int:documento_id>')
+@role_required('Administrador', 'Colaborador')
 def download(documento_id):
      # Extraer el ID del documento desde el formulario
     archivo = get_documento(documento_id)  # Implementa esta función para buscar el documento

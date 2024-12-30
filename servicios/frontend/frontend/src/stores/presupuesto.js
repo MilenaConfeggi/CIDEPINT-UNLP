@@ -43,7 +43,7 @@ export const usePresupuestoStore = defineStore('presupuesto', {
         alert('Por favor selecciona un archivo PDF.')
       }
     },
-    async viewPresupuesto(id, legajoId) {
+    async viewPresupuesto(legajoId) {
       const token = useAuthStore().getToken()
       try {
         const response = await fetch(`${import.meta.env.VITE_API_URL}/presupuestos/ver_documento/${legajoId}`, {

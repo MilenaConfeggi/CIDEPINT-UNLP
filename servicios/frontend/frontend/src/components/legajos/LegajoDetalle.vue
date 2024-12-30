@@ -101,7 +101,7 @@
                           </RouterLink>
                         </li>
                         <li v-if="hasPermission('ver_presupuesto') && existeDocumento(documento.nombre)">
-                          <button type="button" class="dropdown-item" @click="viewPresupuesto(documento.id, documento.nombre, legajo.id)">
+                          <button type="button" class="dropdown-item" @click="viewPresupuesto(legajo.id)">
                             Ver
                           </button>
                         </li>
@@ -162,7 +162,7 @@
                 </td>
               </tr>
             </tbody>
-          </table>
+          </table>otra opción es
         </div>
       </div>
     </div>

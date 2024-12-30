@@ -18,9 +18,124 @@ from reportlab.pdfgen import canvas
 from datetime import datetime
 from servicios.backend.src.core.services import servicioDocumento
 from models.documentos.documento import Documento
+from sqlalchemy import desc
 
 
 UPLOAD_FOLDER = os.path.abspath("documentos")
+
+def generar_documento_de_legajo(id_legajo):
+    # Completar con los datos necesarios
+    legajo = Legajo.query.filter_by(id=id_legajo).first()
+    presupuesto = Presupuesto.query.filter_by(legajo_id=legajo.id).order_by(desc(Presupuesto.fecha_creacion)).first()
+
+    # Crear la ruta de destino
+    doc_dir = os.path.join(UPLOAD_FOLDER, "legajos", str(legajo.id))
+    os.makedirs(doc_dir, exist_ok=True)  # Crear el directorio si no existe
+
+    # Eliminar archivos que comienzan con "presupuesto"
+    for archivo in os.listdir(doc_dir):
+        archivo_path = os.path.join(doc_dir, archivo)
+        if os.path.isfile(archivo_path) and archivo.startswith("legajo_"):
+            os.remove(archivo_path)
+
+    timestamp = datetime.now().strftime("%Y%m%d")
+    output_filename = os.path.join(doc_dir, f"legajo_{timestamp}.pdf")
+
+    # Document setup
+    doc = SimpleDocTemplate(
+        output_filename,
+        pagesize=letter,
+        rightMargin=36,
+        leftMargin=36,
+        topMargin=36,
+        bottomMargin=36
+    )
+    
+    # Styles
+    styles = getSampleStyleSheet()
+    normal_style = ParagraphStyle(
+        'Normal',
+        fontSize=12,
+        leading=14
+    )
+    title_style = ParagraphStyle(
+        'TitleStyle',
+        parent=styles['Heading1'],
+        fontSize=16,
+        alignment=1,  # Centrado
+        spaceAfter=12
+    )
+    
+    # Content elements
+    elements = []
+    
+    # Rutas de los logos
+    logo_cic = os.path.join(UPLOAD_FOLDER, "logos", "CIC.png")
+    logo_conicet = os.path.join(UPLOAD_FOLDER, "logos", "CONICET.jpg")
+    logo_unlp = os.path.join(UPLOAD_FOLDER, "logos", "UNLP.png")
+    logo_cidepint = os.path.join(UPLOAD_FOLDER, "logos", "CIDEPINT.png")
+
+    # Insertar logos
+    image_cic = Image(logo_cic, width=1.2*inch, height=0.6*inch)
+    image_conicet = Image(logo_conicet, width=1.5*inch, height=0.6*inch)
+    image_unlp = Image(logo_unlp, width=1.2*inch, height=0.6*inch)
+    image_cidepint = Image(logo_cidepint, width=7.6*inch, height=0.6*inch)
+    logos_table = Table([[image_cic, image_conicet, image_unlp]])
+    logos_table.setStyle(TableStyle([('ALIGN', (0, 0), (-1, -1), 'CENTER')]))
+
+    # Títulos y párrafos
+    elements.append(logos_table)
+    elements.append(image_cidepint)
+    elements.append(Spacer(1, 12))
+
+    # Form fields
+    form_fields = [
+        ['Legajo Interno Nº:', legajo.id],
+        ['Cliente:', legajo.cliente.nombre],
+        ['CUIT:', legajo.cliente.cuit],
+        ['Contacto:', legajo.cliente.contacto],
+        ['Domicilio completo:', legajo.cliente.calle + " " + legajo.cliente.numero + ", " + legajo.cliente.localidad],
+        ['Teléfono:', legajo.cliente.telefono],
+        ['Cel:', legajo.cliente.celular],
+        ['E-mail:', legajo.cliente.email],
+        ['Área:', legajo.area.nombre],
+        ['Fecha de entrada:', legajo.fecha_entrada.strftime("%d de %B de %Y")],
+        ['Objetivo de la OT:', legajo.objetivo],
+        ['Presupuesto Nº:', presupuesto.nro_presupuesto]
+    ]
+    
+    # Create form table
+    # First column (labels) will be 2.5 inches, second column (input fields) will be 5 inches
+    form_table = Table(form_fields, colWidths=[2.5*inch, 5*inch])
+    form_table.setStyle(TableStyle([
+        ('GRID', (0,0), (-1,-1), 0.5, colors.black),  # Add grid to all cells
+        ('ALIGN', (0,0), (0,-1), 'LEFT'),  # Left align all cells in first column
+        ('ALIGN', (1,0), (1,-1), 'LEFT'),  # Left align all cells in second column
+        ('FONTSIZE', (0,0), (-1,-1), 12),  # Set font size for all cells
+        ('PADDING', (0,0), (-1,-1), 6),    # Add padding to all cells
+        ('BACKGROUND', (0,0), (0,-1), colors.lightgrey),  # Light grey background for labels
+        ('FONTNAME', (0,0), (0,-1), 'Helvetica-Bold'),   # Bold font for labels
+        ('FONTNAME', (1,0), (1,-1), 'Helvetica'),        # Regular font for input fields
+        ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),           # Vertically center all content
+    ]))
+    
+    
+    # Add form table to elements
+    elements.append(form_table)
+    
+    # Build the document
+    doc.build(elements)
+
+
+    # Crear el documento en la base de datos
+    data = {
+        "nombre_documento": "legajo.pdf",
+        "estado_id": 5,
+        "legajo_id": legajo.id,
+        "tipo_id": 9
+    }
+    servicioDocumento.crear_documento(data)
+
 
 class NumberedCanvas(canvas.Canvas):
     def __init__(self, *args, **kwargs):

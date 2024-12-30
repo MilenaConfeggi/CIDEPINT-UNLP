@@ -65,6 +65,9 @@ def seeds_tipos_documento():
             'nombre': 'adicional',
         },
         {
+            'nombre': 'Legajo',
+        },
+        {
             'nombre': 'Recibo',
         },
     ]

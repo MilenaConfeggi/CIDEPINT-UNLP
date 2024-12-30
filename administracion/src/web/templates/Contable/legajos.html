@@ -222,7 +222,8 @@
             </tr>
         {% endfor %}
         </tbody>
-        <div
+    </table>
+    <div
             class="grid px-4 py-3 text-xs font-semibold tracking-wide text-gray-500 uppercase border-t bg-gray-50 sm:grid-cols-9"
             >
             <span class="flex items-center col-span-3">
@@ -301,7 +302,6 @@
             </span>
             </div>
         </div>
-    </table>
     </div>
     <form id="modals" method="POST" action="{{ url_for('contable.delete_document') }}">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">

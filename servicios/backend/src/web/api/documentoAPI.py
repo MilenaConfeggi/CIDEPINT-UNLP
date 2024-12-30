@@ -215,7 +215,6 @@ def get_documentos_by_tipo(tipo):
 @jwt_required()
 def get_documentos_adicionales(id):
     data = documentos_schema.dump(list_documentos_adicionales_by_legajo(id))
-    print(data)
     return jsonify(data), 200
 
 @bp.get("/view_adicional/<int:id>")
@@ -226,7 +225,6 @@ def view_adicional(id):
     directory = os.path.normpath(os.path.join(UPLOAD_FOLDER, "adicional"))
     filename = documento.nombre_documento
     file_path = os.path.join(directory, filename)
-    print(file_path)
     if not os.path.exists(file_path):
         print("No existe")
         abort(404, description="El documento no existe, prueba generar uno primero")

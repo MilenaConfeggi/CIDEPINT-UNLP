@@ -112,6 +112,13 @@
                           </label>
                         </li>
                       </template>
+                      <template v-else-if="documento.nombre === 'Legajo'">
+                        <li>
+                          <button type="button" class="dropdown-item" @click="viewLegajo(legajo.id)">
+                            Ver
+                          </button>
+                        </li>
+                      </template>
                       <template v-else-if="documento.nombre === 'adicional'">
                         <li v-for="adicional in adicionales" :key="adicional.id" class="dropdown-item" @click="viewAdicional(adicional.id)">
                           {{ adicional.nombre_documento }}
@@ -135,7 +142,7 @@
                           </label>
                         </li>
                       </template>
-                      <template v-if="documento.nombre !== 'Informe' && documento.nombre !== 'Certificado CIDEPINT' && documento.nombre !== 'Presupuesto CIDEPINT' && documento.nombre !== 'Factura' && documento.nombre !== 'adicional'">
+                      <template v-if="documento.nombre !== 'Informe' && documento.nombre !== 'Certificado CIDEPINT' && documento.nombre !== 'Presupuesto CIDEPINT' && documento.nombre !== 'Factura' && documento.nombre !== 'adicional' && documento.nombre !== 'Legajo'">
                         <li v-if="!existeDocumento(documento.nombre)">
                           <label :for="`upload-pdf-${documento.id}`" class="dropdown-item">
                             Cargar
@@ -364,6 +371,29 @@ const viewAdicional = async (adicionalId) => {
   } catch (error) {
     console.error('Error al obtener el archivo adicional:', error)
     alert('No se pudo cargar el archivo adicional.')
+  }
+}
+
+const viewLegajo = async (legajoId) => {
+  const token = authStore.getToken()
+  try {
+    const response = await axios.get(
+      `${import.meta.env.VITE_API_URL}/presupuestos/ver_legajo/${legajoId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        responseType: 'blob',
+      },
+    )
+
+    // Crear una URL para visualizar el archivo
+    const blob = new Blob([response.data], { type: response.headers['content-type'] })
+    const fileUrl = URL.createObjectURL(blob)
+    window.open(fileUrl, '_blank')
+  } catch (error) {
+    console.error('Error al obtener el archivo del legajo:', error)
+    alert('No se pudo cargar el archivo del legajo.')
   }
 }
 

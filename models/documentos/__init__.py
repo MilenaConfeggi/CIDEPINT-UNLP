@@ -122,3 +122,6 @@ def list_legajos(page=1, per_page=10, empresa=None, fecha=None, area=None):
 
 def list_documentos_by_tipo(tipo):
     return db.session.query(Documento).filter_by(tipo_documento_id=tipo).all()
+
+def list_documentos_adicionales_by_legajo(legajo):
+    return db.session.query(Documento).filter_by(legajo_id=legajo, tipo_documento_id=8).all()

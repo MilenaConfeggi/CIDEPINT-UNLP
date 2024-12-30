@@ -33,6 +33,21 @@ def seeds_documentos():
             'tipo_documento_id': 5,
             'legajo_id': 33
         },
+        {
+            'nombre_documento': 'Adicional1.pdf',
+            'fecha_creacion': datetime(2024, 1, 1),
+            'estado_id': 1,
+            'tipo_documento_id': 8,
+            'legajo_id': 33
+        },
+        {
+            'nombre_documento': 'Adicional2.pdf',
+            'fecha_creacion': datetime(2024, 1, 1),
+            'estado_id': 1,
+            'tipo_documento_id': 8,
+            'legajo_id': 33
+        },
+
     ]
     for data in documentos_data:
         db.session.add(Documento(**data))

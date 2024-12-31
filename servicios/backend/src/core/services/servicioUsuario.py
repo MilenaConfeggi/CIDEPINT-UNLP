@@ -250,3 +250,5 @@ def es_director(usuario):
 def es_secretaria(usuario):
     return usuario.rol.nombre == "Secretaria"
 
+def listar_usuarios_paginados(page, per_page):
+    return Usuario.query.filter_by(esta_borrado=False).paginate(page=page, per_page=per_page)

@@ -1,7 +1,7 @@
 <template>
   <div>
-    <button @click="mostrarFormularioCrear" class="stans-button right">Crear Usuario</button>
-    <button @click="mostrarJefeArea" class="stans-button right">Cambiar Jefe de Área</button>
+    <button @click="mostrarFormularioCrear" class="stans-button">Crear Usuario</button>
+    <button @click="mostrarJefeArea" class="stans-button">Cambiar Jefe de Área</button>
     <ListadoUsuarios />
 
     <!-- Modal de CrearUsuario -->
@@ -57,6 +57,7 @@ const cerrarJefeArea = () => {
   cursor: pointer;
   font-size: 16px;
   transition: background-color 0.3s ease;
+  margin-right: 10px; /* Añadir margen entre los botones */
 }
 
 .stans-button:hover {

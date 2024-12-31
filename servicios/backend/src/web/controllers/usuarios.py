@@ -14,9 +14,19 @@ bp = Blueprint('usuarios', __name__, url_prefix='/usuarios')
 def listar_usuarios():
     if not check_permission("listar_usuarios"):
         return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
-    usuarios = servicioUsuario.listar_usuarios()
-    data = usuariosSchema.dump(usuarios, many=True)
-    return jsonify(data), 200
+    
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 10, type=int)
+    
+    usuarios_paginated = servicioUsuario.listar_usuarios_paginados(page, per_page)
+    data = usuariosSchema.dump(usuarios_paginated.items)
+    
+    return jsonify({
+        'usuarios': data,
+        'total': usuarios_paginated.total,
+        'pages': usuarios_paginated.pages,
+        'current_page': usuarios_paginated.page
+    }), 200
 
 @bp.get("/<int:id_area>")
 @jwt_required()

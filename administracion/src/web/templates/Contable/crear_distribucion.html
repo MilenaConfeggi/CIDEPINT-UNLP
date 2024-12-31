@@ -84,11 +84,12 @@
     </div>
         
         <label for="empleados_seleccionados">Seleccionar Empleados que recibiran una parte  del monto</label>
-        <div id="empleados-seleccionados">
+        <div id="empleados-seleccionados" class="max-h-60 overflow-y-auto border border-gray-300 rounded p-2">
             {% for subfield in form.empleados_seleccionados %}
-                <div>
-                    <input type="checkbox" id="empleado-{{ subfield.id }}" name="{{ subfield.name }}" value="{{ subfield.data }}" {% if subfield.checked %}checked{% endif %}>
-                    <label for="{{ subfield.id }}">{{ subfield.label.text }}</label>
+                <div class="flex items-center">
+                    <input type="checkbox" id="empleado-{{ subfield.id }}" name="{{ subfield.name }}" value="{{ subfield.data }}" 
+                           {% if subfield.checked %}checked{% endif %} class="mr-2">
+                    <label for="empleado-{{ subfield.id }}" class="text-sm text-gray-700">{{ subfield.label.text }}</label>
                 </div>
             {% endfor %}
         </div>

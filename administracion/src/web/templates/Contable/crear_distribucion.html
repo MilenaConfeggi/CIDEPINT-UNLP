@@ -14,13 +14,25 @@
             {% endfor %}
         </div>
 
-        <div class="mb-4">
-            <label for="porcentaje_comisiones" class="block text-sm font-medium text-gray-700">Porcentaje de Comisiones que se le descontara al monto total</label>
-            {{ form.porcentaje_comisiones(class_='block w-full border border-gray-300 rounded py-2 px-3', placeholder="Ingrese el porcentaje de comisiones", value=19) }}
+        <div class="mb-4 relative">
+            <label for="porcentaje_comisiones" class="block text-sm font-medium text-gray-700">
+                Porcentaje de Comisiones que se le descontará al monto total
+            </label>
+            <div class="relative">
+                {{ form.porcentaje_comisiones(
+                    class_='block w-full border border-gray-300 rounded py-2 pl-3 pr-10', 
+                    placeholder="Ingrese el porcentaje de comisiones", 
+                    value=19
+                ) }}
+                <span class="absolute top-0 bottom-0 right-3 flex items-center text-gray-1000 pointer-events-none">
+                    %
+                </span>
+            </div>
             {% for error in form.porcentaje_comisiones.errors %}
                 <p class="text-red-500 text-sm">{{ error }}</p>
             {% endfor %}
         </div>
+        
 
         <div class="mb-4">
             <label for="costos" class="block text-sm font-medium text-gray-700">Costos que se le restara al monto despues de las comisiones</label>
@@ -38,13 +50,25 @@
             {% endfor %}
         </div>
 
-        <div class="mb-4">
-            <label for="porcentaje_area" class="block text-sm font-medium text-gray-700">Porcentaje Área para las ganancias, el resto se lo llevara el cidepint</label>
-            {{ form.porcentaje_area(class_='block w-full border border-gray-300 rounded py-2 px-3', placeholder="Ingrese el porcentaje del área", value=40) }}
+        <div class="mb-4 relative">
+            <label for="porcentaje_area" class="block text-sm font-medium text-gray-700">
+                Porcentaje Área para las ganancias, el resto se lo llevará el Cidepint
+            </label>
+            <div class="relative">
+                {{ form.porcentaje_area(
+                    class_='block w-full border border-gray-300 rounded py-2 pl-3 pr-10', 
+                    placeholder="Ingrese el porcentaje del área", 
+                    value=40
+                ) }}
+                <span class="absolute top-0 bottom-0 right-3 flex items-center text-gray-1000 pointer-events-none">
+                    %
+                </span>
+            </div>
             {% for error in form.porcentaje_area.errors %}
                 <p class="text-red-500 text-sm">{{ error }}</p>
             {% endfor %}
         </div>
+        
 
         <div class="mb-4">
         <label for="ganancias_de_id" class="block text-sm font-medium text-gray-700">Área de Ganancias</label>
@@ -68,13 +92,25 @@
                 </div>
             {% endfor %}
         </div>
-        <div class="mb-4">
-            <label for="porcentaje_empleados" class="block text-sm font-medium text-gray-700">Porcentaje del monto que se llevaran los Empleados, el resto se lo llevara la area seleccionada como ganancia</label>
-            {{ form.porcentaje_empleados(class_='block w-full border border-gray-300 rounded py-2 px-3', placeholder="Ingrese el porcentaje de empleados", value=distribucion_max_id.porcentaje_empleados if distribucion_max_id is not none else '') }}
+        <div class="mb-4 relative">
+            <label for="porcentaje_empleados" class="block text-sm font-medium text-gray-700">
+                Porcentaje del monto que se llevarán los empleados, el resto se lo llevará el área seleccionada como ganancia
+            </label>
+            <div class="relative">
+                {{ form.porcentaje_empleados(
+                    class_='block w-full border border-gray-300 rounded py-2 pl-3 pr-10', 
+                    placeholder="Ingrese el porcentaje de empleados", 
+                    value=distribucion_max_id.porcentaje_empleados if distribucion_max_id is not none else ''
+                ) }}
+                <span class="absolute top-0 bottom-0 right-3 flex items-center pointer-events-none text-gray-1000">
+                    %
+                </span>
+            </div>
             {% for error in form.porcentaje_empleados.errors %}
                 <p class="text-red-500 text-sm">{{ error }}</p>
             {% endfor %}
         </div>
+        
         <div class="mt-6">
             <button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded hover:bg-indigo-700">
                 Guardar Distribución

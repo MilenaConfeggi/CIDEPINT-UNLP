@@ -84,15 +84,19 @@
     </div>
         
         <label for="empleados_seleccionados">Seleccionar Empleados que recibiran una parte  del monto</label>
-        <div id="empleados-seleccionados" class="max-h-60 overflow-y-auto border border-gray-300 rounded p-2">
-            {% for subfield in form.empleados_seleccionados %}
-                <div class="flex items-center">
-                    <input type="checkbox" id="empleado-{{ subfield.id }}" name="{{ subfield.name }}" value="{{ subfield.data }}" 
-                           {% if subfield.checked %}checked{% endif %} class="mr-2">
-                    <label for="empleado-{{ subfield.id }}" class="text-sm text-gray-700">{{ subfield.label.text }}</label>
-                </div>
-            {% endfor %}
+        <div id="empleados-seleccionados" 
+     style="max-height: 10rem; overflow-y: auto; border: 1px solid #d1d5db; border-radius: 0.25rem; padding: 0.5rem;">
+    {% for subfield in form.empleados_seleccionados %}
+        <div class="flex items-center">
+            <input type="checkbox" id="empleado-{{ subfield.id }}" name="{{ subfield.name }}" value="{{ subfield.data }}" 
+                   {% if subfield.checked %}checked{% endif %} class="mr-2">
+            <label for="empleado-{{ subfield.id }}" class="text-sm text-gray-700">{{ subfield.label.text }}</label>
         </div>
+    {% endfor %}
+</div>
+
+
+
         <div class="mb-4 relative">
             <label for="porcentaje_empleados" class="block text-sm font-medium text-gray-700">
                 Porcentaje del monto que se llevarán los empleados, el resto se lo llevará el área seleccionada como ganancia

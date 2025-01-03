@@ -306,6 +306,7 @@ def seed_usuarios():
         "cargar_interarea_firmada",
         "listarStans", #este es el de presupuestos
         "generar_presupuesto",
+        "generar_presupuestont",
         "ver_presupuesto",
         "cargar_presupuesto_firmado",
         "ver_presupuesto_firmado",
@@ -350,6 +351,7 @@ def seed_usuarios():
             "cargar_interarea_firmada",
             "listarStans",
             "generar_presupuesto",
+            "generar_presupuestont",
             "ver_presupuesto",
             "cargar_presupuesto_firmado",
             "ver_presupuesto_firmado",
@@ -391,6 +393,7 @@ def seed_usuarios():
             "cargar_interarea_firmada",
             "listarStans",
             "generar_presupuesto",
+            "generar_presupuestont",
             "ver_presupuesto",
             "ver_presupuesto_firmado",
             "ver_presupuesto_pendiente",

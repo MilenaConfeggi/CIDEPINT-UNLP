@@ -44,6 +44,30 @@ def generar_presupuesto(id_legajo):
     servicioPresupuesto.crear_presupuesto_con_stans(data)
     return jsonify({"message": "Presupuesto creado correctamente"}), 200
 
+
+@bp.get("/sin_presu/<int:id_legajo>")
+@jwt_required()
+def buscar_presupuestont(id_legajo):
+    if not check_permission("generar_presupuestont"):
+        return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
+    #if data['medioDePago'] == []:
+    #    return jsonify({"error": "No se seleccionó medio de pago"}), 400
+    data = servicioPresupuesto.tiene_presupuestont(id_legajo)
+    print(data)
+    return jsonify(data), 200
+
+@bp.post("/crearnt/<int:id_legajo>")
+@jwt_required()
+def generar_presupuestont(id_legajo):
+    if not check_permission("generar_presupuestont"):
+        return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
+    data = request.get_json()
+    #if data['medioDePago'] == []:
+    #    return jsonify({"error": "No se seleccionó medio de pago"}), 400
+    data['legajo'] = id_legajo
+    servicioPresupuesto.crear_presupuestont_con_stans(data)
+    return jsonify({"message": "Marcado como sin presupuesto correctamente"}), 200
+
 @bp.get("/ver_documento/<int:id_legajo>")
 @jwt_required()
 def ver_presupuesto(id_legajo):

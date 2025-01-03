@@ -100,6 +100,14 @@
                             Generar
                           </RouterLink>
                         </li>
+                        <li v-if="hasPermission('generar_presupuestont') && !existeDocumento(documento.nombre) && presupuestont === false">
+                          <RouterLink :to="`/marcar_sin_presupuesto/${legajo.id}`" class="dropdown-item">
+                            Marcar como sin presupuesto
+                          </RouterLink>
+                        </li>
+                        <li v-if="presupuestont === true" class="dropdown-item">
+                            Ya está marcado como SIN presupuesto
+                        </li>
                         <li v-if="hasPermission('ver_presupuesto') && existeDocumento(documento.nombre)">
                           <button type="button" class="dropdown-item" @click="viewPresupuesto(documento.id, documento.nombre, legajo.id)">
                             Ver
@@ -245,6 +253,8 @@ const nroFactura = ref('')
 const documentoID = ref('')
 const adicionales = ref([])
 
+const presupuestont = ref('')
+
 const formatDate = (dateString) => {
   const options = { year: 'numeric', day: '2-digit', month: '2-digit' }
   return new Date(dateString).toLocaleDateString('es-ES', options)
@@ -351,6 +361,22 @@ const fetchAdicionales = async (legajoId) => {
   }
 }
 
+const fetchSinPresupuesto = async (legajoId) => {
+  const token = authStore.getToken()
+  try {
+    const response = await axios.get(`${import.meta.env.VITE_API_URL}/presupuestos/sin_presu/${legajoId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    presupuestont.value = response.data
+    console.log(presupuestont)
+  } catch (error) {
+    console.error('Error al obtener presupuesto:', error)
+  }
+}
+
+
 const viewAdicional = async (adicionalId) => {
   const token = authStore.getToken()
   try {
@@ -406,6 +432,7 @@ onMounted(async () => {
     await legajosStore.getLegajo(route.params.id)
     await documentosStore.getTiposDocumentos()
     await fetchAdicionales(route.params.id)
+    await fetchSinPresupuesto(route.params.id)
   } catch (err) {
     console.error('Error al cargar el legajo:', err)
     errorMessage.value = err.message || 'Error al cargar el legajo'

@@ -18,6 +18,8 @@ class Presupuesto(db.Model):
     legajo_id = db.Column(db.Integer, db.ForeignKey('legajo.id'))
     legajo = db.relationship('Legajo', back_populates='presupuesto_cidepint')
 
+    es_presupuesto = db.Column(db.Boolean, default=True, nullable=False)
+
 # Evento para establecer el valor predeterminado de nro_presupuesto
 @event.listens_for(Presupuesto, 'after_insert')
 def set_nro_presupuesto(mapper, connection, target):

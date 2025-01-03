@@ -139,6 +139,7 @@
                     {% endif %}
                 </td>
                 <td class="px-4 py-3 text-sm">
+                    <div class="flex items-center space-x-4">
                     <a href="{{ url_for('contable.get_documentosAdd',id=legajo.id) }}"
                         class="flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-black-600 rounded-lg focus:outline-none focus:shadow-outline-gray"
                         aria-label="Ver"
@@ -154,7 +155,24 @@
                                 ></path>
                             </svg>
                         </a>
-                </td>
+                        <a href="{{ url_for('contable.get_documentosAdd',id=legajo.id) }}"
+                        class="flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-black-600 rounded-lg focus:outline-none focus:shadow-outline-gray"
+                        aria-label="Ver"
+                        >
+                        <svg class="px-4 aspect-square w-14 h-14 rounded-lg object-cover group-hover:opacity-75 xl:aspect-[7/7]"
+                            aria-hidden="true"
+                            fill="currentColor"
+                            viewBox="0 0 448 512"
+                            >
+                            <path
+                          fill-rule="evenodd"
+                          d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"
+                          clip-rule="evenodd"
+                            ></path>
+                          </svg>
+                        </a>
+                    </div>
+                    </td>
                 <td class="px-4 py-3 text-sm">
                     {% if legajo.documentos['Recibo'] %}
                     <a href="{{ url_for('contable.download', documento_id=legajo.documentos['Recibo'].id) }}" 
@@ -166,6 +184,8 @@
                     {% endif %}
                 </td>
                 <td class="px-4 py-3 text-sm {% if legajo.distribuciones %}bg-green-600{% else %}bg-red-600{% endif %}" >
+                    <div class="flex items-center space-x-4">
+                    {% if legajo.distribuciones %}
                     <a href="{{ url_for('contable.get_distribuciones',id=legajo.id) }}"
                         class="flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-black-600 rounded-lg focus:outline-none focus:shadow-outline-gray"
                         aria-label="Ver"
@@ -181,11 +201,107 @@
                                 ></path>
                             </svg>
                         </a>
+                        {% endif %}
+                        <a href="{{ url_for('contable.get_crear_distribucion', id=legajo.id) }}"
+                        class="flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-black-600 rounded-lg focus:outline-none focus:shadow-outline-gray"
+                        aria-label="Ver">
+                        <svg class="px-4 aspect-square w-14 h-14 rounded-lg object-cover group-hover:opacity-75 xl:aspect-[7/7]"
+                            aria-hidden="true"
+                            fill="currentColor"
+                            viewBox="0 0 448 512"
+                            >
+                            <path
+                          fill-rule="evenodd"
+                          d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"
+                          clip-rule="evenodd"
+                            ></path>
+                          </svg>
+                        </a>
+                    </div>
                 </td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
+    <div
+            class="grid px-4 py-3 text-xs font-semibold tracking-wide text-gray-500 uppercase border-t bg-gray-50 sm:grid-cols-9"
+            >
+            <span class="flex items-center col-span-3">
+                Mostrando {{ paginacion.first }}-{{ paginacion.last }} de {{ paginacion.total }}
+            </span>
+            <span class="col-span-2"></span>
+            <!-- Pagination -->
+            <span class="flex col-span-4 mt-2 sm:mt-auto sm:justify-end">
+                <nav aria-label="Table navigation">
+                <ul class="inline-flex items-center">
+                    <li>
+                    <a
+                        class="px-3 py-1 rounded-md rounded-l-lg focus:outline-none focus:shadow-outline-purple"
+                        aria-label="Anterior"
+                        href="{{ url_for('contable.get_legajos', page=paginacion.prev_num) }}"
+                    >
+                        <svg
+                        class="w-4 h-4 fill-current"
+                        aria-hidden="true"
+                        viewBox="0 0 20 20"
+                        >
+                        <path
+                            d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                            clip-rule="evenodd"
+                            fill-rule="evenodd"
+                        ></path>
+                        </svg>
+                    </a>
+                    </li>
+                    {% if paginacion.iter_pages() %}
+                    {% for page in paginacion.iter_pages() %}
+                        {% if page %}
+                            {% if page != paginacion.page %}
+                                <li>
+                                    <a href="{{ url_for('contable.get_legajos', page=page) }}" class="px-3 py-1 text-gray transition-colors duration-150">
+                                        {{ page }}
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li>
+                                    <p class="px-3 py-1 text-white transition-colors duration-150 bg-blue-600 border border-r-0 border-blue-600 rounded-md focus:outline-none focus:shadow-outline-blue">
+                                        {{ page }}
+                                    </p>
+                                </li>
+                            {% endif %}
+                        {% else %}
+                            <li>
+                                <p class="px-3 py-1 text-white transition-colors duration-150">
+                                    ..
+                                </p>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% endif %}
+                    <li>
+                    <a
+                        class="px-3 py-1 rounded-md rounded-r-lg focus:outline-none focus:shadow-outline-purple"
+                        aria-label="Next"
+                        href="{{ url_for('contable.get_legajos', page=paginacion.next_num) }}"
+                    >
+                        <svg
+                        class="w-4 h-4 fill-current"
+                        aria-hidden="true"
+                        viewBox="0 0 20 20"
+                        >
+                        <path
+                            d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                            clip-rule="evenodd"
+                            fill-rule="evenodd"
+                        ></path>
+                        </svg>
+                    </a>
+                    </li>
+                </ul>
+                </nav>
+            </span>
+            </div>
+        </div>
     </div>
     <form id="modals" method="POST" action="{{ url_for('contable.delete_document') }}">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">

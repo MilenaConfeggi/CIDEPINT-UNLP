@@ -4,15 +4,19 @@ from models.documentos import find_estado_by_nombre
 from models.clientes import Cliente
 from datetime import datetime
 
-def list_legajos(page=1, per_page=10, empresa=None, fecha=None):
-    empresa = empresa.strip()
-    fecha = fecha.strip()
+def list_legajos(page=1, per_page=10, empresa=None, fecha=None,facturacion=None):
+    
+    
     query = Legajo.query
     if empresa:
+        empresa = empresa.strip()
         query = query.join(Legajo.cliente).filter(Cliente.email.like(f'%{empresa}%'))
     if fecha:
+        fecha = fecha.strip()
         fecha = datetime.strptime(fecha, '%Y-%m-%d')
         query = query.filter(Legajo.fecha_entrada == fecha)
+    if facturacion:
+        query = query.filter(Legajo.necesita_facturacion)
     return query.paginate(page=page, per_page=per_page, error_out=False)
 
 def list_legajos_all():

@@ -62,9 +62,9 @@ def crear_fondo():
         if archivos_adminDB.chequear_nombre_carpeta_existente(data["titulo"]):
             flash("Ya existe una carpeta con ese título", 'error')
             return render_template("contable/crear_fondo.html", form=form)
-        carpeta = archivos_adminDB.crear_carpeta(data["titulo"],[],[])
-        data["carpeta_id"] = carpeta.id
-        fondo.create_fondo(**data)
+        x = fondo.create_fondo(**data)
+        carpeta = archivos_adminDB.crear_carpeta(data["titulo"],[],[],x.id)
+        
         flash("Fondo creado correctamente","success")
         return redirect(url_for("contable.index_fondo"))
     else:
@@ -165,6 +165,7 @@ def delete_ingreso():
     fondo.modificar_fondo(fondo_id, saldo=fond.saldo)
     
     # Eliminar archivo asociado si existe
+    archivo_id = None
     if ingreso.archivo_id:
         archivo_id = ingreso.archivo_id
     ingresoDB.delete_ingreso(id)
@@ -198,8 +199,10 @@ def descargar_ingreso(id):
 @role_required('Administrador', 'Colaborador')
 def get_legajos():
     params = request.args.to_dict()
-    legajos = legajoDB.list_legajos_all()
-    legajos = [legajo for legajo in legajos if legajo.necesita_facturacion]
+    page = request.args.get("page", 1, type=int)
+    per_page = 10
+    legajos = legajoDB.list_legajos(page, per_page,None,None,True)
+    #legajos = [legajo for legajo in legajos if legajo.necesita_facturacion]
     forms = {}
     for legajo in legajos:
         forms[legajo.id] = UploadDocumentoForm(legajo_id=legajo.id)
@@ -218,7 +221,7 @@ def get_legajos():
                 "distribuciones" : distribuciones
             })
     form = DownloadForm()
-    return render_template("contable/legajos.html",legajos = resultado, forms=forms,formDescarga = form)
+    return render_template("contable/legajos.html",legajos = resultado, forms=forms,formDescarga = form,paginacion = legajos)
 
 
 @bp.get("/distribuciones/crear/<int:id>")
@@ -298,8 +301,9 @@ def get_distribuciones(id):
     return render_template("contable/listar_distribuciones.html",distribuciones = data, legajo = legajo)
 
 
-@bp.post("/distribuciones/delete/<int:id>")
-def delete_distribucion(id):
+@bp.post("/distribuciones/delete")
+def delete_distribucion():
+    id = request.form.get("distribucion_id")
     distribucion = distribucionDB.get_distribucion(id)
     if not distribucion:
         return redirect(url_for("contable.get_legajos"))
@@ -430,6 +434,7 @@ def upload():
 @role_required('Administrador', 'Colaborador')
 def delete_document():
     documento_id = request.form.get("documento_id")
+    print(documento_id)
     documento = get_documento(documento_id)
     if documento is None:
         return jsonify({"error": "No se encontro el archivo"}), 404

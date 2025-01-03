@@ -34,3 +34,5 @@ def delete_ingreso(id):
         db.session.commit()
         return True
     return False
+def get_ingreso_con_archivo(archivo_id):
+    return Ingreso.query.filter_by(archivo_id=archivo_id).all()

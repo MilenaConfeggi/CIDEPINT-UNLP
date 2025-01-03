@@ -8,6 +8,7 @@ from models.archivos_admin.archivo import Archivo
 from models.archivos_admin.carpeta import Carpeta, usuarios_leen_carpeta
 from flask_login import current_user
 from datetime import datetime
+from sqlalchemy.sql import expression
 
 def listar_archivos_de_carpeta(id_carpeta):
     query = Archivo.query.filter(Archivo.id_carpeta == id_carpeta)
@@ -18,12 +19,12 @@ def listar_archivos_de_carpeta(id_carpeta):
 def listar_carpetas(anio):
     if current_user.rol != 'Personal':
         return Carpeta.query.filter(
-            extract('year', Carpeta.fecha_ingreso) == anio
+            (extract('year', Carpeta.fecha_ingreso) == datetime.now().year) | (Carpeta.id_fondo.isnot(None))
         ).order_by(Carpeta.nombre.asc()).all()
     else:
         return Carpeta.query.join(usuarios_leen_carpeta).filter(
-            extract('year', Carpeta.fecha_ingreso) == anio,
-            usuarios_leen_carpeta.c.id_user == current_user.id
+            (extract('year', Carpeta.fecha_ingreso) == anio,
+            usuarios_leen_carpeta.c.id_user == current_user.id) |  (Carpeta.id_fondo.isnot(None))
         ).order_by(Carpeta.nombre.asc()).all()
 
 
@@ -31,11 +32,13 @@ def crear_carpeta(
     nombre,
     usuarios_leen,
     usuarios_editan,
+    fondo
 ):
     nueva_carpeta = Carpeta(
             nombre=nombre,
             usuarios_editan=usuarios_editan,
             usuarios_leen=usuarios_leen,
+            id_fondo=fondo
             )
     
     db.session.add(nueva_carpeta)

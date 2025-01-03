@@ -56,11 +56,42 @@
                     {% endif %}
                 </td>
                 <td class="px-4 py-3 text-sm">
+                <button data-id="{{ distribucion.id }}"
+                    class="open-modal-btn flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-black-600 rounded-lg focus:outline-none focus:shadow-outline-gray"
+                    aria-label="Borrar"
+                    >
+                    <svg
+                        class="w-5 h-5"
+                        aria-hidden="true"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                    >
+                        <path
+                        fill-rule="evenodd"
+                        d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                        clip-rule="evenodd"
+                        ></path>
+                    </svg>
+                </button>
+                    
+
+                <!--
                 <form action="{{ url_for('contable.delete_distribucion', id=distribucion.id) }}" method="post" onsubmit="return confirm('¿Está seguro que desea eliminar esta distribución?');">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <button type="submit" class="text-red-600 hover:text-red-900">Eliminar</button>
+                    <button type="submit" class="text-red-600 hover:text-red-900">                         <svg
+                        class="w-5 h-5"
+                        aria-hidden="true"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                    >
+                        <path
+                        fill-rule="evenodd"
+                        d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                        clip-rule="evenodd"
+                        ></path>
+                    </svg></button>
                 </form>
-
+-->
                 </td>
             </tr>
         {% endfor %}
@@ -70,4 +101,61 @@
     <p class="text-gray-600 mt-4">No hay distribuciones registradas para este legajo.</p>
     {% endif %}
 </div>
+<form id="modals" method="POST" action="{{ url_for('contable.delete_distribucion') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="modal hidden" id="modal-borrar" data-id="1" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+            <div class="fixed inset-0 bg-gray-500/75 transition-opacity" aria-hidden="true"></div>
+                <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+                    <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                        <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+                            <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                                <h3 class="text-base font-semibold text-gray-900" id="modal-title">¿Eliminar Distribucion? Se revertiran todos los cambios a los saldos</h3>
+                                    <input type="hidden" id="documento_id" name="distribucion_id" value="" />
+                            </div>
+                            <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                            <button type="submit" class="px-3 py-2 text-white bg-green-600 rounded hover:bg-green-500 sm:ml-3 sm:w-auto">Confirmar</button>
+                            <button type="button" class="close-modal px-3 py-2 text-white bg-red-600 rounded hover:bg-red-500 sm:ml-3 sm:w-auto">Cancelar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+</form>
+<script>
+    // Manejo de modales dinámicos
+document.addEventListener('DOMContentLoaded', () => {
+    // Selecciona todos los botones para abrir modales
+    const openModalButtons = document.querySelectorAll('.open-modal-btn');
+    
+    // Función para abrir el modal correspondiente
+    const openModal = (id) => {
+        const modal = document.querySelector(`#modal-borrar`);
+        document.querySelector('#documento_id').value = id;
+        modal.classList.remove('hidden'); // Muestra el modal
+    };
+    
+    // Asocia evento de clic a los botones de abrir modal
+    openModalButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+            const id = button.getAttribute('data-id');
+            openModal(id);
+        });
+    });
+    
+    document.querySelector('.close-modal').addEventListener('click', () => {
+        const modal = document.querySelector(`#modal-borrar`);
+        modal.classList.add('hidden');
+    });
+    
+    // Cierra el modal al hacer clic fuera del contenido
+    document.querySelectorAll('.modal').forEach((modal) => {
+        modal.addEventListener('click', (event) => {
+        if (event.target === modal) {
+            const id = modal.getAttribute('data-id');
+            closeModal(id);
+        }
+        });
+    });
+    });  
+</script>
 {% endblock %}

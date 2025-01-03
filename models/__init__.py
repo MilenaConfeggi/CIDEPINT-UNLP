@@ -19,3 +19,8 @@ from models.personal.empleado import Empleado
 from models.personal.personal import User
 from models.personal.ausencia import Ausencia
 from models.empleado_distribucion.empleado_distribucion import Empleado_Distribucion
+from models.compras.compra import Compra
+from models.compras.proveedor import Proveedor
+from models.Fondo.fondo import Fondo
+from models.compras.compra_area import compra_area
+from models.compras.compra_fondo import compra_fondo

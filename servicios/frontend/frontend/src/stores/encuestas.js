@@ -23,7 +23,7 @@ export const useEncuestasStore = defineStore('encuestas', {
         if (!response.status === 200) {
             throw new Error('No se pudo crear la encuesta')
         } else {
-            this.link = `http://localhost:5173/encuesta?id=${uniqueKey}`
+            this.link = `${import.meta.env.VITE_API_URL}/encuesta?id=${uniqueKey}`
         }
       } catch (error) {
         console.error('Error al obtener las encuestas:', error)

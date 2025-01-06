@@ -1,12 +1,12 @@
 <template>
   <main>
     <div class="d-flex flex-column justify-content-center align-items-center">
+      <h2 class="text-center">
+        Bienvenido a la plataforma de 
+      </h2>
 
       <img alt="cidepint logo" class="logo d-flex justify-content-center" src="/CIDEPINT_full_logo.png" width="400em" height="100em" > 
       
-      <p class="text-center">
-        Bienvenido a la aplicación de gestión del centro de investigacion y desarrollo en tecnologias de pinturas y recubrimientos.
-      </p>
     </div>
     <div v-if="estaLogeado" class="row row-cols-3 row-cols-md-3 g-4">
       <div class="col">

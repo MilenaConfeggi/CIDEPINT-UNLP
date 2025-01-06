@@ -72,27 +72,28 @@
           </tr>
         </tbody>
       </table>
-      <div v-if="totalPages > 1" class="pagination d-flex justify-content-center grid gap-3">
-        <button @click="prevPage" :disabled="currentPage === 1" class="btn">
-          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 1024 1024">
-            <path
-              fill="currentColor"
-              d="M685.248 104.704a64 64 0 0 1 0 90.496L368.448 512l316.8 316.8a64 64 0 0 1-90.496 90.496L232.704 557.248a64 64 0 0 1 0-90.496l362.048-362.048a64 64 0 0 1 90.496 0"
-            />
-          </svg>
-        </button>
-
-        <span class="d-flex align-items-center">Página {{ currentPage }} de {{ totalPages }}</span>
-
-        <button @click="nextPage" :disabled="currentPage === totalPages" class="btn">
-          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 1024 1024">
-            <path
-              fill="currentColor"
-              d="M338.752 104.704a64 64 0 0 0 0 90.496l316.8 316.8l-316.8 316.8a64 64 0 0 0 90.496 90.496l362.048-362.048a64 64 0 0 0 0-90.496L429.248 104.704a64 64 0 0 0-90.496 0"
-            />
-          </svg>
-        </button>
-      </div>
+      <nav aria-label="Paginación" class="mt-3">
+        <ul class="pagination justify-content-center">
+          <li class="page-item" :class="{ disabled: currentPage === 1 }">
+            <button class="page-link" @click="prevPage" :disabled="currentPage === 1">
+              Anterior
+            </button>
+          </li>
+          <li
+            v-for="page in totalPages"
+            :key="page"
+            class="page-item"
+            :class="{ active: currentPage === page }"
+          >
+            <button class="page-link" @click="goToPage(page)">{{ page }}</button>
+          </li>
+          <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+            <button class="page-link" @click="nextPage" :disabled="currentPage === totalPages">
+              Siguiente
+            </button>
+          </li>
+        </ul>
+      </nav>
     </div>
     <p v-else-if="loading" class="font-bold text-center">Cargando...</p>
     <p v-else class="font-bold text-center">No hay legajos</p>
@@ -130,12 +131,12 @@ const validateDates = () => {
 
 const fetchLegajos = async () => {
   const params = {
-    area: userRol.value === '' ? area.value : userRol.value, 
+    area: userRol.value === '' ? area.value : userRol.value,
     ensayo: ensayo.value,
     empresa: empresa.value,
     fecha: fecha.value,
     page: currentPage.value,
-    per_page: 10,
+    per_page: 2,
   }
   await legajosStore.getLegajos(params)
 }
@@ -154,6 +155,10 @@ const nextPage = () => {
   if (currentPage.value < totalPages.value) {
     currentPage.value++
   }
+}
+
+const goToPage = (page) => {
+  currentPage.value = page
 }
 
 onMounted(() => {
@@ -249,7 +254,6 @@ watch([ensayo, area, empresa, fecha, currentPage], () => {
   padding: 8px 16px;
   font-weight: bold;
 }
-
 
 /* Definir anchos fijos para las columnas */
 .col-numero {

@@ -23,26 +23,37 @@
         </div>
         <div class="card-body">
           <h1 class="card-title">LEG_{{ legajo.id }}</h1>
-          <div class="row row-cols-2 ">
-            <p class="col" >Objetivo: {{ legajo.objetivo }}</p>
+          <div class="row row-cols-2">
+            <p class="col">Objetivo: {{ legajo.objetivo }}</p>
             <p class="col" v-if="legajo.necesita_facturacion">Necesita facturación</p>
             <p class="col" v-else>No necesita facturación</p>
             <p class="col" v-if="legajo.es_juridico">No requiere presupuesto</p>
             <p class="col" v-else>Requiere presupuesto</p>
-            <p class="col" v-if="legajo.motivo_cancelacion">Motivo de cancelación: {{ legajo.motivo_cancelacion }}</p>
+            <p class="col" v-if="legajo.motivo_cancelacion">
+              Motivo de cancelación: {{ legajo.motivo_cancelacion }}
+            </p>
           </div>
           <hr class="" />
           <div v-if="legajo.cliente">
             <h1 class="text-center">Cliente</h1>
-            <div class="row row-cols-2 ">
-              <p class="col" >Nombre: {{ legajo.cliente.nombre }}</p>
-              <p class="col" >CUIT: {{ legajo.cliente.cuit }}</p>
+            <div class="row row-cols-2">
+              <p class="col">Nombre: {{ legajo.cliente.nombre }}</p>
+              <p class="col">CUIT: {{ legajo.cliente.cuit }}</p>
               <p class="col">Email: {{ legajo.cliente.email }}</p>
               <p class="col">Contacto telefónico: {{ legajo.cliente.telefono }}</p>
             </div>
           </div>
           <div class="d-flex justify-content-end gap-3 mb-2">
-            <button v-if="!legajo.admin_habilitado" class="btn btn-dark" @click="adminLegajo">
+            <button
+              v-if="
+                !legajo.admin_habilitado &&
+                existeDocumento('Presupuesto CIDEPINT') &&
+                existeDocumento('Presupuesto CONICET') &&
+                existeDocumento('Orden de compra')
+              "
+              class="btn btn-dark"
+              @click="adminLegajo"
+            >
               Habilitar para administración
             </button>
           </div>
@@ -64,7 +75,10 @@
                         type="button"
                         data-bs-toggle="dropdown"
                         aria-expanded="false"
-                        v-if="(documento.nombre !== 'Factura' || legajo.necesita_facturacion) && (documento.nombre !== 'Presupuesto CIDEPINT' || !legajo.es_juridico)"
+                        v-if="
+                          (documento.nombre !== 'Factura' || legajo.necesita_facturacion) &&
+                          (documento.nombre !== 'Presupuesto CIDEPINT' || !legajo.es_juridico)
+                        "
                       >
                         Acciones
                       </button>

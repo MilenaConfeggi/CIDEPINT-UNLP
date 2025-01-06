@@ -79,30 +79,36 @@
               >
                 Ver documento
               </button>
-              <RouterLink :to="`/`" class="btn btn-primary ml-3">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                  <path
-                    fill="currentColor"
-                    d="m12 16l-5-5l1.4-1.45l2.6 2.6V4h2v8.15l2.6-2.6L17 11zm-6 4q-.825 0-1.412-.587T4 18v-3h2v3h12v-3h2v3q0 .825-.587 1.413T18 20z"
-                  />
-                </svg>
-              </RouterLink>
             </td>
           </tr>
         </tbody>
       </table>
-      <div v-if="totalPages > 1" class="pagination">
-        <button @click="prevPage" :disabled="currentPage === 1">Anterior</button>
-
-        <span>Página {{ currentPage }} de {{ totalPages }}</span>
-
-        <button @click="nextPage" :disabled="currentPage === totalPages">Siguiente</button>
-      </div>
+      <nav aria-label="Paginación" class="mt-3">
+        <ul class="pagination justify-content-center">
+          <li class="page-item" :class="{ disabled: currentPage === 1 }">
+            <button class="page-link" @click="prevPage" :disabled="currentPage === 1">
+              Anterior
+            </button>
+          </li>
+          <li
+            v-for="page in totalPages"
+            :key="page"
+            class="page-item"
+            :class="{ active: currentPage === page }"
+          >
+            <button class="page-link" @click="goToPage(page)">{{ page }}</button>
+          </li>
+          <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+            <button class="page-link" @click="nextPage" :disabled="currentPage === totalPages">
+              Siguiente
+            </button>
+          </li>
+        </ul>
+      </nav>
     </div>
     <div v-else>No hay Documentos</div>
   </div>
 </template>
-
 
 <script setup>
 import { onMounted, watch } from 'vue'
@@ -111,8 +117,10 @@ import { useAreasStore } from '@/stores/areas'
 import { storeToRefs } from 'pinia'
 import axios from 'axios'
 import { ref } from 'vue'
+import { useToast } from 'vue-toastification'
 
 const documentosStore = useDocumentosStore()
+const toast = useToast()
 const areasStore = useAreasStore()
 const currentPage = ref(1)
 const actualFile = ref(null)
@@ -146,6 +154,7 @@ const fetchDocumentos = async () => {
     ensayo: ensayo.value,
   }
   await documentosStore.getDocumentos(params)
+  console.log(documentosStore.documentos)
 }
 
 const fetchAreas = async () => {
@@ -170,7 +179,7 @@ const viewFile = async (doc) => {
     window.open(fileUrl.value, '_blank')
   } catch (error) {
     console.error('Error al obtener el archivo:', error)
-    alert('No se pudo cargar el archivo.')
+    toast.error('No se pudo cargar el archivo', error)
   }
 }
 
@@ -184,6 +193,10 @@ const nextPage = () => {
   if (currentPage.value < totalPages.value) {
     currentPage.value++
   }
+}
+
+const goToPage = (page) => {
+  currentPage.value = page
 }
 
 onMounted(() => {
@@ -279,7 +292,6 @@ watch([tipo_documento, currentPage, area, empresa, fecha, ensayo], () => {
   padding: 8px 16px;
   font-weight: bold;
 }
-
 
 /* Definir anchos fijos para las columnas */
 .col-numero {

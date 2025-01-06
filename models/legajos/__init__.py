@@ -11,7 +11,7 @@ from models.presupuestos.STAN import STAN
 from models.presupuestos.ensayo import Ensayo
 
 
-def list_legajos(page=1, per_page=10, empresa=None, fecha=None, area=None, ensayo=None):
+def list_legajos(page=1, per_page=2, empresa=None, fecha=None, area=None, ensayo=None):
     query = Legajo.query
     query = (
         Legajo.query.outerjoin(Legajo.presupuesto_cidepint)  

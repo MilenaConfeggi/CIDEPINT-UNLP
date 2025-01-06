@@ -93,7 +93,7 @@
           id="necesita_facturacion"
           v-model="form.necesita_facturacion"
         />
-        <label class="form-check-label" for="necesita_facturacion"> Necesita facturacion </label>
+        <label class="form-check-label" for="necesita_facturacion"> Necesita facturación </label>
       </div>
     </div>
     <div class="mb-3">
@@ -105,7 +105,7 @@
         required
         v-model="form.objetivo"
       ></textarea>
-      <div class="invalid-feedback">Please enter a message in the textarea.</div>
+      <div class="invalid-feedback">Por favor ingrese un objetivo para el legajo.</div>
     </div>
     <div class="col-12 d-flex justify-content-center">
       <button type="submit" class="btn btn-primary">Crear legajo</button>
@@ -116,6 +116,7 @@
 import axios from 'axios'
 import { useAreasStore } from '../../stores/areas'
 import { storeToRefs } from 'pinia'
+import { useToast } from 'vue-toastification';
 
 export default {
   data() {
@@ -144,11 +145,13 @@ export default {
   setup() {
     const areasStore = useAreasStore();
     const { areas, loading, error } = storeToRefs(areasStore);
+    const toast = useToast();
 
     return {
       areas,
       loading,
       error,
+      toast,
     };
   },
   async mounted() {
@@ -197,10 +200,11 @@ export default {
         try {
           const response = await axios.post('http://127.0.0.1:5000/api/legajos/add', data)
           console.log(response)
-          alert('Formulario enviado correctamente')
+          this.toast.success('Formulario enviado correctamente')
           this.wasValidated = false
           this.resetForm()
         } catch (error) {
+          this.toast.error('Error al enviar el formulario')
           console.log(error)
         }
       } else {

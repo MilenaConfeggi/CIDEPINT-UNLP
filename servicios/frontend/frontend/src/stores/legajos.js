@@ -1,5 +1,7 @@
 import axios from 'axios'
 import { defineStore } from 'pinia'
+import { useToast } from 'vue-toastification'
+
 
 export const useLegajosStore = defineStore('legajos', {
   state: () => ({
@@ -8,6 +10,7 @@ export const useLegajosStore = defineStore('legajos', {
     loading: false,
     error: null,
     totalPages: 0,
+    toast: useToast(),
   }),
   actions: {
     async getLegajos(params) {
@@ -89,8 +92,12 @@ export const useLegajosStore = defineStore('legajos', {
         if (response.status !== 200) {
           throw new Error('Error al habilitar el legajo')
         }
+        else {
+          this.toast.success('Legajo habilitado para el area de administracion') 
+        }
       } catch (error) {
         this.error = error
+        this.toast.error('Error al habilitar el legajo')
         console.log(error)
       } finally {
         this.loading = false

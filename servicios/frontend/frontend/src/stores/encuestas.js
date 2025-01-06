@@ -40,11 +40,12 @@ export const useEncuestasStore = defineStore('encuestas', {
           legajo_id: id,
         }
         const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/legajos/mandar_informe`, data)
-        if (!response.status === 200) {
+        if (response.status !== 200) {
           throw new Error('No se pudo mandar el correo')
         }
       } catch (error) {
         console.error('Error al mandar el correo:', error)
+        throw new Error('Error al mandar el correo')
       }
     }
   },

@@ -52,7 +52,7 @@
               <div v-if="legajo.presupuesto_cidepint[0]?.stans">
                 <div v-for="stan in legajo.presupuesto_cidepint[0].stans" :key="stan.id">
                   <span v-for="ensayo in stan.ensayos" :key="ensayo.id">{{
-                    ensayo.nombre + ' '
+                    ensayo.nombre + ', '
                   }}</span>
                 </div>
               </div>
@@ -130,7 +130,7 @@ const validateDates = () => {
 
 const fetchLegajos = async () => {
   const params = {
-    area: area.value,
+    area: userRol.value === '' ? area.value : userRol.value, 
     ensayo: ensayo.value,
     empresa: empresa.value,
     fecha: fecha.value,

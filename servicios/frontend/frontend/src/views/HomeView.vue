@@ -5,7 +5,7 @@
       <img alt="cidepint logo" class="logo d-flex justify-content-center" src="/CIDEPINT_full_logo.png" width="400em" height="100em" > 
       
       <p class="text-center">
-        Bienvenido a la aplicación de gestión de legajos de la Universidad Nacional de La Plata.
+        Bienvenido a la aplicación de gestión del centro de investigacion y desarrollo en tecnologias de pinturas y recubrimientos.
       </p>
     </div>
     <div v-if="estaLogeado" class="row row-cols-3 row-cols-md-3 g-4">

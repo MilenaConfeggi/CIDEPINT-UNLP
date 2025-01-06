@@ -101,12 +101,10 @@ def enviar_correo_con_link_y_pdf():
     if doc is None:
         return jsonify({"error": "No se encontro el documento"}), 404
     
-    if doc.estado_id != 6 and doc.estado_id != 8:
-        return jsonify({"error": "El documento no está en estado Firmado"}), 404
     
     current_file = Path(__file__).resolve()
     project_root = current_file.parents[5]
-    documentos_path = project_root / "documentos" / "informes" / legajo_id
+    documentos_path = project_root / "documentos" / "informes" / str(legajo_id)
     file_path = documentos_path / doc.nombre_documento
     try:
         # Configuración del servidor SMTP
@@ -124,10 +122,10 @@ def enviar_correo_con_link_y_pdf():
         body = f"""
         Buen día,
 
-        Gracias por hacer uso de nuestro servicio. a continuación, puede acceder a la siguiente encuesta para poder darnos un feedback: 
+        Gracias por hacer uso de nuestro servicio!. A continuación, puede acceder a la siguiente encuesta para poder darnos un feedback: 
         {link}
 
-        Además, hemos adjuntado, en formato PDF el Informe.
+        Además hemos adjuntado, en formato PDF, el Informe.
 
         Saludos,
         Equipo CIDEPINT

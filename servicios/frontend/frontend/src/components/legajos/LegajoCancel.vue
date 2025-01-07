@@ -34,12 +34,14 @@
 <script>
 import { useRoute, useRouter } from 'vue-router'
 import { useLegajosStore } from '../../stores/legajos'
+import { useToast } from 'vue-toastification';
 
 export default {
   setup() {
     const route = useRoute()
     const router = useRouter()
     const legajosStore = useLegajosStore()
+    const toast = useToast()
 
     const legajoId = route.params.id
 
@@ -47,6 +49,7 @@ export default {
       legajoId,
       legajosStore,
       router,
+      toast,
     }
   },
   data() {
@@ -73,12 +76,14 @@ export default {
 
       try {
         await this.legajosStore.cancelLegajo(this.legajoId, this.form.motivo, this.form.estado)
-        alert('Legajo cancelado exitosamente')
+        this.toast.success('Legajo cancelado exitosamente')
         this.resetForm()
-        this.router.push('/legajos')
+        setTimeout(() => {
+          this.router.push('/legajos')
+        }, 2000)
       } catch (error) {
+        this.toast.error('Error al cancelar el legajo')
         console.error('Error al cancelar el legajo:', error)
-        alert('Ocurrió un error al cancelar el legajo. Inténtelo nuevamente.')
       } finally {
         this.isSubmitting = false
       }

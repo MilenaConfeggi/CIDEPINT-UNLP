@@ -132,7 +132,7 @@ survey.onComplete.add(function (sender, options) {
   // Display the "Saving..." message (pass a string value to display a custom message)
   options.showSaveInProgress();
   const xhr = new XMLHttpRequest();
-  xhr.open("POST", `http://127.0.0.1:5000/api/encuestas/complete?id=${surveyId}`); 
+  xhr.open("POST", `${import.meta.env.VITE_API_URL}/api/encuestas/complete?id=${surveyId}`); 
   xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
   xhr.onload = xhr.onerror = function () {
     if (xhr.status == 200) {

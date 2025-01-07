@@ -37,8 +37,9 @@ documentos_schema = DocumentoSchema(many=True)
 
 class PaginationDocumentoSchema(Schema):
     items = fields.Nested(DocumentoSchema, many=True)
-    total = fields.Integer()
-    page = fields.Integer()
-    per_page = fields.Integer()
+    total = fields.Integer(dump_only=True)  
+    pages = fields.Integer(dump_only=True)  
+    current_page = fields.Integer(dump_only=True) 
+    per_page = fields.Integer(dump_only=True)  
     
 pagination_documento_schema = PaginationDocumentoSchema()

@@ -8,6 +8,7 @@ export const useDocumentosStore = defineStore('documentos', {
     loading: false,
     error: null,
     doc: null,
+    totalPages: 0,
   }),
   actions: {
     async getDocumentos(params) {
@@ -15,7 +16,7 @@ export const useDocumentosStore = defineStore('documentos', {
       this.loading = true
       this.error = null
       try {
-        const response = await axios.get('http://127.0.0.1:5000/api/documentos/', {
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/documentos/`, {
           params: {
             page,
             per_page,
@@ -26,6 +27,7 @@ export const useDocumentosStore = defineStore('documentos', {
             ensayo,
           },
         })
+        this.totalPages = response.data.pages
         this.documentos = response.data
         return response
       } catch (error) {
@@ -39,7 +41,7 @@ export const useDocumentosStore = defineStore('documentos', {
       this.loading = true
       this.error = null
       try {
-        const response = await axios.get('http://127.0.0.1:5000/api/documentos/tipos_documentos')
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/documentos/tipos_documentos`)
         this.tipos_documentos = response.data
       } catch (error) {
         this.error = error
@@ -59,7 +61,7 @@ export const useDocumentosStore = defineStore('documentos', {
         formData.append('editar', editar)
         formData.append('nro_factura', nroFactura)
         
-        const response = await axios.post('http://127.0.0.1:5000/api/documentos/upload', formData, {
+        const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/documentos/upload`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
@@ -78,7 +80,7 @@ export const useDocumentosStore = defineStore('documentos', {
       this.error = null
       console.log(nombreDocumento, tipo, legajo_id)
       try {
-        const response = await axios.post('http://127.0.0.1:5000/api/documentos/download', {
+        const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/documentos/download`, {
           params: {
             nombre_documento: nombreDocumento,
             tipo_documento_id: tipo,
@@ -108,7 +110,7 @@ export const useDocumentosStore = defineStore('documentos', {
       this.loading = true
       this.error = null
       try {
-        const response = await axios.get(`http://127.0.0.1:5000/api/documentos/${id}`)
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/documentos/${id}`)
         this.doc = response.data
       } catch (error) {
         this.error = error

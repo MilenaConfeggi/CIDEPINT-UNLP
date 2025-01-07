@@ -12,7 +12,7 @@ export const useAreasStore = defineStore("areas", {
             this.loading = true;
             this.error = null;
             try {
-                const response = await axios.get("http://127.0.0.1:5000/api/area/");
+                const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/area/`);
                 this.areas = response.data;
                 return response;
             } catch (error) {

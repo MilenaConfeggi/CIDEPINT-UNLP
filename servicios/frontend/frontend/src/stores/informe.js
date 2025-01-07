@@ -1,9 +1,8 @@
 import axios from 'axios'
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { useToast } from 'vue-toastification'
 import { useAuthStore } from './auth'
 import { useEncuestasStore } from './encuestas'
-import { useRoute } from 'vue-router'
 import { useLegajosStore } from './legajos'
 
 export const useInformeStore = defineStore('informe', {
@@ -168,23 +167,23 @@ export const useInformeStore = defineStore('informe', {
         this.showToast = true
       }
     },
-    async enviarInforme(id) {
+    async enviarInforme(id, leg_id) {
+      const toast = useToast()
       const legajosStore = useLegajosStore()
       const encuestasStore = useEncuestasStore()
-      const route = useRoute()
       const legajo = legajosStore.legajo
-      let archivo = legajo.value.documento.find((doc) => doc.tipo_documento_id === id)
-      const legajoId = route.params.id
+      console.log(legajo)
+      let archivo = legajo?.documento?.find((doc) => doc.tipo_documento_id === id)
+      const legajoId = leg_id
       try {
+        toast.info('Mandando correo...')
         await encuestasStore.createEncuestas()
         const link = encuestasStore.link
-        await encuestasStore.mandarMail(legajo.value.cliente.email, link, archivo.id, legajoId)
-        this.successMessage = 'Correo enviado con éxito'
-        this.showToast = true
+        await encuestasStore.mandarMail(legajo?.cliente?.email, link, archivo.id, legajoId)
+        toast.success('Correo enviado con éxito')
       } catch (error) {
         console.error('Error al enviar el correo:', error)
-        this.errorMessage = error.message || 'Error al enviar el correo'
-        this.showToast = true
+        toast.error(error.message || 'Error al enviar el correo')
       }
     },
   },

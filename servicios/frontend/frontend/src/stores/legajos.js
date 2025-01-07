@@ -1,5 +1,7 @@
 import axios from 'axios'
 import { defineStore } from 'pinia'
+import { useToast } from 'vue-toastification'
+
 
 export const useLegajosStore = defineStore('legajos', {
   state: () => ({
@@ -8,6 +10,7 @@ export const useLegajosStore = defineStore('legajos', {
     loading: false,
     error: null,
     totalPages: 0,
+    toast: useToast(),
   }),
   actions: {
     async getLegajos(params) {
@@ -15,7 +18,7 @@ export const useLegajosStore = defineStore('legajos', {
       this.loading = true
       this.error = null
       try {
-        const response = await axios.get('http://127.0.0.1:5000/api/legajos/', {
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/legajos/`, {
           params: {
             page,
             per_page,
@@ -26,6 +29,7 @@ export const useLegajosStore = defineStore('legajos', {
           },
         })
         this.legajos = response.data
+        console.log(response.data.pages)
         this.totalPages = response.data.pages
       } catch (error) {
         this.error = error
@@ -38,7 +42,7 @@ export const useLegajosStore = defineStore('legajos', {
       this.loading = true
       this.error = null
       try {
-        const response = await axios.get(`http://127.0.0.1:5000/api/legajos/${id}`)
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/legajos/${id}`)
         this.legajo = response.data
       } catch (error) {
         this.error = error
@@ -51,7 +55,7 @@ export const useLegajosStore = defineStore('legajos', {
       this.loading = true
       this.error = null
       try {
-        const response = await axios.post('http://127.0.0.1:5000/api/legajos/add', data)
+        const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/legajos/add`, data)
         if (response.status !== 200) {
           throw new Error('Error al crear el legajo')
         }
@@ -70,7 +74,7 @@ export const useLegajosStore = defineStore('legajos', {
         proc,
       }
       try {
-        const response = await axios.post(`http://127.0.0.1:5000/api/legajos/cancel/${id}`, data)
+        const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/legajos/cancel/${id}`, data)
         if (response.status !== 200) {
           throw new Error('Error al cancelar el legajo')
         }
@@ -85,12 +89,16 @@ export const useLegajosStore = defineStore('legajos', {
       this.loading = true
       this.error = null
       try {
-        const response = await axios.post(`http://127.0.0.1:5000/api/legajos/admin/${id}`)
+        const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/legajos/admin/${id}`)
         if (response.status !== 200) {
           throw new Error('Error al habilitar el legajo')
         }
+        else {
+          this.toast.success('Legajo habilitado para el area de administracion') 
+        }
       } catch (error) {
         this.error = error
+        this.toast.error('Error al habilitar el legajo')
         console.log(error)
       } finally {
         this.loading = false

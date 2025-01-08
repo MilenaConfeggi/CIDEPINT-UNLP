@@ -106,7 +106,9 @@ import { useLegajosStore } from '../../stores/legajos'
 import { useAreasStore } from '../../stores/areas'
 import { storeToRefs } from 'pinia'
 import { ref } from 'vue'
+import { useToast } from 'vue-toastification'
 
+const toast = useToast()
 const today = new Date().toISOString().split('T')[0]
 
 const legajosStore = useLegajosStore()
@@ -124,7 +126,7 @@ const { areas } = storeToRefs(areasStore)
 
 const validateDates = () => {
   if (new Date(this.startDate) > new Date()) {
-    alert('La fecha no puede ser en el futuro.')
+    toast.warning('La fecha no puede ser en el futuro.')
     fecha.value = ''
   }
 }

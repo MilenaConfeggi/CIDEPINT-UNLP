@@ -487,7 +487,7 @@ const handleFileUpload = async (event, id, legajoId, editar = false) => {
       showToast.value = true
     }
   } else {
-    alert('Por favor selecciona un archivo PDF.')
+    toast.warning('Por favor selecciona un archivo PDF.')
   }
 }
 const existeDocumento = (nombreDocumento) => {
@@ -522,7 +522,7 @@ const viewFile = async (id, tipo) => {
     window.open(fileUrl.value, '_blank')
   } catch (error) {
     console.error('Error al obtener el archivo:', error)
-    alert('No se pudo cargar el archivo.')
+    toast.warning('No se pudo cargar el archivo.') 
   }
 }
 const viewCertificado = async (id, tipo, legajoId) => {
@@ -606,7 +606,7 @@ const viewAdicional = async (adicionalId) => {
     window.open(fileUrl, '_blank')
   } catch (error) {
     console.error('Error al obtener el archivo adicional:', error)
-    alert('No se pudo cargar el archivo adicional.')
+    toast.warning('No se pudo cargar el archivo adicional.')
   }
 }
 
@@ -629,7 +629,7 @@ const viewLegajo = async (legajoId) => {
     window.open(fileUrl, '_blank')
   } catch (error) {
     console.error('Error al obtener el archivo del legajo:', error)
-    alert('No se pudo cargar el archivo del legajo.')
+    toast.warning('No se pudo cargar el archivo del legajo.')
   }
 }
 

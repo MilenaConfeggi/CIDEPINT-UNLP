@@ -165,7 +165,7 @@ export default {
         await areasStore.getAreas()
       } catch (error) {
         console.error('Error cargando áreas:', error)
-        alert('Hubo un error cargando las áreas. Intente de nuevo más tarde.')
+        this.toast.error('Hubo un error cargando las áreas. Intente de nuevo más tarde.')
       }
     },
     async validateForm() {

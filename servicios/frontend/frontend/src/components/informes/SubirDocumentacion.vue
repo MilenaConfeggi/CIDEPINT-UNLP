@@ -41,6 +41,7 @@
   </template>
   
   <script>
+  import { useToast } from 'vue-toastification';
   export default {
     props: {
       legajoId: {
@@ -70,6 +71,7 @@
         document.getElementById('archivo').click();
       },
       async submitForm() {
+        const toast = useToast();
         this.isUploading = true;
         this.error = null;
         this.successMessage = null;
@@ -88,11 +90,10 @@
           if (!response.ok) {
             throw new Error(data.error || 'Error al enviar los datos');
           }
-  
-          this.successMessage = data.message || 'Archivo subido con éxito';
+          toast.success(data.message || 'Archivo subido con éxito');
           console.log('Respuesta del servidor:', data);
         } catch (error) {
-          this.error = error.message || 'Hubo un problema al subir el archivo';
+          toast.error(error.message || 'Hubo un problema al subir el archivo');
           console.error('Error:', error);
         } finally {
           this.isUploading = false;

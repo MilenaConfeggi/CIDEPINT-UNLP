@@ -50,6 +50,7 @@
 import { ref, onMounted, watch, computed } from 'vue';
 import axios from 'axios';
 import { useAuthStore } from '@/stores/auth'
+import { useToast } from 'vue-toastification';
 
 const permisos = JSON.parse(localStorage.getItem('permisos')) || [];
 
@@ -78,6 +79,7 @@ export default {
     const mostrarVerFotoModal = ref(false);
     const fotoSeleccionada = ref(null);
     const seleccionadas = ref([]);
+    const toast = useToast();
 
     const fetchFotos = async () => {
       const authStore = useAuthStore();
@@ -161,10 +163,10 @@ export default {
           }
         });
         console.log(response.data);
-        alert('Correo enviado correctamente');
+        this.toast.success('Correo enviado correctamente');
       } catch (error) {
         console.error('Error al enviar el correo:', error);
-        alert('Error al enviar el correo');
+        this.toast.error('Error al enviar el correo');
       }
     };
 

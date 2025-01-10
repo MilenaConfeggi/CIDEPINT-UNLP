@@ -2,7 +2,7 @@ import axios from 'axios'
 import { defineStore } from 'pinia'
 import { useAuthStore } from './auth'
 import { useToast } from 'vue-toastification'
-
+import { useRouter } from 'vue-router'
 export const usePresupuestoStore = defineStore('presupuesto', {
   state: () => ({
     successMessage: '',
@@ -12,9 +12,11 @@ export const usePresupuestoStore = defineStore('presupuesto', {
   actions: {
     async uploadPresupuestoFirmado(event, id, legajoId) {
       const toast = useToast()
+      const router = useRouter()
       const file = event.target.files[0]
       const token = useAuthStore().getToken()
       if (file && file.type === 'application/pdf') {
+        toast.info('Subiendo presupuesto firmado...')
         try {
           const formData = new FormData()
           formData.append('archivo', file)
@@ -33,10 +35,14 @@ export const usePresupuestoStore = defineStore('presupuesto', {
             toast.success('Presupuesto firmado subido correctamente')
             setTimeout(() => window.location.reload(), 2000)
           } else {
-            throw new Error(response.data.error || 'No se pudo subir el archivo')
+            throw { status: response.status, message: `Error: ${response.status}` }; 
           }
         } catch (error) {
           console.error('Error al subir el archivo:', error)
+          if (error.status === 401 || error.status === 422) {
+            useAuthStore().logout()
+            router.push('/log-in')
+          }
           toast.error(error.response?.data?.error || 'Error al subir el archivo')
         }
       } else {
@@ -57,15 +63,14 @@ export const usePresupuestoStore = defineStore('presupuesto', {
           },
         )
         if (!response.ok) {
-          const errorData = await response.json()
-          throw new Error(errorData.message || 'Error al obtener el documento')
+          throw new Error('Error al obtener el documento')
         }
         const blob = await response.blob()
         const url = URL.createObjectURL(blob)
         window.open(url, '_blank')
       } catch (error) {
         console.error('Error al obtener el documento:', error)
-        toast.error(error.message || 'Error al obtener el documento')
+        toast.error('Error al obtener el documento o no existe')
       }
     },
     async verPresupuestoFirmado(id, legajoId) {
@@ -82,15 +87,14 @@ export const usePresupuestoStore = defineStore('presupuesto', {
           },
         )
         if (!response.ok) {
-          const errorData = await response.json()
-          throw new Error(errorData.message || 'Error al obtener el documento')
+          throw new Error('Error al obtener el documento')
         }
         const blob = await response.blob()
         const url = URL.createObjectURL(blob)
         window.open(url, '_blank')
       } catch (error) {
         console.error('Error al obtener el documento:', error)
-        toast.error(error.message || 'Error al obtener el documento')
+        toast.error('Error al obtener el documento o no existe')
       }
     },
   },

@@ -117,6 +117,7 @@ import axios from 'axios'
 import { useAreasStore } from '../../stores/areas'
 import { storeToRefs } from 'pinia'
 import { useToast } from 'vue-toastification';
+import { useRouter } from 'vue-router';
 
 export default {
   data() {
@@ -146,12 +147,14 @@ export default {
     const areasStore = useAreasStore();
     const { areas, loading, error } = storeToRefs(areasStore);
     const toast = useToast();
+    const router = useRouter()
 
     return {
       areas,
       loading,
       error,
       toast,
+      router
     };
   },
   async mounted() {
@@ -203,6 +206,9 @@ export default {
           this.toast.success('Formulario enviado correctamente')
           this.wasValidated = false
           this.resetForm()
+          setTimeout(() => {
+            this.router.push('/legajos')
+          }, 1500)
         } catch (error) {
           this.toast.error('Error al enviar el formulario')
           console.log(error)

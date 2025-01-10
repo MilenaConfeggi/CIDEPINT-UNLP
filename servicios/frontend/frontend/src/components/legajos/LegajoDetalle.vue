@@ -208,7 +208,7 @@
                             <button
                               type="button"
                               class="dropdown-item"
-                              @click="viewPresupuesto(documento.id, documento.nombre, legajo.id)"
+                              @click="viewPresupuesto(legajo.id)"
                             >
                               Ver
                             </button>
@@ -441,7 +441,7 @@ const {
   verDocumentacion,
   enviarInforme,
 } = informeStore
-const { uploadPresupuestoFirmado, viewPresupuesto, verPresupuestoFirmado } = presupuestoStore
+const { uploadPresupuestoFirmado, viewPresupuesto } = presupuestoStore
 const actualFile = ref(null)
 const fileName = ref(null)
 const fileUrl = ref(null)
@@ -547,8 +547,7 @@ const viewCertificado = async (id, tipo, legajoId) => {
     window.open(url, '_blank')
   } catch (error) {
     console.error('Error al obtener el documento:', error)
-    errorMessage.value = error.message || 'El documento no existe, prueba generar uno primero'
-    showToast.value = true
+    toast.error(error.message || 'El documento no existe, prueba generar uno primero')
   }
 }
 

@@ -114,7 +114,7 @@ const fetchStans = async (page = 1) => {
     currentPage.value = data.current_page
     totalPages.value = data.pages
   } catch (error) {
-    if (error.status === 401) {
+    if (error.status === 401 || error.status === 422) {
       authStore.logout()
       router.push('/log-in')
     }

@@ -11,6 +11,9 @@ from administracion.src.core.bcrypt import bcrypt
 from sqlalchemy.sql import text
 from administracion.src.core import database
 from models.personal.personal import User
+from flask_mail import Mail
+
+mail = Mail()
 
 def create_app(env="development", static_folder="../../static"):
     app = Flask(__name__, static_folder=static_folder)
@@ -37,9 +40,12 @@ def create_app(env="development", static_folder="../../static"):
     def load_user(user_id):
         return User.query.get(int(user_id))
 
+    # Initialize Flask-Mail
+    mail.init_app(app)
+
     # Register routes and handlers
-    app = registrar_rutas(app)
-    app = registrar_handlers(app)
+    registrar_rutas(app)
+    registrar_handlers(app)
 
     @app.cli.command(name="reset-db")
     def reset_db():
@@ -50,5 +56,4 @@ def create_app(env="development", static_folder="../../static"):
     def seed_db():
         database.seed()
         
-
     return app

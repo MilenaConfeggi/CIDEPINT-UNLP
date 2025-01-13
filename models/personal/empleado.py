@@ -12,7 +12,7 @@ class Empleado(db.Model):
     user = db.relationship('User', back_populates='empleado')
 
     usuario_servicio_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=True)
-    usuario_servicio = db.relationship('Usuario', back_populates='empleado')
+    usuario_servicio = db.relationship('Usuario', back_populates='empleado', uselist=False)
 
     email = db.Column(db.String(120), unique=True, nullable=False)
     area_id = db.Column(db.Integer, db.ForeignKey('area.id'), nullable=False)

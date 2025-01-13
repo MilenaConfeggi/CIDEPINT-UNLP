@@ -20,7 +20,7 @@
             <label for="usuario" class="form-label">Seleccione un usuario de ese área para hacerlo jefe de área</label>
             <select id="usuario" v-model="usuario" class="form-control" required>
               <option v-for="usuario in usuariosExistentes" :key="usuario.id" :value="usuario.id">
-                {{ usuario.mail }}
+                {{ usuario.nombre }} {{ usuario.apellido }}
               </option>
             </select>
           </div>

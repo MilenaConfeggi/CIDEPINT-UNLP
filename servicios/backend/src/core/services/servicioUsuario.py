@@ -152,6 +152,21 @@ def listar_usuarios_por_area(area_id):
     )
     return usuarios
 
+def listar_jefes_de_area_de_un_area(area_id):
+    roles = ["Jefe de area", "Trabajador"]
+    usuarios = (
+        Usuario.query
+        .join(Empleado, Empleado.usuario_servicio_id == Usuario.id)  # Unir las tablas Usuario y Empleado
+        .join(Rol, Rol.id == Usuario.rol_id)
+        .filter(
+            Empleado.area_id == area_id,  # Filtrar por el área específica
+            Usuario.esta_borrado == False,  # Asegurarse de que el usuario no está borrado
+            Rol.nombre.in_(["Jefe de area", "Trabajador"])
+        )
+        .all()
+    )
+    return usuarios
+
 def cambiar_jefe_area(data):
     ja = buscar_rol_por_id(2)
     esclavo = buscar_rol_por_id(1)

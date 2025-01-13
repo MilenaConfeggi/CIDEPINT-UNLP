@@ -1,7 +1,7 @@
 from servicios.backend.src.core.config import Config
 from flask import jsonify, abort, Blueprint, request
 from servicios.backend.src.core.services import servicioUsuario
-from servicios.backend.src.web.schemas.usuarios import usuariosSchema, usuarioSchema, rolesSchema, empleadosSchema, empleadoSchema
+from servicios.backend.src.web.schemas.usuarios import usuariosSchema, usuarioSchema, rolesSchema, empleadosSchema, empleadoSchema, usuariosConNombreSchema
 from servicios.backend.src.web.schemas.area import area_schemas
 from servicios.backend.src.web.helpers.auth import is_authenticated, check_permission
 from flask_jwt_extended import jwt_required, get_jwt_identity
@@ -33,8 +33,8 @@ def listar_usuarios():
 def listar_usuarios_de_un_area(id_area):
     if not check_permission("listar_usuarios_de_un_area"):
         return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
-    usuarios = servicioUsuario.listar_usuarios_por_area(id_area)
-    data = usuariosSchema.dump(usuarios, many=True)
+    usuarios = servicioUsuario.listar_jefes_de_area_de_un_area(id_area)
+    data = usuariosConNombreSchema.dump(usuarios, many=True)
     return jsonify(data), 200
 
 @bp.get("/roles")

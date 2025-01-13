@@ -135,7 +135,7 @@ const routes = [
     name: 'recuperar_contra',
     component: () => import('../components/usuarios/RecuperarContra.vue'),
     props: true,
-    meta: { requiresAuth: true, showNavbar: true },
+    meta: {  },
   },
   {
     path: '/generar_certificado/:id_legajo',

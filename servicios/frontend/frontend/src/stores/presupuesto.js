@@ -18,6 +18,7 @@ export const usePresupuestoStore = defineStore('presupuesto', {
       if (file && file.type === 'application/pdf') {
         toast.info('Subiendo presupuesto firmado...')
         try {
+          toast.info('Subiendo presupuesto firmado...')
           const formData = new FormData()
           formData.append('archivo', file)
           const response = await axios.post(

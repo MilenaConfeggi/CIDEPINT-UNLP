@@ -41,7 +41,11 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
+import { useToast } from 'vue-toastification';
+import { useRouter } from 'vue-router';
 
+const toast = useToast();
+const router = useRouter();
 const route = useRoute();
 const idLegajo = route.params.id_legajo;
 
@@ -114,6 +118,7 @@ const submitForm = async () => {
   console.log('Datos enviados:', data); // <-- Aquí
 
   try {
+    toast.info('Generando certificado...')
     const response = await fetch(`${import.meta.env.VITE_API_URL}/certificado/crear/${idLegajo}`, {
       method: 'POST',
       headers: {
@@ -129,9 +134,13 @@ const submitForm = async () => {
     if (!response.ok) {
       throw new Error(result.message || 'Error al generar el certificado');
     }
-
+    toast.success('Certificado generado correctamente')
     successMessage.value = result.message;
+    setTimeout(() => {
+      router.push('/certificados');
+    }, 1500);
   } catch (err) {
+    toast.error('Error al generar el certificado')
     submitError.value = err.message || 'Error desconocido';
   }
 };

@@ -1,5 +1,7 @@
 import axios from 'axios'
 import { defineStore } from 'pinia'
+import { useAuthStore } from './auth';
+import { useRouter } from 'vue-router';
 
 export const useDocumentosStore = defineStore('documentos', {
   state: () => ({
@@ -9,6 +11,8 @@ export const useDocumentosStore = defineStore('documentos', {
     error: null,
     doc: null,
     totalPages: 0,
+    authStore: useAuthStore(),
+    router: useRouter(),
   }),
   actions: {
     async getDocumentos(params) {
@@ -27,12 +31,20 @@ export const useDocumentosStore = defineStore('documentos', {
             ensayo,
           },
         })
+        if (!response.ok) {
+          throw ({message: 'Error al obtener los documentos', status: response.status})
+        }
         this.totalPages = response.data.pages
         this.documentos = response.data
         return response
       } catch (error) {
-        this.error = error
-        throw new Error(error)
+        if (error.status === 401 || error.status === 422) {
+          this.authStore.logout()
+          this.router.push('/log-in')
+        } else {
+          this.error = error
+          throw new Error(error)
+        }
       } finally {
         this.loading = false
       }
@@ -42,10 +54,18 @@ export const useDocumentosStore = defineStore('documentos', {
       this.error = null
       try {
         const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/documentos/tipos_documentos`)
+        if (!response.ok) {
+          throw ({message: 'Error al obtener los tipos de documentos', status: response.status})
+        }
         this.tipos_documentos = response.data
       } catch (error) {
-        this.error = error
-        console.log(error)
+        if (error.status === 401 || error.status === 422) {
+          this.authStore.logout()
+          this.router.push('/log-in')
+        } else {
+          this.error = error
+          console.log(error)
+        }
       } finally {
         this.loading = false
       }
@@ -111,10 +131,18 @@ export const useDocumentosStore = defineStore('documentos', {
       this.error = null
       try {
         const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/documentos/${id}`)
+        if (!response.ok) {
+          throw ({message: 'Error al obtener el documento', status: response.status})
+        }
         this.doc = response.data
       } catch (error) {
-        this.error = error
-        console.log(error)
+        if (error.status === 401 || error.status === 422) {
+          this.authStore.logout()
+          this.router.push('/log-in')
+        } else {
+          this.error = error
+          console.log(error)
+        }
       } finally {
         this.loading = false
       }

@@ -16,21 +16,33 @@
   import { ref, onMounted } from 'vue';
   import { useRoute } from 'vue-router';
   import axios from 'axios';
-  
+  import { useAuthStore } from '../../stores/auth';
+  import { useRouter } from 'vue-router';
+
   export default {
     setup() {
       const route = useRoute();
       const mailId = Number(route.params.mailId);
       const mail = ref(null);
       const error = ref(null);
-  
+      const authStore = useAuthStore();
+      const router = useRouter();
+
       const fetchMail = async () => {
         try {
           const response = await axios.get(`${import.meta.env.VITE_API_URL}/mails/${mailId}`);
+          if (!response.ok) {
+            throw ({message: 'Error al obtener el mail', status: response.status})
+          }
           mail.value = response.data;
         } catch (err) {
-          error.value = 'Error al cargar el mail';
-          console.error(err);
+          if (err.status === 401 || err.status === 422) {
+            authStore.logout()
+            router.push('/log-in')
+          } else {
+            error.value = 'Error al cargar el mail';
+            console.error(err);
+          }
         }
       };
   

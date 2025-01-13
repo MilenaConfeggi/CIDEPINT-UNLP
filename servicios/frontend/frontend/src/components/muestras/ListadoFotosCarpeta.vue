@@ -50,7 +50,7 @@
 import { ref, onMounted, watch, computed } from 'vue';
 import axios from 'axios';
 import { useAuthStore } from '@/stores/auth'
-import { useToast } from 'vue-toastification';
+import { useRouter } from 'vue-router';
 
 const permisos = JSON.parse(localStorage.getItem('permisos')) || [];
 
@@ -79,7 +79,7 @@ export default {
     const mostrarVerFotoModal = ref(false);
     const fotoSeleccionada = ref(null);
     const seleccionadas = ref([]);
-    const toast = useToast();
+    const router = useRouter();
 
     const fetchFotos = async () => {
       const authStore = useAuthStore();
@@ -91,10 +91,18 @@ export default {
             "Content-Type": "multipart/form-data"
           }
         });
+        if (!response.ok) {
+          throw ({message: 'Error al obtener las fotos', status: response.status})
+        }
         fotos.value = response.data;
       } catch (err) {
-        error.value = 'Error al cargar las fotos';
-        console.error(err);
+        if (err.status === 401 || err.status === 422) {
+          authStore.logout()
+          router.push('/log-in')
+        } else {
+          error.value = 'Error al cargar las fotos';
+          console.error(err);
+        }
       }
     };
 

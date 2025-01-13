@@ -136,8 +136,7 @@ export const useInformeStore = defineStore('informe', {
           }
         } catch (error) {
           console.error('Error al subir el archivo:', error)
-          this.errorMessage = error.response?.data?.error || 'Error al subir el archivo'
-          this.showToast = true
+          toast.error(error.response?.data?.error || 'Error al subir el archivo')
         }
       } else {
         toast.warning('Por favor selecciona un archivo PDF, Word, Excel o PowerPoint.')

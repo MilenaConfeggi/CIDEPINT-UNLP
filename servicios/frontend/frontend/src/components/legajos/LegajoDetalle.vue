@@ -422,8 +422,9 @@ import { useToast } from 'vue-toastification'
 import axios from 'axios'
 import StateBadge from '../StateBadge.vue'
 import { useAuthStore } from '../../stores/auth'
-
+import { useRouter } from 'vue-router'
 const route = useRoute()
+const router = useRouter()
 const legajosStore = useLegajosStore()
 const documentosStore = useDocumentosStore()
 const informeStore = useInformeStore()
@@ -484,7 +485,7 @@ const handleFileUpload = async (event, id, legajoId, editar = false) => {
       }
     } catch (error) {
       console.error('Error al subir el archivo:', error)
-      showToast.value = true
+      toast.error('Error al subir el archivo', error)
     }
   } else {
     toast.warning('Por favor selecciona un archivo PDF.')
@@ -562,8 +563,17 @@ const fetchAdicionales = async (legajoId) => {
         },
       },
     )
+    if (!response.ok) {
+      throw ({message: 'Error al obtener los documentos adicionales', status: response.status})
+    }
     adicionales.value = response.data
   } catch (error) {
+    if (error.status === 422 || error.status === 401) {
+      authStore.logout()
+      router.push('/log-in')
+    } else {
+      toast.error('Error al obtener los documentos adicionales', error)
+    }
     console.error('Error al obtener los documentos adicionales:', error)
   }
 }
@@ -579,9 +589,18 @@ const fetchSinPresupuesto = async (legajoId) => {
         },
       },
     )
+    if (!response.ok) {
+      throw ({message: 'Error al obtener el presupuesto', status: response.status})
+    }
     presupuestont.value = response.data
     console.log(presupuestont)
   } catch (error) {
+    if (error.status === 422 || error.status === 401) {
+      authStore.logout()
+      router.push('/log-in')
+    } else {
+      toast.error('Error al obtener el presupuesto', error)
+    }
     console.error('Error al obtener presupuesto:', error)
   }
 }
@@ -644,8 +663,7 @@ onMounted(async () => {
     await fetchSinPresupuesto(route.params.id)
   } catch (err) {
     console.error('Error al cargar el legajo:', err)
-    errorMessage.value = err.message || 'Error al cargar el legajo'
-    showToast.value = true
+    toast.error('Error al cargar el legajo', err)
   }
 })
 </script>

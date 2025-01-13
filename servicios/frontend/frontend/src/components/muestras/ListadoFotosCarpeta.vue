@@ -50,6 +50,7 @@
 import { ref, onMounted, watch, computed } from 'vue';
 import axios from 'axios';
 import { useAuthStore } from '@/stores/auth'
+import { useRouter } from 'vue-router';
 
 const permisos = JSON.parse(localStorage.getItem('permisos')) || [];
 
@@ -78,6 +79,7 @@ export default {
     const mostrarVerFotoModal = ref(false);
     const fotoSeleccionada = ref(null);
     const seleccionadas = ref([]);
+    const router = useRouter();
 
     const fetchFotos = async () => {
       const authStore = useAuthStore();
@@ -89,10 +91,18 @@ export default {
             "Content-Type": "multipart/form-data"
           }
         });
+        if (response.status < 200 || response.status >= 300) {
+          throw ({message: 'Error en la petición', status: response.status})
+        }
         fotos.value = response.data;
       } catch (err) {
-        error.value = 'Error al cargar las fotos';
-        console.error(err);
+        if (err.status === 401 || err.status === 422) {
+          authStore.logout()
+          router.push('/log-in')
+        } else {
+          error.value = 'Error al cargar las fotos';
+          console.error(err);
+        }
       }
     };
 
@@ -161,10 +171,10 @@ export default {
           }
         });
         console.log(response.data);
-        alert('Correo enviado correctamente');
+        this.toast.success('Correo enviado correctamente');
       } catch (error) {
         console.error('Error al enviar el correo:', error);
-        alert('Error al enviar el correo');
+        this.toast.error('Error al enviar el correo');
       }
     };
 

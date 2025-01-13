@@ -15,7 +15,7 @@
       </form>
         <button 
         class="recover-password-button" 
-        @click="redirectToRecoverPassword">
+        @click="redirectToRecoverPassword()">
         ¿Olvidaste tu contraseña?
       </button>
       <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>

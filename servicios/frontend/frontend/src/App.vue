@@ -13,6 +13,10 @@ const token = ref(authStore.getToken() || localStorage.getItem('access_token'));
 // Recuperar los permisos desde localStorage
 const permisos = ref(JSON.parse(localStorage.getItem('permisos')) || []);
 
+const hasPermission = (permiso) => {
+  return permisos.value.includes(permiso)
+}
+
 // Computada para verificar si el usuario tiene el permiso "listar_stans"
 const tienePermisoListarStans = computed(() => {
   return permisos.value.includes('listar_stans');
@@ -72,7 +76,7 @@ const logout = () => {
         <RouterLink v-if="estaLogueado && tienePermisoListarUsuarios" to="/usuarios" class="nav-item">
           <i class="fas fa-users"></i> Usuarios
         </RouterLink>
-        <RouterLink v-if="estaLogueado" to="/legajos" class="nav-item">
+        <RouterLink v-if="estaLogueado && hasPermission('listar_legajos')" to="/legajos" class="nav-item">
           <i class="fas fa-folder"></i> Legajos
         </RouterLink>
         <RouterLink v-if="estaLogueado" to="/documentos" class="nav-item">

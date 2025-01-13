@@ -23,6 +23,7 @@
         </div>
         <div class="card-body">
           <h1 class="card-title">LEG_{{ legajo.id }}</h1>
+          <span v-if="isAdmin" class="badge rounded-pill text-bg-dark">{{ legajo.area?.nombre }}</span>
           <div class="row row-cols-2">
             <p class="col">Objetivo: {{ legajo.objetivo }}</p>
             <p class="col" v-if="legajo.necesita_facturacion">Necesita facturación</p>
@@ -208,7 +209,7 @@
                             <button
                               type="button"
                               class="dropdown-item"
-                              @click="viewPresupuesto(documento.id, documento.nombre, legajo.id)"
+                              @click="viewPresupuesto(legajo.id)"
                             >
                               Ver
                             </button>
@@ -422,8 +423,9 @@ import { useToast } from 'vue-toastification'
 import axios from 'axios'
 import StateBadge from '../StateBadge.vue'
 import { useAuthStore } from '../../stores/auth'
-
+import { useRouter } from 'vue-router'
 const route = useRoute()
+const router = useRouter()
 const legajosStore = useLegajosStore()
 const documentosStore = useDocumentosStore()
 const informeStore = useInformeStore()
@@ -441,12 +443,13 @@ const {
   verDocumentacion,
   enviarInforme,
 } = informeStore
-const { uploadPresupuestoFirmado, viewPresupuesto, verPresupuestoFirmado } = presupuestoStore
+const { uploadPresupuestoFirmado, viewPresupuesto } = presupuestoStore
 const actualFile = ref(null)
 const fileName = ref(null)
 const fileUrl = ref(null)
 const authStore = useAuthStore()
 const permisos = JSON.parse(localStorage.getItem('permisos')) || []
+const isAdmin = ref(localStorage.getItem('area') === 'null')
 
 const hasPermission = (permiso) => {
   return permisos.includes(permiso)
@@ -484,10 +487,10 @@ const handleFileUpload = async (event, id, legajoId, editar = false) => {
       }
     } catch (error) {
       console.error('Error al subir el archivo:', error)
-      showToast.value = true
+      toast.error('Error al subir el archivo', error)
     }
   } else {
-    alert('Por favor selecciona un archivo PDF.')
+    toast.warning('Por favor selecciona un archivo PDF.')
   }
 }
 const existeDocumento = (nombreDocumento) => {
@@ -522,7 +525,7 @@ const viewFile = async (id, tipo) => {
     window.open(fileUrl.value, '_blank')
   } catch (error) {
     console.error('Error al obtener el archivo:', error)
-    alert('No se pudo cargar el archivo.')
+    toast.warning('No se pudo cargar el archivo.') 
   }
 }
 const viewCertificado = async (id, tipo, legajoId) => {
@@ -538,7 +541,7 @@ const viewCertificado = async (id, tipo, legajoId) => {
       },
     )
 
-    if (!response.ok) {
+    if (response.status !== 200) {
       const errorData = await response.json()
       throw new Error(errorData.message || 'El documento no existe, prueba generar uno primero')
     }
@@ -547,8 +550,7 @@ const viewCertificado = async (id, tipo, legajoId) => {
     window.open(url, '_blank')
   } catch (error) {
     console.error('Error al obtener el documento:', error)
-    errorMessage.value = error.message || 'El documento no existe, prueba generar uno primero'
-    showToast.value = true
+    toast.error(error.message || 'El documento no existe, prueba generar uno primero')
   }
 }
 
@@ -563,14 +565,26 @@ const fetchAdicionales = async (legajoId) => {
         },
       },
     )
+    if (response.status !== 200) {
+      throw ({message: 'Error al obtener los documentos adicionales', status: response.status})
+    }
     adicionales.value = response.data
   } catch (error) {
+    if (error.status === 422 || error.status === 401) {
+      authStore.logout()
+      router.push('/log-in')
+    } else {
+      toast.error('Error al obtener los documentos adicionales', error)
+    }
     console.error('Error al obtener los documentos adicionales:', error)
   }
 }
 
 const fetchSinPresupuesto = async (legajoId) => {
   const token = authStore.getToken()
+  if (!hasPermission('generar_presupuestont')) {
+    return
+  }
   try {
     const response = await axios.get(
       `${import.meta.env.VITE_API_URL}/presupuestos/sin_presu/${legajoId}`,
@@ -580,9 +594,18 @@ const fetchSinPresupuesto = async (legajoId) => {
         },
       },
     )
+    if (response.status !== 200) {
+      throw ({message: 'Error al obtener el presupuesto', status: response.status})
+    }
     presupuestont.value = response.data
     console.log(presupuestont)
   } catch (error) {
+    if (error.status === 422 || error.status === 401) {
+      authStore.logout()
+      router.push('/log-in')
+    } else {
+      toast.error('Error al obtener el presupuesto', error)
+    }
     console.error('Error al obtener presupuesto:', error)
   }
 }
@@ -606,7 +629,7 @@ const viewAdicional = async (adicionalId) => {
     window.open(fileUrl, '_blank')
   } catch (error) {
     console.error('Error al obtener el archivo adicional:', error)
-    alert('No se pudo cargar el archivo adicional.')
+    toast.warning('No se pudo cargar el archivo adicional.')
   }
 }
 
@@ -629,7 +652,7 @@ const viewLegajo = async (legajoId) => {
     window.open(fileUrl, '_blank')
   } catch (error) {
     console.error('Error al obtener el archivo del legajo:', error)
-    alert('No se pudo cargar el archivo del legajo.')
+    toast.warning('No se pudo cargar el archivo del legajo.')
   }
 }
 
@@ -645,8 +668,7 @@ onMounted(async () => {
     await fetchSinPresupuesto(route.params.id)
   } catch (err) {
     console.error('Error al cargar el legajo:', err)
-    errorMessage.value = err.message || 'Error al cargar el legajo'
-    showToast.value = true
+    toast.error('Error al cargar el legajo', err)
   }
 })
 </script>

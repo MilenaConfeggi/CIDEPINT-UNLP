@@ -41,6 +41,7 @@
 import { ref, onMounted, watch } from 'vue';
 import axios from 'axios';
 import { useAuthStore } from '@/stores/auth'
+import { useRouter } from 'vue-router';
 
 export default {
   props: {
@@ -54,7 +55,7 @@ export default {
     const error = ref(null);
     const mostrarVerFotoModal = ref(false);
     const fotoSeleccionada = ref(null);
-
+    const router = useRouter();
     const fetchFotos = async () => {
       const authStore = useAuthStore();
       const token = authStore.getToken();
@@ -65,10 +66,18 @@ export default {
             "Content-Type": "multipart/form-data"
           }
         });
+        if (response.status !== 200) {
+          throw ({message: 'Error en la petición', status: response.status})
+        }
         fotos.value = response.data;
       } catch (err) {
-        error.value = 'Error al cargar las fotos';
-        console.error(err);
+        if (err.status === 401 || err.status === 422) {
+          authStore.logout()
+          router.push('/log-in')
+        } else {
+          error.value = 'Error al cargar las fotos';
+          console.error(err);
+        }
       }
     };
 

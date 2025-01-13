@@ -58,7 +58,7 @@ def add_legajo():
         return jsonify({"error": "No se pudo crear el legajo"}), 400
     cliente = create_cliente(data.get("cliente"), legajo.id)
     if cliente is None:
-        return jsonify({"error": "No se pudo crear el cliente"}), 400
+        return jsonify({"error": "Ya existe un cliente con ese email"}), 400
     return jsonify({"message": "Legajo creado"}), 201
 
 

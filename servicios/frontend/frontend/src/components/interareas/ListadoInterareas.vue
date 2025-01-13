@@ -79,7 +79,7 @@ const changePage = (page) => {
 const fetchInterareas = async () => {
   try {
     const response = await fetch(`${import.meta.env.VITE_API_URL}/interareas`);
-    if (!response.ok) {
+    if (response.status !== 200) {
       throw new Error("Error al obtener las interáreas");
     }
     const data = await response.json(); 

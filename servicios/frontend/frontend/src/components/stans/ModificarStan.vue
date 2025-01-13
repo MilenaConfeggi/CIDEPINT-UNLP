@@ -52,7 +52,7 @@ const successMessage = ref(null);
 const fetchStan = async () => {
   try {
     const response = await fetch(`${import.meta.env.VITE_API_URL}/stans/modificar_stan/${props.id}`);
-    if (!response.ok) {
+    if (response.status !== 200) {
       throw new Error('Error al obtener el stan');
     }
     const data = await response.json();
@@ -77,7 +77,7 @@ const submitForm = async () => {
 
     const result = await response.json();
 
-    if (!response.ok) {
+    if (response.status !== 200) {
       throw new Error(result.message || 'Error al modificar el stan');
     }
 

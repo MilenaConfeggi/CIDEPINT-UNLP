@@ -65,6 +65,7 @@
 <script>
 import axios from "axios";
 import { useAuthStore } from '@/stores/auth';
+import { useRouter } from 'vue-router';
 
 export default {
   props: {
@@ -93,6 +94,7 @@ export default {
     async fetchMuestras() {
       const authStore = useAuthStore();
       const token = authStore.getToken();
+      const router = useRouter();
       try {
         const response = await axios.get(`${import.meta.env.VITE_API_URL}/muestras/${this.legajoId}`, {
           headers: {
@@ -100,12 +102,20 @@ export default {
             "Content-Type": "application/json"
           },
         });
+
+        if (response.status !== 200) {
+          throw ({message: 'Error al obtener las muestras', status: response.status})
+        }
         if (response.status === 200) {
           this.muestras = response.data.filter(muestra => !muestra.terminada); // Filtrar muestras terminadas
         } else {
           this.error = response.data.message || 'Error al obtener las muestras';
         }
       } catch (error) {
+        if (error.status === 401 || error.status === 422) {
+          authStore.logout()
+          router.push('/log-in')
+        }
         if (error.response && error.response.status === 404) {
           this.error = 'No se encontraron muestras';
         } else {

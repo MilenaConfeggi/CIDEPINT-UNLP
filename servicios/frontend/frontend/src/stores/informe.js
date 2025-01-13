@@ -13,6 +13,7 @@ export const useInformeStore = defineStore('informe', {
   }),
   actions: {
     async uploadInforme(event, id, legajoId) {
+      const toast = useToast()
       const file = event.target.files[0]
       const token = useAuthStore().getToken()
       if (file && file.type === 'application/pdf') {
@@ -31,22 +32,21 @@ export const useInformeStore = defineStore('informe', {
           )
           console.log(response)
           if (response.status === 200) {
-            this.successMessage = 'Informe subido correctamente'
-            this.showToast = true
+            toast.success('Informe subido correctamente')
             setTimeout(() => window.location.reload(), 2000)
           } else {
             throw new Error(response.data.error || 'No se pudo subir el archivo')
           }
         } catch (error) {
           console.error('Error al subir el archivo:', error)
-          this.errorMessage = error.response?.data?.error || 'Error al subir el archivo'
-          this.showToast = true
+          toast.error(error.response?.data?.error || 'Error al subir el archivo')
         }
       } else {
-        alert('Por favor selecciona un archivo PDF.')
+        toast.warning('Por favor selecciona un archivo PDF.')
       }
     },
     async uploadInformeFirmado(event, id, legajoId) {
+      const toast = useToast()
       const file = event.target.files[0]
       const token = useAuthStore().getToken()
       if (file && file.type === 'application/pdf') {
@@ -65,23 +65,22 @@ export const useInformeStore = defineStore('informe', {
           )
           console.log(response)
           if (response.status === 200) {
-            this.successMessage = 'Informe firmado subido correctamente'
-            this.showToast = true
+            toast.success('Informe firmado subido correctamente')
             setTimeout(() => window.location.reload(), 2000)
           } else {
             throw new Error(response.data.error || 'No se pudo subir el archivo')
           }
         } catch (error) {
           console.error('Error al subir el archivo:', error)
-          this.errorMessage = error.response?.data?.error || 'Error al subir el archivo'
-          this.showToast = true
+          toast.error(error.response?.data?.error || 'Error al subir el archivo')
         }
       } else {
-        alert('Por favor selecciona un archivo PDF.')
+        toast.warning('Por favor selecciona un archivo PDF.')
       }
     },
     async verInforme(id) {
       const token = useAuthStore().getToken()
+      const toast = useToast()
       try {
         const response = await fetch(`${import.meta.env.VITE_API_URL}/informes/ver_informe/${id}`, {
           headers: {
@@ -89,7 +88,7 @@ export const useInformeStore = defineStore('informe', {
             'Content-Type': 'multipart/form-data',
           },
         })
-        if (!response.ok) {
+        if (response.status !== 200) {
           const errorData = await response.json()
           throw new Error(errorData.message || 'Error al obtener el informe')
         }
@@ -98,11 +97,11 @@ export const useInformeStore = defineStore('informe', {
         window.open(url, '_blank')
       } catch (error) {
         console.error('Error al obtener el informe:', error)
-        this.errorMessage = error.message || 'Error al obtener el informe'
-        this.showToast = true
+        toast.error(error.message || 'Error al obtener el informe')
       }
     },
     async uploadDocumentacion(event, id, legajoId) {
+      const toast = useToast()
       const file = event.target.files[0]
       const token = useAuthStore().getToken()
       const allowedTypes = [
@@ -130,23 +129,22 @@ export const useInformeStore = defineStore('informe', {
           )
           console.log(response)
           if (response.status === 200) {
-            this.successMessage = 'Documentación subida correctamente'
-            this.showToast = true
+            toast.success('Documentación subida correctamente')
             setTimeout(() => window.location.reload(), 2000)
           } else {
             throw new Error(response.data.error || 'No se pudo subir el archivo')
           }
         } catch (error) {
           console.error('Error al subir el archivo:', error)
-          this.errorMessage = error.response?.data?.error || 'Error al subir el archivo'
-          this.showToast = true
+          toast.error(error.response?.data?.error || 'Error al subir el archivo')
         }
       } else {
-        alert('Por favor selecciona un archivo PDF, Word, Excel o PowerPoint.')
+        toast.warning('Por favor selecciona un archivo PDF, Word, Excel o PowerPoint.')
       }
     },
     async verDocumentacion(id) {
       const token = useAuthStore().getToken()
+      const toast = useToast()
       try {
         const response = await fetch(`${import.meta.env.VITE_API_URL}/informes/ver_documento/${id}`, {
           headers: {
@@ -154,7 +152,7 @@ export const useInformeStore = defineStore('informe', {
             'Content-Type': 'multipart/form-data',
           },
         })
-        if (!response.ok) {
+        if (response.status !== 200) {
           const errorData = await response.json()
           throw new Error(errorData.message || 'Error al obtener el documento')
         }
@@ -163,8 +161,7 @@ export const useInformeStore = defineStore('informe', {
         window.open(url, '_blank')
       } catch (error) {
         console.error('Error al obtener el documento:', error)
-        this.errorMessage = error.message || 'Error al obtener el documento'
-        this.showToast = true
+        toast.error(error.message || 'Error al obtener el documento')
       }
     },
     async enviarInforme(id, leg_id) {

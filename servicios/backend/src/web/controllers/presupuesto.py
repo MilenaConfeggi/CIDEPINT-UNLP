@@ -198,14 +198,14 @@ def cargar_presupuesto_firmado(id_legajo):
         # Eliminar archivos que comienzan con "presupuesto"
         for archiv in os.listdir(folder_path):
             archivo_path = os.path.join(folder_path, archiv)
-            if os.path.isfile(archivo_path) and archiv.startswith("fpresupuesto_firmado_"):
+            if os.path.isfile(archivo_path) and (archiv.startswith("fpresupuesto_firmado_") or archiv.startswith("presupuesto_")):
                 os.remove(archivo_path)
 
         timestamp = datetime.now().strftime("%Y%m%d")
         filename = os.path.join(folder_path, f"fpresupuesto_firmado_{timestamp}.pdf")
 
         doc_data = {
-            'nombre_documento': filename,
+            'nombre_documento': f"fpresupuesto_firmado_{timestamp}.pdf",
             'estado_id': 6,
             'legajo_id': id_legajo,
             'tipo_id': 2

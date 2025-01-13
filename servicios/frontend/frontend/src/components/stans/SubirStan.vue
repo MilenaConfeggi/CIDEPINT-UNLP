@@ -87,7 +87,7 @@ const submitForm = async () => {
 
     const result = await response.json();
 
-    if (!response.ok) {
+    if (response.status !== 200) {
       throw new Error(result.message || 'Error al subir el stan');
     }
 

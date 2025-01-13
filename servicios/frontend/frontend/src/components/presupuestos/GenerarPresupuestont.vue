@@ -81,7 +81,7 @@
         },
       });
   
-      if (!response.ok) {
+      if (response.status !== 200) {
         throw new Error("Error al obtener los usuarios");
       }
   
@@ -101,7 +101,7 @@
         },
       });
   
-      if (!response.ok) {
+      if (response.status !== 200) {
         throw new Error("Error al obtener los medios de pago");
       }
   
@@ -168,7 +168,7 @@
         legajo: idLegajo,
         });
         const result = await response.json();
-        if (!response.ok) {
+        if (response.status !== 200) {
           throw new Error(result.message || 'Error al marcar sin presupuesto');
         }
   

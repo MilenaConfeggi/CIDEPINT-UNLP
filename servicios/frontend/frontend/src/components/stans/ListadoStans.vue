@@ -1,8 +1,8 @@
 <template>
   <div class="container mt-4">
-    <hr class="line">
+    <hr class="line" />
     <h1 class="text-center mb-4">Listado de STAN</h1>
-    <hr class="line">
+    <hr class="line" />
     <div v-if="loading" class="spinner-border text-primary" role="status">
       <span class="sr-only">Loading...</span>
     </div>
@@ -18,7 +18,14 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(stan, index) in stans" :key="stan.id" @click="highlightRow(stan.id)" :class="{ 'table-active': selectedStan === stan.id }" :style="{ animationDelay: `${index * 0.1}s` }" class="fade-in">
+        <tr
+          v-for="(stan, index) in stans"
+          :key="stan.id"
+          @click="highlightRow(stan.id)"
+          :class="{ 'table-active': selectedStan === stan.id }"
+          :style="{ animationDelay: `${index * 0.1}s` }"
+          class="fade-in"
+        >
           <td class="col-numero">{{ stan.numero }}</td>
           <td class="col-ensayos">
             <ul>
@@ -42,13 +49,30 @@
     <nav aria-label="Paginación" class="mt-3">
       <ul class="pagination justify-content-center">
         <li class="page-item" :class="{ disabled: currentPage === 1 }">
-          <button class="page-link" @click="fetchStans(currentPage - 1)" :disabled="currentPage === 1">Anterior</button>
+          <button
+            class="page-link"
+            @click="fetchStans(currentPage - 1)"
+            :disabled="currentPage === 1"
+          >
+            Anterior
+          </button>
         </li>
-        <li v-for="page in totalPages" :key="page" class="page-item" :class="{ active: currentPage === page }">
+        <li
+          v-for="page in totalPages"
+          :key="page"
+          class="page-item"
+          :class="{ active: currentPage === page }"
+        >
           <button class="page-link" @click="fetchStans(page)">{{ page }}</button>
         </li>
         <li class="page-item" :class="{ disabled: currentPage === totalPages }">
-          <button class="page-link" @click="fetchStans(currentPage + 1)" :disabled="currentPage === totalPages">Siguiente</button>
+          <button
+            class="page-link"
+            @click="fetchStans(currentPage + 1)"
+            :disabled="currentPage === totalPages"
+          >
+            Siguiente
+          </button>
         </li>
       </ul>
     </nav>
@@ -56,80 +80,86 @@
 </template>
 
 <script setup>
-import { ref, onMounted, defineEmits } from 'vue';
-import { useAuthStore } from '@/stores/auth';
+import { ref, onMounted, defineEmits } from 'vue'
+import { useAuthStore } from '@/stores/auth'
+import { useRouter } from 'vue-router'
 
-const stans = ref([]);
-const selectedStan = ref(null);
-const currentPage = ref(1);
-const totalPages = ref(1);
-const loading = ref(true);
-const emit = defineEmits(['modificar-stan']);
-const authStore = useAuthStore();
+const router = useRouter()
+const stans = ref([])
+const selectedStan = ref(null)
+const currentPage = ref(1)
+const totalPages = ref(1)
+const loading = ref(true)
+const emit = defineEmits(['modificar-stan'])
+const authStore = useAuthStore()
 
 const fetchStans = async (page = 1) => {
-  loading.value = true;
+  loading.value = true
   try {
-    const token = authStore.getToken();
+    const token = authStore.getToken()
     const response = await fetch(`${import.meta.env.VITE_API_URL}/stans?page=${page}&per_page=10`, {
-      method: "GET",
+      method: 'GET',
       headers: {
-        "Authorization": `Bearer ${token}`,
-        "Content-Type": "application/json"
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
       },
-    });
+    })
 
-    if (!response.ok) {
-      throw new Error("Error al obtener los stans");
+    if (response.status !== 200) {
+      throw { status: response.status, message: `Error: ${response.status}` }; 
     }
 
-    const data = await response.json();
-    stans.value = data.stans;
-    currentPage.value = data.current_page;
-    totalPages.value = data.pages;
+    const data = await response.json()
+    stans.value = data.stans
+    currentPage.value = data.current_page
+    totalPages.value = data.pages
   } catch (error) {
-    console.error("Error al obtener los stans:", error);
+    if (error.status === 401 || error.status === 422) {
+      authStore.logout()
+      router.push('/log-in')
+    }
+    console.error('Error al obtener los stans:', error.message || error)
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-};
+}
 
 const highlightRow = (id) => {
-  selectedStan.value = id;
-};
+  selectedStan.value = id
+}
 
 const modificarStan = (id) => {
-  emit('modificar-stan', id);
-};
+  emit('modificar-stan', id)
+}
 
 const eliminarStan = async (id) => {
-  if (!confirm("¿Estás seguro de que deseas eliminar este STAN?")) {
-    return;
+  if (!confirm('¿Estás seguro de que deseas eliminar este STAN?')) {
+    return
   }
 
   try {
-    const token = authStore.getToken();
+    const token = authStore.getToken()
     const response = await fetch(`${import.meta.env.VITE_API_URL}/stans/eliminar_stan/${id}`, {
-      method: "DELETE",
+      method: 'DELETE',
       headers: {
-        "Authorization": `Bearer ${token}`,
-        "Content-Type": "application/json"
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
       },
-    });
+    })
 
-    if (!response.ok) {
-      throw new Error("Error al eliminar el STAN");
+    if (response.status !== 200) {
+      throw new Error('Error al eliminar el STAN')
     }
 
-    await fetchStans(currentPage.value);
+    await fetchStans(currentPage.value)
   } catch (error) {
-    console.error("Error al eliminar el STAN:", error);
+    console.error('Error al eliminar el STAN:', error)
   }
-};
+}
 
 onMounted(() => {
-  fetchStans();
-});
+  fetchStans()
+})
 </script>
 
 <style scoped>
@@ -141,7 +171,8 @@ onMounted(() => {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra para la tabla */
 }
 
-.table th, .table td {
+.table th,
+.table td {
   text-align: center;
   vertical-align: middle;
   padding: 10px;
@@ -177,7 +208,9 @@ button {
   border-radius: 5px;
   cursor: pointer;
   font-size: 16px;
-  transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Transición para el fondo y la sombra */
+  transition:
+    background-color 0.3s ease,
+    box-shadow 0.3s ease; /* Transición para el fondo y la sombra */
 }
 
 button:hover {
@@ -202,7 +235,7 @@ button:hover {
   border: 1px solid #007bff;
   border-radius: 4px;
   color: #007bff;
-  background-color: white; 
+  background-color: white;
   text-decoration: none;
   transition: all 0.3s ease;
 }
@@ -248,7 +281,9 @@ button:hover {
 .btn-modificar {
   background-color: #ffc107; /* Color amarillo */
   color: #000; /* Color negro */
-  transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Transición para el fondo y la sombra */
+  transition:
+    background-color 0.3s ease,
+    box-shadow 0.3s ease; /* Transición para el fondo y la sombra */
 }
 
 .btn-modificar:hover {
@@ -259,7 +294,9 @@ button:hover {
 .btn-eliminar {
   background-color: #dc3545; /* Color rojo */
   color: #fff; /* Color blanco */
-  transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Transición para el fondo y la sombra */
+  transition:
+    background-color 0.3s ease,
+    box-shadow 0.3s ease; /* Transición para el fondo y la sombra */
 }
 
 .btn-eliminar:hover {
@@ -267,7 +304,8 @@ button:hover {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra al pasar el ratón */
 }
 
-.btn-modificar, .btn-eliminar {
+.btn-modificar,
+.btn-eliminar {
   font-size: 0.8rem; /* Tamaño de fuente más pequeño */
   padding: 5px 10px; /* Menor padding */
   width: 30px; /* Ancho más pequeño */

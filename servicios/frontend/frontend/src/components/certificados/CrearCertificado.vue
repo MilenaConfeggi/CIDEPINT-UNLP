@@ -41,7 +41,11 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
+import { useToast } from 'vue-toastification';
+import { useRouter } from 'vue-router';
 
+const toast = useToast();
+const router = useRouter();
 const route = useRoute();
 const idLegajo = route.params.id_legajo;
 
@@ -60,7 +64,7 @@ const fetchEmpleados = async () => {
       },
     });
     const result = await response.json();
-    if (!response.ok) {
+    if (response.status !== 200) {
       throw new Error(result.message || 'Error al obtener los empleados');
     }
     empleados.value = result.map(empleado => ({
@@ -84,7 +88,7 @@ const fetchDescripcion = async () => {
     const result = await response.text();
     console.log('Descripción recibida:', result);
 
-    if (!response.ok) {
+    if (response.status !== 200) {
       throw new Error('Error al obtener la descripción');
     }
 
@@ -114,6 +118,7 @@ const submitForm = async () => {
   console.log('Datos enviados:', data); // <-- Aquí
 
   try {
+    toast.info('Generando certificado...')
     const response = await fetch(`${import.meta.env.VITE_API_URL}/certificado/crear/${idLegajo}`, {
       method: 'POST',
       headers: {
@@ -126,12 +131,16 @@ const submitForm = async () => {
     const result = await response.json();
     console.log('Respuesta del servidor:', result); // <-- Aquí
 
-    if (!response.ok) {
+    if (response.status !== 200) {
       throw new Error(result.message || 'Error al generar el certificado');
     }
-
+    toast.success('Certificado generado correctamente')
     successMessage.value = result.message;
+    setTimeout(() => {
+      router.push('/certificados');
+    }, 1500);
   } catch (err) {
+    toast.error('Error al generar el certificado')
     submitError.value = err.message || 'Error desconocido';
   }
 };

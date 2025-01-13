@@ -180,6 +180,7 @@ def view_file(filename):
     # Ruta base de los documentos
     current_file = Path(__file__).resolve()
     project_root = current_file.parents[5]
+    
     documentos_path = project_root / "documentos" / tipo
 
     # Ruta completa del archivo

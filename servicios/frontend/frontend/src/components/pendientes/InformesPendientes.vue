@@ -73,6 +73,8 @@
 
 <script>
 import axios from "axios";
+import { useAuthStore } from '../../stores/auth';
+import { useRouter } from 'vue-router';
 
 export default {
     data() {
@@ -112,14 +114,24 @@ export default {
     },
     methods: {
         async fetchInformes() {
+            const authStore = useAuthStore();
+            const router = useRouter();
             this.loading = true;
             this.error = null;
             try {
                 const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/documentos/list/4`);
+                if (response.status !== 200) {
+                    throw ({message: 'Error al obtener los informes', status: response.status})
+                }
                 this.processInformes(response.data);
             } catch (error) {
-                console.error("Error al obtener los informes:", error);
-                this.error = "No se pudieron cargar los informes. Intente nuevamente.";
+                if (error.status === 401 || error.status === 422) {
+                    authStore.logout()
+                    router.push('/log-in')
+                } else {
+                    console.error("Error al obtener los informes:", error);
+                    this.error = "No se pudieron cargar los informes. Intente nuevamente.";
+                }
             } finally {
                 this.loading = false;
             }

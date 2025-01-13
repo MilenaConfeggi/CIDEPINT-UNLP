@@ -157,7 +157,7 @@ export default {
           body: JSON.stringify(datosFormulario),
         });
 
-        if (!response.ok) {
+        if (response.status !== 200) {
           throw new Error("Error al enviar el formulario");
         }
 

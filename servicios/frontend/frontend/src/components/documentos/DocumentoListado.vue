@@ -66,7 +66,7 @@
               {{
                 documento.tipo_documento.nombre === 'Presupuesto CIDEPINT'
                   ? documento?.legajo.presupuesto_cidepint[0]?.id
-                  : ''
+                  : '-'
               }}
             </td>
             <td>
@@ -114,14 +114,20 @@
 import { onMounted, watch } from 'vue'
 import { useDocumentosStore } from '../../stores/documentos'
 import { useAreasStore } from '@/stores/areas'
+import { usePresupuestoStore } from '../../stores/presupuesto'
 import { storeToRefs } from 'pinia'
 import axios from 'axios'
 import { ref } from 'vue'
 import { useToast } from 'vue-toastification'
+import { useAuthStore } from '../../stores/auth'
+import { useInformeStore } from '../../stores/informe'
 
 const documentosStore = useDocumentosStore()
+const presupuestosStore = usePresupuestoStore()
+const informeStore = useInformeStore()
 const toast = useToast()
 const areasStore = useAreasStore()
+const authStore = useAuthStore()
 const currentPage = ref(1)
 const actualFile = ref(null)
 const fileUrl = ref(null)
@@ -161,7 +167,52 @@ const fetchAreas = async () => {
   await areasStore.getAreas()
 }
 
+const viewLegajo = async (legajoId) => {
+  const token = authStore.getToken()
+  try {
+    const response = await axios.get(
+      `${import.meta.env.VITE_API_URL}/presupuestos/ver_legajo/${legajoId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        responseType: 'blob',
+      },
+    )
+
+    // Crear una URL para visualizar el archivo
+    const blob = new Blob([response.data], { type: response.headers['content-type'] })
+    const fileUrl = URL.createObjectURL(blob)
+    window.open(fileUrl, '_blank')
+  } catch (error) {
+    console.error('Error al obtener el archivo del legajo:', error)
+    toast.warning('No se pudo cargar el archivo del legajo.')
+  }
+}
+
 const viewFile = async (doc) => {
+  console.log(doc)
+  if (doc.tipo_documento.nombre === 'Presupuesto CIDEPINT'){
+    presupuestosStore.viewPresupuesto(doc.legajo_id)
+    return
+  }
+  if (doc.tipo_documento.nombre === 'Certificado CIDEPINT'){
+    viewCertificado(doc.legajo_id)
+    return
+  }
+  if (doc.tipo_documento.nombre === 'Informe'){
+    if ([8, 9].includes(doc.estado_id)) {
+      informeStore.verDocumentacion(doc.legajo_id)
+    }
+    else {
+      informeStore.verInforme(doc.legajo_id)
+    }
+    return
+  }
+  if (doc.tipo_documento.nombre === 'Legajo'){
+    viewLegajo(doc.legajo_id)
+    return
+  }
   actualFile.value = doc
   const tipo = doc.tipo_documento.nombre
   try {
@@ -182,6 +233,33 @@ const viewFile = async (doc) => {
     toast.error('No se pudo cargar el archivo', error)
   }
 }
+
+const viewCertificado = async (legajoId) => {
+  const token = authStore.getToken()
+  try {
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL}/certificado/ver_documento/${legajoId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
+        },
+      },
+    )
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'El documento no existe, prueba generar uno primero')
+    }
+    const blob = await response.blob()
+    const url = URL.createObjectURL(blob)
+    window.open(url, '_blank')
+  } catch (error) {
+    console.error('Error al obtener el documento:', error)
+    toast.error(error.message || 'El documento no existe, prueba generar uno primero')
+  }
+}
+
 
 const prevPage = () => {
   if (currentPage.value > 1) {

@@ -104,7 +104,7 @@ const router = useRouter();
 const fetchInterarea = async (id) => {
     try {
         const response = await fetch(`${import.meta.env.VITE_API_URL}/interareas/${id}`);
-        if (!response.ok) {
+        if (response.status !== 200) {
             throw new Error("Error al obtener los detalles de la interárea");
         }
             interarea.value = await response.json();
@@ -116,7 +116,7 @@ const fetchInterarea = async (id) => {
 const fetchDescargarSolicitud = async (nombreSolicitud) => {
     try {
         const response = await fetch(`${import.meta.env.VITE_API_URL}/interareas/descargar/${nombreSolicitud}`);
-        if (!response.ok) {
+        if (response.status !== 200) {
             throw new Error("Error al descargar la solicitud");
         }
         const blob = await response.blob();
@@ -146,7 +146,7 @@ const guardarResultado = async () => {
             }),
         });
 
-        if (!response.ok) {
+        if (response.status !== 200) {
             throw new Error("Error al guardar el resultado");
         }
 
@@ -179,7 +179,7 @@ const subirSolicitudFirmada = async () => {
             body: formData,
         });
 
-        if (!response.ok) {
+        if (response.status !== 200) {
             throw new Error("Error al subir la solicitud firmada");
         }
 
@@ -215,7 +215,7 @@ const subirSolicitudCompleta = async () => {
             body: formData,
         });
 
-        if (!response.ok) {
+        if (response.status !== 200) {
             throw new Error("Error al subir la solicitud completa");
         }
 

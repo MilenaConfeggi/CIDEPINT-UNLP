@@ -120,7 +120,7 @@ export default {
             this.error = null;
             try {
                 const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/documentos/list/4`);
-                if (!response.ok) {
+                if (response.status !== 200) {
                     throw ({message: 'Error al obtener los informes', status: response.status})
                 }
                 this.processInformes(response.data);

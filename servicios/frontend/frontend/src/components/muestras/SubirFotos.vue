@@ -103,7 +103,7 @@ export default {
           },
         });
 
-        if (!response.ok) {
+        if (response.status !== 200) {
           throw ({message: 'Error al obtener las muestras', status: response.status})
         }
         if (response.status === 200) {

@@ -35,9 +35,7 @@
   <script setup>
   import { ref, onMounted, watch } from 'vue';
   import { useAuthStore } from '@/stores/auth';
-  import { useRouter } from 'vue-router';
   
-  const router = useRouter();
   const authStore = useAuthStore();
   
   const area = ref(null); // Cambiado a valor simple
@@ -60,7 +58,7 @@
         "Content-Type": "application/json", // Header opcional para el tipo de contenido
       },
       });
-      if (!response.ok) {
+      if (response.status !== 200) {
         throw new Error('Error al obtener las áreas');
       }
       areasExistentes.value = await response.json();
@@ -79,7 +77,7 @@
         "Content-Type": "application/json", // Header opcional para el tipo de contenido
       },
       });
-      if (!response.ok) {
+      if (response.status !== 200) {
         throw new Error('Error al obtener los usuarios de un área');
       }
       usuariosExistentes.value = await response.json();
@@ -115,7 +113,7 @@
   
       const result = await response.json();
   
-      if (!response.ok) {
+      if (response.status !== 200) {
         throw new Error(result.message || 'Error al crear el usuario');
       }
   

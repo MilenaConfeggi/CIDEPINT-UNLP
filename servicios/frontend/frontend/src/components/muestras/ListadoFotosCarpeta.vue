@@ -91,8 +91,8 @@ export default {
             "Content-Type": "multipart/form-data"
           }
         });
-        if (!response.ok) {
-          throw ({message: 'Error al obtener las fotos', status: response.status})
+        if (response.status < 200 || response.status >= 300) {
+          throw ({message: 'Error en la petición', status: response.status})
         }
         fotos.value = response.data;
       } catch (err) {

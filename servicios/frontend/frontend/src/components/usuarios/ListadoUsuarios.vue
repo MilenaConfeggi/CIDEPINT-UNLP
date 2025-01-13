@@ -68,7 +68,7 @@ const fetchUsuarios = async (page = 1) => {
       },
     });
 
-    if (!response.ok) {
+    if (response.status !== 200) {
       throw new Error("Error al obtener los usuarios");
     }
 
@@ -105,7 +105,7 @@ const eliminarUsuario = async (id) => {
       body: JSON.stringify({ "id": id })
     });
 
-    if (!response.ok) {
+    if (response.status !== 200) {
       throw new Error("Error al eliminar el usuario");
     }
 

@@ -105,7 +105,7 @@ const fetchStans = async (page = 1) => {
       },
     })
 
-    if (!response.ok) {
+    if (response.status !== 200) {
       throw { status: response.status, message: `Error: ${response.status}` }; 
     }
 
@@ -147,7 +147,7 @@ const eliminarStan = async (id) => {
       },
     })
 
-    if (!response.ok) {
+    if (response.status !== 200) {
       throw new Error('Error al eliminar el STAN')
     }
 

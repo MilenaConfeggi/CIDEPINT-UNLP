@@ -87,7 +87,7 @@
   
           const data = await response.json();
   
-          if (!response.ok) {
+          if (response.status !== 200) {
             throw new Error(data.error || 'Error al enviar los datos');
           }
           toast.success(data.message || 'Archivo subido con éxito');

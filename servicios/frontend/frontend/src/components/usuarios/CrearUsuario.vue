@@ -55,7 +55,7 @@ const fetchRoles = async () => {
         "Content-Type": "application/json", // Header opcional para el tipo de contenido
       },
       });
-    if (!response.ok) {
+    if (response.status !== 200) {
       throw new Error('Error al obtener los roles');
     }
     rolesExistentes.value = await response.json();
@@ -86,7 +86,7 @@ const submitForm = async () => {
 
     const result = await response.json();
 
-    if (!response.ok) {
+    if (response.status !== 200) {
       throw new Error(result.message || 'Error al crear el usuario');
     }
 

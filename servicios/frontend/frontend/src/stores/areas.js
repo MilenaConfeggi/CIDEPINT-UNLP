@@ -17,7 +17,7 @@ export const useAreasStore = defineStore("areas", {
             this.error = null;
             try {
                 const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/area/`);
-                if (!response.ok) {
+                if (response.status !== 200) {
                     throw ({message: 'Error al obtener las areas', status: response.status})
                 }
                 this.areas = response.data;

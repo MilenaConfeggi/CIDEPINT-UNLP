@@ -23,6 +23,7 @@
         </div>
         <div class="card-body">
           <h1 class="card-title">LEG_{{ legajo.id }}</h1>
+          <span v-if="isAdmin" class="badge rounded-pill text-bg-dark">{{ legajo.area?.nombre }}</span>
           <div class="row row-cols-2">
             <p class="col">Objetivo: {{ legajo.objetivo }}</p>
             <p class="col" v-if="legajo.necesita_facturacion">Necesita facturación</p>
@@ -448,6 +449,7 @@ const fileName = ref(null)
 const fileUrl = ref(null)
 const authStore = useAuthStore()
 const permisos = JSON.parse(localStorage.getItem('permisos')) || []
+const isAdmin = ref(localStorage.getItem('area') === 'null')
 
 const hasPermission = (permiso) => {
   return permisos.includes(permiso)
@@ -539,7 +541,7 @@ const viewCertificado = async (id, tipo, legajoId) => {
       },
     )
 
-    if (!response.ok) {
+    if (response.status !== 200) {
       const errorData = await response.json()
       throw new Error(errorData.message || 'El documento no existe, prueba generar uno primero')
     }
@@ -563,7 +565,7 @@ const fetchAdicionales = async (legajoId) => {
         },
       },
     )
-    if (!response.ok) {
+    if (response.status !== 200) {
       throw ({message: 'Error al obtener los documentos adicionales', status: response.status})
     }
     adicionales.value = response.data
@@ -580,6 +582,9 @@ const fetchAdicionales = async (legajoId) => {
 
 const fetchSinPresupuesto = async (legajoId) => {
   const token = authStore.getToken()
+  if (!hasPermission('generar_presupuestont')) {
+    return
+  }
   try {
     const response = await axios.get(
       `${import.meta.env.VITE_API_URL}/presupuestos/sin_presu/${legajoId}`,
@@ -589,7 +594,7 @@ const fetchSinPresupuesto = async (legajoId) => {
         },
       },
     )
-    if (!response.ok) {
+    if (response.status !== 200) {
       throw ({message: 'Error al obtener el presupuesto', status: response.status})
     }
     presupuestont.value = response.data

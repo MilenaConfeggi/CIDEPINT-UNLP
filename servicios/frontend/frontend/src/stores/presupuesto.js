@@ -63,7 +63,7 @@ export const usePresupuestoStore = defineStore('presupuesto', {
             },
           },
         )
-        if (!response.ok) {
+        if (response.status !== 200) {
           throw new Error('Error al obtener el documento')
         }
         const blob = await response.blob()
@@ -87,7 +87,7 @@ export const usePresupuestoStore = defineStore('presupuesto', {
             },
           },
         )
-        if (!response.ok) {
+        if (response.status !== 200) {
           throw new Error('Error al obtener el documento')
         }
         const blob = await response.blob()

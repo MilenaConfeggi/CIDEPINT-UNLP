@@ -88,7 +88,7 @@ export const useInformeStore = defineStore('informe', {
             'Content-Type': 'multipart/form-data',
           },
         })
-        if (!response.ok) {
+        if (response.status !== 200) {
           const errorData = await response.json()
           throw new Error(errorData.message || 'Error al obtener el informe')
         }
@@ -152,7 +152,7 @@ export const useInformeStore = defineStore('informe', {
             'Content-Type': 'multipart/form-data',
           },
         })
-        if (!response.ok) {
+        if (response.status !== 200) {
           const errorData = await response.json()
           throw new Error(errorData.message || 'Error al obtener el documento')
         }

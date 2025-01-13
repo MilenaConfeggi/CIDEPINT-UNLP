@@ -31,7 +31,7 @@ export const useDocumentosStore = defineStore('documentos', {
             ensayo,
           },
         })
-        if (!response.ok) {
+        if (response.status !== 200) {
           throw ({message: 'Error al obtener los documentos', status: response.status})
         }
         this.totalPages = response.data.pages
@@ -54,7 +54,7 @@ export const useDocumentosStore = defineStore('documentos', {
       this.error = null
       try {
         const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/documentos/tipos_documentos`)
-        if (!response.ok) {
+        if (response.status !== 200) {
           throw ({message: 'Error al obtener los tipos de documentos', status: response.status})
         }
         this.tipos_documentos = response.data
@@ -131,7 +131,7 @@ export const useDocumentosStore = defineStore('documentos', {
       this.error = null
       try {
         const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/documentos/${id}`)
-        if (!response.ok) {
+        if (response.status !== 200) {
           throw ({message: 'Error al obtener el documento', status: response.status})
         }
         this.doc = response.data

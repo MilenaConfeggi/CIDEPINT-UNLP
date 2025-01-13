@@ -31,7 +31,7 @@
       const fetchMail = async () => {
         try {
           const response = await axios.get(`${import.meta.env.VITE_API_URL}/mails/${mailId}`);
-          if (!response.ok) {
+          if (response.status !== 200) {
             throw ({message: 'Error al obtener el mail', status: response.status})
           }
           mail.value = response.data;

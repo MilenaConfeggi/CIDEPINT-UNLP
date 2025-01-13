@@ -60,10 +60,10 @@
             <td>{{ legajo.area.nombre }}</td>
             <td><StateBadge :state="legajo.estado?.nombre" /></td>
             <td>
-              <RouterLink :to="`/legajos/${legajo.id}`" class="btn btn-primary mr-3">
+              <RouterLink :to="`/legajos/${legajo.id}`" class="btn btn-primary mr-3" v-if="hasPermission('ver_legajo')">
                 Ver detalle
               </RouterLink>
-              <RouterLink :to="`/legajos/cancelar/${legajo.id}`">
+              <RouterLink :to="`/legajos/cancelar/${legajo.id}`" v-if="hasPermission('cancelar_legajo')">
                 <button v-if="legajo.estado?.nombre === 'En curso'" class="btn btn-danger">
                   Cancelar
                 </button>
@@ -107,6 +107,12 @@ import { useAreasStore } from '../../stores/areas'
 import { storeToRefs } from 'pinia'
 import { ref } from 'vue'
 import { useToast } from 'vue-toastification'
+
+const permisos = JSON.parse(localStorage.getItem('permisos')) || []
+
+const hasPermission = (permiso) => {
+  return permisos.includes(permiso)
+}
 
 const toast = useToast()
 const today = new Date().toISOString().split('T')[0]

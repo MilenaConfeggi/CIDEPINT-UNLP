@@ -116,16 +116,13 @@ def borrar_usuario():
         return jsonify({"message": str(e)}), 406
 
 @bp.post("/recuperar_contra")
-@jwt_required()
 def recuperar_contra():
-    if not check_permission("recuperar_contra"):
-        return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
     try:
         data = request.get_json()
 
         if data['mail'] == []:
             return jsonify({"message": "No se ha cargado mail"}), 400
-
+    
         servicioUsuario.recuperar_contra(data)
         
         return jsonify({"message": "Se envió un mail con una contraseña provisional a la dirección de correo del usuario"}), 200

@@ -17,6 +17,7 @@
   
   <script>
   import axios from 'axios';
+  import { useToast } from 'vue-toastification';
   
   export default {
 
@@ -31,14 +32,18 @@
   },
     methods: {
       async recuperar_contra() {
+
+        const toast = useToast();
         try {
           const response = await axios.post(`${import.meta.env.VITE_API_URL}/usuarios/recuperar_contra`, {
             mail: this.mail
           }
         );
-        this.successMessage = response.data.message;
-        } catch (error) {
-          this.errorMessage = error.response?.data?.Error || 'Error al cambiar contraseña';
+        //this.successMessage = response.data.message;
+        toast.success(response.data.message);
+        } catch (err) {
+          //this.errorMessage = error.response?.data?.Error || 'Error al cambiar contraseña';
+          toast.error(err.response.data.message);
         }
       }
     }

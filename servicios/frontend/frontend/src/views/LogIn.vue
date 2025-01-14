@@ -26,6 +26,7 @@
 <script>
 import axios from 'axios';
 import { useAuthStore } from '@/stores/auth';
+import { useToast } from 'vue-toastification';
 
 export default {
   data() {
@@ -38,6 +39,7 @@ export default {
   methods: {
     async login() {
       const authStore = useAuthStore();
+      const toast = useToast();
       try {
         const response = await axios.post(`${import.meta.env.VITE_API_URL}/auth/authenticate`, {
           mail: this.mail,
@@ -56,7 +58,9 @@ export default {
           });
         }
       } catch (error) {
-        this.errorMessage = error.response?.data?.Error || 'Error al iniciar sesión';
+        //this.errorMessage = error.response?.data?.Error || 'Error al iniciar sesión';
+        
+        toast.error(error.response.data.message);
       }
     },
     redirectToRecoverPassword() {

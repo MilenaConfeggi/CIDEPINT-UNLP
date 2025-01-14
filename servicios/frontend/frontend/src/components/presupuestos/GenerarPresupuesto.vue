@@ -50,7 +50,10 @@
   <script setup>
   import { ref, onMounted } from 'vue';
   import { useRoute } from 'vue-router';
+  import { useRouter } from 'vue-router';
+
   import { useAuthStore } from '@/stores/auth';
+  import { useToast } from 'vue-toastification';
   
   const stans = ref([]);
   const selectedStan = ref(null);
@@ -62,6 +65,7 @@
   //const medioDePagoSeleccionado = ref("")
 
   const route = useRoute();
+  const router = useRouter();
   const idLegajo = route.params.id_legajo;
 
   const fetchError = ref(null);
@@ -149,6 +153,8 @@
     try {
 
         const token = authStore.getToken();
+        const toast = useToast();
+        toast.info("Generando presupuesto...");
         const response = await fetch(`${import.meta.env.VITE_API_URL}/presupuestos/crear/${idLegajo}`, {
         method: 'POST',
         headers: {
@@ -171,9 +177,14 @@
           throw new Error(result.message || 'Error al generar el presupuesto');
         }
   
-        successMessage.value = result.message;
+        //successMessage.value = result.message;
+        toast.success(result.message)
+        setTimeout(() => {
+          router.push({ path: `/legajos/${idLegajo}` });
+        }, 1500); // 1500 milisegundos = 1,5 segundos
     } catch (err) {
-      submitError.value = err.message || 'Error desconocido';
+      //submitError.value = err.message || 'Error desconocido';
+      toast.error(err.message)
     }
   };
   

@@ -21,7 +21,9 @@
   <script>
   import axios from 'axios';
   import { useAuthStore } from '@/stores/auth';
+  import { useToast } from 'vue-toastification';
   const authStore = useAuthStore();
+
   
   export default {
     data() {
@@ -40,9 +42,11 @@
     methods: {
       async cambiar_contra() {
         const token = authStore.getToken();
+        const toast = useToast();
         try {
             if (this.password != this.passw2){
-                this.errorMessage = "Las nuevas contraseñas no coinciden"
+                //this.errorMessage = "Las nuevas contraseñas no coinciden";
+                toast.error("Las nuevas contraseñas no coinciden");
                 return;
             }
           const response = await axios.post(`${import.meta.env.VITE_API_URL}/auth/cambiar_contra`, {
@@ -55,12 +59,14 @@
             }
           }
         );
+          toast.success("Contraseña cambiada correctamente");
           localStorage.setItem('permisos', JSON.stringify(response.data.permisos));
           this.$router.push({ name: 'home' }).then(() => {
             location.reload();
           });
         } catch (error) {
-          this.errorMessage = error.response?.data?.Error || 'Error al cambiar contraseña';
+          toast.error(error.response.data.message);
+          //this.errorMessage = error.response?.data?.Error || 'Error al cambiar contraseña';
         }
       }
     }

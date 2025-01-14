@@ -35,6 +35,7 @@
   <script setup>
   import { ref, onMounted, watch } from 'vue';
   import { useAuthStore } from '@/stores/auth';
+  import { useToast } from 'vue-toastification';
   
   const authStore = useAuthStore();
   
@@ -94,6 +95,7 @@
   });
   
   const submitForm = async () => {
+    const toast = useToast();
     error.value = null;
     successMessage.value = null;
     isSubmitting.value = true;
@@ -117,10 +119,11 @@
         throw new Error(result.message || 'Error al crear el usuario');
       }
   
-      successMessage.value = result.message;
+      //successMessage.value = result.message;
+      toast.success(result.message)
       
     } catch (err) {
-      error.value = err.message;
+      toast.error(err.message)
     } finally {
       isSubmitting.value = false;
     }

@@ -31,6 +31,7 @@
 import { ref, onMounted } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { useRouter } from 'vue-router';
+import { useToast } from 'vue-toastification';
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -72,6 +73,7 @@ const submitForm = async () => {
   const data = {
     ...usuario.value
   };
+  const toast = useToast();
 
   try {
     const token = authStore.getToken();
@@ -90,12 +92,14 @@ const submitForm = async () => {
       throw new Error(result.message || 'Error al crear el usuario');
     }
 
-    successMessage.value = result.message;
+    //successMessage.value = result.message;
+    toast.success(result.message);
     setTimeout(() => {
       router.push({ name: 'usuarios' });
     }, 1500); // 1500 milisegundos = 1,5 segundos
   } catch (err) {
-    error.value = err.message;
+    //error.value = err.message;
+    toast.error(err.message);
   } finally {
     isSubmitting.value = false;
   }

@@ -11,12 +11,12 @@ def authenticate():
         mail = request.json.get("mail")
         password = request.json.get("password")
         if not mail or not password:
-            return jsonify({"error": "El correo y la contraseña son obligatorios"}), 400
+            return jsonify({"message": "El correo y la contraseña son obligatorios"}), 400
 
         # Validar el usuario
         usuario = servicioUsuario.check_user(mail, password)
-        if not usuario:
-            return jsonify({"error": "El usuario y la contraseña no coinciden"}), 406
+        if usuario is None:
+            return jsonify({"message": "El usuario y la contraseña no coinciden"}), 406
         print(usuario.rol.nombre)
         if usuario.rol.nombre in ["Secretaria", "Director"]:
             area = None
@@ -26,12 +26,14 @@ def authenticate():
         access_token = create_access_token(identity=mail)
         permisos = list(servicioUsuario.obtener_permisos(usuario))
         cambiar_contra = usuario.cambiar_contra
-        return jsonify({"info": "Sesión iniciada correctamente", "access_token": access_token, "permisos": permisos, "cambiar_contra": cambiar_contra, "area": area}), 200
+        return jsonify({"message": "Sesión iniciada correctamente", "access_token": access_token, "permisos": permisos, "cambiar_contra": cambiar_contra, "area": area}), 200
     except KeyError:
-        return jsonify({"error": "Parámetros faltantes o inválidos"}), 401
+        return jsonify({"message": "Parámetros faltantes o inválidos"}), 401
+    except ValueError:
+        return jsonify({"message": "El usuario y la contraseña no coinciden"}), 406
     except Exception as e:
         print(e)
-        return jsonify({"error": "Ha ocurrido un error"}), 500
+        return jsonify({"message": "Ha ocurrido un error"}), 500
 
 @bp.post("/cambiar_contra")
 @jwt_required()
@@ -40,21 +42,21 @@ def cambiar_contra():
         password = request.json.get("password")
         passw2 = request.json.get("passw2")
         if not passw2 or not password:
-            return jsonify({"error": "La contraseña es obligatoria"}), 400
+            return jsonify({"message": "La contraseña es obligatoria"}), 400
 
         if passw2 != password:
-            return jsonify({"error": "Las contraseñas no coinciden"}), 406
+            return jsonify({"message": "Las contraseñas no coinciden"}), 406
         
         servicioUsuario.cambiar_contra(password)
         usuario = servicioUsuario.obtener_usuario_por_mail(get_jwt_identity())
         permisos = list(servicioUsuario.obtener_permisos(usuario))
 
-        return jsonify({"info": "Contraseña cambiada correctamente", "permisos": permisos}), 200
+        return jsonify({"message": "Contraseña cambiada correctamente", "permisos": permisos}), 200
     except KeyError:
-        return jsonify({"error": "Parámetros faltantes o inválidos"}), 401
+        return jsonify({"message": "Parámetros faltantes o inválidos"}), 401
     except Exception as e:
         print(e)
-        return jsonify({"error": "Ha ocurrido un error"}), 500
+        return jsonify({"message": "Ha ocurrido un error"}), 500
 
 @bp.post("/cambiar_contra_vieja")
 @jwt_required()
@@ -64,18 +66,20 @@ def cambiar_contra_vieja():
         password = request.json.get("password")
         passw2 = request.json.get("passw2")
         if not passw2 or not password:
-            return jsonify({"error": "La contraseña es obligatoria"}), 400
+            return jsonify({"message": "La contraseña es obligatoria"}), 400
 
         if passw2 != password:
-            return jsonify({"error": "Las contraseñas no coinciden"}), 406
+            return jsonify({"message": "Las contraseñas no coinciden"}), 406
         
         usuario = servicioUsuario.check_user(get_jwt_identity(), oldpassword)
         
         servicioUsuario.cambiar_contra(password)
 
-        return jsonify({"info": "Contraseña cambiada correctamente"}), 200
+        return jsonify({"message": "Contraseña cambiada correctamente"}), 200
     except KeyError:
-        return jsonify({"error": "Parámetros faltantes o inválidos"}), 401
+        return jsonify({"message": "Parámetros faltantes o inválidos"}), 401
+    except ValueError:
+        return jsonify({"message": "La contraseña actual es incorrecta"}), 406
     except Exception as e:
         print(e)
-        return jsonify({"error": "Ha ocurrido un error"}), 500
+        return jsonify({"message": "Ha ocurrido un error"}), 500

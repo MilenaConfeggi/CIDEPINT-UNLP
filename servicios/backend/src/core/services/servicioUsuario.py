@@ -100,6 +100,8 @@ def crear_usuario(data):
 def recuperar_contra(data):
     mail = data.get('mail')
     usuario = obtener_usuario_por_mail(mail)
+    if usuario is None:
+        raise ValueError("No existe un usuario con ese mail")
 
     contrasena = generar_contrasena_aleatoria()
 

@@ -65,7 +65,7 @@
             <td>
               {{
                 documento.tipo_documento.nombre === 'Presupuesto CIDEPINT'
-                  ? documento?.legajo.presupuesto_cidepint[0]?.id
+                  ? documento?.legajo.presupuesto_cidepint?.id
                   : '-'
               }}
             </td>

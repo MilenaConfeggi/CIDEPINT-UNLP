@@ -76,9 +76,6 @@
                         type="button"
                         data-bs-toggle="dropdown"
                         aria-expanded="false"
-                        v-if="
-                          (documento.nombre !== 'Factura' || legajo.necesita_facturacion)
-                        "
                       >
                         Acciones
                       </button>

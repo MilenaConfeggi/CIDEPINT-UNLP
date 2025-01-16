@@ -1658,10 +1658,6 @@ input:checked + .toggle-bg {
   height: 100%;
 }
 
-.h-dvh {
-  height: 100dvh;
-}
-
 .min-h-full {
   min-height: 100%;
 }

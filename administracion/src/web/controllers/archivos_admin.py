@@ -16,8 +16,6 @@ def index():
     anio_actual = datetime.now().year
     anio = request.args.get("anio", anio_actual)
     carpetas = servicio_archivos.listar_carpetas(anio)
-    for carpeta in carpetas:
-        print(carpeta.fondo)
     anios = list(range(2024,  anio_actual + 1))
     anios.reverse()
     return render_template("archivos_admin/lista_carpetas.html",carpetas=carpetas,anios=anios)

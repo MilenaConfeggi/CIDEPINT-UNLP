@@ -281,7 +281,7 @@ def agregando_compra():
         try:
             monto, areas, empleados, fondos = validar_montos_y_acumular(form)
         except ValidationError as e:
-            flash("Compra no agregada", "error")
+            flash(f"{e}", "error")
             return render_template("compras/creacion_compra.html", form=form, areas=lista_areas, empleados=lista_empleados, fondos=lista_fondos)
         if (form.estado.data == "APROBADA" and monto <= form.importe.data) or (form.estado.data == "REALIZADA" and monto <= form.importe.data):
             crear_compra(

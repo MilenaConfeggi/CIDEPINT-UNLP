@@ -253,15 +253,16 @@ def crear_distribucion(id):
         #Sumo lo indicado al saldo de las areas
         area_ganancias = int(data["ganancias_de_id"])
         area_costos = int(data["costos_de_id"])
-        porcentaje_area = round(float(data["porcentaje_area"]) * 0.01, 2)
-        porcentaje_empleados = round(float(data["porcentaje_empleados"]) * 0.01, 2)
-        porcentaje_comisiones = round(float(data["porcentaje_comisiones"]) * 0.01, 2)
-        monto_a_distribuir = round(float(data["monto_a_distribuir"]), 2)
+        porcentaje_area = round(float(data["porcentaje_area"]) * 0.01, 4)
+        porcentaje_empleados = round(float(data["porcentaje_empleados"]) * 0.01, 4)
+        porcentaje_comisiones = round(float(data["porcentaje_comisiones"]) * 0.01, 4)
+        monto_a_distribuir = round(float(data["monto_a_distribuir"]), 4)
         costos = round(float(data["costos"]), 2)
         areaDB.sumar_saldo_area(area_costos, costos)
-        monto_modificado = round((monto_a_distribuir * (1 - porcentaje_comisiones)) - costos, 2)
+        monto_modificado = round((monto_a_distribuir * (1 - porcentaje_comisiones)) - costos, 4)
         areaDB.sumar_saldo_area(area_ganancias, round((monto_modificado * porcentaje_area) * (1 - porcentaje_empleados), 2))
-        areaDB.sumar_saldo_area(1, round((monto_modificado * (1 - porcentaje_area)) * 0.95, 2))
+        areaCidepint = areaDB.get_area_by_name("CIDEPINT")
+        areaDB.sumar_saldo_area(areaCidepint.id, round((monto_modificado * (1 - porcentaje_area)) * 0.95, 2))
         
         # Obtener todos los colaboradores y admin
         empleados = empleadoDB.list_empleados()
@@ -288,9 +289,11 @@ def crear_distribucion(id):
         return redirect(url_for("contable.get_legajos"))
     else:
         # Obtener el primer campo con error
+        print(form.errors)
         first_error_field = next(iter(form.errors))
         first_error_message = form.errors[first_error_field][0]
-        return render_template("contable/crear_distribucion.html", form = form)
+        flash(f"Error en el campo {first_error_field}: {first_error_message}", 'danger')
+        return redirect(url_for("contable.get_crear_distribucion",id=id))
 
 
 @bp.get("/distribuciones/<int:id>")

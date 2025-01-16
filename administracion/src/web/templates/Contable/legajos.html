@@ -12,7 +12,7 @@
     <span class="ml-1 font-bold text-lg">Volver</span>
 </a>
 <div class="px-4 py-3 mx-8 mt-2 mb-8 bg-white rounded-lg shadow-md animate-fade-right animate-once">
-<h1>Legajos </h1>
+    <h3 class="mb-2 text-lg font-semibold text-gray-600">Legajos</h3>
 <div class="flex flex-wrap items-end mb-1">
     {% if 'SinDistribucion' in request.args.getlist('filtro') %}
     <a href="{{ url_for('contable.get_legajos') }}" 

@@ -23,8 +23,8 @@ def listar_carpetas(anio):
         ).order_by(Carpeta.nombre.asc()).all()
     else:
         return Carpeta.query.join(usuarios_leen_carpeta).filter(
-            (extract('year', Carpeta.fecha_ingreso) == anio,
-            usuarios_leen_carpeta.c.id_user == current_user.id) |  (Carpeta.id_fondo.isnot(None))
+            (extract('year', Carpeta.fecha_ingreso) == anio) & 
+            ((usuarios_leen_carpeta.c.id_user == current_user.id) | (Carpeta.id_fondo.isnot(None)))
         ).order_by(Carpeta.nombre.asc()).all()
 
 

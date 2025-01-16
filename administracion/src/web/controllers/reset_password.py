@@ -20,16 +20,16 @@ def reset_password():
         
         user = empleado.user
         if not user:
-            flash('No user associated with this email.', 'danger')
+            flash('No existe un usuario con la dirección de correo electrónico ingresada.', 'danger')
             return redirect(url_for('reset.reset_password'))
 
         token = s.dumps(email, salt='password-reset-salt')
         link = url_for('reset.reset_with_token', token=token, _external=True)
-        msg = Message('Password Reset Request', sender=app.config['MAIL_DEFAULT_SENDER'], recipients=[email])
-        msg.body = f'Your link to reset your password is {link}'
+        msg = Message('Solicitud de cambio de contraseña', sender=app.config['MAIL_DEFAULT_SENDER'], recipients=[email])
+        msg.body = f'Tu link para resetear tu contraseña es: {link}'
         mail = app.extensions.get('mail')  # Obtén la instancia de Mail desde la aplicación
         mail.send(msg)
-        flash('A password reset link has been sent to your email.', 'info')
+        flash('Un link para cambiar tu contraseña ha sido enviado a tu dirección de correo electrónico.', 'info')
         return redirect(url_for('auth.login'))  # Cambia 'login' por 'auth.login'
     return render_template('reset_password.html')
 
@@ -39,24 +39,24 @@ def reset_with_token(token):
     try:
         email = s.loads(token, salt='password-reset-salt', max_age=3600)
     except:
-        flash('The reset link is invalid or has expired.', 'danger')
+        flash('El link es invalido o expiró.', 'danger')
         return redirect(url_for('reset.reset_password'))
     
     empleado = Empleado.query.filter_by(email=email).first()
     if not empleado:
-        flash('Invalid email.', 'danger')
+        flash('Dirección de correo electrónico invalida.', 'danger')
         return redirect(url_for('reset.reset_password'))
     
     user = empleado.user
     if not user:
-        flash('No user associated with this email.', 'danger')
+        flash('No existe un usuario asociado con esta dirección de correo electrónico.', 'danger')
         return redirect(url_for('reset.reset_password'))
 
     if request.method == 'POST':
         new_password = request.form['password']
         user.set_password(new_password)  # Usa el método set_password para hashear la contraseña
         db.session.commit()
-        flash('Your password has been updated!', 'success')
+        flash('Tu contraseña ha sido actualizada con éxito.', 'success')
         return redirect(url_for('auth.login'))  # Cambia 'login' por 'auth.login'
     
     return render_template('reset_with_token.html', token=token)

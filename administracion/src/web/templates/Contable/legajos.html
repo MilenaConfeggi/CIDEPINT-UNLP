@@ -3,8 +3,16 @@
     Pagina de Cotable
 {% endblock %}
 {% block content %}
+<a href="{{url_for('contable.index')}}"
+    class="inline-flex items-center px-3 py-4 rounded-md text-black-500 hover:bg-black-50">
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-6 w-6">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h18">
+        </path>
+    </svg>
+    <span class="ml-1 font-bold text-lg">Volver</span>
+</a>
 <div class="px-4 py-3 mx-8 mt-2 mb-8 bg-white rounded-lg shadow-md animate-fade-right animate-once">
-<h1>Contable </h1>
+<h1>Legajos </h1>
 <div class="flex flex-wrap items-end mb-1">
     {% if 'SinDistribucion' in request.args.getlist('filtro') %}
     <a href="{{ url_for('contable.get_legajos') }}" 
@@ -108,7 +116,7 @@
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <input type="hidden" name="legajo_id" value="{{ legajo.id }}">
                         <input type="hidden" name="tipo" value="orden_facturacion">
-                        <label for="archivo" class="cursor-pointer">
+                        <label for="archivo{{ legajo.id }}" class="cursor-pointer">
                           <svg class="px-4 aspect-square w-14 h-14 rounded-lg object-cover group-hover:opacity-75 xl:aspect-[7/7]"
                             aria-hidden="true"
                             fill="currentColor"
@@ -121,7 +129,7 @@
                             ></path>
                           </svg>
                         </label>
-                        <input id="archivo" name="file" type="file" class="hidden" onchange="this.form.submit()">
+                        <input id="archivo{{ legajo.id }}" name="file" type="file" class="hidden" onchange="this.form.submit()">
                       </form>
                     {% endif %}
                      
@@ -139,7 +147,7 @@
                     {% endif %}
                 </td>
                 <td class="px-4 py-3 text-sm">
-                    <div class="flex items-center space-x-4">
+                    <div class="flex items-center justify-center space-x-4">
                     <a href="{{ url_for('contable.get_documentosAdd',id=legajo.id) }}"
                         class="flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-black-600 rounded-lg focus:outline-none focus:shadow-outline-gray"
                         aria-label="Ver"

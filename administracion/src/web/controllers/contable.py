@@ -366,9 +366,9 @@ def upload():
     file = request.files['file']
     tipo = request.form['tipo']
     legajo_id = request.form['legajo_id']
-    
+    print(f'id del legajo: {legajo_id}')
     if file.filename == '':# or not file.filename.endswith('.pdf'):
-        flash("El archivo tiene que terner nombre o/y una extencion valida", "danger")
+        flash("El archivo tiene que terner nombre o/y una extensión valida", "danger")
         return redirect(url_for("contable.get_legajos"))
     td = get_tipo_documento_nombre(tipo)
     if td is None:

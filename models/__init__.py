@@ -11,3 +11,16 @@ from models.presupuestos.ensayo_stan import EnsayoStan
 from models.documentos.documento import Documento
 from models.resultados_encuestas.resultado_encuesta import ResultadoEncuesta
 from models.presupuestos.mediodepago import MedioPago
+from models.personal.area import Area
+from models.patrimonio.bien import Bien
+from models.archivos_admin.archivo import Archivo
+from models.archivos_admin.carpeta import Carpeta
+from models.personal.empleado import Empleado   
+from models.personal.personal import User
+from models.personal.ausencia import Ausencia
+from models.empleado_distribucion.empleado_distribucion import Empleado_Distribucion
+from models.compras.compra import Compra
+from models.compras.proveedor import Proveedor
+from models.Fondo.fondo import Fondo
+from models.compras.compra_area import compra_area
+from models.compras.compra_fondo import compra_fondo

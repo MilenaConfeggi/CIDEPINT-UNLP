@@ -1,27 +1,45 @@
+from flask_jwt_extended import get_jwt_identity, jwt_required
 from models import db
 from models.muestras.muestra import Muestra
 from models.muestras.foto import Foto
+from models.usuarios.usuario import Usuario
+from models.legajos.legajo import Legajo
+from models.personal.empleado import Empleado
 from datetime import datetime
 
-def crear_muestra(data, legajo_id):
-    anio_actual = datetime.now().year
-    ultima_muestra = Muestra.query.filter(db.extract('year', Muestra.fecha_ingreso) == anio_actual).order_by(Muestra.nro_muestra.desc()).first()
+NRO_MUESTRA_INICIAL = 5
 
-    if (ultima_muestra):
-        nro_muestra = ultima_muestra.nro_muestra + 1
+def crear_muestra(data, legajo_id):
+    fecha_ingreso = data.get('fecha_ingreso')
+    anio_ingreso = fecha_ingreso.year
+
+    # Verificar si hay alguna muestra en la base de datos
+    ultima_muestra = Muestra.query.order_by(Muestra.fecha_ingreso.desc(), Muestra.nro_muestra.desc()).first()
+
+    if not ultima_muestra:
+        # No hay ninguna muestra en la base de datos
+        nro_muestra = NRO_MUESTRA_INICIAL
     else:
-        nro_muestra = 1
+        # Hay muestras en la base de datos
+        ultima_muestra_anio_ingreso = Muestra.query.filter(db.extract('year', Muestra.fecha_ingreso) == anio_ingreso).order_by(Muestra.nro_muestra.desc()).first()
+        
+        if not ultima_muestra_anio_ingreso:
+            # Es la primera muestra del año de ingreso
+            nro_muestra = 1
+        else:
+            # Incrementar el número de muestra basado en la última muestra del año de ingreso
+            nro_muestra = ultima_muestra_anio_ingreso.nro_muestra + 1
+
     nueva_muestra = Muestra(
         nro_muestra=nro_muestra,
         fecha_ingreso=data.get('fecha_ingreso'),
         iden_cliente=data.get('iden_cliente'),
-        terminada= False,
+        terminada=False,
         legajo_id=legajo_id
     )
     db.session.add(nueva_muestra)
     db.session.commit()
     return nueva_muestra
-
 
 def listar_muestras(id_legajo):
     return Muestra.query.filter_by(legajo_id=id_legajo).all()
@@ -80,3 +98,15 @@ def listar_fotos_por_fecha(legajo_id, fecha):
         Muestra.legajo_id == legajo_id,
         Foto.fecha == fecha
     ).all()
+
+def listar_todas():
+    return Muestra.query.all()
+
+
+def tiene_permiso(id_legajo, mail):
+    legajo = Legajo.query.filter_by(id=id_legajo).first()
+    usuario = Usuario.query.filter_by(mail=mail).first()
+    for empleado in usuario.empleado:
+        if empleado.area == legajo.area:
+            return True
+    return False

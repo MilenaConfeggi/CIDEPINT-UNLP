@@ -2,6 +2,8 @@ from marshmallow import Schema, fields, validates_schema
 from .tipoDocumento import TipoDocumentoSchema
 from .estado import EstadoSchema
 from .cliente import ClienteSchema
+from .presupuesto import PresupuestoSchema
+from .area import AreaSchema
 
 class LDSchema(Schema):
     id = fields.Integer(dump_only=True)
@@ -15,6 +17,8 @@ class LDSchema(Schema):
     documento_id = fields.Integer(allow_none=True)
     estado_id = fields.Integer(dump_only=True)
     estado = fields.Nested(EstadoSchema, dump_only=True)
+    area = fields.Nested(AreaSchema, dump_only=True)
+    presupuesto_cidepint = fields.List(fields.Nested(PresupuestoSchema, dump_only=True, allow_none=True))
 
 class DocumentoSchema(Schema):
     id = fields.Integer(dump_only=True)
@@ -33,8 +37,9 @@ documentos_schema = DocumentoSchema(many=True)
 
 class PaginationDocumentoSchema(Schema):
     items = fields.Nested(DocumentoSchema, many=True)
-    total = fields.Integer()
-    page = fields.Integer()
-    per_page = fields.Integer()
+    total = fields.Integer(dump_only=True)  
+    pages = fields.Integer(dump_only=True)  
+    current_page = fields.Integer(dump_only=True) 
+    per_page = fields.Integer(dump_only=True)  
     
 pagination_documento_schema = PaginationDocumentoSchema()

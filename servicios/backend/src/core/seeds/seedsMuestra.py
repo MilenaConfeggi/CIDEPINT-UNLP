@@ -10,48 +10,7 @@ def seeds_muestras():
 def seed_muestras():
 
 
-    muestras_data = [
-        {
-            'fecha_ingreso': datetime(2024, 1, 1),
-            'iden_cliente': 'Muestra 1',
-            'legajo_id': 35,
-            "terminada": False
-        },
-        {
-            'fecha_ingreso': datetime(2024, 2, 1),
-            'iden_cliente': 'Muestra 2',
-            'legajo_id': 35,
-            "terminada": False
-        },
-        {
-            'fecha_ingreso': datetime(2024, 3, 1),
-            'iden_cliente': 'Muestra 3',
-            'legajo_id': 35,
-            "terminada": False
-        }
-    ]
-
-    for data in muestras_data:
-        crear_muestra(data, data['legajo_id'])
+    pass
 
 def seed_fotos():
-    fotos_data = [
-        {
-            'nombre_archivo': 'foto1.jpg',
-            'fecha': datetime(2023, 1, 2),
-            'muestra_id': 1
-        },
-        {
-            'nombre_archivo': 'foto2.jpg',
-            'fecha': datetime(2023, 2, 2),
-            'muestra_id': 1
-        },
-        {
-            'nombre_archivo': 'foto3.jpg',
-            'fecha': datetime(2023, 3, 2),
-            'muestra_id': 3
-        }
-    ]
-
-    for data in fotos_data:
-        crear_foto(data, data['muestra_id'])
+    pass

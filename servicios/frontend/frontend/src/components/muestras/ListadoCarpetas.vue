@@ -35,7 +35,8 @@
 import { ref, onMounted, watch, computed } from 'vue';
 import axios from 'axios';
 import ListadoFotosCarpeta from './ListadoFotosCarpeta.vue';
-
+import { useAuthStore } from '@/stores/auth';
+import { useRouter } from 'vue-router';
 export default {
   components: {
     ListadoFotosCarpeta
@@ -52,16 +53,31 @@ export default {
     const error = ref(null);
     const mostrarListadoFotosCarpeta = ref(false);
     const fechaSeleccionada = ref(null);
+    const router = useRouter();
 
     const fetchFotos = async () => {
+      const authStore = useAuthStore();
+      const token = authStore.getToken();
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/muestras/fotos_por_legajo/${props.legajoId}`);
-        console.log('Response data:', response.data); // Verificar la respuesta del backend
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/muestras/fotos_por_legajo/${props.legajoId}`, {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "multipart/form-data"
+          },
+        });
+        if (response.status !== 200) {
+          throw ({message: 'Error al obtener las fotos', status: response.status})
+        }
         fotos.value = response.data;
         agruparFotosPorFecha();
-      } catch (err) {
-        error.value = 'Error al cargar las fotos';
-        console.error('Error fetching photos:', err);
+        } catch (err) {
+        if (err.status === 401 || err.status === 422) {
+          authStore.logout()
+          router.push('/log-in')
+        } else {
+          error.value = 'Error al cargar las fotos';
+          console.error('Error fetching photos:', err);
+        }
       }
     };
 

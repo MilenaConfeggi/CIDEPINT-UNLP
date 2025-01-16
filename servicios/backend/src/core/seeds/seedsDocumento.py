@@ -7,13 +7,6 @@ from datetime import datetime
 def seeds_documentos():
     documentos_data = [
         {
-            'nombre_documento': 'Documento 1',
-            'fecha_creacion': datetime(2024, 1, 1),
-            'estado_id': 1,
-            'tipo_documento_id': 1,
-            'legajo_id': 33
-        },
-        {
             'nombre_documento': 'Documento 2',
             'fecha_creacion': datetime(2024, 1, 1),
             'estado_id': 2,
@@ -40,12 +33,21 @@ def seeds_documentos():
             'tipo_documento_id': 5,
             'legajo_id': 33
         },
-        {    'nombre_documento': 'Factura',
+        {
+            'nombre_documento': 'Adicional1.pdf',
             'fecha_creacion': datetime(2024, 1, 1),
             'estado_id': 1,
-            'tipo_documento_id': 6,
+            'tipo_documento_id': 8,
             'legajo_id': 33
-        }
+        },
+        {
+            'nombre_documento': 'Adicional2.pdf',
+            'fecha_creacion': datetime(2024, 1, 1),
+            'estado_id': 1,
+            'tipo_documento_id': 8,
+            'legajo_id': 33
+        },
+
     ]
     for data in documentos_data:
         db.session.add(Documento(**data))
@@ -76,6 +78,9 @@ def seeds_tipos_documento():
         },
         {
             'nombre': 'adicional',
+        },
+        {
+            'nombre': 'Legajo',
         },
         {
             'nombre': 'Recibo',

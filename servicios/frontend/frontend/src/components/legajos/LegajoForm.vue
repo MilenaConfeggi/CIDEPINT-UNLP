@@ -1,4 +1,18 @@
 <template>
+  <RouterLink to="/legajos" class="back-button">
+    <svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" viewBox="0 0 24 24">
+      <g fill="none">
+        <path
+          d="M24 0v24H0V0zM12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.019-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z"
+        />
+        <path
+          fill="black"
+          d="M3.283 10.94a1.5 1.5 0 0 0 0 2.12l5.656 5.658a1.5 1.5 0 1 0 2.122-2.122L7.965 13.5H19.5a1.5 1.5 0 0 0 0-3H7.965l3.096-3.096a1.5 1.5 0 1 0-2.122-2.121z"
+        />
+      </g>
+    </svg>
+  </RouterLink>
+  <h2 class="mb-3 text-center mb-5">Crear legajo</h2>
   <form
     @submit.prevent="validateForm"
     class="row g-3 needs-validation"
@@ -37,10 +51,20 @@
         required
       />
     </div>
-    <div class="col-12">
+    <div class="col-md-6">
       <label for="contacto" class="form-label">Contacto</label>
       <input type="text" class="form-control" id="contacto" v-model="form.contacto" required />
       <div class="invalid-feedback">Por favor, introduzca un contacto.</div>
+    </div>
+    <div class="col-md-6">
+      <label for="area" class="form-label">Area</label>
+      <select class="form-select" id="area" v-model="form.area" required>
+        <option selected value="">Seleccione el area...</option>
+        <option v-for="area in areas" :key="area.id" :value="area.id">
+          {{ area.nombre }}
+        </option>
+      </select>
+      <div class="invalid-feedback">Por favor, seleccione un área.</div>
     </div>
     <div class="col-md-6">
       <label for="calle" class="form-label">Calle</label>
@@ -74,7 +98,7 @@
           id="es_juridico"
           v-model="form.es_juridico"
         />
-        <label class="form-check-label" for="es_juridico"> Es juridico </label>
+        <label class="form-check-label" for="es_juridico"> No requiere presupuesto </label>
       </div>
       <div class="form-check">
         <input
@@ -83,21 +107,32 @@
           id="necesita_facturacion"
           v-model="form.necesita_facturacion"
         />
-        <label class="form-check-label" for="necesita_facturacion"> Necesita facturacion </label>
+        <label class="form-check-label" for="necesita_facturacion"> Necesita facturación </label>
       </div>
     </div>
     <div class="mb-3">
       <label for="objetivo" class="form-label">Objetivo del OT</label>
-      <textarea class="form-control" id="objetivo" placeholder="Objetivo" required v-model="form.objetivo"></textarea>
-      <div class="invalid-feedback">Please enter a message in the textarea.</div>
+      <textarea
+        class="form-control"
+        id="objetivo"
+        placeholder="Objetivo"
+        required
+        v-model="form.objetivo"
+      ></textarea>
+      <div class="invalid-feedback">Por favor ingrese un objetivo para el legajo.</div>
     </div>
     <div class="col-12 d-flex justify-content-center">
-      <button type="submit" class="btn btn-primary">Sign in</button>
+      <button type="submit" class="btn btn-primary">Crear legajo</button>
     </div>
   </form>
 </template>
 <script>
 import axios from 'axios'
+import { useAreasStore } from '../../stores/areas'
+import { storeToRefs } from 'pinia'
+import { useToast } from 'vue-toastification';
+import { useRouter } from 'vue-router';
+
 export default {
   data() {
     return {
@@ -115,11 +150,41 @@ export default {
         objetivo: '',
         es_juridico: false,
         necesita_facturacion: false,
+        nombreCliente: '',
+        area: '',
       },
       wasValidated: false,
     }
   },
+
+  setup() {
+    const areasStore = useAreasStore();
+    const { areas, loading, error } = storeToRefs(areasStore);
+    const toast = useToast();
+    const router = useRouter()
+
+    return {
+      areas,
+      loading,
+      error,
+      toast,
+      router
+    };
+  },
+  async mounted() {
+    const areasStore = useAreasStore();
+    await areasStore.getAreas();
+  },
   methods: {
+    async loadAreas() {
+      try {
+        const areasStore = useAreasStore()
+        await areasStore.getAreas()
+      } catch (error) {
+        console.error('Error cargando áreas:', error)
+        this.toast.error('Hubo un error cargando las áreas. Intente de nuevo más tarde.')
+      }
+    },
     async validateForm() {
       const form = this.$el
       if (form.checkValidity()) {
@@ -127,7 +192,7 @@ export default {
           email: this.form.email,
           cuit: this.form.cuit,
           telefono: this.form.telefono,
-          celular: this.form.celular,
+          celular: this.form.telefono,
           direccion: this.form.direccion,
           contacto: this.form.contacto,
           calle: this.form.calle,
@@ -136,25 +201,30 @@ export default {
           codigo_postal: this.form.codigo_postal,
           piso: this.form.piso,
           depto: this.form.depto,
+          nombre: this.form.nombreCliente,
         }
         const legajo = {
           objetivo: this.form.objetivo,
           es_juridico: this.form.es_juridico,
           necesita_facturacion: this.form.necesita_facturacion,
           fecha_entrada: new Date().toISOString().replace('T', ' ').replace('Z', ''),
-          nro_legajo: 'LEG' + Math.floor(Math.random() * 1000),
+          area_id: this.form.area,
         }
         const data = {
           legajo: legajo,
           cliente: cliente,
         }
         try {
-          const response = await axios.post('http://127.0.0.1:5000/api/legajos/add', data)
+          const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/legajos/add`, data)
           console.log(response)
-          alert('Formulario enviado correctamente')
+          this.toast.success('Formulario enviado correctamente')
           this.wasValidated = false
           this.resetForm()
+          setTimeout(() => {
+            this.router.push('/legajos')
+          }, 1500)
         } catch (error) {
+          this.toast.error('Error al enviar el formulario')
           console.log(error)
         }
       } else {
@@ -175,6 +245,7 @@ export default {
       this.form.objetivo = ''
       this.form.es_juridico = false
       this.form.necesita_facturacion = false
+      this.form.area = ''
     },
   },
 }

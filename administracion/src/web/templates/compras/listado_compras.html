@@ -107,14 +107,14 @@
                     </td>
                     <td class="px-4 py-3">
                         <div class="flex items-center space-x-2">
-                            <a href="{{ url_for('compra.ver_compra', id_compra=compra.id) }}">
+                            <a href="{{ url_for('compra.ver_compra', id_compra=compra.id) }}" title="Ver compra">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                     <path d="M10 2C5.58 2 1.73 4.61.29 8.5a1 1 0 000 .99C1.73 15.39 5.58 18 10 18s8.27-2.61 9.71-6.5a1 1 0 000-.99C18.27 4.61 14.42 2 10 2zm0 14c-3.87 0-7.19-2.28-8.48-5.5C2.81 7.28 6.13 5 10 5s7.19 2.28 8.48 5.5C17.19 13.72 13.87 16 10 16zm0-9a3 3 0 100 6 3 3 0 000-6z"/>
                                 </svg>
                             </a>
                             {% if rol == "Administrador" or rol == "Colaborador" %}
                                 {% if compra.estado.value == 'Espera' or compra.estado.value == 'Aprobada'  %}
-                                    <a href="{{ url_for('compra.editar_compra', id_compra=compra.id) }}">
+                                    <a href="{{ url_for('compra.editar_compra', id_compra=compra.id) }}" title="Editar compra">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                             <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
                                         </svg>
@@ -122,7 +122,7 @@
                                 {% endif %}
                                 {% if compra.estado.value == 'Espera' %}
                                 <form action="{{ url_for('compra.aprobar_compra', id_compra=compra.id) }}" method="get" style="display:inline;">
-                                    <button type="submit">
+                                    <button type="submit" title="Aprobar compra">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                             <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L8 12.586 4.707 9.293a1 1 0 00-1.414 1.414l4 4a1 1 0 001.414 0l8-8a1 1 0 000-1.414z" clip-rule="evenodd"/>
                                         </svg>
@@ -131,7 +131,7 @@
                                 {% endif %}
                                 {% if compra.estado.value == 'Aprobada' %}
                                 <form action="{{ url_for('compra.realizar_compra', id_compra=compra.id) }}" method="get" style="display:inline;">
-                                    <button type="submit">
+                                    <button type="submit" title="Realizar compra">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 640 512" fill="currentColor">
                                             <path d="M535 41c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l64 64c4.5 4.5 7 10.6 7 17s-2.5 12.5-7 17l-64 64c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l23-23L384 112c-13.3 0-24-10.7-24-24s10.7-24 24-24l174.1 0L535 41zM105 377l-23 23L256 400c13.3 0 24 10.7 24 24s-10.7 24-24 24L81.9 448l23 23c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0L7 441c-4.5-4.5-7-10.6-7-17s2.5-12.5 7-17l64-64c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9zM96 64l241.9 0c-3.7 7.2-5.9 15.3-5.9 24c0 28.7 23.3 52 52 52l117.4 0c-4 17 .6 35.5 13.8 48.8c20.3 20.3 53.2 20.3 73.5 0L608 169.5 608 384c0 35.3-28.7 64-64 64l-241.9 0c3.7-7.2 5.9-15.3 5.9-24c0-28.7-23.3-52-52-52l-117.4 0c4-17-.6-35.5-13.8-48.8c-20.3-20.3-53.2-20.3-73.5 0L32 342.5 32 128c0-35.3 28.7-64 64-64zm64 64l-64 0 0 64c35.3 0 64-28.7 64-64zM544 320c-35.3 0-64 28.7-64 64l64 0 0-64zM320 352a96 96 0 1 0 0-192 96 96 0 1 0 0 192z"/>
                                         </svg>
@@ -140,7 +140,7 @@
                                 {% endif %}
                                 {% if compra.estado.value == 'Espera' or compra.estado.value == 'Aprobada' %}
                                 <form action="{{ url_for('compra.rechazar_compra', id_compra=compra.id) }}" method="get" style="display:inline;">
-                                    <button type="submit">
+                                    <button type="submit" title="Rechazar compra">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                             <path d="M6 2a1 1 0 00-1 1v1H3a1 1 0 100 2h14a1 1 0 100-2h-2V3a1 1 0 00-1-1H6zM4 7v9a2 2 0 002 2h8a2 2 0 002-2V7H4z"/>
                                         </svg>

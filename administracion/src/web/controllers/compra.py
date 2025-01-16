@@ -322,6 +322,9 @@ def editar_compra(id_compra):
     if not compra:
         return redirect(url_for("compra.lista_compras"))
     form = form_editar_compra(obj=compra)
+    form.proveedor.process(formdata=None, data=compra.id_proveedor)
+    form.solicitante.process(formdata=None, data=compra.id_empleado)
+    form.estado.process(formdata=None, data=compra.estado.name)
     form.fondos.entries = []
     form.areas.entries = []
     form.empleados.entries = []

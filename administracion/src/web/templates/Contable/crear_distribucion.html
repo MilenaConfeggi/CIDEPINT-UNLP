@@ -1,6 +1,14 @@
 {% extends 'layout.html' %}
 {% block title %}Nueva Distribución{% endblock %}
 {% block content %}
+<a href="{{url_for('contable.get_legajos')}}"
+    class="inline-flex items-center px-3 py-4 rounded-md text-black-500 hover:bg-black-50">
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-6 w-6">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h18">
+        </path>
+    </svg>
+    <span class="ml-1 font-bold text-lg">Volver</span>
+</a>
     <form class="px-4" method="POST" action="{{ url_for('contable.crear_distribucion', id = id_legajo) }}">
         {{ form.hidden_tag() }}
 

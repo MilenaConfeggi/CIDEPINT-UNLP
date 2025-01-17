@@ -272,24 +272,23 @@ def crear_distribucion(id):
         
         # Relación con los empleados
         empleados_ids = form.empleados_seleccionados.data
-        monto_empleado = round(((monto_modificado * porcentaje_area) * (porcentaje_empleados)) / len(empleados_ids), 2)
-        for empleado_id in empleados_ids:
-            empleado = db.session.query(Empleado).get(empleado_id)
-            if empleado:
-                empleado.saldo += monto_empleado
-                empleado_distribucion = Empleado_Distribucion(
-                    empleado_id=empleado.id,
-                    distribucion_id=nueva_distribucion.id
-                )
-                db.session.add(empleado_distribucion)
-
-                db.session.commit()
+        if empleados_ids:
+            monto_empleado = round(((monto_modificado * porcentaje_area) * (porcentaje_empleados)) / len(empleados_ids), 2)
+            for empleado_id in empleados_ids:
+                empleado = db.session.query(Empleado).get(empleado_id)
+                if empleado:
+                    empleado.saldo += monto_empleado
+                    empleado_distribucion = Empleado_Distribucion(
+                        empleado_id=empleado.id,
+                        distribucion_id=nueva_distribucion.id
+                    )
+                    db.session.add(empleado_distribucion) 
+        db.session.commit()
         #Redirige a la lista de distribuciones
         flash("Distribución creada correctamente","success")
         return redirect(url_for("contable.get_legajos"))
     else:
         # Obtener el primer campo con error
-        print(form.errors)
         first_error_field = next(iter(form.errors))
         first_error_message = form.errors[first_error_field][0]
         flash(f"Error en el campo {first_error_field}: {first_error_message}", 'danger')
@@ -319,16 +318,11 @@ def delete_distribucion():
     porcentaje_comisiones = distribucion.porcentaje_comisiones * 0.01
     monto_a_distribuir = distribucion.monto_a_distribuir
     costos = distribucion.costos
-    print("restas")
     areaDB.sumar_saldo_area(area_costos, round(-costos, 2))
-    print("costos", round(-costos, 2))
     monto_modificado = round((monto_a_distribuir * (1 - porcentaje_comisiones)) - costos, 2)
-    print("monto modificado", round(monto_modificado, 2))
     areaDB.sumar_saldo_area(area_ganancias, round(-(monto_modificado * porcentaje_area) * (1 - porcentaje_empleados), 2))
-    print("ganancias", round(-(monto_modificado * porcentaje_area) * (1 - porcentaje_empleados), 2))
-    areaDB.sumar_saldo_area(1, round(-(monto_modificado * (1 - porcentaje_area)) * 0.95, 2))
-    print("area 1", round(-(monto_modificado * (1 - porcentaje_area)) * 0.95, 2))
-
+    areaCidepint = areaDB.get_area_by_name("CIDEPINT")
+    areaDB.sumar_saldo_area(areaCidepint.id, round(-(monto_modificado * (1 - porcentaje_area)) * 0.95, 2))
     empleados = empleadoDB.list_empleados()
     colaboradores = [empleado for empleado in empleados if empleado.user.rol == "Colaborador" or empleado.user.rol == "Administrador"]
     for colaborador in colaboradores:
@@ -336,19 +330,20 @@ def delete_distribucion():
         print("saldo restado a colaboradro:" ,(((monto_modificado * (1 - porcentaje_area)) * 0.05) / len(colaboradores)))
 
     empleados_ids = [ed.empleado_id for ed in distribucion.empleados_asociados]
-    monto_empleado = ((monto_modificado * porcentaje_area) * (porcentaje_empleados)) / len(empleados_ids)
-    for empleado_id in empleados_ids:
-        empleado = db.session.query(Empleado).get(empleado_id)
-        if empleado:
-            empleado.saldo -= monto_empleado
-            print("saldo restado a empleado:",monto_empleado)
-            empleado_distribucion = db.session.query(Empleado_Distribucion).filter_by(
+    if empleados_ids:
+        monto_empleado = ((monto_modificado * porcentaje_area) * (porcentaje_empleados)) / len(empleados_ids)
+        for empleado_id in empleados_ids:
+            empleado = db.session.query(Empleado).get(empleado_id)
+            if empleado:
+                empleado.saldo -= monto_empleado
+                empleado_distribucion = db.session.query(Empleado_Distribucion).filter_by(
                 empleado_id=empleado.id, distribucion_id=distribucion.id).first()
-            if empleado_distribucion:
-                db.session.delete(empleado_distribucion)
+                if empleado_distribucion:
+                    db.session.delete(empleado_distribucion)
 
     db.session.commit()
     distribucionDB.delete_distribucion(id)
+    flash("Distribución eliminada correctamente","success")
     return redirect(url_for("contable.get_distribuciones",id=legajo_id))
 
 

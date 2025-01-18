@@ -19,7 +19,6 @@ class FormularioNuevaDistribucion(FlaskForm):
     
     porcentaje_empleados = FloatField('Porcentaje Empleados', 
                                       validators=[
-                                          DataRequired(message="es requerido"),
                                           NumberRange(min=0, max=100, message="Debe estar entre 0 y 100")
                                       ],
                                       render_kw={"aria-label": "Porcentaje Empleados"}

@@ -32,7 +32,7 @@ def crear_carpeta(
     nombre,
     usuarios_leen,
     usuarios_editan,
-    fondo
+    fondo=None
 ):
     nueva_carpeta = Carpeta(
             nombre=nombre,

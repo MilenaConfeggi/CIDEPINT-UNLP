@@ -113,6 +113,7 @@
                         <a href="{{ url_for('patrimonio.mostrar_bien', id_bien=bien.id) }}"
                         class="flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-black-600 rounded-lg focus:outline-none focus:shadow-outline-gray"
                         aria-label="Ver"
+                        title="Ver"
                         >
                             <svg
                                 class="w-5 h-5"
@@ -129,6 +130,7 @@
                             <a href="{{ url_for('patrimonio.editar_bien', id_bien=bien.id) }}"
                             class="flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-black-600 rounded-lg focus:outline-none focus:shadow-outline-gray"
                             aria-label="Editar"
+                            title="Editar"
                             >
                                 <svg
                                     class="w-5 h-5"
@@ -144,7 +146,9 @@
                             {% if bien.motivo_baja %}
                                 <button data-id="{{ bien.id }}"
                                 class="open-modal-restaurar-btn flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-black-600 rounded-lg focus:outline-none focus:shadow-outline-gray"
-                                aria-label="Restaurar">
+                                aria-label="Restaurar"
+                                title="Restaurar"
+                                >
                                 <svg
                                     class="w-5 h-5"
                                     aria-hidden="true"
@@ -163,6 +167,7 @@
                                 <button data-id="{{ bien.id }}"
                                 class="open-modal-btn flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-black-600 rounded-lg focus:outline-none focus:shadow-outline-gray"
                                 aria-label="Borrar"
+                                title="Borrar"
                                 >
                                 <svg
                                     class="w-5 h-5"

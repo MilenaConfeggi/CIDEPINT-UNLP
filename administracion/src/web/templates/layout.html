@@ -10,7 +10,7 @@
       {% block title %}{% endblock %}
     </title>
   </head>
-  <body class="bg-gray-50 h-full">
+  <body class="bg-gray-50 min-h-screen">
     {% if current_user.is_authenticated %}
       {% include "navbar.html" %}
     {% endif %}

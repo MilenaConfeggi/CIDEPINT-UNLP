@@ -193,6 +193,9 @@ def actualizar_carpeta(id_carpeta):
             flash("Carpeta no encontrada", 'error')
             return redirect(url_for('archivos.index'))
         if carpeta.nombre != data.get('nombre'):
+            if carpeta.fondo != []:
+                flash('No se puede editar el nombre de una carpeta asociada a un fondo', 'error')
+                return redirect(url_for('archivos.index'))
             if servicio_archivos.chequear_nombre_carpeta_existente(data.get('nombre')):
                 flash('Ya existe una carpeta con ese nombre', 'error')
                 return render_template("archivos_admin/editar_carpeta.html", form=form,id_carpeta=id_carpeta, users=servicio_personal.listar_usuarios_personal())

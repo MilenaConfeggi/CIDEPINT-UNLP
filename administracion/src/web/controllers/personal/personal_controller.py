@@ -343,6 +343,16 @@ def inhabilitar_usuario(id):
     flash('Usuario inhabilitado con éxito', 'success')
     return redirect(url_for('personal.ver_perfil', id=user.id))
 
+@personal_bp.route('/usuario/habilitar/<int:id>', methods=['POST'])
+@role_required('Administrador', 'Colaborador')
+def habilitar_usuario(id):
+    user = User.query.get_or_404(id)
+    
+    user.habilitado = True
+    user.update()
+    flash('Usuario habilitado con éxito', 'success')
+    return redirect(url_for('personal.ver_perfil', id=user.id))
+
 @personal_bp.route('/topicos', methods=['GET'])
 @role_required('Administrador', 'Colaborador', 'Personal') 
 def seleccionar_topico():

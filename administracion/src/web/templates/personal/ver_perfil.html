@@ -86,7 +86,15 @@
   {% if current_user.id != user.id %}
   <form id="inhabilitar-usuario-form" action="{{ url_for('personal.inhabilitar_usuario', id=user.id) }}" method="POST" class="mt-4 mb-4">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <button type="button" id="inhabilitar-usuario-btn" class="bg-red-500 text-white px-4 py-2 rounded">Inhabilitar Usuario</button>
+    {% if user.habilitado %}
+      <button type="button" id="inhabilitar-usuario-btn" class="bg-red-500 text-white px-4 py-2 rounded">Inhabilitar Usuario</button>
+    {% endif %}
+  </form>
+  <form id="habilitar-usuario-form" action="{{ url_for('personal.habilitar_usuario', id=user.id) }}" method="POST" class="mt-4 mb-4">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    {% if not user.habilitado %}
+      <button type="button" id="habilitar-usuario-btn" class="bg-green-500 text-white px-4 py-2 rounded">Habilitar Usuario</button>
+    {% endif %}
   </form>
   {% endif %}
 </div>
@@ -96,6 +104,8 @@
   document.addEventListener('DOMContentLoaded', function() {
     const cargoSelect = document.getElementById('cargo');
     const subdivisionCargoSelect = document.getElementById('subdivision_cargo');
+    const inhabilitarUsuarioBtn = document.getElementById('inhabilitar-usuario-btn');
+    const habilitarUsuarioBtn = document.getElementById('habilitar-usuario-btn');
 
     const subdivisiones = {
       'Investigador': ['Asistente', 'Adjunto', 'Independiente', 'Principal', 'Superior'],
@@ -115,6 +125,17 @@
         optionElement.textContent = option;
         subdivisionCargoSelect.appendChild(optionElement);
       });
+
+      // Ocultar el botón de inhabilitar si el cargo es Administrativo
+      if (selectedCargo === 'Administrativo') {
+        if (inhabilitarUsuarioBtn) {
+          inhabilitarUsuarioBtn.style.display = 'none';
+        }
+      } else {
+        if (inhabilitarUsuarioBtn) {
+          inhabilitarUsuarioBtn.style.display = 'block';
+        }
+      }
     }
 
     cargoSelect.addEventListener('change', updateSubdivisionCargoOptions);
@@ -122,25 +143,43 @@
     // Inicializar las opciones de subdivisión de cargo al cargar la página
     updateSubdivisionCargoOptions();
 
-    // Mostrar alertas basadas en los mensajes flash
-
-
     // Manejar la confirmación de inhabilitación
-    document.getElementById('inhabilitar-usuario-btn').addEventListener('click', function() {
-      Swal.fire({
-        title: '¿Estás seguro?',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Sí, inhabilitar',
-        cancelButtonText: 'Cancelar'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          document.getElementById('inhabilitar-usuario-form').submit();
-        }
+    if (inhabilitarUsuarioBtn) {
+      inhabilitarUsuarioBtn.addEventListener('click', function() {
+        Swal.fire({
+          title: '¿Estás seguro?',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Sí, inhabilitar',
+          cancelButtonText: 'Cancelar'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            document.getElementById('inhabilitar-usuario-form').submit();
+          }
+        });
       });
-    });
+    }
+
+    // Manejar la confirmación de habilitación
+    if (habilitarUsuarioBtn) {
+      habilitarUsuarioBtn.addEventListener('click', function() {
+        Swal.fire({
+          title: '¿Estás seguro?',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Sí, habilitar',
+          cancelButtonText: 'Cancelar'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            document.getElementById('habilitar-usuario-form').submit();
+          }
+        });
+      });
+    }
   });
 </script>
 

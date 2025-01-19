@@ -213,7 +213,6 @@ def get_legajos():
         if((params.get('filtro') and params['filtro'] =="SinDistribucion" and distribuciones == [] )or not params.get('filtro')):
             resultado.append({
                 "id": legajo.id,
-                "nro_legajo": legajo.nro_legajo,
                 "cliente": legajo.cliente,
                 "documentos": documentos,
                 "distribuciones" : distribuciones

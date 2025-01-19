@@ -45,6 +45,7 @@ def modificar_area(id):
         success, message = area.update()
         if success:
             flash('Área actualizada con éxito', 'success')
+            return redirect(url_for('area.listar_areas'))
         else:
             flash(message, 'error')    
     return render_template('personal/modificar_area.html', area=area)
@@ -62,6 +63,7 @@ def eliminar_area(id):
     
     success, message = area.delete()
     if success:
+        flash('Área eliminada con éxito', 'success')
         return redirect(url_for('area.listar_areas'))
     else:
         flash(message, 'error')

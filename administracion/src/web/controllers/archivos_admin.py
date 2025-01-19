@@ -6,6 +6,7 @@ from flask_login import current_user
 from administracion.src.web.forms.carpeta_nueva import FormularioNuevaCarpeta
 from administracion.src.web.controllers.roles import role_required
 from administracion.src.core.servicios import personal as servicio_personal
+from administracion.src.core.ingresos import ingreso as ingresoDB
 
 bp = Blueprint("archivos",__name__,url_prefix="/archivos")
 
@@ -15,7 +16,6 @@ def index():
     anio_actual = datetime.now().year
     anio = request.args.get("anio", anio_actual)
     carpetas = servicio_archivos.listar_carpetas(anio)
-
     anios = list(range(2024,  anio_actual + 1))
     anios.reverse()
     return render_template("archivos_admin/lista_carpetas.html",carpetas=carpetas,anios=anios)
@@ -134,6 +134,10 @@ def eliminar_archivo(id_carpeta):
         return redirect(url_for('archivos.ver_carpeta',id_carpeta=id_carpeta))
     
     data = request.form
+    if ingresoDB.get_ingreso_con_archivo(data.get('id_archivo')):
+        flash('No se puede eliminar el archivo, ya que está asociado a un ingreso', 'error')
+        return redirect(url_for('archivos.ver_carpeta',id_carpeta=id_carpeta))
+
     if servicio_archivos.eliminar_archivo(id_archivo=data.get('id_archivo')):
         flash('Archivo eliminado correctamente', 'success')
     else:
@@ -145,6 +149,10 @@ def eliminar_archivo(id_carpeta):
 @role_required('Administrador', 'Colaborador') 
 def eliminar_carpeta():
     data = request.form
+    carpeta = servicio_archivos.conseguir_carpeta_de_id(data.get('id_carpeta'))
+    if carpeta.fondo != []:
+        flash('Para eliminar una carpeta asociada a un fondo, por favor elimine el fondo en la parte de contable', 'error')
+        return redirect(url_for('archivos.index'))
     if servicio_archivos.eliminar_carpeta(id_carpeta=data.get('id_carpeta')):
         flash('Carpeta eliminada correctamente', 'success')
     else:
@@ -185,6 +193,9 @@ def actualizar_carpeta(id_carpeta):
             flash("Carpeta no encontrada", 'error')
             return redirect(url_for('archivos.index'))
         if carpeta.nombre != data.get('nombre'):
+            if carpeta.fondo != []:
+                flash('No se puede editar el nombre de una carpeta asociada a un fondo', 'error')
+                return redirect(url_for('archivos.index'))
             if servicio_archivos.chequear_nombre_carpeta_existente(data.get('nombre')):
                 flash('Ya existe una carpeta con ese nombre', 'error')
                 return render_template("archivos_admin/editar_carpeta.html", form=form,id_carpeta=id_carpeta, users=servicio_personal.listar_usuarios_personal())

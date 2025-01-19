@@ -31,6 +31,7 @@
                 >
                     <th class="px-4 py-3">Titulo</th>
                     <th class="px-4 py-3">Saldo</th>
+                    <th class="px-4 py-3">Ingresos</th>
                     <th class="px-4 py-3">Acciones</th>
                 </tr>
                 </thead>
@@ -66,6 +67,25 @@
                                     ></path>
                                 </svg>
                             </a>
+                            <a href="{{ url_for('contable.mostrar_fondo', fondo_id=fondo.id) }}"
+                            class="flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-black-600 rounded-lg focus:outline-none focus:shadow-outline-gray"
+                            aria-label="Ver"
+                            >
+                            <svg class="px-4 aspect-square w-14 h-14 rounded-lg object-cover group-hover:opacity-75 xl:aspect-[7/7]"
+                            aria-hidden="true"
+                            fill="currentColor"
+                            viewBox="0 0 448 512"
+                            >
+                            <path
+                          fill-rule="evenodd"
+                          d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"
+                          clip-rule="evenodd"
+                            ></path>
+                          </svg>
+                            </a>
+                        </div>
+                        </td>
+                            <td class="px-4 py-3">
                             <button data-id="{{ fondo.id }}"
                                 class="open-modal-btn flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-black-600 rounded-lg focus:outline-none focus:shadow-outline-gray"
                                 aria-label="Borrar"
@@ -83,8 +103,8 @@
                                     ></path>
                                 </svg>
                             </button>
-                        </div>
                         </td>
+                        
                     </tr>
                 {% endfor %}
                 </tbody>

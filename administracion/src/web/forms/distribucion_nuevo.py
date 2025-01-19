@@ -11,7 +11,7 @@ class FormularioNuevaDistribucion(FlaskForm):
 
     porcentaje_area = FloatField('Porcentaje Area', 
                                  validators=[
-                                     DataRequired(message="es requerido"),
+                                     DataRequired(message="no puede ser 0"),
                                      NumberRange(min=0, max=100, message="Debe estar entre 0 y 100")
                                  ],
                                  render_kw={"aria-label": "Porcentaje Area"}
@@ -19,7 +19,6 @@ class FormularioNuevaDistribucion(FlaskForm):
     
     porcentaje_empleados = FloatField('Porcentaje Empleados', 
                                       validators=[
-                                          DataRequired(message="es requerido"),
                                           NumberRange(min=0, max=100, message="Debe estar entre 0 y 100")
                                       ],
                                       render_kw={"aria-label": "Porcentaje Empleados"}
@@ -27,7 +26,7 @@ class FormularioNuevaDistribucion(FlaskForm):
     
     porcentaje_comisiones = FloatField('Porcentaje Comisiones', 
                                        validators=[
-                                           DataRequired(message="es requerido"),
+                                           
                                            NumberRange(min=0, max=100, message="Debe estar entre 0 y 100")
                                        ],
                                        render_kw={"aria-label": "Porcentaje Comisiones"}
@@ -35,7 +34,7 @@ class FormularioNuevaDistribucion(FlaskForm):
     
     monto_a_distribuir = FloatField('Monto a Distribuir', 
                                     validators=[
-                                        DataRequired(message="es requerido"),
+                                        DataRequired(message="no puede ser 0"),
                                         NumberRange(min=0, message="Debe ser un valor positivo")
                                     ],
                                     render_kw={"aria-label": "Monto a Distribuir"}
@@ -43,15 +42,16 @@ class FormularioNuevaDistribucion(FlaskForm):
     
     costos = FloatField('Costos', 
                         validators=[
-                            DataRequired(message="es requerido"),
-                            NumberRange(min=0, message="Debe ser un valor positivo")
+                        
+                            NumberRange(min=0, message="Debe ser un valor positivo"),
+                            Optional()
                         ],
                         render_kw={"aria-label": "Costos"}
                         )
     
-    ganancias_de_id = SelectField('Area de Ganancias', coerce=int, validators=[Optional()], render_kw={"aria-label": "Area de Ganancias"})
+    ganancias_de_id = SelectField('Area de Ganancias', coerce=int, validators=[DataRequired(message="es requerido")], render_kw={"aria-label": "Area de Ganancias"})
     
-    costos_de_id = SelectField('Area de Costos', coerce=int, validators=[Optional()], render_kw={"aria-label": "Area de Costos"})
+    costos_de_id = SelectField('Area de Costos', coerce=int, validators=[DataRequired(message="es requerido")], render_kw={"aria-label": "Area de Costos"})
     
     # Seleccionar Empleados
     

@@ -4,7 +4,13 @@ class Config(object):
     TESTING = False
     SECRET_KEY = getenv('SECRET_KEY', urandom(24).hex())
     SESSION_TYPE = "filesystem"
-
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    MAIL_SERVER = 'smtp.gmail.com'
+    MAIL_PORT = 587
+    MAIL_USE_TLS = True
+    MAIL_USERNAME = 'cidepint996@gmail.com'
+    MAIL_PASSWORD = 'ovsd lfba ejyo qdha'
+    MAIL_DEFAULT_SENDER = 'cidepint996@gmail.com'
 
 class DevelopmentConfig(Config):
     DB_USER = getenv("DB_USER", "postgres")

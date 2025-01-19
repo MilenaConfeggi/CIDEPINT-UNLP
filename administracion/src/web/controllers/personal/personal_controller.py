@@ -1,4 +1,5 @@
-from flask import flash, redirect, render_template, request, send_file, url_for, Blueprint, session
+from flask import flash, redirect, render_template, request, send_file, url_for, Blueprint, session, current_app
+from flask_mail import Message
 from models.personal.personal import User
 from models.personal.area import Area
 from administracion.src.core.servicios import personal as servicio_personal
@@ -78,6 +79,11 @@ def registrar_usuario():
         )
         success, message = nuevo_empleado.save()
         if success:
+            msg = Message('Nuevo usuario', sender=current_app.config['MAIL_DEFAULT_SENDER'], recipients=[email])
+            #Añadir link
+            msg.body = f'Se ha creado un nuevo usuario para esta dirección de correo electrónico en la página de administración del CIDEPINT. Tus datos para acceder a la página son Usuario: {username} y Contraseña: {password}'
+            mail = current_app.extensions.get('mail')  # Obtén la instancia de Mail desde la aplicación
+            mail.send(msg)
             flash('Usuario registrado con éxito', 'success')
         else:
             flash(message, 'error')
@@ -155,8 +161,15 @@ def descargar_empleados():
     busqueda = request.args.get('busqueda', None)
     ordenar_por = request.args.get('ordenar_por', 'nombre')
     orden = request.args.get('orden', 'asc')
+    mostrar_inhabilitados = request.args.get('mostrar_inhabilitados', False) == 'True'
     
-    query = Empleado.query.join(User).filter(User.habilitado == True)
+    query = Empleado.query
+
+    print(request.args.get('mostrar_inhabilitados'))
+    print(mostrar_inhabilitados)
+
+    if not mostrar_inhabilitados:
+        query = query.join(User).filter(User.habilitado == True)
     
     if busqueda:
         query = query.filter(or_(

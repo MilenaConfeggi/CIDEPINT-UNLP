@@ -24,5 +24,5 @@ class Carpeta(db.Model):
     usuarios_leen = db.relationship("User", secondary=usuarios_leen_carpeta, back_populates="carpetas_lee")
     usuarios_editan = db.relationship('User', secondary=usuarios_editan_carpeta, back_populates='carpetas_edita')
 
-    #id_fondo = db.Column(db.Integer, db.ForeignKey('fondo.id'))
-    fondo = db.relationship('Fondo', back_populates='carpeta')
+    id_fondo = db.Column(db.Integer, db.ForeignKey('fondo.id'), nullable=True)
+    fondo = db.relationship('Fondo', back_populates='carpeta', uselist=False)

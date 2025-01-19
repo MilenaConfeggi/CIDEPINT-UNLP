@@ -11,7 +11,9 @@ from models.presupuestos.STAN import STAN
 from models.presupuestos.ensayo import Ensayo
 
 
-def list_legajos(page=1, per_page=2, empresa=None, fecha=None, area=None, ensayo=None):
+def list_legajos(page=1, per_page=10, empresa=None, fecha=None,facturacion=None):
+    
+    
     query = Legajo.query
     query = (
         Legajo.query.outerjoin(Legajo.presupuesto_cidepint)  
@@ -26,14 +28,14 @@ def list_legajos(page=1, per_page=2, empresa=None, fecha=None, area=None, ensayo
         )
     )
     if empresa:
-        query = query.join(Legajo.cliente).filter(Cliente.nombre.like(f"%{empresa}%"))
+        empresa = empresa.strip()
+        query = query.join(Legajo.cliente).filter(Cliente.email.like(f'%{empresa}%'))
     if fecha:
-        fecha = datetime.strptime(fecha, "%Y-%m-%d")
-        query = query.filter(func.date(Legajo.fecha_entrada) == fecha.date()) 
-    if area:
-        query = query.join(Legajo.area).filter(Area.id == area)
-    if ensayo:
-        query = query.filter(Legajo.presupuesto_cidepint.any(STAN.ensayos.any(Ensayo.nombre.like(f"%{ensayo}%"))))
+        fecha = fecha.strip()
+        fecha = datetime.strptime(fecha, '%Y-%m-%d')
+        query = query.filter(Legajo.fecha_entrada == fecha)
+    if facturacion:
+        query = query.filter(Legajo.necesita_facturacion)
     return query.paginate(page=page, per_page=per_page, error_out=False)
 
 

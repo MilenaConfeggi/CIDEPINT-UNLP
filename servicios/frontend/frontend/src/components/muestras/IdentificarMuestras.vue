@@ -38,6 +38,8 @@
 </template>
 
 <script>
+import { useAuthStore } from '@/stores/auth';
+import { ref, onMounted, computed } from 'vue';
 export default {
   props: {
     legajoId: {
@@ -66,22 +68,24 @@ export default {
       this.isSubmitting = true;
       this.error = null;
       this.successMessage = null;
-
+      const authStore = useAuthStore();
+      const token = authStore.getToken();
       try {
         const response = await fetch(
           `${import.meta.env.VITE_API_URL}/muestras/subir_muestras/${this.legajoId}`,
           {
             method: 'POST',
             headers: {
-              'Content-Type': 'application/json'
-            },
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
+          },
             body: JSON.stringify(this.muestras)
           }
         );
 
         const data = await response.json();
 
-        if (!response.ok) {
+        if (response.status !== 200) {
           throw new Error(data.message || 'Error al enviar los datos');
         }
 

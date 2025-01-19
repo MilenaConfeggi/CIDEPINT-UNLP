@@ -1,6 +1,6 @@
 <template>
   <main>
-    <RouterLink to="/legajos" class="">
+    <RouterLink to="/legajos" class="back-button">
       <svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" viewBox="0 0 24 24">
         <g fill="none">
           <path
@@ -13,105 +13,346 @@
         </g>
       </svg>
     </RouterLink>
-    <div
-      class="d-flex justify-content-center align-items-center border-2 border-blue-500 rounded-lg p-4 m-4"
-    >
+    <div class="d-flex justify-content-center align-items-center rounded p-4 m-4">
       <p v-if="loading">Cargando...</p>
       <p v-if="error">{{ error }}</p>
-      <p v-if="!legajo && !loading">No se encontro el legajo</p>
-      <div v-else>
-        <p>LEG_{{ legajo.id }}</p>
-        <StateBadge v-if="legajo.estado" :state="legajo.estado?.nombre" />
-        <p>Fecha entrada: {{ formatDate(legajo.fecha_entrada) }}</p>
-        <p>Objetivo: {{}}</p>
-        <div v-if="legajo.cliente">
-          <h6>Cliente</h6>
-          <p>{{ legajo.cliente.nombre }}</p>
-          <p>CUIT: {{ legajo.cliente.cuit }}</p>
+      <p v-if="!legajo && !loading">No se encontró el legajo</p>
+      <div v-else class="card border-dark text-center w-75">
+        <div class="card-header">
+          <StateBadge v-if="legajo.estado" :state="legajo.estado?.nombre" />
         </div>
-
-        <div v-if="legajo && tipos_documentos?.length">
-          <table class="table">
-            <thead>
-              <tr>
-                <th scope="col">Documentacion</th>
-                <th scope="col">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="documento in tipos_documentos" :key="documento.id">
-                <td>{{ documento.nombre }}</td>
-                <td>
-                  <div class="dropdown">
-                    <button
-                      class="btn btn-secondary dropdown-toggle"
-                      type="button"
-                      data-bs-toggle="dropdown"
-                      aria-expanded="false"
+        <div class="card-body">
+          <h1 class="card-title">LEG_{{ legajo.id }}</h1>
+          <span v-if="isAdmin" class="badge rounded-pill text-bg-dark">{{ legajo.area?.nombre }}</span>
+          <div class="row row-cols-2">
+            <p class="col">Objetivo: {{ legajo.objetivo }}</p>
+            <p class="col" v-if="legajo.necesita_facturacion">Necesita facturación</p>
+            <p class="col" v-else>No necesita facturación</p>
+            <p class="col" v-if="legajo.es_juridico">No requiere presupuesto</p>
+            <p class="col" v-else>Requiere presupuesto</p>
+            <p class="col" v-if="legajo.motivo_cancelacion">
+              Motivo de cancelación: {{ legajo.motivo_cancelacion }}
+            </p>
+          </div>
+          <hr class="" />
+          <div v-if="legajo.cliente">
+            <h1 class="text-center">Cliente</h1>
+            <div class="row row-cols-2">
+              <p class="col">Nombre: {{ legajo.cliente.nombre }}</p>
+              <p class="col">CUIT: {{ legajo.cliente.cuit }}</p>
+              <p class="col">Email: {{ legajo.cliente.email }}</p>
+              <p class="col">Contacto telefónico: {{ legajo.cliente.telefono }}</p>
+            </div>
+          </div>
+          <div class="d-flex justify-content-end gap-3 mb-2">
+            <button
+              v-if="
+                !legajo.admin_habilitado &&
+                existeDocumento('Presupuesto CIDEPINT') &&
+                existeDocumento('Presupuesto CONICET') &&
+                existeDocumento('Orden de compra')
+              "
+              class="btn btn-dark"
+              @click="adminLegajo"
+            >
+              Habilitar para administración
+            </button>
+          </div>
+          <div v-if="legajo && tipos_documentos?.length">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Documentación</th>
+                  <th scope="col">Acciones</th>
+                </tr>
+              </thead>
+              <tbody class="table-group-divider">
+                <tr v-for="documento in tipos_documentos" :key="documento.id">
+                  <td>{{ documento.nombre }}</td>
+                  <td>
+                    <div class="dropdown">
+                      <button
+                        class="btn btn-dark dropdown-toggle"
+                        type="button"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                      >
+                        Acciones
+                      </button>
+                      <ul class="dropdown-menu">
+                        <template v-if="documento.nombre === 'Informe'">
+                          <li v-if="hasPermission('cargar_documentacion')">
+                            <label :for="`upload-doc-${documento.id}`" class="dropdown-item">
+                              Subir Documentación
+                              <input
+                                :id="`upload-doc-${documento.id}`"
+                                type="file"
+                                accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
+                                @change="uploadDocumentacion($event, documento.id, legajo.id)"
+                                hidden
+                              />
+                            </label>
+                          </li>
+                          <li v-if="hasPermission('ver documentacion')">
+                            <button
+                              type="button"
+                              class="dropdown-item"
+                              @click="verDocumentacion(legajo.id)"
+                            >
+                              Ver Documentación
+                            </button>
+                          </li>
+                          <li v-if="hasPermission('cargar_informe')">
+                            <label :for="`upload-informe-${documento.id}`" class="dropdown-item">
+                              Subir Informe
+                              <input
+                                :id="`upload-informe-${documento.id}`"
+                                type="file"
+                                accept="application/pdf"
+                                @change="uploadInforme($event, documento.id, legajo.id)"
+                                hidden
+                              />
+                            </label>
+                          </li>
+                          <li v-if="hasPermission('ver informe')">
+                            <button
+                              type="button"
+                              class="dropdown-item"
+                              @click="verInforme(legajo.id)"
+                            >
+                              Ver Informe
+                            </button>
+                          </li>
+                          <li v-if="hasPermission('cargar_informe_firmado')">
+                            <label
+                              :for="`upload-informe-firmado-${documento.id}`"
+                              class="dropdown-item"
+                            >
+                              Subir Informe Firmado
+                              <input
+                                :id="`upload-informe-firmado-${documento.id}`"
+                                type="file"
+                                accept="application/pdf"
+                                @change="uploadInformeFirmado($event, documento.id, legajo.id)"
+                                hidden
+                              />
+                            </label>
+                          </li>
+                          <li v-if="legajo?.estado?.nombre === 'Informado'">
+                            <button
+                              type="button"
+                              class="dropdown-item"
+                              @click="enviarInforme(documento.id, legajo.id)"
+                            >
+                              Enviar Informe
+                            </button>
+                          </li>
+                        </template>
+                        <template v-else-if="documento.nombre === 'Certificado CIDEPINT'">
+                          <li v-if="hasPermission('generar_certificado')">
+                            <RouterLink
+                              :to="`/generar_certificado/${legajo.id}`"
+                              class="dropdown-item"
+                            >
+                              Generar
+                            </RouterLink>
+                          </li>
+                          <li
+                            v-if="
+                              hasPermission('ver_certificado') && existeDocumento(documento.nombre)
+                            "
+                          >
+                            <button
+                              type="button"
+                              class="dropdown-item"
+                              @click="viewCertificado(documento.id, documento.nombre, legajo.id)"
+                            >
+                              Ver
+                            </button>
+                          </li>
+                        </template>
+                        <template v-else-if="documento.nombre === 'Presupuesto CIDEPINT'">
+                          <li v-if="hasPermission('generar_presupuesto')">
+                            <RouterLink
+                              :to="`/generar_presupuesto/${legajo.id}`"
+                              class="dropdown-item"
+                            >
+                              Generar
+                            </RouterLink>
+                          </li>
+                          <li
+                            v-if="
+                              hasPermission('generar_presupuestont') &&
+                              !existeDocumento(documento.nombre) &&
+                              presupuestont === false
+                            "
+                          >
+                            <RouterLink
+                              :to="`/marcar_sin_presupuesto/${legajo.id}`"
+                              class="dropdown-item"
+                            >
+                              Marcar como sin presupuesto
+                            </RouterLink>
+                          </li>
+                          <li v-if="presupuestont === true" class="dropdown-item">
+                            Ya está marcado como SIN presupuesto
+                          </li>
+                          <li
+                            v-if="
+                              hasPermission('ver_presupuesto') && existeDocumento(documento.nombre)
+                            "
+                          >
+                            <button
+                              type="button"
+                              class="dropdown-item"
+                              @click="viewPresupuesto(legajo.id)"
+                            >
+                              Ver
+                            </button>
+                          </li>
+                          <li
+                            v-if="
+                              hasPermission('cargar_presupuesto_firmado') &&
+                              existeDocumento(documento.nombre)
+                            "
+                          >
+                            <label
+                              :for="`upload-presupuesto-firmado-${documento.id}`"
+                              class="dropdown-item"
+                            >
+                              Subir Presupuesto Firmado
+                              <input
+                                :id="`upload-presupuesto-firmado-${documento.id}`"
+                                type="file"
+                                accept="application/pdf"
+                                @change="uploadPresupuestoFirmado($event, documento.id, legajo.id)"
+                                hidden
+                              />
+                            </label>
+                          </li>
+                        </template>
+                        <template v-else-if="documento.nombre === 'Legajo'">
+                          <li>
+                            <button
+                              type="button"
+                              class="dropdown-item"
+                              @click="viewLegajo(legajo.id)"
+                            >
+                              Ver
+                            </button>
+                          </li>
+                        </template>
+                        <template v-else-if="documento.nombre === 'adicional'">
+                          <li
+                            v-for="adicional in adicionales"
+                            :key="adicional.id"
+                            class="dropdown-item"
+                            @click="viewAdicional(adicional.id)"
+                          >
+                            {{ adicional.nombre_documento }}
+                          </li>
+                        </template>
+                        <template v-else>
+                          <li v-if="existeDocumento(documento.nombre)">
+                            <button
+                              type="button"
+                              class="dropdown-item"
+                              data-bs-toggle="modal"
+                              data-bs-target="#exampleModal"
+                              @click="viewFile(documento.id, documento.nombre)"
+                            >
+                              Ver documento
+                            </button>
+                          </li>
+                          <li v-if="existeDocumento(documento.nombre)">
+                            <button
+                              type="button"
+                              class="dropdown-item"
+                              @click="downloadDocumento(documento.id, legajo.id)"
+                            >
+                              Descargar
+                            </button>
+                          </li>
+                          <li v-if="existeDocumento(documento.nombre)">
+                            <label :for="`edit-pdf-${documento.id}`" class="dropdown-item">
+                              Editar
+                              <input
+                                :id="`edit-pdf-${documento.id}`"
+                                type="file"
+                                accept="application/pdf"
+                                @change="handleFileUpload($event, documento.id, legajo.id, true)"
+                                hidden
+                              />
+                            </label>
+                          </li>
+                        </template>
+                        <template
+                          v-if="
+                            documento.nombre !== 'Informe' &&
+                            documento.nombre !== 'Certificado CIDEPINT' &&
+                            documento.nombre !== 'Presupuesto CIDEPINT' &&
+                            documento.nombre !== 'Factura' &&
+                            documento.nombre !== 'adicional' &&
+                            documento.nombre !== 'Legajo'
+                          "
+                        >
+                          <li v-if="!existeDocumento(documento.nombre)">
+                            <label :for="`upload-pdf-${documento.id}`" class="dropdown-item">
+                              Cargar
+                              <input
+                                :id="`upload-pdf-${documento.id}`"
+                                type="file"
+                                accept="application/pdf"
+                                @change="handleFileUpload($event, documento.id, legajo.id)"
+                                hidden
+                              />
+                            </label>
+                          </li>
+                        </template>
+                        <template v-if="documento.nombre === 'Factura'">
+                          <li v-if="!existeDocumento(documento.nombre)">
+                            <button
+                              data-bs-toggle="modal"
+                              data-bs-target="#exampleModal3"
+                              class="dropdown-item"
+                              @click="cargarFactura(documento.id)"
+                            >
+                              Cargar
+                            </button>
+                          </li>
+                        </template>
+                      </ul>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Mails</td>
+                  <td>
+                    <RouterLink :to="`/mails/${legajo.id}`" class="btn btn-primary"
+                      >Ver Mails</RouterLink
                     >
-                      Acciones
-                    </button>
-                    <ul class="dropdown-menu">
-                      <template v-if="existeDocumento(documento.nombre)">
-                        <li>
-                          <button
-                            type="button"
-                            class="dropdown-item"
-                            data-bs-toggle="modal"
-                            data-bs-target="#exampleModal"
-                            @click="viewFile( documento.id, documento.nombre)"
-                          >
-                            Ver documento
-                          </button>
-                        </li>
-                        <li>
-                          <button
-                            type="button"
-                            class="dropdown-item"
-                            @click="downloadDocumento(documento.id, legajo.id)"
-                          >
-                            Descargar
-                          </button>
-                        </li>
-                        <li>
-                          <label for="upload-pdf" class="dropdown-item">
-                          Editar
-                          <input
-                            id="upload-pdf"
-                            type="file"
-                            accept="application/pdf"
-                            @change="handleFileUpload($event, documento.id, legajo.id, true)"
-                            class="dropdown-item"
-                            hidden
-                          />
-                        </label>
-                        </li>
-                      </template>
-                      <li v-else>
-                        <label for="upload-pdf" class="dropdown-item">
-                          Cargar
-                          <input
-                            id="upload-pdf"
-                            type="file"
-                            accept="application/pdf"
-                            @change="handleFileUpload($event, documento.id, legajo.id)"
-                            class="dropdown-item"
-                            hidden
-                          />
-                        </label>
-                      </li>
-                    </ul>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="">Muestras</td>
+                  <td>
+                    <RouterLink :to="`/muestras/${legajo.id}`" class="btn btn-primary"
+                      >Ver Muestras</RouterLink
+                    >
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card-footer">
+          <p>Fecha entrada: {{ formatDate(legajo.fecha_entrada) }}</p>
         </div>
       </div>
     </div>
     <div
       class="modal fade"
-      id="exampleModal"
+      id="exampleModal3"
       tabindex="-1"
       aria-labelledby="exampleModalLabel"
       aria-hidden="true"
@@ -119,7 +360,7 @@
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
-            <h1 class="modal-title fs-5" id="exampleModalLabel">{{ actualFile?.nombre_documento }}</h1>
+            <h1 class="modal-title fs-5" id="exampleModalLabel">Cargar factura</h1>
             <button
               type="button"
               class="btn-close"
@@ -128,16 +369,23 @@
             ></button>
           </div>
           <div class="modal-body">
-            <div v-if="fileUrl" style="height: 100vh;"> 
-              <vue-pdf-app :pdf="fileUrl" :page-number="1" ></vue-pdf-app> 
-            </div>
-            <div v-else>
-              <p>No se encontro el archivo</p>
-            </div>
+            <input
+              v-model="nroFactura"
+              :placeholder="`Ingrese el número de la factura`"
+              class="form-control"
+              type="text"
+            />
           </div>
           <div class="modal-footer">
+            <input
+              :id="`upload-pdf-${documentoID}`"
+              type="file"
+              accept="application/pdf"
+              @change="handleFileUpload($event, documentoID, legajo.id)"
+              class="btn btn-primary"
+              :hidden="nroFactura === ''"
+            />
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary">Descargar</button>
           </div>
         </div>
       </div>
@@ -145,7 +393,7 @@
     <div v-if="showToast" class="toast-container position-fixed bottom-0 end-0 p-3">
       <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="toast-header">
-          <strong class="me-auto">Error</strong>
+          <strong class="me-auto">{{ errorMessage ? 'Error' : 'Éxito' }}</strong>
           <button
             type="button"
             class="btn-close"
@@ -153,110 +401,350 @@
             aria-label="Close"
           ></button>
         </div>
-        <div class="toast-body">El archivo no se pudo cargar. {{ error }}</div>
+        <div class="toast-body">{{ errorMessage || successMessage }}</div>
       </div>
     </div>
   </main>
 </template>
 
-<script>
-import VuePdfApp from 'vue3-pdf-app' 
-import 'vue3-pdf-app/dist/icons/main.css'
-export default {
-  components: {
-    VuePdfApp
-  }
-};
-</script>
-
 <script setup>
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useLegajosStore } from '../../stores/legajos'
 import { useDocumentosStore } from '../../stores/documentos'
+import { useInformeStore } from '../../stores/informe'
+import { usePresupuestoStore } from '../../stores/presupuesto'
 import { storeToRefs } from 'pinia'
-import { ref } from 'vue'
+import { useToast } from 'vue-toastification'
 import axios from 'axios'
 import StateBadge from '../StateBadge.vue'
-
-
-
-
+import { useAuthStore } from '../../stores/auth'
+import { useRouter } from 'vue-router'
 const route = useRoute()
+const router = useRouter()
 const legajosStore = useLegajosStore()
 const documentosStore = useDocumentosStore()
+const informeStore = useInformeStore()
+const presupuestoStore = usePresupuestoStore()
+const toast = useToast()
 
 const { legajo, loading, error } = storeToRefs(legajosStore)
 const { tipos_documentos } = storeToRefs(documentosStore)
-const showToast = ref(false)
+const { successMessage, errorMessage, showToast } = storeToRefs(informeStore)
+const {
+  uploadInforme,
+  uploadInformeFirmado,
+  verInforme,
+  uploadDocumentacion,
+  verDocumentacion,
+  enviarInforme,
+} = informeStore
+const { uploadPresupuestoFirmado, viewPresupuesto } = presupuestoStore
+const actualFile = ref(null)
 const fileName = ref(null)
 const fileUrl = ref(null)
-const actualFile = ref(null)
+const authStore = useAuthStore()
+const permisos = JSON.parse(localStorage.getItem('permisos')) || []
+const isAdmin = ref(localStorage.getItem('area') === 'null')
+
+const hasPermission = (permiso) => {
+  return permisos.includes(permiso)
+}
+const nroFactura = ref('')
+const documentoID = ref('')
+const adicionales = ref([])
+
+const presupuestont = ref('')
 
 const formatDate = (dateString) => {
   const options = { year: 'numeric', day: '2-digit', month: '2-digit' }
   return new Date(dateString).toLocaleDateString('es-ES', options)
 }
-const handleFileUpload = async (event, id, legajoId, editar=false) => {
+
+const cargarFactura = (id) => {
+  documentoID.value = id
+}
+
+const handleFileUpload = async (event, id, legajoId, editar = false) => {
   const file = event.target.files[0]
+  console.log(id)
   if (file && file.type === 'application/pdf') {
     try {
       fileName.value = file.name
-      const response = await documentosStore.subirArchivo(file, id, legajoId, editar)
-      console.log(response)
+      let facturaNumber = nroFactura.value
+      const response = await documentosStore.subirArchivo(file, id, legajoId, editar, facturaNumber)
       if (response.status === 200) {
-        window.location.reload()
-      }
-      else {
+        toast.success('Archivo subido correctamente')
+        setTimeout(() => {
+          window.location.reload()
+        }, 2000)
+      } else {
         throw new Error('No se pudo subir el archivo')
       }
     } catch (error) {
       console.error('Error al subir el archivo:', error)
-      showToast.value = true
+      toast.error('Error al subir el archivo', error)
     }
   } else {
-    alert('Por favor selecciona un archivo PDF.')
+    toast.warning('Por favor selecciona un archivo PDF.')
   }
 }
-
 const existeDocumento = (nombreDocumento) => {
   return legajo.value.documento?.some((doc) => doc.tipo_documento.nombre === nombreDocumento)
 }
 
 const downloadDocumento = async (tipo, legajo_id) => {
-  actualFile.value = legajo.value.documento.find(
-    (doc) => doc.tipo_documento_id === tipo,
+  actualFile.value = legajo.value.documento.find((doc) => doc.tipo_documento_id === tipo)
+  const response = await documentosStore.download(
+    actualFile.value.nombre_documento,
+    tipo,
+    legajo_id,
   )
-  const response = await documentosStore.download(actualFile.value.nombre_documento, tipo, legajo_id)
   console.log(response)
 }
 
 const viewFile = async (id, tipo) => {
-  actualFile.value = legajo.value.documento.find(
-    (doc) => doc.tipo_documento_id === id,
-  )
+  actualFile.value = legajo.value.documento.find((doc) => doc.tipo_documento_id === id)
   try {
-    const response = await axios.get(`http://127.0.0.1:5000/api/documentos/view/${actualFile.value.nombre_documento}`, {
-      params: { tipo },
-      responseType: 'blob',
-    })
+    const response = await axios.get(
+      `${import.meta.env.VITE_API_URL}/api/documentos/view/${actualFile.value.nombre_documento}`,
+      {
+        params: { tipo },
+        responseType: 'blob',
+      },
+    )
 
     // Crear una URL para visualizar el archivo
     const blob = new Blob([response.data], { type: response.headers['content-type'] })
     console.log(response.data)
     fileUrl.value = URL.createObjectURL(blob)
+    window.open(fileUrl.value, '_blank')
   } catch (error) {
     console.error('Error al obtener el archivo:', error)
-    alert('No se pudo cargar el archivo.')
+    toast.warning('No se pudo cargar el archivo.') 
   }
+}
+const viewCertificado = async (id, tipo, legajoId) => {
+  const token = authStore.getToken()
+  try {
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL}/certificado/ver_documento/${legajoId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
+        },
+      },
+    )
+
+    if (response.status !== 200) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'El documento no existe, prueba generar uno primero')
+    }
+    const blob = await response.blob()
+    const url = URL.createObjectURL(blob)
+    window.open(url, '_blank')
+  } catch (error) {
+    console.error('Error al obtener el documento:', error)
+    toast.error(error.message || 'El documento no existe, prueba generar uno primero')
+  }
+}
+
+const fetchAdicionales = async (legajoId) => {
+  const token = authStore.getToken()
+  try {
+    const response = await axios.get(
+      `${import.meta.env.VITE_API_URL}/api/documentos/adicionales/${legajoId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    )
+    if (response.status !== 200) {
+      throw ({message: 'Error al obtener los documentos adicionales', status: response.status})
+    }
+    adicionales.value = response.data
+  } catch (error) {
+    if (error.status === 422 || error.status === 401) {
+      authStore.logout()
+      router.push('/log-in')
+    } else {
+      toast.error('Error al obtener los documentos adicionales', error)
+    }
+    console.error('Error al obtener los documentos adicionales:', error)
+  }
+}
+
+const fetchSinPresupuesto = async (legajoId) => {
+  const token = authStore.getToken()
+  if (!hasPermission('generar_presupuestont')) {
+    return
+  }
+  try {
+    const response = await axios.get(
+      `${import.meta.env.VITE_API_URL}/presupuestos/sin_presu/${legajoId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    )
+    if (response.status !== 200) {
+      throw ({message: 'Error al obtener el presupuesto', status: response.status})
+    }
+    presupuestont.value = response.data
+    console.log(presupuestont)
+  } catch (error) {
+    if (error.status === 422 || error.status === 401) {
+      authStore.logout()
+      router.push('/log-in')
+    } else {
+      toast.error('Error al obtener el presupuesto', error)
+    }
+    console.error('Error al obtener presupuesto:', error)
+  }
+}
+
+const viewAdicional = async (adicionalId) => {
+  const token = authStore.getToken()
+  try {
+    const response = await axios.get(
+      `${import.meta.env.VITE_API_URL}/api/documentos/view_adicional/${adicionalId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        responseType: 'blob',
+      },
+    )
+
+    // Crear una URL para visualizar el archivo
+    const blob = new Blob([response.data], { type: response.headers['content-type'] })
+    const fileUrl = URL.createObjectURL(blob)
+    window.open(fileUrl, '_blank')
+  } catch (error) {
+    console.error('Error al obtener el archivo adicional:', error)
+    toast.warning('No se pudo cargar el archivo adicional.')
+  }
+}
+
+const viewLegajo = async (legajoId) => {
+  const token = authStore.getToken()
+  try {
+    const response = await axios.get(
+      `${import.meta.env.VITE_API_URL}/presupuestos/ver_legajo/${legajoId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        responseType: 'blob',
+      },
+    )
+
+    // Crear una URL para visualizar el archivo
+    const blob = new Blob([response.data], { type: response.headers['content-type'] })
+    const fileUrl = URL.createObjectURL(blob)
+    window.open(fileUrl, '_blank')
+  } catch (error) {
+    console.error('Error al obtener el archivo del legajo:', error)
+    toast.warning('No se pudo cargar el archivo del legajo.')
+  }
+}
+
+const adminLegajo = async () => {
+  await legajosStore.habilitar(route.params.id)
 }
 
 onMounted(async () => {
   try {
     await legajosStore.getLegajo(route.params.id)
     await documentosStore.getTiposDocumentos()
+    await fetchAdicionales(route.params.id)
+    await fetchSinPresupuesto(route.params.id)
   } catch (err) {
     console.error('Error al cargar el legajo:', err)
+    toast.error('Error al cargar el legajo', err)
   }
 })
 </script>
+<style scoped>
+.back-button {
+  display: inline-block;
+  margin-bottom: 1rem;
+  color: #000;
+  text-decoration: none;
+}
+
+.back-button:hover {
+  color: #007bff;
+}
+
+.table th,
+.table td {
+  vertical-align: middle;
+}
+
+.dropdown-toggle::after {
+  margin-left: 0.5rem;
+}
+
+.dropdown-menu {
+  min-width: 200px;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  transition: background-color 0.3s ease;
+}
+
+.dropdown-item:hover {
+  background-color: #f8f9fa;
+  color: #343a40;
+}
+
+.dropdown-item input[type='file'] {
+  display: none;
+}
+
+.toast-container {
+  z-index: 1055;
+}
+
+.toast {
+  background-color: #fff;
+  border: 1px solid #ccc;
+}
+
+.toast-header {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.toast-body {
+  color: #000;
+}
+
+.btn-dark {
+  background-color: #343a40;
+  border-color: #343a40;
+}
+
+.btn-dark:hover {
+  background-color: #23272b;
+  border-color: #1d2124;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+  border-color: #004085;
+}
+</style>

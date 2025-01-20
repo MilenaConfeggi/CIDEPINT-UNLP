@@ -221,6 +221,11 @@ def descargar_empleados():
     
     return redirect(url_for('personal.ver_empleados'))
 
+import logging
+
+# Configurar el registro
+logging.basicConfig(level=logging.DEBUG)
+
 @personal_bp.route('/perfil/<int:id>', methods=['GET', 'POST'])
 @role_required('Administrador', 'Colaborador', 'Personal') 
 def ver_perfil(id):
@@ -233,6 +238,7 @@ def ver_perfil(id):
     
     if request.method == 'POST':
         form_type = request.form.get('form_type')
+        logging.debug(f'Form type: {form_type}')
         
         if form_type == 'upload_file':
             if 'archivo' in request.files:
@@ -249,6 +255,8 @@ def ver_perfil(id):
             nombre = request.form.get('nombre')
             apellido = request.form.get('apellido')
             dni = request.form.get('dni')
+            
+            logging.debug(f'Username: {username}, Email: {email}, Nombre: {nombre}, Apellido: {apellido}, DNI: {dni}')
             
             if not username or not email or not nombre or not apellido or not dni:
                 flash('Todos los campos obligatorios deben ser completados.', 'error')
@@ -268,11 +276,14 @@ def ver_perfil(id):
             
             # Solo permitir modificar el área si el usuario es 'Administrador'
             if current_user.rol == 'Administrador':
-                area_nombre = request.form.get('area_id')
-                area = Area.query.filter_by(nombre=area_nombre).first()
+                area_id = request.form.get('area_id')
+                logging.debug(f'Area ID: {area_id}')
+                area = Area.query.filter_by(id=area_id).first()
                 if area:
+                    logging.debug(f'Area encontrada: {area.id}')
                     user.empleado.area_id = area.id
                 else:
+                    logging.error('Área no encontrada')
                     flash('Área no encontrada', 'error')
                     return redirect(url_for('personal.ver_perfil', id=user.id))
             
@@ -281,6 +292,7 @@ def ver_perfil(id):
                 user.set_password(request.form.get('password'))
             
             success, message = user.update()
+            logging.debug(f'Update success: {success}, Message: {message}')
             if success:
                 flash('Perfil actualizado con éxito', 'success')
             else:
@@ -308,7 +320,7 @@ def ver_perfil(id):
         {'name': 'nombre', 'label': 'Nombre', 'type': 'text', 'value': user.empleado.nombre or ''},
         {'name': 'apellido', 'label': 'Apellido', 'type': 'text', 'value': user.empleado.apellido or ''},
         {'name': 'dni', 'label': 'DNI', 'type': 'text', 'value': user.empleado.dni or ''},
-        {'name': 'area_id', 'label': 'Área', 'type': 'select', 'value': user.empleado.area_id or '', 'options': [area.nombre for area in areas], 'disabled': current_user.rol != 'Administrador'},
+        {'name': 'area_id', 'label': 'Área', 'type': 'select', 'value': user.empleado.area_id or '', 'options': [{'id': area.id, 'nombre': area.nombre} for area in areas], 'disabled': current_user.rol != 'Administrador'},
         {'name': 'dependencia', 'label': 'Dependencia', 'type': 'select', 'value': user.empleado.dependencia or '', 'options': dependencias},
         {'name': 'cargo', 'label': 'Cargo', 'type': 'select', 'value': user.empleado.cargo or '', 'options': cargos},
         {'name': 'subdivision_cargo', 'label': 'Subdivisión del Cargo', 'type': 'select', 'value': user.empleado.subdivision_cargo or '', 'options': subdivisiones_cargo.get(user.empleado.cargo, [])},
@@ -318,7 +330,10 @@ def ver_perfil(id):
         {'name': 'observaciones', 'label': 'Observaciones', 'type': 'textarea', 'value': user.empleado.observaciones or ''},
     ]
     
-    return render_template('personal/ver_perfil.html', user=user, saldo_area=saldo_area, archivos=archivos, campos=campos)
+    # Loguear los campos que se envían al template
+    logging.debug(f'Campos enviados al template: {campos}')
+    
+    return render_template('personal/ver_perfil.html', user=user, saldo_area=saldo_area, archivos=archivos, campos=campos, areas=areas)
 
 @personal_bp.route('/archivo/eliminar/<int:id>', methods=['POST'])
 @role_required('Administrador', 'Colaborador', 'Personal') 
@@ -341,6 +356,16 @@ def inhabilitar_usuario(id):
     user.habilitado = False
     user.update()
     flash('Usuario inhabilitado con éxito', 'success')
+    return redirect(url_for('personal.ver_perfil', id=user.id))
+
+@personal_bp.route('/usuario/habilitar/<int:id>', methods=['POST'])
+@role_required('Administrador', 'Colaborador')
+def habilitar_usuario(id):
+    user = User.query.get_or_404(id)
+    
+    user.habilitado = True
+    user.update()
+    flash('Usuario habilitado con éxito', 'success')
     return redirect(url_for('personal.ver_perfil', id=user.id))
 
 @personal_bp.route('/topicos', methods=['GET'])

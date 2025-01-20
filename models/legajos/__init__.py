@@ -11,7 +11,7 @@ from models.presupuestos.STAN import STAN
 from models.presupuestos.ensayo import Ensayo
 
 
-def list_legajos(page=1, per_page=10, empresa=None, fecha=None, area=None, ensayo=None, facturacion=None):
+def list_legajos(page=1, per_page=10, empresa=None, fecha=None, area=None, ensayo=None, facturacion=None,admin=None):
     query = Legajo.query
     query = (
         Legajo.query.outerjoin(Legajo.presupuesto_cidepint)  
@@ -37,6 +37,8 @@ def list_legajos(page=1, per_page=10, empresa=None, fecha=None, area=None, ensay
         query = query.filter(Legajo.presupuesto_cidepint.any(STAN.ensayos.any(Ensayo.nombre.like(f"%{ensayo}%"))))
     if facturacion:
         query = query.filter(Legajo.necesita_facturacion)
+    if admin:
+        query = query.filter(Legajo.admin_habilitado)
     return query.paginate(page=page, per_page=per_page, error_out=False)
 
 

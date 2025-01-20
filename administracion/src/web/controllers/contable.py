@@ -199,7 +199,7 @@ def get_legajos():
     params = request.args.to_dict()
     page = request.args.get("page", 1, type=int)
     per_page = 10
-    legajos = legajoDB.list_legajos(page, per_page,None,None,True)
+    legajos = legajoDB.list_legajos(page, per_page,None,None,None,True)
     #legajos = [legajo for legajo in legajos if legajo.necesita_facturacion]
     forms = {}
     for legajo in legajos:

@@ -79,13 +79,13 @@
           <a href="{{ url_for('personal.descargar_archivo', id=archivo.id) }}" class="text-blue-500 font-semibold hover:underline">{{ archivo.nombre }}</a>
           <span class="text-gray-600 ml-2">{{ archivo.tipo }}</span>
         </div>
-        <form action="{{ url_for('personal.eliminar_archivo', id=archivo.id) }}" method="POST" class="inline">
+        <form action="{{ url_for('personal.eliminar_archivo', id=archivo.id) }}" method="POST" class="inline eliminar-archivo-form">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-          <button type="submit" class="text-red-500 hover:text-red-700 ml-4">Eliminar</button>
+          <button type="submit" class="text-red-500 hover:text-red-700 ml-4 eliminar-archivo-btn">Eliminar</button>
         </form>
       </li>
     {% endfor %}
-</ul>
+  </ul>
 
   {% if current_user.id != user.id %}
   <form id="inhabilitar-usuario-form" action="{{ url_for('personal.inhabilitar_usuario', id=user.id) }}" method="POST" class="mt-4 mb-4">
@@ -184,6 +184,29 @@
         });
       });
     }
+
+    // Manejar la confirmación de eliminación de archivos
+    const eliminarArchivoForms = document.querySelectorAll('.eliminar-archivo-form');
+
+    eliminarArchivoForms.forEach(function(form) {
+      form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        Swal.fire({
+          title: '¿Estás seguro?',
+          text: "No podrás revertir esto!",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Sí, eliminar',
+          cancelButtonText: 'Cancelar'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            form.submit();
+          }
+        });
+      });
+    });
   });
 </script>
 

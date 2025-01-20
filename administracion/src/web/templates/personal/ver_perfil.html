@@ -20,7 +20,11 @@
         {% elif campo.type == 'select' %}
           <select name="{{ campo.name }}" id="{{ campo.name }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" {% if campo.disabled %}disabled{% endif %}>
             {% for option in campo.options %}
-              <option value="{{ option }}" {% if option == campo.value %}selected{% endif %}>{{ option }}</option>
+              {% if campo.name == 'area_id' %}
+                <option value="{{ option.id }}" {% if option.id == campo.value %}selected{% endif %}>{{ option.nombre }}</option>
+              {% else %}
+                <option value="{{ option }}" {% if option == campo.value %}selected{% endif %}>{{ option }}</option>
+              {% endif %}
             {% endfor %}
           </select>
         {% else %}

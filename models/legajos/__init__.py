@@ -81,5 +81,14 @@ def legajo_informado(id):
     db.session.commit()
     return legajo
 
+def legajo_en_curso(id):
+    legajo = find_legajo_by_id(id)
+    new_estado = find_estado_by_nombre('En curso')
+    if new_estado is None:
+        return None
+    legajo.estado = new_estado
+    db.session.commit()
+    return legajo
+
 def cant_legajos_estado(estado):
     return db.session.query(Legajo).filter_by(estado_id=estado).count()

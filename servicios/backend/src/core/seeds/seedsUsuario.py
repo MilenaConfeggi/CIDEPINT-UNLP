@@ -24,13 +24,13 @@ def seed_usuarios():
         rol_director = crear_rol({"nombre": "Director"})
         db.session.add(rol_director)
         db.session.commit()
-
+    
     def seed_usuarios_pruebas():
         default_area = Area(nombre='Area 2fault', saldo=0)
         area_1 = get_area(1)
         area_2 = get_area(2)
         area_3 = get_area(3)
-
+        
         usuario_1 = User(
             username='rober',
             password='rober'
@@ -168,14 +168,14 @@ def seed_usuarios():
             habilitado=True,
             rol='Personal'
         )
-
+        
         usuario_7 = User(
             username='lucas',
             password='lucas'
         )
 
         personal_7 = Empleado(
-            user=usuario_6,
+            user=usuario_7,
             email='lucas@example.com',
             area=area_3,
             dni='2040095',
@@ -193,21 +193,23 @@ def seed_usuarios():
         )
 
 
-
+        
         db.session.add(usuario_1)
         db.session.add(usuario_2)
         db.session.add(usuario_3)
         db.session.add(usuario_4)
         db.session.add(usuario_5)
         db.session.add(usuario_6)
+        
         db.session.add(usuario_7)
-
+        
         db.session.add(personal_1)
         db.session.add(personal_2)
         db.session.add(personal_3)
         db.session.add(personal_4)
         db.session.add(personal_5)
         db.session.add(personal_6)
+        
         db.session.add(personal_7)
 
         def find_role_by_name(rol):

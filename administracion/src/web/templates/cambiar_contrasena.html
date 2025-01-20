@@ -24,9 +24,9 @@
     <label for="dependencia" class="block text-gray-700 text-sm font-bold mb-2">Dependencia:</label>
     <select name="dependencia" id="dependencia" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
       <option value="">Seleccione una dependencia</option>
-      <option value="UNLP">UNLP</option>
-      <option value="CIC">CIC</option>
-      <option value="CONICET">CONICET</option>
+      <option value="UNLP" {% if empleado.dependencia == 'UNLP' %}selected{% endif %}>UNLP</option>
+      <option value="CIC" {% if empleado.dependencia == 'CIC' %}selected{% endif %}>CIC</option>
+      <option value="CONICET" {% if empleado.dependencia == 'CONICET' %}selected{% endif %}>CONICET</option>
     </select>
   </div>
   {% endif %}
@@ -36,10 +36,10 @@
     <label for="cargo" class="block text-gray-700 text-sm font-bold mb-2">Cargo:</label>
     <select name="cargo" id="cargo" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
       <option value="">Seleccione un cargo</option>
-      <option value="Investigador">Investigador</option>
-      <option value="CPA">CPA</option>
-      <option value="Administrativo">Administrativo</option>
-      <option value="Técnico">Técnico</option>
+      <option value="Investigador" {% if empleado.cargo == 'Investigador' %}selected{% endif %}>Investigador</option>
+      <option value="CPA" {% if empleado.cargo == 'CPA' %}selected{% endif %}>CPA</option>
+      <option value="Administrativo" {% if empleado.cargo == 'Administrativo' %}selected{% endif %}>Administrativo</option>
+      <option value="Técnico" {% if empleado.cargo == 'Técnico' %}selected{% endif %}>Técnico</option>
     </select>
   </div>
   {% endif %}
@@ -55,22 +55,22 @@
 
   <div class="mb-4">
     <label for="telefono" class="block text-gray-700 text-sm font-bold mb-2">Teléfono:</label>
-    <input type="text" name="telefono" id="telefono" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+    <input type="text" name="telefono" id="telefono" value="{{ empleado.telefono }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
   </div>
 
   <div class="mb-4">
     <label for="domicilio" class="block text-gray-700 text-sm font-bold mb-2">Domicilio:</label>
-    <input type="text" name="domicilio" id="domicilio" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+    <input type="text" name="domicilio" id="domicilio" value="{{ empleado.domicilio }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
   </div>
 
   <div class="mb-4">
     <label for="fecha_nacimiento" class="block text-gray-700 text-sm font-bold mb-2">Fecha de Nacimiento:</label>
-    <input type="date" name="fecha_nacimiento" id="fecha_nacimiento" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+    <input type="date" name="fecha_nacimiento" id="fecha_nacimiento" value="{{ empleado.fecha_nacimiento }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
   </div>
 
   <div class="mb-4">
     <label for="observaciones" class="block text-gray-700 text-sm font-bold mb-2">Observaciones:</label>
-    <textarea name="observaciones" id="observaciones" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"></textarea>
+    <textarea name="observaciones" id="observaciones" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">{{ empleado.observaciones }}</textarea>
   </div>
   
   <div class="flex items-center justify-between">

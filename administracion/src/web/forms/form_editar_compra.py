@@ -48,8 +48,7 @@ class form_editar_compra(FlaskForm):
         message="Este campo es requerido")])
     importe = FloatField('importe', validators=[DataRequired(
         message="Este campo es requerido"), validar_solo_numeros])
-    observaciones = StringField('observaciones', validators=[DataRequired(
-        message="Este campo es requerido")])
+    observaciones = StringField('observaciones')
     estado = SelectField('estado', 
         choices=[
             (estado.name, estado.value)

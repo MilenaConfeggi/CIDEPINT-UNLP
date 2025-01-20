@@ -21,7 +21,7 @@ def authenticate():
         if usuario.rol.nombre in ["Secretaria", "Director"]:
             area = None
         else:
-            area = usuario.empleado[0].area_id
+            area = usuario.empleado.area_id
         # Generar el token JWT usando el correo como identidad
         access_token = create_access_token(identity=mail)
         permisos = list(servicioUsuario.obtener_permisos(usuario))

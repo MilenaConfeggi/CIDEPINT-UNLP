@@ -12,19 +12,20 @@
     <span class="ml-1 font-bold text-lg">Volver</span>
 </a>
 <div class="px-4 py-3 mx-8 mt-2 mb-8 bg-white rounded-lg shadow-md animate-fade-right animate-once">
-<h1>Legajos </h1>
+    <h3 class="mb-2 text-lg font-semibold text-gray-600">Legajos</h3>
 <div class="flex flex-wrap items-end mb-1">
-    {% if 'SinDistribucion' in request.args.getlist('filtro') %}
-    <a href="{{ url_for('contable.get_legajos') }}" 
-       class="px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-blue-600 border border-transparent rounded-lg active:bg-blue-600 hover:bg-blue-700 focus:outline-none focus:shadow-outline-blue">
-        Ver todos los legajos
-    </a>
-    {% else %}
-    <a href="{{ url_for('contable.get_legajos', filtro='SinDistribucion') }}" 
-       class="px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-blue-600 border border-transparent rounded-lg active:bg-blue-600 hover:bg-blue-700 focus:outline-none focus:shadow-outline-blue">
-        Ver solo legajos sin distribución
-    </a>
-    {% endif %}
+    <form method="get" action="{{ url_for('contable.get_legajos') }}">
+        <label>
+            <input 
+                type="checkbox" 
+                name="filtro" 
+                value="SinDistribucion" 
+                onchange="this.form.submit()"
+                {% if 'SinDistribucion' in request.args.getlist('filtro') %} checked {% endif %}
+            >
+            Ver solo legajos sin distribución
+        </label>
+    </form>
 </div>
 <div class="w-full overflow-x-auto">
     <table class="w-full whitespace-no-wrap mt-2">
@@ -51,7 +52,7 @@
                 <td class="px-4 py-3">
                 <div class="flex items-center text-sm">
                     <div>
-                        <p class="font-semibold">{{ legajo.nro_legajo }}</p>
+                        <p class="font-semibold">{{ legajo.id }}</p>
                     </div>
                 </div>
                 </td>

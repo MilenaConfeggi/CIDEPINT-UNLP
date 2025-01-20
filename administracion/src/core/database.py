@@ -317,7 +317,7 @@ def seed():
     )
 
     db.session.add(compra_1)
-
+    '''
     usuario_1 = User(
         username='rober',
         password='rober'
@@ -446,7 +446,6 @@ def seed():
     )
 
     db.session.add_all([personal_1,usuario_1,personal_2, usuario_2, personal_3, usuario_3, personal_4, usuario_4, personal_5, usuario_5, personal_6, usuario_6])
-
     ausencia_1 = Ausencia(
         empleado=personal_1,
         fecha_desde=datetime.strptime('2024-12-09', '%Y-%m-%d'),
@@ -502,7 +501,7 @@ def seed():
         fecha_hasta=datetime.strptime('2024-12-25', '%Y-%m-%d'),
         motivo='Capacitación'
     )
-
+    
     db.session.add_all([ausencia_1, ausencia_2, ausencia_3, ausencia_4, ausencia_5, ausencia_6, ausencia_7, ausencia_8])
-
+    '''
     db.session.commit()

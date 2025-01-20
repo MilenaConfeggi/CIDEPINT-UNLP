@@ -12,8 +12,8 @@ class Empleado(db.Model):
     user = db.relationship('User', back_populates='empleado')
 
     # Las dejo comentadas porque nos rompe el sistema del lado de administracion, por favor, antes de descomentarlas avisennos para que podamos arreglarlo
-    # usuario_servicio_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=True) 
-    # usuario_servicio = db.relationship('Usuario', back_populates='empleado', uselist=False)
+    usuario_servicio_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=True) 
+    usuario_servicio = db.relationship('Usuario', back_populates='empleado', uselist=False)
 
     email = db.Column(db.String(120), unique=True, nullable=False)
     area_id = db.Column(db.Integer, db.ForeignKey('area.id'), nullable=False)

@@ -10,7 +10,7 @@ class FormularioPermiso(FlaskForm):
 
     def __init__(self, *args, **kwargs):
         super(FormularioPermiso, self).__init__(*args, **kwargs)
-        self.user_id.choices = [(usuario.id, f"{usuario.empleado.nombre} {usuario.empleado.apellido} - {usuario.empleado.email}") for usuario in servicio_personal.listar_usuarios_personal()]
+        self.user_id.choices = [(usuario.id, f"{usuario.empleado.nombre} {usuario.empleado.apellido} - {usuario.empleado.dni}") for usuario in servicio_personal.listar_usuarios_personal()]
 
 class FormularioNuevaCarpeta(FlaskForm):
         

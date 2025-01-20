@@ -1,7 +1,8 @@
-from flask import Blueprint, render_template, request, redirect, flash, url_for, Response
+from flask import Blueprint, render_template, request, redirect, flash, url_for, Response, send_file
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from io import BytesIO
+import pandas as pd
 from flask_login import current_user
 from administracion.src.core.compras.compra import filtrar_compras, buscar_compra, filtrar_compras_descargadas, crear_compra, borrar_compra, agregar_fuentes_a_compra, obtener_fondos, obtener_areas, obtener_empleados, editar_compra_espera, editar_compra_aprobada_o_realizada, realizar_compra_aprobada
 from administracion.src.core.proveedores.proveedor import filtrar_proveedores, chequeo_razon_social_existente, crear_proveedor, borrar_proveedor, actualizar_proveedor, buscar_proveedor
@@ -148,24 +149,33 @@ def descargar_compras_excel():
         fecha_menor, fecha_mayor, estado, current_user.rol, current_user.empleado.area_id
     )
     # Prepare CSV data
-    def generate_csv():
-        data = [
-            ["Fecha", "Descripcion", "Estado", "Numero de Factura", "Fuentes de financiamiento"]
-        ]
-        for compra in compras:
-            fondos = "; ".join(fondo.titulo for fondo in compra.fondos)
-            empleados = "; ".join(f"{empleado.nombre} {empleado.apellido}" for empleado in compra.empleados)
-            areas = "; ".join(area.nombre for area in compra.areas)
-            fuentes = "; ".join([fondos, empleados, areas])
-            data.append([compra.fecha, compra.descripcion, compra.estado.value, compra.numero_factura, fuentes])
-        # Write CSV rows
-        for row in data:
-            yield ", ".join(map(str, row)) + "\n"
-    # Return CSV response
-    return Response(
-        generate_csv(),
-        mimetype="text/csv",
-        headers={"Content-Disposition": "attachment;filename=lista_compras.csv"},
+    data = []
+    for compra in compras:
+        fondos = "; ".join(fondo.titulo for fondo in compra.fondos)
+        empleados = "; ".join(f"{empleado.nombre} {empleado.apellido}" for empleado in compra.empleados)
+        areas = "; ".join(area.nombre for area in compra.areas)
+        fuentes = "; ".join(filter(None, [fondos, empleados, areas]))  # Avoid empty fields
+
+        data.append({
+            'Fecha': compra.fecha,
+            'Descripción': compra.descripcion,
+            'Estado': compra.estado.value,
+            'Número de Factura': compra.numero_factura,
+            'Fuentes de Financiamiento': fuentes
+        })
+    # Create DataFrame
+    df = pd.DataFrame(data)
+    # Create an in-memory Excel file
+    buffer = BytesIO()
+    with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False, sheet_name='Compras')
+    buffer.seek(0)
+    # Send the file as a response
+    return send_file(
+        buffer,
+        download_name='lista_compras.xlsx',
+        as_attachment=True,
+        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
 
 @bp.get("/descargar_compras_pdf")
@@ -322,6 +332,9 @@ def editar_compra(id_compra):
     if not compra:
         return redirect(url_for("compra.lista_compras"))
     form = form_editar_compra(obj=compra)
+    form.proveedor.process(formdata=None, data=compra.id_proveedor)
+    form.solicitante.process(formdata=None, data=compra.id_empleado)
+    form.estado.process(formdata=None, data=compra.estado.name)
     form.fondos.entries = []
     form.areas.entries = []
     form.empleados.entries = []

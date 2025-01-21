@@ -287,6 +287,89 @@ def seed_usuarios():
         db.session.add(usuario7)
 
         db.session.commit()
+    
+    def seed_usuarios_finales():
+
+        area_1 = get_area(1)
+
+        def find_role_by_name(rol):
+            return Rol.query.filter_by(nombre=rol).first()
+        
+        rol_secretaria = find_role_by_name('Secretaria')
+        rol_director = find_role_by_name('Director')
+
+        walter = User(
+            username='Walter',
+            password='direccioncidepint',
+            rol='Administrador'
+        )
+
+        db.session.add(walter)
+
+        personal_walter = Empleado(
+            user=walter,
+            email='direccion@cidepint.ing.unlp.edu.ar',
+            area=area_1,
+            dni='14655236',
+            nombre='Walter',
+            apellido='Egli',
+            dependencia='UNLP',#TODO REVISAR
+            cargo='Administrativo',
+            subdivision_cargo='Ley 10430',#TODO REVISAR
+            telefono='2227412879',
+            domicilio='33 Nº 1224',
+            fecha_nacimiento=datetime.strptime('1962-02-12', '%Y-%m-%d'),
+            observaciones='',
+            habilitado=True
+        )
+
+        db.session.add(personal_walter)
+
+        usuario_walter = crear_usuario(
+            {
+                "mail": "direccion@cidepint.ing.unlp.edu.ar",
+                "contra": "direccioncidepint",
+                "rol": rol_director,
+                "cambiar_contra": True,
+            }
+        )
+        db.session.add(usuario_walter)
+
+        alicia = User(
+            username='Alicia',
+            password='secretariacidepint',
+            rol='Personal'
+        )
+
+        db.session.add(alicia)
+
+        personal_alicia = Empleado(
+            user=alicia,
+            email='servicios@cidepint.ing.unlp.edu.ar',
+            area=area_1,
+            dni='20849128',
+            nombre='Ana Alicia',
+            apellido='Marchissio',
+            dependencia='UNLP',#TODO REVISAR
+            cargo='Administrativo',
+            subdivision_cargo='Ley 10430',#TODO REVISAR
+            observaciones='',
+            habilitado=True
+        )
+
+        db.session.add(personal_alicia)
+
+        usuario_alicia = crear_usuario(
+            {
+                "mail": "servicios@cidepint.ing.unlp.edu.ar",
+                "contra": "secretariacidepint",
+                "rol": rol_secretaria,
+                "cambiar_contra": True,
+            }
+        )
+        db.session.add(usuario_alicia)
+
+        db.session.commit()
 
     def seeds_permisos():
         todosLosPermisos = [ #Acá van todos los permisos a insertar (todos los posibles permisos que hay en el sistema)
@@ -483,6 +566,6 @@ def seed_usuarios():
 
     seeds_roles()
     seeds_permisos()
-    seed_usuarios_pruebas()
+    seed_usuarios_finales()
 
 

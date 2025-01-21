@@ -119,20 +119,20 @@ def create_app(env="development", static_folder=""):
         """
         seedsMedioPago.seeds_medio_pago()
         print("Medios de pago creados!")
-        #seedsArea.seeds_areas()TODO HACER AREAS
-        #print("Areas creados!")
+        seedsArea.seeds_areas()
+        print("Areas creadas!")
         seedsEstados.seeds_estados()
         print("Estados creados!")
         seedsDocumento.seeds_tipos_documento()
         print("Tipos de documentos creados!")
-        seedsStans.seeds_stans()#PREGUNTAR
+        seedsStans.seeds_stans()
         print("Stans creados!")
         seedsMuestra.seeds_muestras()
         print("Muestras creadas!")
         seedsEstadoInterarea.seeds_estados()
         print("Estados de interareas creados!")
-        #seedsUsuario.seeds_usuarios()
-        #print("Usuarios creados!")
+        seedsUsuario.seeds_usuarios()
+        print("Usuarios creados!")
 
     return app
     

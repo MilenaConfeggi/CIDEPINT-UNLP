@@ -3,7 +3,7 @@ from flask import Flask
 from flask_wtf import CSRFProtect
 from flask_session import Session
 from flask_login import LoginManager
-from models.base import db
+from models import db
 from administracion.src.core.config import config
 from administracion.src.web.controllers.rutas import registrar_rutas
 from administracion.src.web.handlers.handlers import registrar_handlers

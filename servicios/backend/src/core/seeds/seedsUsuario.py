@@ -348,7 +348,7 @@ def seed_usuarios():
             email='servicios@cidepint.ing.unlp.edu.ar',
             area=area_1,
             dni='20849128',
-            nombre='Ana Alicia',
+            nombre='Alicia',
             apellido='Marchissio',
             dependencia='UNLP',#TODO REVISAR
             cargo='Administrativo',

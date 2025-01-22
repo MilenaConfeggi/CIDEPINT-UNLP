@@ -76,6 +76,8 @@ def end_legajo(id):
 
 def legajo_informado(id):
     legajo = find_legajo_by_id(id)
+    if legajo.estado.nombre == 'Terminado':
+        return None
     new_estado = find_estado_by_nombre('Informado')
     if new_estado is None:
         return None
@@ -85,6 +87,8 @@ def legajo_informado(id):
 
 def legajo_en_curso(id):
     legajo = find_legajo_by_id(id)
+    if legajo.estado.nombre == 'Terminado':
+        return None
     new_estado = find_estado_by_nombre('En curso')
     if new_estado is None:
         return None

@@ -55,7 +55,6 @@ const fetchError = ref(null);
 const submitError = ref(null);
 const successMessage = ref(null);
 
-
 const fetchEmpleados = async () => {
   try {
     const response = await fetch(`${import.meta.env.VITE_API_URL}/certificado/obtener_empleados/${idLegajo}`, {
@@ -102,13 +101,14 @@ const fetchDescripcion = async () => {
   }
 };
 
-
-
-
-
 const submitForm = async () => {
   submitError.value = null;
   successMessage.value = null;
+
+  if (!descripcion.value.trim()) {
+    submitError.value = 'La descripción no puede estar vacía';
+    return;
+  }
 
   const data = {
     empleados: empleados.value,
@@ -137,7 +137,7 @@ const submitForm = async () => {
     toast.success('Certificado generado correctamente')
     successMessage.value = result.message;
     setTimeout(() => {
-      router.push('/certificados');
+      
     }, 1500);
   } catch (err) {
     toast.error('Error al generar el certificado')

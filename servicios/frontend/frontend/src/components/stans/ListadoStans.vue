@@ -6,6 +6,12 @@
     <div v-if="loading" class="spinner-border text-primary" role="status">
       <span class="sr-only">Loading...</span>
     </div>
+    <div v-if="successMessage" class="alert alert-success" role="alert">
+      {{ successMessage }}
+    </div>
+    <div v-if="errorMessage" class="alert alert-danger" role="alert">
+      {{ errorMessage }}
+    </div>
     <table v-else class="table table-hover table-bordered">
       <thead class="thead-dark">
         <tr>
@@ -90,6 +96,8 @@ const selectedStan = ref(null)
 const currentPage = ref(1)
 const totalPages = ref(1)
 const loading = ref(true)
+const successMessage = ref(null)
+const errorMessage = ref(null)
 const emit = defineEmits(['modificar-stan'])
 const authStore = useAuthStore()
 
@@ -140,7 +148,7 @@ const eliminarStan = async (id) => {
   try {
     const token = authStore.getToken()
     const response = await fetch(`${import.meta.env.VITE_API_URL}/stans/eliminar_stan/${id}`, {
-      method: 'DELETE',
+      method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
@@ -151,9 +159,13 @@ const eliminarStan = async (id) => {
       throw new Error('Error al eliminar el STAN')
     }
 
-    await fetchStans(currentPage.value)
+    successMessage.value = 'STAN eliminado exitosamente'
+    setTimeout(() => {
+      window.location.reload()
+    }, 1500)
   } catch (error) {
     console.error('Error al eliminar el STAN:', error)
+    errorMessage.value = 'Error al eliminar el STAN'
   }
 }
 

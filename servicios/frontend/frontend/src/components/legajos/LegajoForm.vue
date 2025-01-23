@@ -14,6 +14,7 @@
   </RouterLink>
   <h2 class="mb-3 text-center mb-5">Crear legajo</h2>
   <form
+    ref="formRef"
     @submit.prevent="validateForm"
     class="row g-3 needs-validation"
     novalidate
@@ -186,7 +187,7 @@ export default {
       }
     },
     async validateForm() {
-      const form = this.$el
+      const form = this.$refs.formRef
       if (form.checkValidity()) {
         const cliente = {
           email: this.form.email,

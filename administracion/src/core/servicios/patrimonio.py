@@ -83,6 +83,8 @@ def conseguir_directorio(id_bien):
 def guardar_archivos_de_bien(id_bien, archivos):
 
     for archivo in archivos:
+        if archivo.filename == '':
+            continue
         nombre = secure_filename(archivo.filename)
         directorio = conseguir_directorio(id_bien)
 

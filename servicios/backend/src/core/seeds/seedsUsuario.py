@@ -299,7 +299,7 @@ def seed_usuarios():
         rol_director = find_role_by_name('Director')
 
         walter = User(
-            username='Walter',
+            username='w.egli',
             password='direccioncidepint',
             rol='Administrador'
         )

@@ -317,7 +317,7 @@ def seed():
     )
 
     db.session.add(compra_1)
-    '''
+    
     usuario_1 = User(
         username='rober',
         password='rober'
@@ -503,5 +503,5 @@ def seed():
     )
     
     db.session.add_all([ausencia_1, ausencia_2, ausencia_3, ausencia_4, ausencia_5, ausencia_6, ausencia_7, ausencia_8])
-    '''
+    
     db.session.commit()

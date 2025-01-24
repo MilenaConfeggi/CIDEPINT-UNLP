@@ -16,6 +16,7 @@ def seeds_legajos():
             "necesita_facturacion": True,
             "objetivo": "Objetivo de legajo",
             "area_id": 1,
+            "admin_habilitado": True,
         },
         {
             "fecha_entrada": datetime(2024, 1, 1),
@@ -23,6 +24,7 @@ def seeds_legajos():
             "necesita_facturacion": True,
             "objetivo": "Objetivo de legajo2",
             "area_id": 2,
+            "admin_habilitado": True,
         },
         {
             "fecha_entrada": datetime(2024, 2, 1),

@@ -11,6 +11,12 @@ const routes = [
     meta: { showNavbar: true },
   },
   {
+    path: '/:pathMatch(.*)*',
+    name: 'notFound',
+    component: () => import('../views/NotFound.vue'),
+    meta: { showNavbar: false },
+  },
+  {
     path: '/mails/:legajoId',
     name: 'mails',
     component: () => import('../views/MailsView.vue'),

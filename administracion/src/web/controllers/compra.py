@@ -14,7 +14,7 @@ from administracion.src.web.forms.form_aprobar_compra import form_aprobar_compra
 from administracion.src.web.forms.form_realizar_compra import form_realizar_compra
 from administracion.src.web.controllers.roles import role_required
 from administracion.src.core.servicios.personal import listar_empleados, listar_areas, conseguir_area_de_id, conseguir_empleado_de_id
-from administracion.src.core.fondos.fondo import listar_fondos, conseguir_fondo_de_id
+from administracion.src.core.fondos.fondo import listar_fondos_activos, conseguir_fondo_de_id
 
 bp = Blueprint("compra",__name__,url_prefix="/compra")
 
@@ -277,7 +277,7 @@ def agregar_compra():
     form = form_agregar_compra()
     areas = listar_areas()
     empleados = listar_empleados()
-    fondos = listar_fondos()
+    fondos = listar_fondos_activos()
     return render_template("compras/creacion_compra.html", form=form, areas=areas, empleados=empleados, fondos=fondos)
 
 @bp.post("/agregando_compra")
@@ -286,7 +286,7 @@ def agregando_compra():
     form = form_agregar_compra(request.form)
     lista_areas = listar_areas()
     lista_empleados = listar_empleados()
-    lista_fondos = listar_fondos()
+    lista_fondos = listar_fondos_activos()
     if form.validate_on_submit():
         try:
             monto, areas, empleados, fondos = validar_montos_y_acumular(form)
@@ -327,7 +327,7 @@ def agregando_compra():
 def editar_compra(id_compra):
     areas = listar_areas()
     empleados = listar_empleados()
-    fondos = listar_fondos()
+    fondos = listar_fondos_activos()
     compra = buscar_compra(id_compra)
     if not compra:
         return redirect(url_for("compra.lista_compras"))
@@ -352,7 +352,7 @@ def editando_compra(id_compra):
     form = form_editar_compra(request.form)
     lista_areas = listar_areas()
     lista_empleados = listar_empleados()
-    lista_fondos = listar_fondos()
+    lista_fondos = listar_fondos_activos()
     compra = buscar_compra(id_compra)
     if not compra:
         return redirect(url_for('compra.lista_compras'))
@@ -403,7 +403,7 @@ def aprobar_compra(id_compra):
         return redirect(url_for('compra.lista_compras'))
     areas = listar_areas()
     empleados = listar_empleados()
-    fondos = listar_fondos()
+    fondos = listar_fondos_activos()
     return render_template("compras/aprobar_compra.html", form=form, compra=compra, areas=areas, empleados=empleados, fondos=fondos)
 
 @bp.post("/aprobando_compra/<int:id_compra>")
@@ -412,7 +412,7 @@ def aprobando_compra(id_compra):
     form = form_aprobar_compra(request.form)
     lista_areas = listar_areas()
     lista_empleados = listar_empleados()
-    lista_fondos = listar_fondos()
+    lista_fondos = listar_fondos_activos()
     compra = buscar_compra(id_compra)
     if not compra:
         flash("Compra no encontrada", "error")
@@ -461,7 +461,7 @@ def realizar_compra(id_compra):
     compra = buscar_compra(id_compra)
     areas = listar_areas()
     empleados = listar_empleados()
-    fondos = listar_fondos()
+    fondos = listar_fondos_activos()
     return render_template("compras/realizar_compra.html", form=form, compra=compra, areas=areas, empleados=empleados, fondos=fondos)
 
 @bp.post("/realizando_compra/<int:id_compra>")
@@ -470,7 +470,7 @@ def realizando_compra(id_compra):
     form = form_realizar_compra(request.form)
     lista_areas = listar_areas()
     lista_empleados = listar_empleados()
-    lista_fondos = listar_fondos()
+    lista_fondos = listar_fondos_activos()
     compra = buscar_compra(id_compra)
     if not compra:
         flash("Compra no encontrada", "error")

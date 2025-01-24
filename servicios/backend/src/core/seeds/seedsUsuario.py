@@ -328,6 +328,7 @@ def seed_usuarios():
         "cargar_archivo_completo",
         "cargar_archivo_firmado",
         "guardar_resultado",
+        "listar_areas",
     ]
     PERMISSIONS = { #Acá van los permisos que tiene cada rol
         "Director": [ #Tienen que ser declarados previamente en todosLosPermisos
@@ -377,6 +378,7 @@ def seed_usuarios():
             "obtener_interarea",
             "descargar_intearea",
             "cargar_archivo_firmado",
+            "listar_areas",
         ],
         "Secretaria": [
             "listar_usuarios",
@@ -425,6 +427,7 @@ def seed_usuarios():
             "obtener_interarea",
             "descargar_intearea",
             "cargar_archivo_firmado",
+            "listar_areas",
         ],
         "Jefe de area": [
             "listar_muestras_identificadas",
@@ -449,6 +452,7 @@ def seed_usuarios():
             "descargar_intearea",
             "cargar_archivo_completo",
             "guardar_resultado",
+            "listar_areas",
         ],
         "Trabajador": [
             "listar_muestras_identificadas",

@@ -86,6 +86,8 @@
 <script>
 import { useRouter } from "vue-router";
 
+import { useAuthStore } from '@/stores/auth';
+
 export default {
   setup() {
     const router = useRouter();
@@ -149,9 +151,12 @@ export default {
       };
 
       try {
+        const authStore = useAuthStore();
+        const token = authStore.getToken();
         const response = await fetch(`${baseUrl}/interareas/crear`, {
           method: "POST",
           headers: {
+            "Authorization": `Bearer ${token}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify(datosFormulario),

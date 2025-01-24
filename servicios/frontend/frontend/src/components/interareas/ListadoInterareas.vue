@@ -55,7 +55,9 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
+import { useAuthStore } from '@/stores/auth';
 
+const authStore = useAuthStore();
 const interareas = ref([]);
 const currentPage = ref(1); 
 const itemsPerPage = ref(8); 
@@ -78,7 +80,15 @@ const changePage = (page) => {
 
 const fetchInterareas = async () => {
   try {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/interareas`);
+    const token = authStore.getToken();
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/interareas`,{
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
+    }
+    );
     if (response.status !== 200) {
       throw new Error("Error al obtener las interáreas");
     }

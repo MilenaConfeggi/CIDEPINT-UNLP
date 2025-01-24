@@ -320,6 +320,14 @@ def seed_usuarios():
         "listar_documentos",
         "subir_documento",
         "informes_pendientes_cargar",
+        "obtener_estadisticas_conformidad_legajos",
+        "obtener_estadisticas_ensayos",
+        "obtener_interarea",
+        "crear_intearea",
+        "descargar_intearea",
+        "cargar_archivo_completo",
+        "cargar_archivo_firmado",
+        "guardar_resultado",
     ]
     PERMISSIONS = { #Acá van los permisos que tiene cada rol
         "Director": [ #Tienen que ser declarados previamente en todosLosPermisos
@@ -364,6 +372,11 @@ def seed_usuarios():
             "crear_legajo",
             "listar_documentos",
             "subir_documento",
+            "obtener_estadisticas_conformidad_legajos",
+            "obtener_estadisticas_ensayos",
+            "obtener_interarea",
+            "descargar_intearea",
+            "cargar_archivo_firmado",
         ],
         "Secretaria": [
             "listar_usuarios",
@@ -407,6 +420,11 @@ def seed_usuarios():
             "subir_documento",
             "cargar_presupuesto_firmado",
             "informes_pendientes_cargar",
+            "obtener_estadisticas_conformidad_legajos",
+            "obtener_estadisticas_ensayos",
+            "obtener_interarea",
+            "descargar_intearea",
+            "cargar_archivo_firmado",
         ],
         "Jefe de area": [
             "listar_muestras_identificadas",
@@ -426,6 +444,11 @@ def seed_usuarios():
             "ver_perfil",
             "recuperar_contra",
             "ver_certificado",
+            "obtener_interarea",
+            "crear_intearea",
+            "descargar_intearea",
+            "cargar_archivo_completo",
+            "guardar_resultado",
         ],
         "Trabajador": [
             "listar_muestras_identificadas",
@@ -439,6 +462,9 @@ def seed_usuarios():
             "recuperar_contra",
             "ver informe",
             "ver_certificado",
+            "obtener_interarea",
+            "descargar_intearea",
+            "cargar_archivo_completo",
         ],
     }
 

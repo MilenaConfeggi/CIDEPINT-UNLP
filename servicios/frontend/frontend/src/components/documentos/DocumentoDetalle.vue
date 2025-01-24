@@ -2,7 +2,7 @@
   <div v-if="doc">
     <p>Nombre del documento: {{ doc.nombre_documento }}</p>
     <button @click="viewFile(doc.nombre_documento, doc.tipo_documento)">Ver Archivo</button> 
-    <div v-if="fileUrl" class="file-preview">
+  <div v-if="fileUrl" class="file-preview">
       <iframe :src="fileUrl" frameborder="0" width="100%" height="600px"></iframe>
     </div>
   </div>
@@ -31,7 +31,7 @@ onMounted(async () => {
 
 const viewFile = async (filename, tipo) => {
   try {
-    const response = await axios.get(`http://127.0.0.1:5000/api/view/${filename}`, {
+    const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/view/${filename}`, {
       params: { tipo },
       responseType: 'blob', // Importante para manejar archivos binarios
     })

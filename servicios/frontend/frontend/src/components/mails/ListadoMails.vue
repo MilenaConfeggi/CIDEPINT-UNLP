@@ -1,6 +1,8 @@
 <template>
   <div class="container mt-4">
+    <hr class="line">
     <h1 class="text-center mb-4">Mails para el legajo {{ legajoId }}</h1>
+    <hr class="line">
     <div v-if="error" class="alert alert-danger" role="alert">{{ error }}</div>
     <div v-if="mails.length" class="row">
       <div v-for="mail in mails" :key="mail.id" class="col-md-3 mb-4">

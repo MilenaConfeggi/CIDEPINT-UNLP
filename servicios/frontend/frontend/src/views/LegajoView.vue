@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h1>Legajos</h1>
+        <h1 class="text-center">Listado de Legajos</h1>
         <LegajoListado />
     </div>
 </template>

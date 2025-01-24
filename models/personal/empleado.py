@@ -1,6 +1,12 @@
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import validates
 from datetime import datetime
+from models.usuarios.usuario import Usuario
+from models.usuarios.rol import Rol
+from models.usuarios.rol_permiso import RolPermiso
+from models.usuarios.permiso import Permiso
+
+
 from models.compras.compra_empleado import compra_empleado
 from models.base import db
 
@@ -10,6 +16,11 @@ class Empleado(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     user = db.relationship('User', back_populates='empleado')
+
+    # Las dejo comentadas porque nos rompe el sistema del lado de administracion, por favor, antes de descomentarlas avisennos para que podamos arreglarlo
+    usuario_servicio_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=True) 
+    usuario_servicio = db.relationship('Usuario', back_populates='empleado', uselist=False)
+
     email = db.Column(db.String(120), unique=True, nullable=False)
     area_id = db.Column(db.Integer, db.ForeignKey('area.id'), nullable=False)
     area = db.relationship('Area', backref=db.backref('empleados', lazy=True))
@@ -64,7 +75,7 @@ class Empleado(db.Model):
             raise ValueError(f"Subdivisión de cargo '{value}' no es válida para el cargo '{self.cargo}'.")
         return value
 
-    def __init__(self, user, email, area, dni, nombre, apellido, dependencia=None, cargo=None, subdivision_cargo=None, telefono=None, domicilio=None, fecha_nacimiento=None, observaciones=None):
+    def __init__(self, user, email, area, dni, nombre, apellido, dependencia=None, cargo=None, subdivision_cargo=None, telefono=None, domicilio=None, fecha_nacimiento=None, observaciones=None, habilitado=True, rol='Personal'):
         self.user = user
         self.email = email
         self.area = area
@@ -78,6 +89,10 @@ class Empleado(db.Model):
         self.domicilio = domicilio
         self.fecha_nacimiento = fecha_nacimiento
         self.observaciones = observaciones
+        self.habilitado = habilitado
+        self.rol = rol
+        self.primer_login = True
+        self.usuario_servicio = None
 
     def __repr__(self) -> str:
         return f"Empleado {self.nombre} {self.apellido}"

@@ -192,8 +192,8 @@
                     No disponible
                     {% endif %}
                 </td>
-                <td class="px-4 py-3 text-sm {% if legajo.distribuciones %}bg-green-600{% else %}bg-red-600{% endif %}" >
-                    <div class="flex items-center space-x-4">
+                <td class="px-4 py-3 text-sm {% if legajo.distribuciones %}bg-green-600{% else %}bg-red-600{% endif %} bg-opacity-80" >
+                    <div class="flex items-center space-x-4 justify-center">
                     {% if legajo.distribuciones %}
                     <a href="{{ url_for('contable.get_distribuciones',id=legajo.id) }}"
                         class="flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-black-600 rounded-lg focus:outline-none focus:shadow-outline-gray"

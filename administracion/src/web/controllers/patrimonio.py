@@ -64,7 +64,6 @@ def crear_bien():
                 descripcion=data.get('descripcion'),
                 area=servicio_personal.conseguir_area_de_id(data.get('area')),
             )
-
         if form.archivos_adjuntos.data:
             servicio_patrimonio.guardar_archivos_de_bien(bien.id, form.archivos_adjuntos.data)
 

@@ -3,7 +3,14 @@
     Modificar Área
 {% endblock %}
 {% block content %}
-
+<a href="{{url_for('area.listar_areas')}}"
+    class="inline-flex items-center px-3 py-4 rounded-md text-black-500 hover:bg-black-50">
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-6 w-6">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h18">
+        </path>
+    </svg>
+    <span class="ml-1 font-bold text-lg">Volver</span>
+</a>
 <div class="h-full w-full flex justify-center items-center flex-col px-4 mt-20">
     <form
         action="{{ url_for('area.modificar_area', id=area.id) }}"
@@ -43,12 +50,14 @@
                 required
             />
         </div>
-        <button
-            type="submit"
-            class="text-white bg-blue-500 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center"
-        >
-            Guardar Cambios
-        </button>
+        <div class="flex justify-center">
+            <button
+                type="submit"
+                class="text-white bg-blue-500 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center"
+            >
+                Guardar Cambios
+            </button>
+        </div>
     </form>
     <form id="eliminar-area-form" action="{{ url_for('area.eliminar_area', id=area.id) }}" method="POST" class="mt-4 w-full max-w-lg flex justify-center items-center">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />

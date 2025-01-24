@@ -10,18 +10,18 @@
   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
   
   <div class="mb-4">
-    <label for="nueva_contrasena" class="block text-gray-700 text-sm font-bold mb-2">Nueva Contraseña:</label>
+    <label for="nueva_contrasena" class="block text-gray-700 text-sm font-bold mb-2">Nueva Contraseña: <span class="text-red-500">*</span></label>
     <input type="password" name="nueva_contrasena" id="nueva_contrasena" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
   </div>
   
   <div class="mb-4">
-    <label for="confirmar_contrasena" class="block text-gray-700 text-sm font-bold mb-2">Confirmar Contraseña:</label>
+    <label for="confirmar_contrasena" class="block text-gray-700 text-sm font-bold mb-2">Confirmar Contraseña: <span class="text-red-500">*</span></label>
     <input type="password" name="confirmar_contrasena" id="confirmar_contrasena" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
   </div>
 
   {% if not empleado.dependencia %}
   <div class="mb-4">
-    <label for="dependencia" class="block text-gray-700 text-sm font-bold mb-2">Dependencia:</label>
+    <label for="dependencia" class="block text-gray-700 text-sm font-bold mb-2">Dependencia: <span class="text-red-500">*</span></label>
     <select name="dependencia" id="dependencia" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
       <option value="">Seleccione una dependencia</option>
       <option value="UNLP" {% if empleado.dependencia == 'UNLP' %}selected{% endif %}>UNLP</option>
@@ -33,7 +33,7 @@
 
   {% if not empleado.cargo %}
   <div class="mb-4">
-    <label for="cargo" class="block text-gray-700 text-sm font-bold mb-2">Cargo:</label>
+    <label for="cargo" class="block text-gray-700 text-sm font-bold mb-2">Cargo: <span class="text-red-500">*</span></label>
     <select name="cargo" id="cargo" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
       <option value="">Seleccione un cargo</option>
       <option value="Investigador" {% if empleado.cargo == 'Investigador' %}selected{% endif %}>Investigador</option>
@@ -46,7 +46,7 @@
 
   {% if not empleado.subdivision_cargo %}
   <div class="mb-4">
-    <label for="subdivision_cargo" class="block text-gray-700 text-sm font-bold mb-2">Subdivisión del Cargo:</label>
+    <label for="subdivision_cargo" class="block text-gray-700 text-sm font-bold mb-2">Subdivisión del Cargo: <span class="text-red-500">*</span></label>
     <select name="subdivision_cargo" id="subdivision_cargo" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
       <option value="">Seleccione una subdivisión del cargo</option>
     </select>
@@ -55,22 +55,22 @@
 
   <div class="mb-4">
     <label for="telefono" class="block text-gray-700 text-sm font-bold mb-2">Teléfono:</label>
-    <input type="text" name="telefono" id="telefono" value="{{ empleado.telefono }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+    <input type="text" name="telefono" id="telefono" value="{% if empleado.telefono %}{{ empleado.telefono }}{% endif %}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
   </div>
 
   <div class="mb-4">
     <label for="domicilio" class="block text-gray-700 text-sm font-bold mb-2">Domicilio:</label>
-    <input type="text" name="domicilio" id="domicilio" value="{{ empleado.domicilio }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+    <input type="text" name="domicilio" id="domicilio" value="{% if empleado.domicilio %}{{ empleado.domicilio }}{% endif %}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
   </div>
 
   <div class="mb-4">
     <label for="fecha_nacimiento" class="block text-gray-700 text-sm font-bold mb-2">Fecha de Nacimiento:</label>
-    <input type="date" name="fecha_nacimiento" id="fecha_nacimiento" value="{{ empleado.fecha_nacimiento }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+    <input type="date" name="fecha_nacimiento" id="fecha_nacimiento" value="{% if empleado.fecha_nacimiento %}{{ empleado.fecha_nacimiento }}{% endif %}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
   </div>
 
   <div class="mb-4">
     <label for="observaciones" class="block text-gray-700 text-sm font-bold mb-2">Observaciones:</label>
-    <textarea name="observaciones" id="observaciones" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">{{ empleado.observaciones }}</textarea>
+    <textarea name="observaciones" id="observaciones" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">{% if empleado.observaciones %}{{ empleado.observaciones }}{% endif %}</textarea>
   </div>
   
   <div class="flex items-center justify-between">

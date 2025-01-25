@@ -14,6 +14,7 @@
   </RouterLink>
   <h2 class="mb-3 text-center mb-5">Crear legajo</h2>
   <form
+    ref="formulario"
     @submit.prevent="validateForm"
     class="row g-3 needs-validation"
     novalidate
@@ -27,21 +28,22 @@
         id="nombreCliente"
         required
         v-model="form.nombreCliente"
+        placeholder="Ingresar nombre del cliente."
       />
-      <div class="invalid-feedback">Por favor, introduzca un nombre del cliente.</div>
+      <div class="invalid-feedback">Por favor, ingrese nombre del cliente.</div>
     </div>
     <div class="col-md-6">
       <label for="cuit" class="form-label">CUIT</label>
-      <input type="number" class="form-control" id="cuit" required v-model="form.cuit" />
-      <div class="invalid-feedback">Por favor, introduzca un CUIT.</div>
+      <input type="number" class="form-control" id="cuit" required v-model="form.cuit" placeholder="Ingresar CUIT."/>
+      <div class="invalid-feedback">Por favor, ingrese CUIT.</div>
     </div>
     <div class="col-md-6">
-      <label for="email" class="form-label">Mail</label>
-      <input type="email" class="form-control" id="email" required v-model="form.email" />
-      <div class="invalid-feedback">Por favor, introduzca un email valido.</div>
+      <label for="email" class="form-label">Email</label>
+      <input type="email" class="form-control" id="email" required v-model="form.email" placeholder="Ingresar email." />
+      <div class="invalid-feedback">Por favor, ingrese un email valido.</div>
     </div>
     <div class="col-md-6">
-      <label for="telefono" class="form-label">Telefono</label>
+      <label for="telefono" class="form-label">Teléfono</label>
       <input
         type="text"
         class="form-control"
@@ -50,11 +52,12 @@
         v-model="form.telefono"
         required
       />
+      <div class="invalid-feedback">Por favor, ingrese un teléfono.</div>
     </div>
     <div class="col-md-6">
       <label for="contacto" class="form-label">Contacto</label>
-      <input type="text" class="form-control" id="contacto" v-model="form.contacto" required />
-      <div class="invalid-feedback">Por favor, introduzca un contacto.</div>
+      <input type="text" class="form-control" id="contacto" v-model="form.contacto" required placeholder="Ingresar contacto."/>
+      <div class="invalid-feedback">Por favor, ingrese un contacto.</div>
     </div>
     <div class="col-md-6">
       <label for="area" class="form-label">Area</label>
@@ -68,27 +71,31 @@
     </div>
     <div class="col-md-6">
       <label for="calle" class="form-label">Calle</label>
-      <input type="text" class="form-control" id="calle" v-model="form.calle" required />
+      <input type="text" class="form-control" id="calle" v-model="form.calle" required placeholder="Ingresar calle."/>
+      <div class="invalid-feedback">Por favor, ingrese calle.</div>
     </div>
     <div class="col-md-6">
-      <label for="numero" class="form-label">Numero</label>
-      <input type="text" class="form-control" id="calle" v-model="form.numero" required />
+      <label for="numero" class="form-label">Número</label>
+      <input type="text" class="form-control" id="calle" v-model="form.numero" required placeholder="Ingresar número."/>
+      <div class="invalid-feedback">Por favor, ingrese número.</div>
     </div>
     <div class="col-md-6">
       <label for="piso" class="form-label">Piso</label>
-      <input type="text" class="form-control" id="piso" v-model="form.piso" />
+      <input type="text" class="form-control" id="piso" v-model="form.piso" placeholder="Ingresar piso."/>
     </div>
     <div class="col-md-6">
       <label for="depto" class="form-label">Departamento</label>
-      <input type="text" class="form-control" id="depto" v-model="form.depto" />
+      <input type="text" class="form-control" id="depto" v-model="form.depto" placeholder="Ingresar departamento."/>
     </div>
     <div class="col-md-6">
-      <label for="cp" class="form-label">Codigo postal</label>
-      <input type="text" class="form-control" id="cp" v-model="form.codigo_postal" required />
+      <label for="cp" class="form-label">Código postal</label>
+      <input type="text" class="form-control" id="cp" v-model="form.codigo_postal" required placeholder="Ingresar código postal."/>
+      <div class="invalid-feedback">Por favor, ingrese código postal.</div>
     </div>
     <div class="col-md-2">
       <label for="localidad" class="form-label">Localidad</label>
-      <input type="text" class="form-control" id="localidad" v-model="form.localidad" required />
+      <input type="text" class="form-control" id="localidad" v-model="form.localidad" required placeholder="Ingresar localidad."/>
+      <div class="invalid-feedback">Por favor, ingrese una localidad.</div>
     </div>
     <div class="col-md-3 mt-4">
       <div class="form-check">
@@ -115,11 +122,11 @@
       <textarea
         class="form-control"
         id="objetivo"
-        placeholder="Objetivo"
+        placeholder="Ingresar objetivo."
         required
         v-model="form.objetivo"
       ></textarea>
-      <div class="invalid-feedback">Por favor ingrese un objetivo para el legajo.</div>
+      <div class="invalid-feedback">Por favor, ingrese un objetivo para el legajo.</div>
     </div>
     <div class="col-12 d-flex justify-content-center">
       <button type="submit" class="btn btn-primary">Crear legajo</button>
@@ -186,7 +193,7 @@ export default {
       }
     },
     async validateForm() {
-      const form = this.$el
+      const form = this.$refs.formulario;
       if (form.checkValidity()) {
         const cliente = {
           email: this.form.email,
@@ -215,7 +222,11 @@ export default {
           cliente: cliente,
         }
         try {
-          const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/legajos/add`, data)
+          const authStore = useAuthStore();
+          const token = authStore.getToken();
+          const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/legajos/add`,
+            { headers: { Authorization: `Bearer ${token}`} }
+          ,data)
           console.log(response)
           this.toast.success('Formulario enviado correctamente')
           this.wasValidated = false

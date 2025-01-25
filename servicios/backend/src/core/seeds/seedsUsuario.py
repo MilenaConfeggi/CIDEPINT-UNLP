@@ -468,6 +468,7 @@ def seed_usuarios():
             "obtener_interarea",
             "descargar_intearea",
             "cargar_archivo_completo",
+            "listar_areas"
         ],
     }
 

@@ -21,7 +21,7 @@ def listar_interareas():#No se, por las dudas pongo a todos
 @bp.get("/<int:id>")
 @jwt_required()
 def obtener_interarea(id):#No se por las dudas pongo a todos
-    if not check_permission("obtener_intearea"):
+    if not check_permission("obtener_interarea"):
         return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
     interarea = servicioInterarea.obtener_interarea(id)
     data = interareaSchema.dump(interarea)

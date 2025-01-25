@@ -107,18 +107,15 @@ const router = useRouter();
 const fetchInterarea = async (id) => {
     try {
         const token = authStore.getToken();
+        console.log(token);
         const response = await fetch(`${import.meta.env.VITE_API_URL}/interareas/${id}`,{
-            method: "GET",
-            headers: {
-                "Authorization": `Bearer ${token}`,
-                "Content-Type": "application/json"
-            },
+            headers: { Authorization : `Bearer ${token}` },
         }
         );
         if (response.status !== 200) {
             throw new Error("Error al obtener los detalles de la interárea");
         }
-            interarea.value = await response.json();
+        interarea.value = await response.json();
     } catch (error) {
         console.error("Error al obtener la interárea:", error);
     }

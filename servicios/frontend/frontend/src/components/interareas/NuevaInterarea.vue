@@ -85,13 +85,12 @@
 
 <script>
 import { useRouter } from "vue-router";
-
 import { useAuthStore } from '@/stores/auth';
 
 export default {
   setup() {
     const router = useRouter();
-    return { router};
+    return { router };
   },
   data() {
     return {
@@ -118,10 +117,14 @@ export default {
   methods: {
     async fetchData() {
       try {
+        const authStore = useAuthStore();
+        const token = authStore.getToken();
         const baseUrl = import.meta.env.VITE_API_URL;
         const [legajosRes, areasRes, muestrasRes] = await Promise.all([
           fetch(`${baseUrl}/api/legajos/all`),
-          fetch(`${baseUrl}/api/area/`),
+          fetch(`${baseUrl}/api/area/`, 
+            { headers: { Authorization: `Bearer ${token}`} },
+          ),
           fetch(`${baseUrl}/muestras/`),
         ]);
         this.legajos = await legajosRes.json();

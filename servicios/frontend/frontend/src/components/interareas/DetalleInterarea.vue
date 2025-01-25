@@ -107,7 +107,6 @@ const router = useRouter();
 const fetchInterarea = async (id) => {
     try {
         const token = authStore.getToken();
-        console.log(token);
         const response = await fetch(`${import.meta.env.VITE_API_URL}/interareas/${id}`,{
             headers: { Authorization : `Bearer ${token}` },
         }

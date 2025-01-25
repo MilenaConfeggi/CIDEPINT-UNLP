@@ -12,11 +12,14 @@ export const useAreasStore = defineStore("areas", {
     actions: {
         async getAreas() {
             const authStore = useAuthStore();
+            const token = authStore.token;
             const router = useRouter();
             this.loading = true;
             this.error = null;
             try {
-                const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/area/`);
+                const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/area/`,
+                    { headers: { Authorization: `Bearer ${token}`} },
+                );
                 if (response.status !== 200) {
                     throw ({message: 'Error al obtener las areas', status: response.status})
                 }

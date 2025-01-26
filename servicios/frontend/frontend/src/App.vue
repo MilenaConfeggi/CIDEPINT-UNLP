@@ -126,6 +126,7 @@ const logout = () => {
   </div>
 </template>
 
+
 <style scoped>
 .navbar {
   display: flex;

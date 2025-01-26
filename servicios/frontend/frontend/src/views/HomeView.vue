@@ -1,6 +1,6 @@
 <template>
   <div class="d-flex flex-column justify-content-center align-items-center">
-    <h2 class="text-center">Bienvenido a la plataforma de</h2>
+    <h2 class="text-center .nfl-font">Bienvenido a la plataforma de</h2>
     <img
       alt="cidepint logo"
       class="logo d-flex justify-content-center"

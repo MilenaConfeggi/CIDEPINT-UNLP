@@ -18,8 +18,10 @@ from ..schemas.documento import (
     pagination_documento_schema,
 )
 from ..schemas.tipoDocumento import tipos_documentos_schema, tipo_documento_schema
+from servicios.backend.src.web.helpers.auth import check_permission
 from flask import Blueprint, abort, request, jsonify, send_file, send_from_directory
 from flask import current_app as app
+from flask_jwt_extended import jwt_required
 from datetime import datetime
 from pathlib import Path
 import os
@@ -35,7 +37,10 @@ def list_tipos_documentos():
 
 
 @bp.get("/")
+@jwt_required()
 def get_documentos():
+    if not check_permission("listar_documentos"):
+        return jsonify({"message": "No tiene permiso para acceder a este recurso"}), 403
     params = request.args
     page = params.get("page", 1, int)
     per_page = params.get("per_page", 10, int)
@@ -58,7 +63,10 @@ def get_documentos():
 
 
 @bp.post("/upload")
+@jwt_required()
 def upload():
+    if not check_permission("subir_documento"):
+        return jsonify({"message": "No tiene permiso para acceder a este recurso"}), 403
     file = request.files["file"]
     tipo = request.form["tipo"]
     legajo_id = request.form["legajo_id"]
@@ -172,7 +180,10 @@ def download():
 
 
 @bp.get("/view/<string:filename>")
+@jwt_required()
 def view_file(filename):
+    if not check_permission("ver documentacion"):
+        return jsonify({"message": "No tiene permiso para acceder a este recurso"}), 403
     tipo = request.args.get("tipo")  # Recibir el tipo de documento como parámetro
     if not tipo:
         return jsonify({"error": "El tipo de documento es obligatorio"}), 400

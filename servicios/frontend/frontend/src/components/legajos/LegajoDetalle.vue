@@ -44,7 +44,7 @@
               <p class="col">Contacto telefónico: {{ legajo.cliente.telefono }}</p>
             </div>
           </div>
-          <div class="d-flex justify-content-end gap-3 mb-2">
+          <div class="d-flex justify-content-center gap-3 mb-2">
             <button
               v-if="
                 !legajo.admin_habilitado &&

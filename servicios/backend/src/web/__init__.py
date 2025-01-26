@@ -40,6 +40,7 @@ def create_app(env="development", static_folder=""):
     app = Flask(__name__)
     app.config.from_object(config[env])
     app.config["JWT_TOKEN_LOCATION"] = ["headers"]
+    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = 6 * 3600 #El token de autenticación caducará en 6 horas
     app.url_map.strict_slashes = False
     db.init_app(app)
     bcrypt.init_app(app)

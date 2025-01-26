@@ -25,6 +25,7 @@
         aria-label="nombre del cliente"
         class="form-control"
         id="empresa"
+        placeholder="Ingresar nombre de la empresa."
       />
       <label class="input-group-text" for="ensayo">Ensayo</label>
       <input
@@ -33,6 +34,7 @@
         id="ensayo"
         type="text"
         aria-label="nombre del ensayo"
+        placeholder="Ingresar nombre del ensayo."
       />
       <label class="input-group-text" for="date">Fecha de carga</label>
       <input
@@ -219,6 +221,9 @@ const viewFile = async (doc) => {
     const response = await axios.get(
       `${import.meta.env.VITE_API_URL}/api/documentos/view/${actualFile.value.nombre_documento}`,
       {
+        headers: {
+          Authorization: `Bearer ${authStore.getToken()}`,
+        },
         params: { tipo },
         responseType: 'blob',
       },

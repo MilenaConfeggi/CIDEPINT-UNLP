@@ -19,17 +19,22 @@ export const useDocumentosStore = defineStore('documentos', {
       const { page, per_page, tipo_documento, empresa, fecha, area, ensayo } = params
       this.loading = true
       this.error = null
+      const token = this.authStore.token;
       try {
         const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/documentos/`, {
-          params: {
-            page,
-            per_page,
-            tipo_documento,
-            empresa,
-            fecha,
-            area,
-            ensayo,
+          headers: {
+            Authorization: `Bearer ${token}`,
           },
+          }, {
+            params: {
+              page,
+              per_page,
+              tipo_documento,
+              empresa,
+              fecha,
+              area,
+              ensayo,
+            },
         })
         if (response.status !== 200) {
           throw ({message: 'Error al obtener los documentos', status: response.status})
@@ -83,6 +88,7 @@ export const useDocumentosStore = defineStore('documentos', {
         
         const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/documentos/upload`, formData, {
           headers: {
+            Authorization: `Bearer ${this.authStore.token}`,
             'Content-Type': 'multipart/form-data',
           },
         })

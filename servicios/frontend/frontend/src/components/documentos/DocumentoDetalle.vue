@@ -13,6 +13,7 @@ import axios from 'axios'
 import { onMounted, ref } from 'vue'
 import { useDocumentosStore } from '../../stores/documentos'
 import { storeToRefs } from 'pinia'
+import { useAuthStore } from '../../stores/auth'
 
 const props = defineProps({
   id: {
@@ -24,6 +25,7 @@ const props = defineProps({
 const documentosStore = useDocumentosStore()
 const { doc } = storeToRefs(documentosStore)
 const fileUrl = ref(null)
+const authStore = useAuthStore()
 
 onMounted(async () => {
   await documentosStore.getDocumento(props.id)
@@ -31,7 +33,9 @@ onMounted(async () => {
 
 const viewFile = async (filename, tipo) => {
   try {
-    const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/view/${filename}`, {
+    const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/view/${filename}`,
+      { Athorization: `Bearer ${authStore.getItem('token')}` },
+    {
       params: { tipo },
       responseType: 'blob', // Importante para manejar archivos binarios
     })

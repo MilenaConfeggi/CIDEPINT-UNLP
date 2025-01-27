@@ -1,29 +1,30 @@
 <template>
-  <RouterLink to="/legajos/newLegajo" class="hover:underline">
-    <svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" viewBox="0 0 16 16">
-      <path
-        fill="currentColor"
-        fill-rule="evenodd"
-        d="M3.5 1.5v13h5.75a.75.75 0 0 1 0 1.5H3a1 1 0 0 1-1-1V1a1 1 0 0 1 1-1h6.644a1 1 0 0 1 .72.305l3.355 3.476a1 1 0 0 1 .281.695V6.25a.75.75 0 0 1-1.5 0V6H9.75A1.75 1.75 0 0 1 8 4.25V1.5zm6 .07l2.828 2.93H9.75a.25.25 0 0 1-.25-.25zM13 15a.75.75 0 0 1-.75-.75v-1.5h-1.5a.75.75 0 0 1 0-1.5h1.5v-1.5a.75.75 0 0 1 1.5 0v1.5h1.5a.75.75 0 0 1 0 1.5h-1.5v1.5A.75.75 0 0 1 13 15"
-        clip-rule="evenodd"
-      />
-    </svg>
-  </RouterLink>
-  <div class="flex flex-col justify-center items-center">
+  <div class="mt-3">
+    <RouterLink to="/legajos/newLegajo" class="hover:underline" v-if="hasPermission('crear_legajo')">
+      <svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" viewBox="0 0 16 16">
+        <path
+          fill="currentColor"
+          fill-rule="evenodd"
+          d="M3.5 1.5v13h5.75a.75.75 0 0 1 0 1.5H3a1 1 0 0 1-1-1V1a1 1 0 0 1 1-1h6.644a1 1 0 0 1 .72.305l3.355 3.476a1 1 0 0 1 .281.695V6.25a.75.75 0 0 1-1.5 0V6H9.75A1.75 1.75 0 0 1 8 4.25V1.5zm6 .07l2.828 2.93H9.75a.25.25 0 0 1-.25-.25zM13 15a.75.75 0 0 1-.75-.75v-1.5h-1.5a.75.75 0 0 1 0-1.5h1.5v-1.5a.75.75 0 0 1 1.5 0v1.5h1.5a.75.75 0 0 1 0 1.5h-1.5v1.5A.75.75 0 0 1 13 15"
+          clip-rule="evenodd"
+        />
+      </svg>
+    </RouterLink>
+  </div>
+  <div class="flex flex-col justify-center items-center mt-4">
     <p v-if="error">{{ error }}</p>
     <div class="input-group mb-3 d-flex flex-row">
       <label class="input-group-text" for="ensayos">Ensayos</label>
-      <input v-model="ensayo" type="text" aria-label="Ensayos" class="form-control" />
-      <label v-if="userRol === ''" class="input-group-text" for="area">Areas</label>
+      <input v-model="ensayo" type="text" aria-label="Ensayos" class="form-control" placeholder="Ingresar ensayo." />
+      <label v-if="userRol === ''" class="input-group-text" for="area">Áreas</label>
       <select v-if="userRol === '' && areas" v-model="area" class="form-select" id="area">
-        <option selected value="">Elige un area</option>
+        <option selected value="">Elige un área</option>
         <option v-for="area in areas" :key="area.id" :value="area.id">
           {{ area.nombre }}
         </option>
       </select>
       <span class="input-group-text">Empresa</span>
-
-      <input v-model="empresa" type="text" aria-label="nombre del cliente" class="form-control" />
+      <input v-model="empresa" type="text" aria-label="nombre del cliente" class="form-control" placeholder="Ingresar nombre de empresa." />
       <label class="input-group-text" for="date">Fecha de carga</label>
       <input
         id="date"

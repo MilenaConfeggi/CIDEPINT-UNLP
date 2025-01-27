@@ -85,6 +85,9 @@
 import { ref, onMounted, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
+import { useAuthStore } from '@/stores/auth';
+
+const authStore = useAuthStore();
 const interarea = ref(null);
 const mostrarInput = ref(false);
 const mostrarSubirSolicitud = ref(false);
@@ -103,11 +106,15 @@ const router = useRouter();
 
 const fetchInterarea = async (id) => {
     try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/interareas/${id}`);
+        const token = authStore.getToken();
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/interareas/${id}`,{
+            headers: { Authorization : `Bearer ${token}` },
+        }
+        );
         if (response.status !== 200) {
             throw new Error("Error al obtener los detalles de la interárea");
         }
-            interarea.value = await response.json();
+        interarea.value = await response.json();
     } catch (error) {
         console.error("Error al obtener la interárea:", error);
     }
@@ -115,7 +122,15 @@ const fetchInterarea = async (id) => {
 
 const fetchDescargarSolicitud = async (nombreSolicitud) => {
     try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/interareas/descargar/${nombreSolicitud}`);
+        const token = authStore.getToken();
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/interareas/descargar/${nombreSolicitud}`, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            },
+        }
+        );
         if (response.status !== 200) {
             throw new Error("Error al descargar la solicitud");
         }
@@ -137,9 +152,13 @@ const guardarResultado = async () => {
         return;
     }
     try {
+        const token = authStore.getToken();
         const response = await fetch(`${import.meta.env.VITE_API_URL}/interareas/guardar_resultado/${interarea.value.id}`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
             body: JSON.stringify({
                 nro_interarea: interarea.value.nro_interarea,
                 resultado: resultado.value,
@@ -174,8 +193,12 @@ const subirSolicitudFirmada = async () => {
     formData.append("id", interarea.value.id);
 
     try {
+        const token = authStore.getToken();
         const response = await fetch(`${import.meta.env.VITE_API_URL}/interareas/cargar_archivo_firmado/${interarea.value.id}`, {
             method: "POST",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+            },
             body: formData,
         });
 
@@ -210,8 +233,12 @@ const subirSolicitudCompleta = async () => {
     formData.append("id", interarea.value.id);
 
     try {
+        const token = authStore.getToken();
         const response = await fetch(`${import.meta.env.VITE_API_URL}/interareas/cargar_archivo_completo/${interarea.value.id}`, {
             method: "POST",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+            },
             body: formData,
         });
 

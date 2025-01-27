@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { defineStore } from 'pinia'
 import { useToast } from 'vue-toastification'
+import { useAuthStore } from './auth'
 
 
 export const useLegajosStore = defineStore('legajos', {
@@ -15,19 +16,25 @@ export const useLegajosStore = defineStore('legajos', {
   actions: {
     async getLegajos(params) {
       const { page, per_page, empresa, fecha, area, ensayo } = params
+      const authStore = useAuthStore();
+      const token = authStore.getToken();
       this.loading = true
       this.error = null
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/legajos/`, {
-          params: {
-            page,
-            per_page,
-            empresa,
-            fecha,
-            area,
-            ensayo,
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/legajos/`, 
+          { 
+            headers: { Authorization: `Bearer ${token}`} 
           },
-        })
+          {
+            params: {
+              page,
+              per_page,
+              empresa,
+              fecha,
+              area,
+              ensayo,
+            },
+          })
         this.legajos = response.data
         console.log(response.data.pages)
         this.totalPages = response.data.pages
@@ -39,10 +46,16 @@ export const useLegajosStore = defineStore('legajos', {
       }
     },
     async getLegajo(id) {
+      const authStore = useAuthStore();
+      const token = authStore.getToken();
       this.loading = true
       this.error = null
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/legajos/${id}`)
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/legajos/${id}`,
+          { 
+            headers: { Authorization: `Bearer ${token}`} 
+          },
+        )
         this.legajo = response.data
       } catch (error) {
         this.error = error

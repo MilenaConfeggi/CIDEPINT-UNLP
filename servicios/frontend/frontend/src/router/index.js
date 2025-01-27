@@ -182,6 +182,12 @@ const routes = [
     component: () => import('../views/EstadisticasView.vue'),
     meta: { requiresAuth: true, showNavbar: true },
   },
+  {
+    path: '/:catchAll(.*)',
+    name: 'Error',
+    component: () => import('../views/ErrorView.vue'),
+    meta: { requiresAuth: false, showNavbar: true },
+  },
 ]
 
 const router = createRouter({

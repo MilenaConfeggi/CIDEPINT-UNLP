@@ -3,8 +3,6 @@ from models.clientes.cliente import Cliente
 
 
 def create_cliente(data, legajo_id):
-    if find_cliente_by_mail(data['email']) is not None:
-        return None
     cliente = Cliente(**data)
     cliente.legajo_id = legajo_id
     db.session.add(cliente)

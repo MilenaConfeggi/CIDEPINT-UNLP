@@ -1,5 +1,10 @@
 from datetime import datetime
-from servicios.backend.src.core.services.servicioUsuario import crear_usuario, crear_rol, crear_permiso, asignar_permiso
+from servicios.backend.src.core.services.servicioUsuario import (
+    crear_usuario,
+    crear_rol,
+    crear_permiso,
+    asignar_permiso,
+)
 from models.personal import get_area
 from models.usuarios.rol import Rol
 from models.usuarios.permiso import Permiso
@@ -24,173 +29,150 @@ def seed_usuarios():
     db.session.add(rol_director)
     db.session.commit()
 
-    default_area = Area(nombre='Area 2fault', saldo=0)
+    default_area = Area(nombre="Area 2fault", saldo=0)
     area_1 = get_area(1)
     area_2 = get_area(2)
     area_3 = get_area(3)
 
-    usuario_1 = User(
-        username='rober',
-        password='rober'
-    )    
-    
+    usuario_1 = User(username="rober", password="rober")
+
     personal_1 = Empleado(
         user=usuario_1,
-        email='rober@example.com',
-        area= area_1,  # Asigna el área creada
-        dni='204060',
-        nombre='Rober',
-        apellido='Tito',
-        dependencia='UNLP',
-        cargo='Administrativo',
-        subdivision_cargo='Ley 10430',
-        telefono='123456789',
-        domicilio='Admin Address',
-        fecha_nacimiento=datetime.strptime('1970-01-01', '%Y-%m-%d'),
-        observaciones='Usuario administrador por defecto',
+        email="rober@example.com",
+        area=area_1,  # Asigna el área creada
+        dni="204060",
+        nombre="Rober",
+        apellido="Tito",
+        dependencia="UNLP",
+        cargo="Administrativo",
+        subdivision_cargo="Ley 10430",
+        telefono="123456789",
+        domicilio="Admin Address",
+        fecha_nacimiento=datetime.strptime("1970-01-01", "%Y-%m-%d"),
+        observaciones="Usuario administrador por defecto",
         habilitado=True,
-        rol='Personal'
+        rol="Personal",
     )
 
-    usuario_2 = User(
-        username='maria',
-        password='maria'
-    )    
-    
+    usuario_2 = User(username="maria", password="maria")
+
     personal_2 = Empleado(
         user=usuario_2,
-        email='moniquita@example.com',
+        email="moniquita@example.com",
         area=area_1,
-        dni='204061',
-        nombre='Maria',
-        apellido='Lopez',
-        dependencia='UNLP',
-        cargo='Administrativo',
-        subdivision_cargo='Ley 10430',
-        telefono='123456780',
-        domicilio='Maria Address',
-        fecha_nacimiento=datetime.strptime('1985-02-01', '%Y-%m-%d'),
-        observaciones='Usuario personal',
+        dni="204061",
+        nombre="Maria",
+        apellido="Lopez",
+        dependencia="UNLP",
+        cargo="Administrativo",
+        subdivision_cargo="Ley 10430",
+        telefono="123456780",
+        domicilio="Maria Address",
+        fecha_nacimiento=datetime.strptime("1985-02-01", "%Y-%m-%d"),
+        observaciones="Usuario personal",
         habilitado=True,
-        rol='Personal'
+        rol="Personal",
     )
 
-    usuario_3 = User(
-        username='juan',
-        password='juan'
-    )    
-    
+    usuario_3 = User(username="juan", password="juan")
+
     personal_3 = Empleado(
         user=usuario_3,
-        email='pepito@example.com',
+        email="pepito@example.com",
         area=area_1,
-        dni='204062',
-        nombre='Juan',
-        apellido='Perez',
-        dependencia='UNLP',
-        cargo='Administrativo',
-        subdivision_cargo='Ley 10430',
-        telefono='123456781',
-        domicilio='Juan Address',
-        fecha_nacimiento=datetime.strptime('1990-03-01', '%Y-%m-%d'),
-        observaciones='Usuario personal',
+        dni="204062",
+        nombre="Juan",
+        apellido="Perez",
+        dependencia="UNLP",
+        cargo="Administrativo",
+        subdivision_cargo="Ley 10430",
+        telefono="123456781",
+        domicilio="Juan Address",
+        fecha_nacimiento=datetime.strptime("1990-03-01", "%Y-%m-%d"),
+        observaciones="Usuario personal",
         habilitado=True,
-        rol='Personal'
+        rol="Personal",
     )
 
-    usuario_4 = User(
-        username='ana',
-        password='ana'
-    )    
-    
+    usuario_4 = User(username="ana", password="ana")
+
     personal_4 = Empleado(
         user=usuario_4,
-        email='secretaria@example.com',
+        email="secretaria@example.com",
         area=default_area,
-        dni='204063',
-        nombre='Ana',
-        apellido='Garcia',
-        dependencia='UNLP',
-        cargo='Administrativo',
-        subdivision_cargo='Ley 10430',
-        telefono='123456782',
-        domicilio='Ana Address',
-        fecha_nacimiento=datetime.strptime('1995-04-01', '%Y-%m-%d'),
-        observaciones='Usuario personal',
+        dni="204063",
+        nombre="Ana",
+        apellido="Garcia",
+        dependencia="UNLP",
+        cargo="Administrativo",
+        subdivision_cargo="Ley 10430",
+        telefono="123456782",
+        domicilio="Ana Address",
+        fecha_nacimiento=datetime.strptime("1995-04-01", "%Y-%m-%d"),
+        observaciones="Usuario personal",
         habilitado=True,
-        rol='Personal'
+        rol="Personal",
     )
 
-    usuario_5 = User(
-        username='luis',
-        password='luis'
-    )    
-    
+    usuario_5 = User(username="luis", password="luis")
+
     personal_5 = Empleado(
         user=usuario_5,
-        email='director@example.com',
+        email="director@example.com",
         area=default_area,
-        dni='204064',
-        nombre='Luis',
-        apellido='Martinez',
-        dependencia='UNLP',
-        cargo='Administrativo',
-        subdivision_cargo='Ley 10430',
-        telefono='123456783',
-        domicilio='Luis Address',
-        fecha_nacimiento=datetime.strptime('1988-05-01', '%Y-%m-%d'),
-        observaciones='Usuario personal',
+        dni="204064",
+        nombre="Luis",
+        apellido="Martinez",
+        dependencia="UNLP",
+        cargo="Administrativo",
+        subdivision_cargo="Ley 10430",
+        telefono="123456783",
+        domicilio="Luis Address",
+        fecha_nacimiento=datetime.strptime("1988-05-01", "%Y-%m-%d"),
+        observaciones="Usuario personal",
         habilitado=True,
-        rol='Personal'
+        rol="Personal",
     )
 
-    usuario_6 = User(
-        username='laura',
-        password='laura'
-    )    
-    
+    usuario_6 = User(username="laura", password="laura")
+
     personal_6 = Empleado(
         user=usuario_6,
-        email='laura@example.com',
+        email="laura@example.com",
         area=area_2,
-        dni='204065',
-        nombre='Laura',
-        apellido='Fernandez',
-        dependencia='UNLP',
-        cargo='Administrativo',
-        subdivision_cargo='Ley 10430',
-        telefono='123456784',
-        domicilio='Laura Address',
-        fecha_nacimiento=datetime.strptime('1992-06-01', '%Y-%m-%d'),
-        observaciones='Usuario personal',
+        dni="204065",
+        nombre="Laura",
+        apellido="Fernandez",
+        dependencia="UNLP",
+        cargo="Administrativo",
+        subdivision_cargo="Ley 10430",
+        telefono="123456784",
+        domicilio="Laura Address",
+        fecha_nacimiento=datetime.strptime("1992-06-01", "%Y-%m-%d"),
+        observaciones="Usuario personal",
         habilitado=True,
-        rol='Personal'
+        rol="Personal",
     )
 
-    usuario_7 = User(
-        username='lucas',
-        password='lucas'
-    )
+    usuario_7 = User(username="lucas", password="lucas")
 
     personal_7 = Empleado(
         user=usuario_6,
-        email='lucas@example.com',
+        email="lucas@example.com",
         area=area_3,
-        dni='2040095',
-        nombre='Lucas',
-        apellido='Fernandez',
-        dependencia='UNLP',
-        cargo='Administrativo',
-        subdivision_cargo='Ley 10430',
-        telefono='123456784',
-        domicilio='Laura Address',
-        fecha_nacimiento=datetime.strptime('1992-06-01', '%Y-%m-%d'),
-        observaciones='Usuario personal',
+        dni="2040095",
+        nombre="Lucas",
+        apellido="Fernandez",
+        dependencia="UNLP",
+        cargo="Administrativo",
+        subdivision_cargo="Ley 10430",
+        telefono="123456784",
+        domicilio="Laura Address",
+        fecha_nacimiento=datetime.strptime("1992-06-01", "%Y-%m-%d"),
+        observaciones="Usuario personal",
         habilitado=True,
-        rol='Personal'
+        rol="Personal",
     )
-
-
 
     db.session.add(usuario_1)
     db.session.add(usuario_2)
@@ -274,41 +256,39 @@ def seed_usuarios():
     db.session.add(usuario6)
     db.session.add(usuario7)
 
-        db.session.commit()
-    
+    db.session.commit()
+
     def seed_usuarios_finales():
 
         area_1 = get_area(1)
 
         def find_role_by_name(rol):
             return Rol.query.filter_by(nombre=rol).first()
-        
-        rol_secretaria = find_role_by_name('Secretaria')
-        rol_director = find_role_by_name('Director')
+
+        rol_secretaria = find_role_by_name("Secretaria")
+        rol_director = find_role_by_name("Director")
 
         walter = User(
-            username='w.egli',
-            password='direccioncidepint',
-            rol='Administrador'
+            username="w.egli", password="direccioncidepint", rol="Administrador"
         )
 
         db.session.add(walter)
 
         personal_walter = Empleado(
             user=walter,
-            email='direccion@cidepint.ing.unlp.edu.ar',
+            email="direccion@cidepint.ing.unlp.edu.ar",
             area=area_1,
-            dni='14655236',
-            nombre='Walter',
-            apellido='Egli',
-            dependencia='UNLP',#TODO REVISAR
-            cargo='Administrativo',
-            subdivision_cargo='Ley 10430',#TODO REVISAR
-            telefono='2227412879',
-            domicilio='33 Nº 1224',
-            fecha_nacimiento=datetime.strptime('1962-02-12', '%Y-%m-%d'),
-            observaciones='',
-            habilitado=True
+            dni="14655236",
+            nombre="Walter",
+            apellido="Egli",
+            dependencia="UNLP",  # TODO REVISAR
+            cargo="Administrativo",
+            subdivision_cargo="Ley 10430",  # TODO REVISAR
+            telefono="2227412879",
+            domicilio="33 Nº 1224",
+            fecha_nacimiento=datetime.strptime("1962-02-12", "%Y-%m-%d"),
+            observaciones="",
+            habilitado=True,
         )
 
         db.session.add(personal_walter)
@@ -323,26 +303,22 @@ def seed_usuarios():
         )
         db.session.add(usuario_walter)
 
-        alicia = User(
-            username='Alicia',
-            password='secretariacidepint',
-            rol='Personal'
-        )
+        alicia = User(username="Alicia", password="secretariacidepint", rol="Personal")
 
         db.session.add(alicia)
 
         personal_alicia = Empleado(
             user=alicia,
-            email='servicios@cidepint.ing.unlp.edu.ar',
+            email="servicios@cidepint.ing.unlp.edu.ar",
             area=area_1,
-            dni='20849128',
-            nombre='Alicia',
-            apellido='Marchissio',
-            dependencia='UNLP',#TODO REVISAR
-            cargo='Administrativo',
-            subdivision_cargo='Ley 10430',#TODO REVISAR
-            observaciones='',
-            habilitado=True
+            dni="20849128",
+            nombre="Alicia",
+            apellido="Marchissio",
+            dependencia="UNLP",  # TODO REVISAR
+            cargo="Administrativo",
+            subdivision_cargo="Ley 10430",  # TODO REVISAR
+            observaciones="",
+            habilitado=True,
         )
 
         db.session.add(personal_alicia)
@@ -360,8 +336,8 @@ def seed_usuarios():
         db.session.commit()
 
     def seeds_permisos():
-        todosLosPermisos = [ #Acá van todos los permisos a insertar (todos los posibles permisos que hay en el sistema)
-            "listar_usuarios", #Por favor, ponerle el mismo nombre que el nombre del método del controlador
+        todosLosPermisos = [  # Acá van todos los permisos a insertar (todos los posibles permisos que hay en el sistema)
+            "listar_usuarios",  # Por favor, ponerle el mismo nombre que el nombre del método del controlador
             "listar_usuarios_de_un_area",
             "listar_roles",
             "listar_empleados",
@@ -371,7 +347,7 @@ def seed_usuarios():
             "borrar_usuario",
             "recuperar_contra",
             "cambiar_jefe_area",
-            "listar_stans", #este es el de usuarios
+            "listar_stans",  # este es el de usuarios
             "cargar_stan",
             "cargar_muestra",
             "listar_muestras_identificadas",
@@ -390,7 +366,7 @@ def seed_usuarios():
             "generar_certificado",
             "ver_certificado",
             "cargar_interarea_firmada",
-            "listarStans", #este es el de presupuestos
+            "listarStans",  # este es el de presupuestos
             "generar_presupuesto",
             "generar_presupuestont",
             "ver_presupuesto",
@@ -421,8 +397,8 @@ def seed_usuarios():
             "view_adicional",
             "get_documentos_by_tipo",
         ]
-        PERMISSIONS = { #Acá van los permisos que tiene cada rol
-            "Director": [ #Tienen que ser declarados previamente en todosLosPermisos
+        PERMISSIONS = {  # Acá van los permisos que tiene cada rol
+            "Director": [  # Tienen que ser declarados previamente en todosLosPermisos
                 "listar_usuarios",
                 "listar_usuarios_de_un_area",
                 "listar_roles",
@@ -433,7 +409,7 @@ def seed_usuarios():
                 "borrar_usuario",
                 "recuperar_contra",
                 "cambiar_jefe_area",
-                "listar_stans", #este es el de usuarios
+                "listar_stans",  # este es el de usuarios
                 "cargar_stan",
                 "cargar_muestra",
                 "listar_muestras_identificadas",
@@ -546,7 +522,7 @@ def seed_usuarios():
                 "generar_certificado",
                 "ver_certificado",
                 "cargar_interarea_firmada",
-                "listarStans", #este es el de presupuestos
+                "listarStans",  # este es el de presupuestos
                 "generar_presupuesto",
                 "generar_presupuestont",
                 "ver_presupuesto",
@@ -602,33 +578,29 @@ def seed_usuarios():
             ],
         }
 
-    for per in todosLosPermisos:
-        permission = crear_permiso(
-            {
-                "nombre": per,
-            }
-        )
-
-    def find_permission_by_name(permiso):
-        return Permiso.query.filter_by(nombre=permiso).first()
-
-    def find_role_by_name(rol):
-        return Rol.query.filter_by(nombre=rol).first()
-
-    for rol in PERMISSIONS:
-        for per in PERMISSIONS[rol]:
-            asignar_permiso(
+        for per in todosLosPermisos:
+            permission = crear_permiso(
                 {
-                    "rol": (find_role_by_name(rol)),
-                    "permiso": (find_permission_by_name(per))
+                    "nombre": per,
                 }
             )
 
+        def find_permission_by_name(permiso):
+            return Permiso.query.filter_by(nombre=permiso).first()
 
-    db.session.commit()
+        def find_role_by_name(rol):
+            return Rol.query.filter_by(nombre=rol).first()
 
-    seeds_roles()
+        for rol in PERMISSIONS:
+            for per in PERMISSIONS[rol]:
+                asignar_permiso(
+                    {
+                        "rol": (find_role_by_name(rol)),
+                        "permiso": (find_permission_by_name(per)),
+                    }
+                )
+
+        db.session.commit()
+
     seeds_permisos()
     seed_usuarios_finales()
-
-

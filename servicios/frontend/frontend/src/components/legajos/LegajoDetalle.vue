@@ -93,7 +93,7 @@
                               />
                             </label>
                           </li>
-                          <li v-if="hasPermission('ver documentacion')">
+                          <li v-if="hasPermission('ver_documentacion')">
                             <button
                               type="button"
                               class="dropdown-item"

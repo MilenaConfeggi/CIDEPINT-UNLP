@@ -74,10 +74,10 @@ def seeds_tipos_documento():
             'nombre': 'Factura',
         },
         {
-            'nombre': 'orden_facturacion',
+            'nombre': 'Orden Facturación',
         },
         {
-            'nombre': 'adicional',
+            'nombre': 'Adicional',
         },
         {
             'nombre': 'Legajo',

@@ -506,9 +506,13 @@ const downloadDocumento = async (tipo, legajo_id) => {
 const viewFile = async (id, tipo) => {
   actualFile.value = legajo.value.documento.find((doc) => doc.tipo_documento_id === id)
   try {
+    const token = authStore.getToken()
     const response = await axios.get(
       `${import.meta.env.VITE_API_URL}/api/documentos/view/${actualFile.value.nombre_documento}`,
       {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
         params: { tipo },
         responseType: 'blob',
       },

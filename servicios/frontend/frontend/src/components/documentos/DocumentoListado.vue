@@ -427,4 +427,26 @@ watch([tipo_documento, currentPage, area, empresa, fecha, ensayo], () => {
     opacity: 1;
   }
 }
+
+/* Estilos responsivos para dispositivos móviles */
+@media (max-width: 768px) {
+  .table {
+    font-size: 0.7rem; /* Reducir aún más el tamaño de la fuente */
+  }
+
+  .table th,
+  .table td {
+    padding: 3px; /* Reducir aún más el padding */
+  }
+
+  .btn {
+    font-size: 0.7rem; /* Reducir aún más el tamaño de la fuente */
+    padding: 3px 6px; /* Reducir aún más el padding */
+  }
+
+  .page-link {
+    padding: 3px 5px; /* Reducir aún más el padding */
+  }
+}
+
 </style>

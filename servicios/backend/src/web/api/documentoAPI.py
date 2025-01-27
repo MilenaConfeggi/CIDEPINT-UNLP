@@ -18,8 +18,10 @@ from ..schemas.documento import (
     pagination_documento_schema,
 )
 from ..schemas.tipoDocumento import tipos_documentos_schema, tipo_documento_schema
+from servicios.backend.src.web.helpers.auth import check_permission
 from flask import Blueprint, abort, request, jsonify, send_file, send_from_directory
 from flask import current_app as app
+from flask_jwt_extended import jwt_required
 from datetime import datetime
 from pathlib import Path
 import os
@@ -30,12 +32,17 @@ bp = Blueprint("documentos", __name__, url_prefix="/api/documentos")
 
 @bp.get("/tipos_documentos")
 def list_tipos_documentos():
+    if not check_permission("listar_tipos_documentos"):
+        return jsonify({"message": "No tiene permiso para acceder a este recurso"}), 403
     data = tipos_documentos_schema.dump(listar_tipos_documentos())
     return jsonify(data), 200
 
 
 @bp.get("/")
+@jwt_required()
 def get_documentos():
+    if not check_permission("listar_documentos"):
+        return jsonify({"message": "No tiene permiso para acceder a este recurso"}), 403
     params = request.args
     page = params.get("page", 1, int)
     per_page = params.get("per_page", 10, int)
@@ -58,7 +65,10 @@ def get_documentos():
 
 
 @bp.post("/upload")
+@jwt_required()
 def upload():
+    if not check_permission("subir_documento"):
+        return jsonify({"message": "No tiene permiso para acceder a este recurso"}), 403
     file = request.files["file"]
     tipo = request.form["tipo"]
     legajo_id = request.form["legajo_id"]
@@ -143,7 +153,10 @@ def upload():
 
 
 @bp.post("/download")
+@jwt_required()
 def download():
+    if not check_permission("descargar_documento"):
+        return jsonify({"message": "No tiene permiso para acceder a este recurso"}), 403
     data = request.get_json()
     archivo = find_documento(data["params"])
     if archivo is None:
@@ -172,7 +185,10 @@ def download():
 
 
 @bp.get("/view/<string:filename>")
+@jwt_required()
 def view_file(filename):
+    if not check_permission("ver_documentacion"):
+        return jsonify({"message": "No tiene permiso para acceder a este recurso"}), 403
     tipo = request.args.get("tipo")  # Recibir el tipo de documento como parámetro
     if not tipo:
         return jsonify({"error": "El tipo de documento es obligatorio"}), 400
@@ -200,27 +216,36 @@ def view_file(filename):
 
 
 @bp.get("/<int:id>")
+@jwt_required()
 def get_documento(id):
+    if not check_permission("get_documento"):
+        return jsonify({"message": "No tiene permiso para acceder a este recurso"}), 403
     data = documento_schema.dump(find_documento_by_id(id))
     if data is None:
         return jsonify({"error": "No se encontro el documento"}), 404
     return jsonify(data), 200
 
 @bp.get("/list/<int:tipo>")
+@jwt_required()
 def get_documentos_by_tipo(tipo):
-    print("entra")
+    if not check_permission("get_documentos_by_tipo"):
+        return jsonify({"message": "No tiene permiso para acceder a este recurso"}), 403
     data = documentos_schema.dump(list_documentos_by_tipo(tipo))
     return jsonify(data), 200
 
 @bp.get("/adicionales/<int:id>")
 @jwt_required()
 def get_documentos_adicionales(id):
+    if not check_permission("get_documentos_adicionales"):
+        return jsonify({"message": "No tiene permiso para acceder a este recurso"}), 403
     data = documentos_schema.dump(list_documentos_adicionales_by_legajo(id))
     return jsonify(data), 200
 
 @bp.get("/view_adicional/<int:id>")
 @jwt_required()
 def view_adicional(id):
+    if not check_permission("view_adicional"):
+        return jsonify({"message": "No tiene permiso para acceder a este recurso"}), 403
     UPLOAD_FOLDER = os.path.abspath("documentos")
     documento = find_documento_by_id(id)
     directory = os.path.normpath(os.path.join(UPLOAD_FOLDER, "adicional"))

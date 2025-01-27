@@ -1,0 +1,10 @@
+@font-face {
+    font-family: 'NFLBenga'; /* Nombre personalizado para la fuente */
+    src: url('@/assets/fonts/NFLBENGA.TTF') format('truetype'); /* Ruta al archivo .ttf */
+    font-weight: normal;
+    font-style: normal;
+}
+
+.nfl-font {
+    font-family: 'NFLBenga', sans-serif; /* Clase para aplicar la fuente */
+}

@@ -199,6 +199,7 @@ def cargar_presupuesto_firmado(id_legajo):
         for archiv in os.listdir(folder_path):
             archivo_path = os.path.join(folder_path, archiv)
             if os.path.isfile(archivo_path) and (archiv.startswith("fpresupuesto_firmado_") or archiv.startswith("presupuesto_")):
+                servicioDocumento.eliminar_documento(archiv)
                 os.remove(archivo_path)
 
         timestamp = datetime.now().strftime("%Y%m%d")

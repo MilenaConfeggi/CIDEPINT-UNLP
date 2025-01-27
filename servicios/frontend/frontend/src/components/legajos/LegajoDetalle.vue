@@ -44,7 +44,7 @@
               <p class="col">Contacto telefónico: {{ legajo.cliente.telefono }}</p>
             </div>
           </div>
-          <div class="d-flex justify-content-end gap-3 mb-2">
+          <div class="d-flex justify-content-center gap-3 mb-2">
             <button
               v-if="
                 !legajo.admin_habilitado &&
@@ -506,9 +506,13 @@ const downloadDocumento = async (tipo, legajo_id) => {
 const viewFile = async (id, tipo) => {
   actualFile.value = legajo.value.documento.find((doc) => doc.tipo_documento_id === id)
   try {
+    const token = authStore.getToken()
     const response = await axios.get(
       `${import.meta.env.VITE_API_URL}/api/documentos/view/${actualFile.value.nombre_documento}`,
       {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
         params: { tipo },
         responseType: 'blob',
       },

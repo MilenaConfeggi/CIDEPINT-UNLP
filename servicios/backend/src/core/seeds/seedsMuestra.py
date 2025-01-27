@@ -8,8 +8,6 @@ def seeds_muestras():
     seed_fotos()
 
 def seed_muestras():
-
-
     pass
 
 def seed_fotos():

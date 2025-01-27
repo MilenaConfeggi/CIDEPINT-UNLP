@@ -40,6 +40,7 @@
 <script>
 import axios from 'axios';
 import VueApexCharts from 'vue3-apexcharts';
+import { useAuthStore } from '@/stores/auth';
   
 export default {
     name: 'Statistics',
@@ -67,7 +68,15 @@ export default {
     methods: {
         async fetchApiData() {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_API_URL}/estadisticas`);
+                const authStore = useAuthStore();
+                const token = authStore.getToken();
+                const response = await axios.get(`${import.meta.env.VITE_API_URL}/estadisticas`,{
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    },
+                }
+                );
                 this.apiData = response.data;
                 this.prepareChartData();
             } catch (error) {
@@ -128,7 +137,15 @@ export default {
                 formData.append('startDate', this.startDate);
                 formData.append('endDate', this.endDate);
 
-                const response = await axios.post(`${import.meta.env.VITE_API_URL}/estadisticas/ensayos`, formData);
+                const authStore = useAuthStore();
+                const token = authStore.getToken();
+
+                const response = await axios.post(`${import.meta.env.VITE_API_URL}/estadisticas/ensayos`, formData,{
+                    headers: {
+                    "Authorization": `Bearer ${token}`,
+                    },
+                }
+                );
 
                 this.apiData.ensayos = response.data;
     

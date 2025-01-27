@@ -31,3 +31,8 @@ def crear_documento(data):
     db.session.add(nuevo_documento)
     db.session.commit()
     return nuevo_documento
+
+def eliminar_documento(nombre):
+    doc = Documento.query.filter_by(Documento.nombre_documento == nombre).first()
+    db.session.remove(doc)
+    db.session.commit()

@@ -61,7 +61,7 @@ const logout = () => {
 </script>
 
 <template>
-  <div>
+  <div class="d-flex flex-column min-vh-100">
     <nav v-if="showNavbar" class="navbar">
       <RouterLink to="/" class="navbar-brand">
         <img alt="Vue logo" class="logo" src="@/assets/Logo.png" width="50" height="50" />
@@ -99,11 +99,33 @@ const logout = () => {
         </button>
       </div>
     </nav>
-    <main>
+    <main class="flex-grow-1">
       <RouterView />
     </main>
+    <footer class="bg-light text-center border py-4 mt-auto">
+      <div class="container">
+        <div class="row">
+          <div class="col d-flex justify-content-start">
+            <a href="https://unlp.edu.ar/" target="_blank" rel="noopener noreferrer">
+              <img alt="UNLP" src="@/assets/UNLP.png" class="img-fluid" width="150" height="150" />
+            </a>
+          </div>
+          <div class="col d-flex justify-content-center">
+            <a href="https://www.cic.gba.gob.ar/" target="_blank" rel="noopener noreferrer">
+              <img alt="CIC" src="@/assets/CIC.png" class="img-fluid" width="150" height="150" />
+            </a>
+          </div>
+          <div class="col d-flex justify-content-end">
+            <a href="https://www.conicet.gov.ar/" target="_blank" rel="noopener noreferrer">
+              <img alt="CONICET" src="@/assets/CONICET.png" class="img-fluid" width="150" height="150" style="margin-top: -10px;"/>
+            </a>
+          </div>
+        </div>
+      </div>
+    </footer>
   </div>
 </template>
+
 
 <style scoped>
 .navbar {

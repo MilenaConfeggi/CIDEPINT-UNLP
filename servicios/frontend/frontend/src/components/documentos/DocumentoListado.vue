@@ -1,5 +1,13 @@
 <template>
   <h1 class="text-center">Listado de documentos</h1>
+  <div class="d-flex justify-content-end">
+    <button @click="borrarFiltros()" class="btn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" viewBox="0 0 1024 1024">
+        <path fill="#0d6efd"
+          d="m899.1 869.6l-53-305.6H864c14.4 0 26-11.6 26-26V346c0-14.4-11.6-26-26-26H618V138c0-14.4-11.6-26-26-26H432c-14.4 0-26 11.6-26 26v182H160c-14.4 0-26 11.6-26 26v192c0 14.4 11.6 26 26 26h17.9l-53 305.6c-.3 1.5-.4 3-.4 4.4c0 14.4 11.6 26 26 26h723c1.5 0 3-.1 4.4-.4c14.2-2.4 23.7-15.9 21.2-30M204 390h272V182h72v208h272v104H204zm468 440V674c0-4.4-3.6-8-8-8h-48c-4.4 0-8 3.6-8 8v156H416V674c0-4.4-3.6-8-8-8h-48c-4.4 0-8 3.6-8 8v156H202.8l45.1-260H776l45.1 260z" />
+      </svg>
+    </button>
+  </div>
   <div class="flex flex-col justify-center items-center">
     <p v-if="loading">Cargando...</p>
     <p v-if="error">{{ error }}</p>
@@ -11,8 +19,8 @@
           {{ tipo?.nombre }}
         </option>
       </select>
-      <label v-if="area === ''" class="input-group-text" for="area">Areas</label>
-      <select v-model="area" v-if="areas && area === ''" class="form-select" id="area">
+      <label v-if="areaRol === ''" class="input-group-text" for="area">Areas</label>
+      <select v-model="area" v-if="areas && areaRol === ''" class="form-select" id="area">
         <option selected value="">Todos</option>
         <option v-for="area in areas" :key="area.id" :value="area.id">
           {{ area.nombre }}
@@ -148,6 +156,14 @@ const validateDates = () => {
     alert('La fecha no puede ser en el futuro.')
     fecha.value = ''
   }
+}
+
+const borrarFiltros = () => {
+  area.value = ''
+  ensayo.value = ''
+  empresa.value = ''
+  fecha.value = ''
+  tipo_documento.value = ''
 }
 
 const fetchDocumentos = async () => {

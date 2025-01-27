@@ -528,4 +528,3 @@ def seed_usuarios():
 
     db.session.commit()
 
-

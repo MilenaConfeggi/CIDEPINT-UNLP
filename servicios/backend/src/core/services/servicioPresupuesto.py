@@ -464,8 +464,9 @@ def crear_stan(data):
 
 def eliminar_stan(id):
     stan = STAN.query.get(id)
-    db.session.delete(stan)
-    db.session.commit()
+    if stan:
+        db.session.delete(stan)
+        db.session.commit()
 
 def validar_numero_stan(numero):
     stan = STAN.query.filter_by(numero=numero).first()

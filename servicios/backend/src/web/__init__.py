@@ -113,5 +113,27 @@ def create_app(env="development", static_folder=""):
         seedsCertificado.seed_distribuciones()
         print("Distribuciones creadas!")
 
+    @app.cli.command(name="seeds-finales-db")
+    def seeds_finales():
+        """
+        Comando para crear los seeds de la base de datos que va a ser entregado al CIDEPINT
+        """
+        seedsMedioPago.seeds_medio_pago()
+        print("Medios de pago creados!")
+        #seedsArea.seeds_areas()TODO HACER AREAS
+        #print("Areas creados!")
+        seedsEstados.seeds_estados()
+        print("Estados creados!")
+        seedsDocumento.seeds_tipos_documento()
+        print("Tipos de documentos creados!")
+        seedsStans.seeds_stans()#PREGUNTAR
+        print("Stans creados!")
+        seedsMuestra.seeds_muestras()
+        print("Muestras creadas!")
+        seedsEstadoInterarea.seeds_estados()
+        print("Estados de interareas creados!")
+        #seedsUsuario.seeds_usuarios()
+        #print("Usuarios creados!")
+
     return app
     

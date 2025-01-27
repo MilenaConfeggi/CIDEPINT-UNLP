@@ -14,7 +14,7 @@
   </RouterLink>
   <h2 class="mb-3 text-center mb-5">Crear legajo</h2>
   <form
-    ref="formulario"
+    ref="formRef"
     @submit.prevent="validateForm"
     class="row g-3 needs-validation"
     novalidate
@@ -139,6 +139,7 @@ import { useAreasStore } from '../../stores/areas'
 import { storeToRefs } from 'pinia'
 import { useToast } from 'vue-toastification';
 import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/stores/auth';
 
 export default {
   data() {
@@ -193,7 +194,7 @@ export default {
       }
     },
     async validateForm() {
-      const form = this.$refs.formulario;
+      const form = this.$refs.formRef
       if (form.checkValidity()) {
         const cliente = {
           email: this.form.email,

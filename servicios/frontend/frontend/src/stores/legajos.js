@@ -21,11 +21,11 @@ export const useLegajosStore = defineStore('legajos', {
       this.loading = true
       this.error = null
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/legajos/`, 
-          { 
-            headers: { Authorization: `Bearer ${token}`} 
-          },
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/legajos/`,
           {
+            headers: {
+              Authorization: `Bearer ${token}`
+            },
             params: {
               page,
               per_page,
@@ -36,7 +36,7 @@ export const useLegajosStore = defineStore('legajos', {
             },
           })
         this.legajos = response.data
-        console.log(response.data.pages)
+        console.log(response.data)
         this.totalPages = response.data.pages
       } catch (error) {
         this.error = error
@@ -52,8 +52,8 @@ export const useLegajosStore = defineStore('legajos', {
       this.error = null
       try {
         const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/legajos/${id}`,
-          { 
-            headers: { Authorization: `Bearer ${token}`} 
+          {
+            headers: { Authorization: `Bearer ${token}` }
           },
         )
         this.legajo = response.data
@@ -107,7 +107,7 @@ export const useLegajosStore = defineStore('legajos', {
           throw new Error('Error al habilitar el legajo')
         }
         else {
-          this.toast.success('Legajo habilitado para el area de administracion') 
+          this.toast.success('Legajo habilitado para el area de administracion')
         }
       } catch (error) {
         this.error = error

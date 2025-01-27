@@ -70,10 +70,7 @@ def validar_longitud(muestra):
 def validar_fecha(fecha):
     if isinstance(fecha, str):
         fecha = datetime.strptime(fecha, '%Y-%m-%d').date()
-    print(fecha)
-    print(datetime.now().date())
     if fecha > datetime.now().date():
-        print("entro")
         return False
     return True
 

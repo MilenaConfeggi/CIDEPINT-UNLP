@@ -1,15 +1,18 @@
 <template>
-  <div class="mt-3">
+  <div class="mt-3 d-flex justify-content-between">
     <RouterLink to="/legajos/newLegajo" class="hover:underline" v-if="hasPermission('crear_legajo')">
       <svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" viewBox="0 0 16 16">
-        <path
-          fill="currentColor"
-          fill-rule="evenodd"
+        <path fill="currentColor" fill-rule="evenodd"
           d="M3.5 1.5v13h5.75a.75.75 0 0 1 0 1.5H3a1 1 0 0 1-1-1V1a1 1 0 0 1 1-1h6.644a1 1 0 0 1 .72.305l3.355 3.476a1 1 0 0 1 .281.695V6.25a.75.75 0 0 1-1.5 0V6H9.75A1.75 1.75 0 0 1 8 4.25V1.5zm6 .07l2.828 2.93H9.75a.25.25 0 0 1-.25-.25zM13 15a.75.75 0 0 1-.75-.75v-1.5h-1.5a.75.75 0 0 1 0-1.5h1.5v-1.5a.75.75 0 0 1 1.5 0v1.5h1.5a.75.75 0 0 1 0 1.5h-1.5v1.5A.75.75 0 0 1 13 15"
-          clip-rule="evenodd"
-        />
+          clip-rule="evenodd" />
       </svg>
     </RouterLink>
+    <button @click="borrarFiltros()" class="btn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" viewBox="0 0 1024 1024">
+        <path fill="#0d6efd"
+          d="m899.1 869.6l-53-305.6H864c14.4 0 26-11.6 26-26V346c0-14.4-11.6-26-26-26H618V138c0-14.4-11.6-26-26-26H432c-14.4 0-26 11.6-26 26v182H160c-14.4 0-26 11.6-26 26v192c0 14.4 11.6 26 26 26h17.9l-53 305.6c-.3 1.5-.4 3-.4 4.4c0 14.4 11.6 26 26 26h723c1.5 0 3-.1 4.4-.4c14.2-2.4 23.7-15.9 21.2-30M204 390h272V182h72v208h272v104H204zm468 440V674c0-4.4-3.6-8-8-8h-48c-4.4 0-8 3.6-8 8v156H416V674c0-4.4-3.6-8-8-8h-48c-4.4 0-8 3.6-8 8v156H202.8l45.1-260H776l45.1 260z" />
+      </svg>
+    </button>
   </div>
   <div class="flex flex-col justify-center items-center mt-4">
     <p v-if="error">{{ error }}</p>
@@ -24,16 +27,10 @@
         </option>
       </select>
       <span class="input-group-text">Empresa</span>
-      <input v-model="empresa" type="text" aria-label="nombre del cliente" class="form-control" placeholder="Ingresar nombre de empresa." />
+      <input v-model="empresa" type="text" aria-label="nombre del cliente" class="form-control"
+        placeholder="Ingresar nombre de empresa." />
       <label class="input-group-text" for="date">Fecha de carga</label>
-      <input
-        id="date"
-        type="date"
-        v-model="fecha"
-        @input="validateDates"
-        :max="today"
-        placeholder="Fecha de inicio"
-      />
+      <input id="date" type="date" v-model="fecha" @input="validateDates" :max="today" placeholder="Fecha de inicio" />
     </div>
     <div v-if="legajos.items?.length && !error">
       <table class="table table-hover table-bordered">
@@ -59,7 +56,9 @@
               </div>
             </td>
             <td>{{ legajo.area.nombre }}</td>
-            <td><StateBadge :state="legajo.estado?.nombre" /></td>
+            <td>
+              <StateBadge :state="legajo.estado?.nombre" />
+            </td>
             <td>
               <RouterLink :to="`/legajos/${legajo.id}`" class="btn btn-primary mr-3" v-if="hasPermission('ver_legajo')">
                 Ver detalle
@@ -80,12 +79,7 @@
               Anterior
             </button>
           </li>
-          <li
-            v-for="page in totalPages"
-            :key="page"
-            class="page-item"
-            :class="{ active: currentPage === page }"
-          >
+          <li v-for="page in totalPages" :key="page" class="page-item" :class="{ active: currentPage === page }">
             <button class="page-link" @click="goToPage(page)">{{ page }}</button>
           </li>
           <li class="page-item" :class="{ disabled: currentPage === totalPages }">
@@ -138,6 +132,13 @@ const validateDates = () => {
   }
 }
 
+const borrarFiltros = () => {
+  area.value = ''
+  ensayo.value = ''
+  empresa.value = ''
+  fecha.value = ''
+}
+
 const fetchLegajos = async () => {
   const params = {
     area: userRol.value === '' ? area.value : userRol.value,
@@ -185,8 +186,10 @@ watch([ensayo, area, empresa, fecha, currentPage], () => {
   width: 100%;
   margin: auto;
   border-collapse: collapse;
-  background-color: #f9f9f9; /* Fondo claro para la tabla */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra para la tabla */
+  background-color: #f9f9f9;
+  /* Fondo claro para la tabla */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  /* Sombra para la tabla */
 }
 
 .table th,
@@ -194,7 +197,8 @@ watch([ensayo, area, empresa, fecha, currentPage], () => {
   text-align: center;
   vertical-align: middle;
   padding: 10px;
-  border: 1px solid #ddd; /* Bordes ligeros para las celdas */
+  border: 1px solid #ddd;
+  /* Bordes ligeros para las celdas */
 }
 
 .table-hover tbody tr:hover {

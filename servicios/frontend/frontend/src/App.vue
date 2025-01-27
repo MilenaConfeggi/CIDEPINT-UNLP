@@ -37,7 +37,6 @@ const tienePermisoVerEstadisticas = computed(() => {
 
 // Computada para verificar si el usuario está logueado
 const estaLogueado = computed(() => {
-  console.log(token.value);
   return !!token.value; // Si el token existe, significa que el usuario está logueado
 });
 

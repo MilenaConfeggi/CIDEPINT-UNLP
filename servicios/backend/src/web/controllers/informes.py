@@ -5,7 +5,7 @@ import os
 from werkzeug.utils import secure_filename
 from models.base import db
 from models.documentos.documento import Documento
-from models.legajos import legajo_informado
+from models.legajos import legajo_informado, legajo_en_curso
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 bp = Blueprint("informes", __name__, url_prefix="/informes")
@@ -23,6 +23,7 @@ def cargar_documentacion(id_legajo):
     if(servicioInforme.buscar_documentacion_por_legajo(id_legajo)):
         servicioInforme.eliminar_documentacion_anterior(id_legajo)
         servicioInforme.eliminar_informe_anterior(id_legajo)
+        legajo_en_curso(id_legajo)
         mensaje = "Se ha eliminado la documentación anterior e informes en caso de que los hubiera"
     else:
         mensaje = " "
@@ -93,7 +94,7 @@ def cargar_informe(id_legajo):
         return jsonify({"error": "No hay documentación para este legajo"}), 404
     
     servicioInforme.cambiar_estado_documentacion(id_legajo)
-    
+    legajo_en_curso(id_legajo)
     try:
         filename = secure_filename(archivo.filename).replace(" ", "_")  # Reemplazar espacios con guion bajo
         user = get_jwt_identity()
@@ -160,6 +161,7 @@ def cargar_informe_firmado(id_legajo):
         user = get_jwt_identity()
         usuario = servicioUsuario.obtener_usuario_por_mail(user)
         if servicioUsuario.es_jefe_de_area(usuario):
+            legajo_en_curso(id_legajo)
             doc_data = {
                 'nombre_documento': filename,
                 'estado_id': 7,

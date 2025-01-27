@@ -106,7 +106,6 @@ def enviar_correo_con_link_y_pdf():
     link = request.get_json().get("link")
     legajo_id = request.get_json().get("legajo_id")
     doc_id = request.get_json().get("arch")
-    print(doc_id)
     doc = get_documento(doc_id)
     if doc is None:
         return jsonify({"error": "No se encontro el documento"}), 404

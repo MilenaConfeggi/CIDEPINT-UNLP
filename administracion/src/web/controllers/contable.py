@@ -84,8 +84,6 @@ def mostrar_fondo(fondo_id):
     if not fond:
         return redirect(url_for('contable.index'))
     ingresos = ingresoDB.get_ingresos_del_fondo(fondo_id)
-    #ingresos = ingresoDB.listar_ingresos()
-    #print(ingresos[1].receptor_id)
     return render_template("contable/detalle_fondo.html", fondo=fond,ingresos=ingresos,form=form)
 
 
@@ -201,7 +199,7 @@ def get_legajos():
     params = request.args.to_dict()
     page = request.args.get("page", 1, type=int)
     per_page = 10
-    legajos = legajoDB.list_legajos(page, per_page,None,None,True)
+    legajos = legajoDB.list_legajos(page, per_page,None,None,None,True)
     #legajos = [legajo for legajo in legajos if legajo.necesita_facturacion]
     forms = {}
     for legajo in legajos:
@@ -215,7 +213,6 @@ def get_legajos():
         if((params.get('filtro') and params['filtro'] =="SinDistribucion" and distribuciones == [] )or not params.get('filtro')):
             resultado.append({
                 "id": legajo.id,
-                "nro_legajo": legajo.nro_legajo,
                 "cliente": legajo.cliente,
                 "documentos": documentos,
                 "distribuciones" : distribuciones
@@ -246,8 +243,6 @@ def crear_distribucion(id):
         data = request.form.to_dict()
         empleados_ids = form.empleados_seleccionados.data
         porcentaje_empleados = round(float(data["porcentaje_empleados"]) * 0.01, 4)
-        print(empleados_ids)
-        print(porcentaje_empleados)
         if porcentaje_empleados == 0 and len(empleados_ids) > 0:
             flash("El porcentaje de empleados no puede ser 0 si se seleccionaron empleados", "error")
             return redirect(url_for("contable.get_crear_distribucion",id=id))
@@ -336,7 +331,6 @@ def delete_distribucion():
     colaboradores = [empleado for empleado in empleados if empleado.user.rol == "Colaborador" or empleado.user.rol == "Administrador"]
     for colaborador in colaboradores:
         colaborador.saldo -= (((monto_modificado * (1 - porcentaje_area)) * 0.05) / len(colaboradores))
-        print("saldo restado a colaboradro:" ,(((monto_modificado * (1 - porcentaje_area)) * 0.05) / len(colaboradores)))
 
     empleados_ids = [ed.empleado_id for ed in distribucion.empleados_asociados]
     if empleados_ids:
@@ -373,7 +367,6 @@ def upload():
     file = request.files['file']
     tipo = request.form['tipo']
     legajo_id = request.form['legajo_id']
-    print(f'id del legajo: {legajo_id}')
     if file.filename == '':# or not file.filename.endswith('.pdf'):
         flash("El archivo tiene que terner nombre o/y una extensión valida", "error")
         return redirect(url_for("contable.get_legajos"))
@@ -441,7 +434,6 @@ def upload():
 @role_required('Administrador', 'Colaborador')
 def delete_document():
     documento_id = request.form.get("documento_id")
-    print(documento_id)
     documento = get_documento(documento_id)
     if documento is None:
         return jsonify({"error": "No se encontro el archivo"}), 404

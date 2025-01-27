@@ -139,6 +139,7 @@ import { useAreasStore } from '../../stores/areas'
 import { storeToRefs } from 'pinia'
 import { useToast } from 'vue-toastification';
 import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/stores/auth';
 
 export default {
   data() {

@@ -135,7 +135,6 @@ def upload():
                 return jsonify({"error": "No se pudo crear el documento"}), 400
 
             file.save(str(file_path))
-            print(nro_factura)
             if nro_factura:
                 legajo = find_legajo_by_id(legajo_id)
                 if legajo is None:
@@ -219,7 +218,6 @@ def get_documento(id):
 
 @bp.get("/list/<int:tipo>")
 def get_documentos_by_tipo(tipo):
-    print("entra")
     data = documentos_schema.dump(list_documentos_by_tipo(tipo))
     return jsonify(data), 200
 
@@ -238,6 +236,5 @@ def view_adicional(id):
     filename = documento.nombre_documento
     file_path = os.path.join(directory, filename)
     if not os.path.exists(file_path):
-        print("No existe")
         abort(404, description="El documento no existe, prueba generar uno primero")
     return send_from_directory(directory, filename)

@@ -467,7 +467,6 @@ const cargarFactura = (id) => {
 
 const handleFileUpload = async (event, id, legajoId, editar = false) => {
   const file = event.target.files[0]
-  console.log(id)
   if (file && file.type === 'application/pdf') {
     try {
       fileName.value = file.name
@@ -516,7 +515,6 @@ const viewFile = async (id, tipo) => {
 
     // Crear una URL para visualizar el archivo
     const blob = new Blob([response.data], { type: response.headers['content-type'] })
-    console.log(response.data)
     fileUrl.value = URL.createObjectURL(blob)
     window.open(fileUrl.value, '_blank')
   } catch (error) {

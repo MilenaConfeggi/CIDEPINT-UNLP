@@ -274,7 +274,7 @@ def seed_usuarios():
     db.session.add(usuario6)
     db.session.add(usuario7)
 
-        db.session.commit()
+    db.session.commit()
     
     def seed_usuarios_finales():
 

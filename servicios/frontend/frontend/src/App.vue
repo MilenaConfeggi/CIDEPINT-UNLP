@@ -1,71 +1,13 @@
-<script setup>
-import { RouterLink, RouterView, useRoute } from 'vue-router';
-import { useAuthStore } from '@/stores/auth'; // Importa tu store de autenticación
-import { ref, computed, watchEffect } from 'vue';
-
-
-const authStore = useAuthStore();
-const route = useRoute();
-
-// Recuperar el token desde el store o localStorage
-const token = ref(authStore.getToken() || localStorage.getItem('access_token'));
-
-// Recuperar los permisos desde localStorage
-const permisos = ref(JSON.parse(localStorage.getItem('permisos')) || []);
-
-const hasPermission = (permiso) => {
-  return permisos.value.includes(permiso)
-}
-
-// Computada para verificar si el usuario tiene el permiso "listar_stans"
-const tienePermisoListarStans = computed(() => {
-  return permisos.value.includes('listar_stans');
-});
-
-// Computada para verificar si el usuario tiene el permiso "listar_usuarios"
-const tienePermisoListarUsuarios = computed(() => {
-  return permisos.value.includes('listar_usuarios');
-});
-
-const tienePermisoPendientes = computed(() => {
-  return permisos.value.includes('ver_pendientes');
-});
-
-const tienePermisoVerEstadisticas = computed(() => {
-  return permisos.value.includes('ver_estadisticas');
-});
-
-// Computada para verificar si el usuario está logueado
-const estaLogueado = computed(() => {
-  return !!token.value; // Si el token existe, significa que el usuario está logueado
-});
-
-const showNavbar = computed(() => {
-  return route.meta.showNavbar
-});
-
-// WatchEffect para actualizar los permisos cuando cambien en localStorage
-watchEffect(() => {
-  permisos.value = JSON.parse(localStorage.getItem('permisos')) || [];
-});
-
-const logout = () => {
-  authStore.removeToken();
-  localStorage.removeItem('access_token'); // Remove the token from localStorage
-  localStorage.removeItem('permisos');
-  localStorage.removeItem('area');
-  location.reload(); // Recarga la página para que se aplique el guard
-  console.log('Logout');
-};
-</script>
-
 <template>
   <div class="d-flex flex-column min-vh-100">
     <nav v-if="showNavbar" class="navbar">
       <RouterLink to="/" class="navbar-brand">
         <img alt="Vue logo" class="logo" src="@/assets/Logo.png" width="50" height="50" />
       </RouterLink>
-      <div class="nav-links">
+      <button class="navbar-toggler" @click="toggleMenu">
+        <i class="fas fa-bars"></i>
+      </button>
+      <div :class="['nav-links', { 'nav-links-mobile': isMenuOpen }]">
         <RouterLink to="/" class="nav-item">
           <i class="fas fa-home"></i> Home
         </RouterLink>
@@ -125,6 +67,64 @@ const logout = () => {
   </div>
 </template>
 
+<script setup>
+import { RouterLink, RouterView, useRoute } from 'vue-router';
+import { useAuthStore } from '@/stores/auth'; // Importa tu store de autenticación
+import { ref, computed, watchEffect } from 'vue';
+
+const authStore = useAuthStore();
+const route = useRoute();
+
+const token = ref(authStore.getToken() || localStorage.getItem('access_token'));
+const permisos = ref(JSON.parse(localStorage.getItem('permisos')) || []);
+
+const hasPermission = (permiso) => {
+  return permisos.value.includes(permiso);
+}
+
+const tienePermisoListarStans = computed(() => {
+  return permisos.value.includes('listar_stans');
+});
+
+const tienePermisoListarUsuarios = computed(() => {
+  return permisos.value.includes('listar_usuarios');
+});
+
+const tienePermisoPendientes = computed(() => {
+  return permisos.value.includes('ver_pendientes');
+});
+
+const tienePermisoVerEstadisticas = computed(() => {
+  return permisos.value.includes('ver_estadisticas');
+});
+
+const estaLogueado = computed(() => {
+  return !!token.value;
+});
+
+const showNavbar = computed(() => {
+  return route.meta.showNavbar;
+});
+
+watchEffect(() => {
+  permisos.value = JSON.parse(localStorage.getItem('permisos')) || [];
+});
+
+const logout = () => {
+  authStore.removeToken();
+  localStorage.removeItem('access_token');
+  localStorage.removeItem('permisos');
+  localStorage.removeItem('area');
+  location.reload();
+  console.log('Logout');
+};
+
+const isMenuOpen = ref(false);
+
+const toggleMenu = () => {
+  isMenuOpen.value = !isMenuOpen.value;
+};
+</script>
 
 <style scoped>
 .navbar {
@@ -134,6 +134,8 @@ const logout = () => {
   background-color: #962929;
   padding: 1rem;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  position: relative; /* Asegura que el menú desplegable se posicione correctamente */
+  z-index: 1000; /* Asegura que la navbar esté por encima de otros elementos */
 }
 
 .navbar-brand {
@@ -147,9 +149,31 @@ const logout = () => {
   margin-right: 1rem;
 }
 
+.navbar-toggler {
+  display: none;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
 .nav-links {
   display: flex;
   gap: 1rem;
+}
+
+.nav-links-mobile {
+  display: none;
+  flex-direction: column; /* Cambia la dirección del flex a columna */
+  gap: 0.5rem; /* Reduce el espacio entre los elementos */
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background-color: #962929;
+  padding: 0.5rem; /* Reduce el padding */
+  z-index: 1001; /* Asegura que el menú desplegable esté por encima de otros elementos */
 }
 
 .nav-item {
@@ -158,7 +182,7 @@ const logout = () => {
   cursor: pointer;
   display: flex;
   align-items: center;
-  padding: 0.5rem 1rem;
+  padding: 0.5rem; /* Reduce el padding */
   border-radius: 5px;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
@@ -177,7 +201,7 @@ const logout = () => {
   font-size: 1rem;
   display: flex;
   align-items: center;
-  padding: 0.5rem 1rem;
+  padding: 0.5rem; /* Reduce el padding */
   border-radius: 5px;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
@@ -193,5 +217,19 @@ const logout = () => {
 
 main {
   padding: 1rem;
+}
+
+@media (max-width: 768px) {
+  .navbar-toggler {
+    display: block;
+  }
+
+  .nav-links {
+    display: none;
+  }
+
+  .nav-links-mobile {
+    display: flex;
+  }
 }
 </style>

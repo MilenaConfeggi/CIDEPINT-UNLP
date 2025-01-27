@@ -39,6 +39,7 @@ def list_legajos(page=1, per_page=10, empresa=None, fecha=None, area=None, ensay
         query = query.filter(Legajo.necesita_facturacion)
     if admin:
         query = query.filter(Legajo.admin_habilitado)
+    query = query.order_by(Legajo.fecha_entrada.desc())
     return query.paginate(page=page, per_page=per_page, error_out=False)
 
 

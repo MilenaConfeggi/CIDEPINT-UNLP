@@ -265,15 +265,6 @@
                             </button>
                           </li>
                           <li v-if="existeDocumento(documento.nombre)">
-                            <button
-                              type="button"
-                              class="dropdown-item"
-                              @click="downloadDocumento(documento.id, legajo.id)"
-                            >
-                              Descargar
-                            </button>
-                          </li>
-                          <li v-if="existeDocumento(documento.nombre)">
                             <label :for="`edit-pdf-${documento.id}`" class="dropdown-item">
                               Editar
                               <input
@@ -490,16 +481,6 @@ const handleFileUpload = async (event, id, legajoId, editar = false) => {
 }
 const existeDocumento = (nombreDocumento) => {
   return legajo.value.documento?.some((doc) => doc.tipo_documento.nombre === nombreDocumento)
-}
-
-const downloadDocumento = async (tipo, legajo_id) => {
-  actualFile.value = legajo.value.documento.find((doc) => doc.tipo_documento_id === tipo)
-  const response = await documentosStore.download(
-    actualFile.value.nombre_documento,
-    tipo,
-    legajo_id,
-  )
-  console.log(response)
 }
 
 const viewFile = async (id, tipo) => {

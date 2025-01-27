@@ -1,6 +1,12 @@
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import validates
 from datetime import datetime
+from models.usuarios.usuario import Usuario
+from models.usuarios.rol import Rol
+from models.usuarios.rol_permiso import RolPermiso
+from models.usuarios.permiso import Permiso
+
+
 from models.compras.compra_empleado import compra_empleado
 from models.base import db
 

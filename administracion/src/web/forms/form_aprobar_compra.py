@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import SelectField, FloatField, FieldList, FormField
 from wtforms.validators import DataRequired
 from administracion.src.core.servicios.personal import listar_empleados, listar_areas
-from administracion.src.core.fondos.fondo import listar_fondos 
+from administracion.src.core.fondos.fondo import listar_fondos_activos 
 class FormularioEmpleado(FlaskForm):
     id_empleado = SelectField('Empleado', choices=[], coerce=int, validators=[DataRequired()])
     monto = FloatField('Monto', validators=[DataRequired()])
@@ -25,7 +25,7 @@ class FormularioFondo(FlaskForm):
 
     def __init__(self, *args, **kwargs):
         super(FormularioFondo, self).__init__(*args, **kwargs)
-        self.id_fondo.choices = [(fondo.id, fondo.titulo) for fondo in listar_fondos()]
+        self.id_fondo.choices = [(fondo.id, fondo.titulo) for fondo in listar_fondos_activos()]
 
 
 class form_aprobar_compra(FlaskForm):

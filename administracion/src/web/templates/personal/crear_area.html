@@ -3,7 +3,14 @@
     Crear Área
 {% endblock %}
 {% block content %}
-
+<a href="{{url_for('area.listar_areas')}}"
+    class="inline-flex items-center px-3 py-4 rounded-md text-black-500 hover:bg-black-50">
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-6 w-6">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h18">
+        </path>
+    </svg>
+    <span class="ml-1 font-bold text-lg">Volver</span>
+</a>
 <div class="h-full w-full flex justify-center items-center flex-col px-4 mt-20">
     <form id="crearAreaForm" action="{{ url_for('area.crear_area') }}" method="POST" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full max-w-lg">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">

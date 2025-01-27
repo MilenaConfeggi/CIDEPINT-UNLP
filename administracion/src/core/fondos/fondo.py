@@ -5,6 +5,15 @@ def listar_fondos():
 
     return Fondo.query.all()
 
+def listar_fondos_activos():
+    """
+    Obtiene todos los fondos activos en la base de datos.
+
+    Returns:
+        List[Fondo]: Una lista de objetos Fondo activos.
+    """
+    return Fondo.query.filter_by(borrado=False).all()
+
 
 def filtrar_fondos(page, per_page):
     return Fondo.query.filter_by(borrado=False).order_by(Fondo.titulo.asc()).paginate(page=page, per_page=per_page, error_out=False)

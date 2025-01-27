@@ -109,9 +109,9 @@
             <td class="px-4 py-3 text-sm"">{{ empleado.nombre }}</td>
             <td class="px-4 py-3 text-sm">{{ empleado.apellido }}</td>
             <td class="px-4 py-3 text-sm">{{ empleado.dni }}</td>
-            <td class="px-4 py-3 text-sm">{{ empleado.dependencia }}</td>
+            <td class="px-4 py-3 text-sm">{% if empleado.dependencia %} {{ empleado.dependencia }} {% endif %}</td>
             <td class="px-4 py-3 text-sm">{{ empleado.area.nombre }}</td>
-            <td class="px-4 py-3 text-sm">{{ empleado.cargo }}</td>
+            <td class="px-4 py-3 text-sm">{% if empleado.cargo %} {{ empleado.cargo }} {% endif %}</td>
             <td class="px-4 py-3">
               <div class="flex items-center space-x-4 text-sm">
                   <a href="{{ url_for('personal.ver_perfil', id=empleado.id) }}"

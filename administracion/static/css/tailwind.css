@@ -1985,12 +1985,6 @@ input:checked + .toggle-bg {
   margin-bottom: calc(3rem * var(--tw-space-y-reverse));
 }
 
-.space-y-4 > :not([hidden]) ~ :not([hidden]) {
-  --tw-space-y-reverse: 0;
-  margin-top: calc(1rem * calc(1 - var(--tw-space-y-reverse)));
-  margin-bottom: calc(1rem * var(--tw-space-y-reverse));
-}
-
 .space-y-6 > :not([hidden]) ~ :not([hidden]) {
   --tw-space-y-reverse: 0;
   margin-top: calc(1.5rem * calc(1 - var(--tw-space-y-reverse)));
@@ -2997,11 +2991,6 @@ input:checked + .toggle-bg {
   color: rgb(88 80 236 / var(--tw-text-opacity, 1));
 }
 
-.hover\:text-red-700:hover {
-  --tw-text-opacity: 1;
-  color: rgb(200 30 30 / var(--tw-text-opacity, 1));
-}
-
 .hover\:text-red-900:hover {
   --tw-text-opacity: 1;
   color: rgb(119 29 29 / var(--tw-text-opacity, 1));
@@ -3383,6 +3372,11 @@ input:checked + .toggle-bg {
   .sm\:px-0 {
     padding-left: 0px;
     padding-right: 0px;
+  }
+
+  .sm\:px-10 {
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
   }
 
   .sm\:px-4 {

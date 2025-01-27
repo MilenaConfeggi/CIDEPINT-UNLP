@@ -106,10 +106,10 @@
             const dropzone = document.getElementById('dropzone');
             const fileInput = document.getElementById('dropzone-file');
             const fileListContainer = document.getElementById('file-list');
-    
+        
             // Mantén una referencia a los archivos seleccionados
             let fileArray = [];
-    
+        
             // Actualiza la vista previa de los archivos seleccionados
             function updateFileList() {
                 fileListContainer.innerHTML = ''; // Limpiamos la lista
@@ -122,7 +122,7 @@
                     `;
                     fileListContainer.appendChild(fileItem);
                 });
-    
+        
                 // Actualizar eventos para eliminar archivos
                 document.querySelectorAll('.remove-file').forEach(button => {
                     button.addEventListener('click', (e) => {
@@ -131,43 +131,57 @@
                         updateFileList(); // Actualizar la vista
                     });
                 });
-    
+        
                 // Sincroniza los archivos con el input real
                 syncInputFiles();
             }
-    
+        
             // Sincroniza el input de archivos con la lista en memoria
             function syncInputFiles() {
                 const dataTransfer = new DataTransfer(); // Crear una instancia para archivos virtuales
                 fileArray.forEach(file => dataTransfer.items.add(file)); // Añadir archivos
                 fileInput.files = dataTransfer.files; // Actualizar los archivos del input
             }
-    
+        
             // Manejador para arrastrar y soltar
             dropzone.addEventListener('dragover', (e) => {
                 e.preventDefault();
                 dropzone.classList.add('border-blue-500');
             });
-    
+        
             dropzone.addEventListener('dragleave', () => {
                 dropzone.classList.remove('border-blue-500');
             });
-    
+        
             dropzone.addEventListener('drop', (e) => {
                 e.preventDefault();
+                console.log('Chau')
                 dropzone.classList.remove('border-blue-500');
                 const files = Array.from(e.dataTransfer.files);
                 fileArray = fileArray.concat(files); // Agregar nuevos archivos sin reemplazar
                 updateFileList(); // Actualizamos la vista
             });
-    
-    
+        
             // Manejador para seleccionar archivos desde el explorador
             fileInput.addEventListener('change', (e) => {
+                console.log('Hola')
                 const files = Array.from(fileInput.files);
-                fileArray = fileArray.concat(files); // Agregar nuevos archivos a la lista
+        
+                // Verificar si hay archivos nuevos y evitar duplicados
+                files.forEach(file => {
+                    if (!fileArray.some(existingFile => existingFile.name === file.name && existingFile.size === file.size)) {
+                        fileArray.push(file); // Añadir si no está ya en la lista
+                    }
+                });
+        
+                fileInput.value = ''; // Limpiamos el input después de procesar los archivos
                 updateFileList();
             });
-        });
+        
+            // Solución adicional: limpiar input al cancelar selección
+            fileInput.addEventListener('click', () => {
+                fileInput.value = ''; // Resetear siempre que el input sea clickeado
+            });
+        });                
     </script>
 {% endblock %}

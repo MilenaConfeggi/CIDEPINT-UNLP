@@ -3,8 +3,15 @@
     Registrar Usuario
 {% endblock %}
 {% block content %}
-
-<div class="container mx-auto px-4 py-8">
+<a href="{{url_for('personal.ver_empleados')}}"
+  class="inline-flex items-center px-3 py-2 rounded-md text-black-500 hover:bg-black-50">
+  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-6 w-6">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h18">
+      </path>
+  </svg>
+  <span class="ml-1 font-bold text-lg">Volver</span>
+</a>
+<div class="container mx-auto px-4 pb-4">
 
   <h1 class="text-2xl font-bold my-4">Registrar Usuario</h1>
   
@@ -14,7 +21,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {% for campo in campos %}
         <div>
-          <label for="{{ campo.name }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ campo.label }}</label>
+          <label for="{{ campo.name }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ campo.label }}{% if campo.required %} <span class="text-red-500">*</span> {% endif %}</label>
           {% if campo.type == 'textarea' %}
             <textarea
               id="{{ campo.name }}"
@@ -29,7 +36,6 @@
               name="{{ campo.name }}"
               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               {% if campo.required %} required {% endif %}
-              {% if campo.name == 'subdivision_cargo' %} required {% endif %}
             >
               {% if campo.name == 'subdivision_cargo' %}
                 <!-- Las opciones se llenarán dinámicamente con JavaScript -->
@@ -62,7 +68,7 @@
       {% endfor %}
     </div>
 
-    <div class="flex items-center justify-between mt-6">
+    <div class="flex items-center justify-end mt-6">
       <button
         type="submit"
         class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
@@ -99,9 +105,11 @@
           optionElement.textContent = option;
           subdivisionCargoSelect.appendChild(optionElement);
         });
-        subdivisionCargoContainer.classList.remove('hidden');
+        subdivisionCargoSelect.setAttribute('required', 'required');
+        console.log('Hola');
+        console.log(subdivisionCargoSelect);
       } else {
-        subdivisionCargoContainer.classList.add('hidden');
+        subdivisionCargoSelect.removeAttribute('required');
       }
     }
 

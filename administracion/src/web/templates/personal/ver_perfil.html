@@ -5,102 +5,130 @@
 {% block content %}
 
 <div class="container mx-auto px-4">
-
-  <h1 class="text-2xl font-bold mb-4">Perfil de Usuario</h1>
-  
-  <form action="{{ url_for('personal.ver_perfil', id=user.id) }}" method="POST" enctype="multipart/form-data" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 grid grid-cols-2 md:grid-cols-4 gap-4">
+{% if current_user.id != user.id %}
+  <a href="{{url_for('personal.ver_empleados')}}"
+    class="inline-flex items-center px-3 py-4 rounded-md text-black-500 hover:bg-black-50">
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-6 w-6">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h18">
+        </path>
+    </svg>
+    <span class="ml-1 font-bold text-lg">Volver</span>
+  </a>
+{% endif %}
+  <div class="flex justify-between w-full items-center">
+    <h1 class="text-2xl font-bold mb-4">Perfil de Usuario</h1>
+    {% if current_user.id != user.id %}
+      {% if user.habilitado %}
+        <form id="inhabilitar-usuario-form" action="{{ url_for('personal.inhabilitar_usuario', id=user.id) }}" method="POST" class="mt-4 mb-4">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="button" id="inhabilitar-usuario-btn" class="bg-red-500 text-white px-4 py-2 rounded">Inhabilitar Usuario</button>
+        </form>
+      {% else %}
+        <form id="habilitar-usuario-form" action="{{ url_for('personal.habilitar_usuario', id=user.id) }}" method="POST" class="mt-4 mb-4">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="button" id="habilitar-usuario-btn" class="bg-green-500 text-white px-4 py-2 rounded">Habilitar Usuario</button>
+        </form>
+      {% endif %}
+    {% endif %}
+  </div>
+  <form action="{{ url_for('personal.ver_perfil', id=user.id) }}" method="POST" enctype="multipart/form-data" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <input type="hidden" name="form_type" value="update_profile">
     
-    {% for campo in campos %}
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {% for campo in campos %}
+        <div class="mb-4">
+          <label class="block text-gray-700 text-sm font-bold mb-2">{{ campo.label }}:</label>
+          {% if campo.type == 'textarea' %}
+            <textarea name="{{ campo.name }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">{{ campo.value }}</textarea>
+          {% elif campo.type == 'select' %}
+            <select name="{{ campo.name }}" id="{{ campo.name }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" {% if campo.disabled %}disabled{% endif %}>
+              {% for option in campo.options %}
+                {% if campo.name == 'area_id' %}
+                  <option value="{{ option.id }}" {% if option.id == campo.value %}selected{% endif %}>{{ option.nombre }}</option>
+                {% else %}
+                  <option value="{{ option }}" {% if option == campo.value %}selected{% endif %}>{{ option }}</option>
+                {% endif %}
+              {% endfor %}
+            </select>
+          {% else %}
+            <input type="{{ campo.type }}" name="{{ campo.name }}" value="{{ campo.value }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" {% if campo.disabled %}disabled{% endif %}>
+          {% endif %}
+        </div>
+      {% endfor %}
+      
+      {% if current_user.id == user.id %}
       <div class="mb-4">
-        <label class="block text-gray-700 text-sm font-bold mb-2">{{ campo.label }}:</label>
-        {% if campo.type == 'textarea' %}
-          <textarea name="{{ campo.name }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">{{ campo.value }}</textarea>
-        {% elif campo.type == 'select' %}
-          <select name="{{ campo.name }}" id="{{ campo.name }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" {% if campo.disabled %}disabled{% endif %}>
-            {% for option in campo.options %}
-              {% if campo.name == 'area_id' %}
-                <option value="{{ option.id }}" {% if option.id == campo.value %}selected{% endif %}>{{ option.nombre }}</option>
-              {% else %}
-                <option value="{{ option }}" {% if option == campo.value %}selected{% endif %}>{{ option }}</option>
-              {% endif %}
-            {% endfor %}
-          </select>
-        {% else %}
-          <input type="{{ campo.type }}" name="{{ campo.name }}" value="{{ campo.value }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" {% if campo.disabled %}disabled{% endif %}>
-        {% endif %}
+        <label class="block text-gray-700 text-sm font-bold mb-2">Contraseña:</label>
+        <input type="password" name="password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
       </div>
-    {% endfor %}
-    
-    {% if current_user.id == user.id %}
-    <div class="mb-4">
-      <label class="block text-gray-700 text-sm font-bold mb-2">Contraseña:</label>
-      <input type="password" name="password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+      {% endif %}
+      
+      <div class="mb-4">
+        <label class="text-gray-700 text-sm font-bold mb-2">Saldo Actual:</label>
+        <p>{{ user.empleado.saldo }}</p>
+      </div>
+      <div class="mb-4">
+        <label class="text-gray-700 text-sm font-bold mb-2">Saldo de su Área:</label>
+        <p>{{ saldo_area }}</p>
+      </div>
     </div>
-    {% endif %}
-    
-    <div class="mb-4 col-span-2">
-      <label class="block text-gray-700 text-sm font-bold mb-2">Saldo Actual:</label>
-      <p>{{ user.empleado.saldo }}</p>
-    </div>
-    <div class="mb-4 col-span-2">
-      <label class="block text-gray-700 text-sm font-bold mb-2">Saldo de su Área:</label>
-      <p>{{ saldo_area }}</p>
-    </div>
-    <div class="flex items-center sm:justify-end col-span-2 w-full justify-center">
-      <button type="submit" id="guardar-cambios-btn" class="bg-blue-500 text-white px-4 py-2 rounded-full">Guardar Cambios</button>
+
+    <div class="flex items-center sm:justify-end w-full justify-end">
+      <button type="submit" id="guardar-cambios-btn" class="bg-blue-500 text-white px-4 py-2 rounded">Guardar Cambios</button>
     </div>
   </form>
 
   <h2 class="text-xl font-bold mb-4">Archivos</h2>
-  <form action="{{ url_for('personal.ver_perfil', id=user.id) }}" method="POST" enctype="multipart/form-data" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <input type="hidden" name="form_type" value="upload_file">
-    
-    <div class="mb-4">
-      <label for="archivo" class="block text-gray-700 text-sm font-bold mb-2">Subir Archivo:</label>
-      <input type="file" name="archivo" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
-    </div>
-    <div class="mb-4">
-      <label for="tipo" class="block text-gray-700 text-sm font-bold mb-2">Tipo de Archivo:</label>
-      <input type="text" name="tipo" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
-    </div>
-    <div class="flex items-center justify-between coarl-span-2">
-      <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-full">Subir Archivo</button>
-    </div>
-  </form>
-
-  <ul class="space-y-4">
-    <h2 class="text-xl font-bold mb-4">Lista de Archivos</h2>
-    {% for archivo in archivos %}
-      <li class="flex items-center justify-between py-4 bg-white shadow rounded-lg">
-        <div>
-          <a href="{{ url_for('personal.descargar_archivo', id=archivo.id) }}" class="text-blue-500 font-semibold hover:underline">{{ archivo.nombre }}</a>
-          <span class="text-gray-600 ml-2">{{ archivo.tipo }}</span>
+  <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+    {% if archivos %}
+      <ul class="divide-y divide-gray-100 border border-gray-200">
+        {% for archivo in archivos %}
+          <li class="flex items-center justify-between py-4 pl-4 pr-5 text-sm/6">
+            <div class="flex w-0 flex-1 items-center">
+              <svg class="size-5 shrink-0 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
+                  <path fill-rule="evenodd" d="M15.621 4.379a3 3 0 0 0-4.242 0l-7 7a3 3 0 0 0 4.241 4.243h.001l.497-.5a.75.75 0 0 1 1.064 1.057l-.498.501-.002.002a4.5 4.5 0 0 1-6.364-6.364l7-7a4.5 4.5 0 0 1 6.368 6.36l-3.455 3.553A2.625 2.625 0 1 1 9.52 9.52l3.45-3.451a.75.75 0 1 1 1.061 1.06l-3.45 3.451a1.125 1.125 0 0 0 1.587 1.595l3.454-3.553a3 3 0 0 0 0-4.242Z" clip-rule="evenodd" />
+              </svg>
+              <div class="ml-4 flex min-w-0 flex-1 gap-2">
+                  <span class="truncate font-medium">{{ archivo.tipo }}</span>
+              </div>
+            </div>
+            <form action="{{ url_for('personal.eliminar_archivo', id=archivo.id) }}" method="POST" class="eliminar-archivo-form">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit"class="ml-4 shrink-0 size-5 eliminar-archivo-btn">
+                <svg class="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd"
+                  d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                  clip-rule="evenodd"
+                  ></path>
+                </svg>
+              </button>
+            </form>
+            <div class="ml-4 shrink-0">
+              <a target="_blank" href="{{ url_for('personal.descargar_archivo', id=archivo.id) }}" class="font-medium text-indigo-600 hover:text-indigo-500">Descargar</a>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+    <form action="{{ url_for('personal.ver_perfil', id=user.id) }}" method="POST" enctype="multipart/form-data">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="form_type" value="upload_file">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+        <div class="mb-4">
+          <label for="archivo" class="block text-gray-700 text-sm font-bold mb-2">Subir Archivo:</label>
+          <input type="file" name="archivo" class="form-control block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm/6" required>
         </div>
-        <form action="{{ url_for('personal.eliminar_archivo', id=archivo.id) }}" method="POST" class="inline eliminar-archivo-form">
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-          <button type="submit" class="text-red-500 hover:text-red-700 ml-4 eliminar-archivo-btn">Eliminar</button>
-        </form>
-      </li>
-    {% endfor %}
-  </ul>
-
-  {% if current_user.id != user.id %}
-  <form id="inhabilitar-usuario-form" action="{{ url_for('personal.inhabilitar_usuario', id=user.id) }}" method="POST" class="mt-4 mb-4">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    {% if user.habilitado %}
-      <button type="button" id="inhabilitar-usuario-btn" class="bg-red-500 text-white px-4 py-2 rounded">Inhabilitar Usuario</button>
-    {% endif %}
-  </form>
-  <form id="habilitar-usuario-form" action="{{ url_for('personal.habilitar_usuario', id=user.id) }}" method="POST" class="mt-4 mb-4">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    {% if not user.habilitado %}
-      <button type="button" id="habilitar-usuario-btn" class="bg-green-500 text-white px-4 py-2 rounded">Habilitar Usuario</button>
-    {% endif %}
-  </form>
-  {% endif %}
+        <div class="mb-4">
+          <label for="tipo" class="block text-gray-700 text-sm font-bold mb-2">Tipo de Archivo:</label>
+          <input type="text" name="tipo" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
+        </div>
+      </div>
+      <div class="flex items-center justify-center">
+        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Subir Archivo</button>
+      </div>
+    </form>
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -129,23 +157,19 @@
         optionElement.textContent = option;
         subdivisionCargoSelect.appendChild(optionElement);
       });
-
-      // Ocultar el botón de inhabilitar si el cargo es Administrativo
-      if (selectedCargo === 'Administrativo') {
-        if (inhabilitarUsuarioBtn) {
-          inhabilitarUsuarioBtn.style.display = 'none';
-        }
-      } else {
-        if (inhabilitarUsuarioBtn) {
-          inhabilitarUsuarioBtn.style.display = 'block';
-        }
-      }
     }
 
     cargoSelect.addEventListener('change', updateSubdivisionCargoOptions);
 
     // Inicializar las opciones de subdivisión de cargo al cargar la página
     updateSubdivisionCargoOptions();
+
+    // Ocultar el botón de inhabilitar si el cargo es Administrativo
+    if ('{{ user.rol }}' != 'Personal') {
+      if (inhabilitarUsuarioBtn) {
+        inhabilitarUsuarioBtn.style.display = 'none';
+      }
+    }
 
     // Manejar la confirmación de inhabilitación
     if (inhabilitarUsuarioBtn) {

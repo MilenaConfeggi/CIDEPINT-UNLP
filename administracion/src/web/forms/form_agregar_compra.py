@@ -3,7 +3,7 @@ from wtforms import DateField, SelectField, StringField, FloatField, FieldList, 
 from wtforms.validators import DataRequired
 from models.compras.compra import estado_compra
 from administracion.src.core.servicios.personal import listar_empleados, listar_areas
-from administracion.src.core.fondos.fondo import listar_fondos 
+from administracion.src.core.fondos.fondo import listar_fondos_activos 
 from administracion.src.core.proveedores.proveedor import listar_proveedores
 import re
 
@@ -29,7 +29,7 @@ class FormularioFondo(FlaskForm):
 
     def __init__(self, *args, **kwargs):
         super(FormularioFondo, self).__init__(*args, **kwargs)
-        self.id_fondo.choices = [(fondo.id, fondo.titulo) for fondo in listar_fondos()]
+        self.id_fondo.choices = [(fondo.id, fondo.titulo) for fondo in listar_fondos_activos()]
 
 
 class form_agregar_compra(FlaskForm):

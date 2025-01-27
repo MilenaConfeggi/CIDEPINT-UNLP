@@ -22,7 +22,7 @@ from models.archivos_admin.archivo import Archivo
 personal_bp = Blueprint("personal", __name__, url_prefix="/personal")
 
 @personal_bp.route('/', methods=['GET'])
-@role_required('Administrador', 'Colaborador', 'Personal')
+@role_required('Administrador', 'Colaborador')
 def index():
     areas = Area.query.all()
     return render_template('personal/index.html', areas=areas)
@@ -207,8 +207,9 @@ def descargar_empleados():
             'Apellido': empleado.apellido,
             'DNI': empleado.dni,
             'Dependencia': empleado.dependencia,
-            'Área': empleado.area,
-            'Cargo': empleado.cargo
+            'Área': empleado.area.nombre,
+            'Cargo': empleado.cargo,
+            'Subdivisión del Cargo': empleado.subdivision_cargo,
         } for empleado in empleados]
         
         df = pd.DataFrame(data)

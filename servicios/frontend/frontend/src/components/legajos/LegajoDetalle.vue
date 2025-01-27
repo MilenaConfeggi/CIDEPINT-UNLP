@@ -93,7 +93,7 @@
                               />
                             </label>
                           </li>
-                          <li v-if="hasPermission('ver documentacion')">
+                          <li v-if="hasPermission('ver_documentacion')">
                             <button
                               type="button"
                               class="dropdown-item"
@@ -242,7 +242,7 @@
                             </button>
                           </li>
                         </template>
-                        <template v-else-if="documento.nombre === 'adicional'">
+                        <template v-else-if="documento.nombre === 'Adicional'">
                           <li
                             v-for="adicional in adicionales"
                             :key="adicional.id"
@@ -283,7 +283,7 @@
                             documento.nombre !== 'Certificado CIDEPINT' &&
                             documento.nombre !== 'Presupuesto CIDEPINT' &&
                             documento.nombre !== 'Factura' &&
-                            documento.nombre !== 'adicional' &&
+                            documento.nombre !== 'Adicional' &&
                             documento.nombre !== 'Legajo'
                           "
                         >

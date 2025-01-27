@@ -360,4 +360,28 @@ button:hover {
     opacity: 1;
   }
 }
+
+/* Estilos responsivos para dispositivos móviles */
+@media (max-width: 768px) {
+  .table {
+    font-size: 0.8rem; /* Reducir el tamaño de la fuente */
+  }
+
+  .table th,
+  .table td {
+    padding: 5px; /* Reducir el padding */
+  }
+
+  .btn-modificar,
+  .btn-eliminar {
+    font-size: 0.6rem; /* Reducir el tamaño de la fuente */
+    padding: 3px 5px; /* Reducir el padding */
+    width: 20px; /* Reducir el ancho */
+    height: 20px; /* Reducir el alto */
+  }
+
+  .page-link {
+    padding: 5px 8px; /* Reducir el padding */
+  }
+}
 </style>

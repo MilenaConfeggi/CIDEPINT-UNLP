@@ -575,7 +575,6 @@ def seed_usuarios():
                 "subir_documento",
                 "ver_perfil",
                 "recuperar_contra",
-                "ver_certificado",
                 "obtener_interarea",
                 "crear_intearea",
                 "descargar_intearea",

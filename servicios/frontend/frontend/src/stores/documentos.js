@@ -57,7 +57,12 @@ export const useDocumentosStore = defineStore('documentos', {
       this.loading = true
       this.error = null
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/documentos/tipos_documentos`)
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/documentos/tipos_documentos`,{
+          headers: {
+            Authorization: `Bearer ${this.authStore.token}`,
+          },
+        }
+        )
         if (response.status !== 200) {
           throw ({ message: 'Error al obtener los tipos de documentos', status: response.status })
         }
@@ -106,6 +111,9 @@ export const useDocumentosStore = defineStore('documentos', {
       console.log(nombreDocumento, tipo, legajo_id)
       try {
         const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/documentos/download`, {
+          headers: {
+            Authorization: `Bearer ${this.authStore.token}`,
+          },
           params: {
             nombre_documento: nombreDocumento,
             tipo_documento_id: tipo,
@@ -135,7 +143,12 @@ export const useDocumentosStore = defineStore('documentos', {
       this.loading = true
       this.error = null
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/documentos/${id}`)
+        const token = this.authStore.token;
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/documentos/${id}`,{
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
         if (response.status !== 200) {
           throw ({ message: 'Error al obtener el documento', status: response.status })
         }

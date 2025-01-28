@@ -16,7 +16,7 @@ from models.base import db
 
 def seeds_usuarios():
 
-    def seed_usuarios():
+    def seed_roles():
         rol_trabajador = crear_rol({"nombre": "Trabajador"})
         db.session.add(rol_trabajador)
         rol_jefe_de_area = crear_rol({"nombre": "Jefe de area"})
@@ -27,10 +27,13 @@ def seeds_usuarios():
         db.session.add(rol_director)
         db.session.commit()
 
+    def seed_usuarios():
+
         default_area = Area(nombre="Area 2fault", saldo=0)
         area_1 = get_area(1)
         area_2 = get_area(2)
         area_3 = get_area(3)
+
 
         usuario_1 = User(username="rober", password="rober")
 
@@ -600,5 +603,6 @@ def seeds_usuarios():
 
         db.session.commit()
 
+    seed_roles()
     seeds_permisos()
     seed_usuarios_finales()

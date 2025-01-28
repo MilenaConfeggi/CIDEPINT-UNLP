@@ -587,17 +587,14 @@ def crear_presupuestont_con_stans(data):
     db.session.add(presupuesto)
     db.session.flush()
 
-    acu=0
     for dupla in data.get('seleccionados'):
-        aux = buscar_stan(dupla.get('id')).precio_dolares
         presupuesto_stan = PresupuestoStan(
             presupuesto_id=presupuesto.id,
             stan_id=dupla.get('id'),
-            precio_carga = aux,
+            precio_carga = 0,
         )
-        acu += aux * dupla.get('cantidad')
         db.session.add(presupuesto_stan)
-    presupuesto.precio = acu
+    presupuesto.precio = 0
     db.session.commit()
     return presupuesto
 

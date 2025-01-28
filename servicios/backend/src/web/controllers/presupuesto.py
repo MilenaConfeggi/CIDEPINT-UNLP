@@ -41,7 +41,10 @@ def generar_presupuesto(id_legajo):
     #if data['medioDePago'] == []:
     #    return jsonify({"error": "No se seleccionó medio de pago"}), 400
     data['legajo'] = id_legajo
-    servicioPresupuesto.crear_presupuesto_con_stans(data)
+    try:
+        servicioPresupuesto.crear_presupuesto_con_stans(data)
+    except TypeError:
+        return jsonify({"message": "Uno de los STANs seleccionados no tiene precio en dólares, cárguele el precio e intente nuevamente"}), 400
     return jsonify({"message": "Presupuesto creado correctamente"}), 200
 
 

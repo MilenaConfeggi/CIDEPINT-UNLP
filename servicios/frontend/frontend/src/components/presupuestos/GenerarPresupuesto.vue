@@ -149,11 +149,11 @@
       submitError.value = 'Todos los stans seleccionados deben tener una cantidad mayor a 0.';
       return;
     }
+    const token = authStore.getToken();
+    const toast = useToast();
 
     try {
 
-        const token = authStore.getToken();
-        const toast = useToast();
         toast.info("Generando presupuesto...");
         const response = await fetch(`${import.meta.env.VITE_API_URL}/presupuestos/crear/${idLegajo}`, {
         method: 'POST',
@@ -174,14 +174,16 @@
         });
         const result = await response.json();
         if (response.status !== 200) {
-          throw new Error(result.message || 'Error al generar el presupuesto');
+          toast.error(result.message);
+        }
+        else{
+          //successMessage.value = result.message;
+          toast.success(result.message)
+          setTimeout(() => {
+            router.push({ path: `/legajos/${idLegajo}` });
+          }, 1500); // 1500 milisegundos = 1,5 segundos
         }
   
-        //successMessage.value = result.message;
-        toast.success(result.message)
-        setTimeout(() => {
-          router.push({ path: `/legajos/${idLegajo}` });
-        }, 1500); // 1500 milisegundos = 1,5 segundos
     } catch (err) {
       //submitError.value = err.message || 'Error desconocido';
       toast.error(err.message)

@@ -164,6 +164,13 @@ const routes = [
     meta: { requiresAuth: true, showNavbar: true },
   },
   {
+    path: '/generar_presupuesto_en_pesos/:id_legajo',
+    name: 'generar_presupuesto_en_pesos',
+    component: () => import('../components/presupuestos/GenerarPresupuestoPesos.vue'),
+    props: true,
+    meta: { requiresAuth: true, showNavbar: true },
+  },
+  {
     path: '/marcar_sin_presupuesto/:id_legajo',
     name: 'generar_presupuestont',
     component: () => import('../components/presupuestos/GenerarPresupuestont.vue'),

@@ -45,7 +45,22 @@ def generar_presupuesto(id_legajo):
         servicioPresupuesto.crear_presupuesto_con_stans(data)
     except TypeError:
         return jsonify({"message": "Uno de los STANs seleccionados no tiene precio en dólares, cárguele el precio e intente nuevamente"}), 400
-    return jsonify({"message": "Presupuesto creado correctamente"}), 200
+    return jsonify({"message": "Presupuesto en dólares creado correctamente"}), 200
+
+@bp.post("/crear_pesos/<int:id_legajo>")
+@jwt_required()
+def generar_presupuesto_pesos(id_legajo):
+    if not check_permission("generar_presupuesto"):
+        return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
+    data = request.get_json()
+    #if data['medioDePago'] == []:
+    #    return jsonify({"error": "No se seleccionó medio de pago"}), 400
+    data['legajo'] = id_legajo
+    try:
+        servicioPresupuesto.crear_presupuesto_con_stans_en_pesos(data)
+    except TypeError:
+        return jsonify({"message": "Uno de los STANs seleccionados no tiene precio en pesos, cárguele el precio e intente nuevamente"}), 400
+    return jsonify({"message": "Presupuesto en pesos creado correctamente"}), 200
 
 
 @bp.get("/sin_presu/<int:id_legajo>")

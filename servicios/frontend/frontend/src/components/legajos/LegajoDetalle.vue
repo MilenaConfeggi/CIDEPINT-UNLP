@@ -177,7 +177,15 @@
                               :to="`/generar_presupuesto/${legajo.id}`"
                               class="dropdown-item"
                             >
-                              Generar
+                              Generar Presupuesto en Dólares
+                            </RouterLink>
+                          </li>
+                          <li v-if="hasPermission('generar_presupuesto')">
+                            <RouterLink
+                              :to="`/generar_presupuesto_en_pesos/${legajo.id}`"
+                              class="dropdown-item"
+                            >
+                              Generar Presupuesto en Pesos
                             </RouterLink>
                           </li>
                           <li

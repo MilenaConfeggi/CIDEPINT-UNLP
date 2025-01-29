@@ -64,6 +64,7 @@ def crear_usuario(data):
         usuario.rol=data.get('rol')
         usuario.esta_borrado=False
         usuario.cambiar_contra=True
+        enviar_contrasena_por_mail(data.get('mail'), contrasena)
         db.session.commit()
         return usuario
     

@@ -24,8 +24,11 @@
           <i class="fas fa-file-alt"></i> Documentos
         </RouterLink>
         <RouterLink v-if="estaLogueado && tienePermisoListarStans" to="/stans" class="nav-item">
-          <i class="fas fa-list"></i> Stans
-        </RouterLink>
+            <i class="fas fa-list"></i> Stans
+          </RouterLink>
+          <RouterLink v-if="estaLogueado" to="/interareas" class="nav-item">
+            <i class="fas fa-exchange-alt"></i> Interareas
+          </RouterLink>
         <RouterLink v-if="estaLogueado && tienePermisoVerEstadisticas" to="/estadisticas" class="nav-item">
           <i class="fas fa-chart-bar"></i> Estadísticas
         </RouterLink>
@@ -188,7 +191,7 @@ const toggleMenu = () => {
 }
 
 .nav-item:hover {
-  background-color: #391111;
+  background-color: #6c2222;
   color: #f8f9fa;
 }
 
@@ -207,7 +210,7 @@ const toggleMenu = () => {
 }
 
 .logout-button:hover {
-  background-color: #3d1313;
+  background-color: #6c2222;
   color: #f8f9fa;
 }
 

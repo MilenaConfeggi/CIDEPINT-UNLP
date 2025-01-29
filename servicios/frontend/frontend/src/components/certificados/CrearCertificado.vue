@@ -100,7 +100,7 @@ const fetchDescripcion = async () => {
       },
     });
 
-    const result = await response.text();
+    const result = await response.json();
     console.log('Descripción recibida:', result);
 
     if (response.status !== 200) {

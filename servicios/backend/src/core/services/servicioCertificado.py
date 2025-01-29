@@ -21,7 +21,6 @@ def generar_certificado(id_legajo, empleados, descripcion):
     fecha_desde = legajo.fecha_entrada.strftime("%d/%m/%Y")
     fecha_hasta = datetime.now().strftime("%d/%m/%Y")
     monto = legajo.presupuesto_cidepint[0].precio
-    print(legajo.nro_factura)
     if legajo.nro_factura is None:
         factura = ""
     else:

@@ -272,7 +272,7 @@
                               Ver documento
                             </button>
                           </li>
-                          <li v-if="existeDocumento(documento.nombre)">
+                          <li v-if="existeDocumento(documento.nombre) && documento.nombre !== 'Orden Facturación'">
                             <label :for="`edit-pdf-${documento.id}`" class="dropdown-item">
                               Editar
                               <input
@@ -292,7 +292,8 @@
                             documento.nombre !== 'Presupuesto CIDEPINT' &&
                             documento.nombre !== 'Factura' &&
                             documento.nombre !== 'Adicional' &&
-                            documento.nombre !== 'Legajo'
+                            documento.nombre !== 'Legajo' &&
+                            documento.nombre !== 'Orden Facturación'
                           "
                         >
                           <li v-if="!existeDocumento(documento.nombre)">

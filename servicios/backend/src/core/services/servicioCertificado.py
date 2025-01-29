@@ -86,7 +86,8 @@ def generar_certificado(id_legajo, empleados, descripcion):
     # Agregar la tabla con datos de los integrantes
     datos_tabla = [["Nombre y Apellido", "Función", "% de Participación"]]
     for empleado in empleados:
-        datos_tabla.append([empleado["nombre"], empleado["funcion"], empleado["participacion"]])
+        nombre_completo = f"{empleado['nombre']} {empleado['apellido']}"
+        datos_tabla.append([nombre_completo, empleado["funcion"], empleado["participacion"]])
 
     # Crear y estilizar la tabla
     tabla_integrantes = Table(datos_tabla, colWidths=[200, 150, 100])

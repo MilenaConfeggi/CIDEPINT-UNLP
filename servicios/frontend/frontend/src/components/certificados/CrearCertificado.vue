@@ -6,25 +6,31 @@
     <form @submit.prevent="submitForm" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 form-container">
       <div class="mb-4">
         <label class="block text-gray-700 text-sm font-bold mb-2">Seleccionar Empleado:</label>
-        <select v-model="selectedEmpleado" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+        <select v-model="selectedEmpleado" @change="agregarEmpleado" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+          <option value="" disabled selected>Seleccione un empleado</option>
           <option v-for="empleado in empleados" :key="empleado.id" :value="empleado">{{ empleado.nombre }} {{ empleado.apellido }}</option>
         </select>
-        <button type="button" @click="agregarEmpleado" class="bg-blue-500 text-white px-4 py-2 rounded mt-2 hover:bg-blue-600">Agregar Empleado</button>
       </div>
-      <div v-for="(empleado, index) in empleadosSeleccionados" :key="index" class="mb-4">
-        <label class="block text-gray-700 text-sm font-bold mb-2">{{ empleado.nombre }} {{ empleado.apellido }}</label>
-        <div class="mb-2">
-          <label class="block text-gray-700 text-sm font-bold mb-2">Función:</label>
-          <select v-model="empleado.funcion" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-            <option value="Responsable del equipo">Responsable del equipo</option>
-            <option value="Integrante del equipo">Integrante del equipo</option>
-          </select>
+      <div v-for="(empleado, index) in empleadosSeleccionados" :key="index" class="mb-4 card">
+        <div class="card-header">
+          <label class="block text-gray-700 text-sm font-bold mb-2">{{ empleado.nombre }} {{ empleado.apellido }}</label>
+          <button type="button" @click="eliminarEmpleado(index)" class="delete-button">
+            <i class="fas fa-trash-alt"></i>
+          </button>
         </div>
-        <div class="mb-2">
-          <label class="block text-gray-700 text-sm font-bold mb-2">Porcentaje de Participación:</label>
-          <input type="number" v-model="empleado.participacion" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
+        <div class="card-body">
+          <div class="mb-2">
+            <label class="block text-gray-700 text-sm font-bold mb-2">Función:</label>
+            <select v-model="empleado.funcion" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+              <option value="Responsable del equipo">Responsable del equipo</option>
+              <option value="Integrante del equipo">Integrante del equipo</option>
+            </select>
+          </div>
+          <div class="mb-2">
+            <label class="block text-gray-700 text-sm font-bold mb-2">Porcentaje de Participación:</label>
+            <input type="number" v-model="empleado.participacion" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
+          </div>
         </div>
-        <button type="button" @click="eliminarEmpleado(index)" class="bg-red-500 text-white px-4 py-2 rounded mt-2 hover:bg-red-600">Eliminar</button>
       </div>
       <div class="mb-4">
         <label for="descripcion" class="block text-gray-700 text-sm font-bold mb-2">Descripción de la actividad tecnológica:</label>
@@ -113,6 +119,8 @@ const agregarEmpleado = () => {
   if (selectedEmpleado.value && !empleadosSeleccionados.value.some(e => e.id === selectedEmpleado.value.id)) {
     empleadosSeleccionados.value.push({
       ...selectedEmpleado.value,
+      nombre: selectedEmpleado.value.nombre,
+      apellido: selectedEmpleado.value.apellido,
       funcion: 'Integrante del equipo',
       participacion: 0,
     });
@@ -160,7 +168,7 @@ const submitForm = async () => {
     toast.success('Certificado generado correctamente')
     successMessage.value = result.message;
     setTimeout(() => {
-      router.push('/certificados');
+      router.push(`/legajos/${idLegajo}`);
     }, 1500);
   } catch (err) {
     toast.error('Error al generar el certificado')
@@ -204,6 +212,38 @@ button {
 
 button:hover {
   background-color: #218838; 
+}
+
+.delete-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #dc3545;
+  font-size: 1.5rem;
+  padding: 0;
+}
+
+.delete-button:hover {
+  background-color: #ffdada;
+}
+
+.card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+  background-color: #f9f9f9;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.card-body {
+  padding: 8px 0;
 }
 
 .alert {

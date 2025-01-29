@@ -21,14 +21,6 @@ def crear_certificado(id_legajo):
     return jsonify({"message": "Certificado generado"})
 
 
-@bp.get("/obtener_empleados/<int:id_legajo>")
-@jwt_required()
-def obtener_empleados(id_legajo):
-    empleados = servicioCertificado.obtener_empleados(id_legajo)
-    if empleados:
-        return jsonify(empleados)
-    return jsonify({"message": "Aún no se ha realizado la distribución"}), 404
-
 @bp.get("/ver_documento/<int:id_legajo>")
 @jwt_required()
 def obtener_certificado(id_legajo):

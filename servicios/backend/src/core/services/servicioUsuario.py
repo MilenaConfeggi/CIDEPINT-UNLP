@@ -270,3 +270,9 @@ def es_secretaria(usuario):
 
 def listar_usuarios_paginados(page, per_page):
     return Usuario.query.filter_by(esta_borrado=False).paginate(page=page, per_page=per_page)
+
+def listar_todos_los_usuarios():
+    return Usuario.query.filter(
+        Usuario.esta_borrado == False,
+        Usuario.rol.has(Rol.nombre.notin_(["Secretaria", "Director"]))
+    ).all()

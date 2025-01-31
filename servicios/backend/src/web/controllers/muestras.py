@@ -26,7 +26,6 @@ def listar_muestras_identificadas(id_legajo):
         return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
     muestras = servicioMuestras.listar_muestras(id_legajo)
     if not muestras:
-        print("No se encontraron muestras para el legajo proporcionado")
         return jsonify({"Error": "No se encontraron muestras para el legajo proporcionado"}), 404
     data = muestrasSchema.dump(muestras, many=True)
     return jsonify(data), 200
@@ -53,7 +52,6 @@ def cargar_muestra(id_legajo):
                 return jsonify({"message": f"La identificación {elem['iden_cliente']} está siendo ingresada más de una vez en este lote. Modificalo y vuelve a intentar"}), 400
             if not servicioMuestras.validar_longitud(muestra):
                 return jsonify({"message": "La identificación del cliente no puede superar los 100 caracteres"}), 400
-            print("fecha ingreso", elem['fecha_ingreso'])
             if not servicioMuestras.validar_fecha(elem['fecha_ingreso']):
                 return jsonify({"message": "La fecha de ingreso no puede ser mayor a la fecha actual"}), 400
             muestras.append(muestra)
@@ -114,10 +112,8 @@ def cargar_fotos(legajo_id):
 
         return jsonify({"message": "Fotos subidas con éxito"}), 200
     except ValidationError as err:
-        print(err.messages)  # Imprime los mensajes de error de validación
         return jsonify({"message": f"Error en la validación de los datos: {err.messages}"}), 400
     except Exception as e:
-        print(e)  # Imprime el error para depuración
         return jsonify({"message": "Ha ocurrido un error inesperado"}), 500
   
 

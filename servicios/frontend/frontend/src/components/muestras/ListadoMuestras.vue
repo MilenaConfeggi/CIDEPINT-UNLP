@@ -31,7 +31,6 @@
     <div v-else-if="!error && !noMuestras" class="text-center">
       <p class="text-muted">No hay muestras disponibles.</p>
     </div>
-
   </div>
 </template>
 
@@ -43,8 +42,7 @@ import axios from 'axios';
 import { useAuthStore } from '@/stores/auth';
 
 export default {
-  components: {
-  },
+  components: {},
   props: {
     legajoId: {
       type: Number,
@@ -68,6 +66,7 @@ export default {
     const fetchMuestras = async () => {
       noMuestras.value = false;
       error.value = null;
+      muestras.value = []; // Limpiar el estado de las muestras antes de la nueva solicitud
       try {
         await store.fetchMuestras(props.legajoId);
         if (muestras.value.length === 0) {

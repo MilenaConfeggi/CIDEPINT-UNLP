@@ -113,7 +113,7 @@ export default {
         this.successMessage = response.data.message || 'Fotos subidas con éxito';
         console.log('Respuesta del servidor:', response.data);
       } catch (error) {
-        this.error = error.message || 'Hubo un problema al subir las fotos, asegúrate de que los archivos sean .png, .jpg o .jpeg';
+        this.error = error.response?.data?.message || 'Hubo un problema al subir las fotos, asegúrate de que los archivos sean .png, .jpg o .jpeg';
         console.error('Error:', error);
       } finally {
         this.isUploading = false;

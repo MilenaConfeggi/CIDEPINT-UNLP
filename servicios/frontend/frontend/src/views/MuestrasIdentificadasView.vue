@@ -1,13 +1,14 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import ListadoMuestras from '../components/muestras/ListadoMuestras.vue';
 import IdentificarMuestras from '../components/muestras/IdentificarMuestras.vue';
+import { useMuestrasStore } from '@/stores/muestras';
 
 const route = useRoute();
 const router = useRouter();
-const legajoId = Number(route.params.legajoId);
+const legajoId = ref(Number(route.params.legajoId));
 
 const permisos = JSON.parse(localStorage.getItem('permisos')) || [];
 
@@ -30,13 +31,20 @@ const cerrarFormularioIdentificar = () => {
 
 // Función para cambiar la vista a MuestrasCarpetasView
 const cambiarVistaCarpetas = () => {
-  router.push({ name: 'muestrasCarpetas', params: { legajoId } });
+  router.push({ name: 'muestrasCarpetas', params: { legajoId: legajoId.value } });
 };
 
 // Función para ir hacia atrás
 const irAtras = () => {
   router.back();
 };
+
+// Limpiar el estado de las muestras cuando cambie el legajoId
+const store = useMuestrasStore();
+watch(() => route.params.legajoId, (newLegajoId) => {
+  legajoId.value = Number(newLegajoId);
+  store.clearMuestras(); // Limpiar el estado de las muestras
+});
 </script>
 
 <template>

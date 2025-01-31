@@ -37,6 +37,7 @@ import axios from 'axios';
 import ListadoFotosCarpeta from './ListadoFotosCarpeta.vue';
 import { useAuthStore } from '@/stores/auth';
 import { useRouter } from 'vue-router';
+
 export default {
   components: {
     ListadoFotosCarpeta
@@ -62,18 +63,18 @@ export default {
         const response = await axios.get(`${import.meta.env.VITE_API_URL}/muestras/fotos_por_legajo/${props.legajoId}`, {
           headers: {
             "Authorization": `Bearer ${token}`,
-            "Content-Type": "multipart/form-data"
+            "Content-Type": "application/json"
           },
         });
         if (response.status !== 200) {
-          throw ({message: 'Error al obtener las fotos', status: response.status})
+          throw new Error('Error al obtener las fotos');
         }
         fotos.value = response.data;
         agruparFotosPorFecha();
-        } catch (err) {
-        if (err.status === 401 || err.status === 422) {
-          authStore.logout()
-          router.push('/log-in')
+      } catch (err) {
+        if (err.response && (err.response.status === 401 || err.response.status === 422)) {
+          authStore.logout();
+          router.push('/log-in');
         } else {
           error.value = 'Error al cargar las fotos';
           console.error('Error fetching photos:', err);

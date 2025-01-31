@@ -15,15 +15,13 @@
         <div class="card" :class="{ 'selected': seleccionadas.includes(foto.id) }" @click="toggleSeleccionar(foto.id)">
           <div class="card-img-container" @click.stop="mostrarVerFoto(foto)">
             <img
-              :src="getImageUrl(foto.muestra_id, foto.nombre_archivo)"
+              :src="getImageUrl(foto.legajo_id, foto.nombre_archivo)"
               alt="Imagen de foto"
               class="card-img"
             />
           </div>
           <div class="card-body">
             <h5 class="card-title">{{ foto.nombre_archivo }}</h5>
-            <p class="card-text">Número de muestra: {{ foto.muestra.nro_muestra }}</p>
-            <p class="card-text">Identificación del cliente: {{ foto.muestra.iden_cliente }}</p>
           </div>
         </div>
       </div>
@@ -38,7 +36,7 @@
         <button class="close-button" @click="cerrarVerFoto">&times;</button>
         <div v-if="fotoSeleccionada">
           <div class="text-center">
-            <img :src="getImageUrl(fotoSeleccionada.muestra_id, fotoSeleccionada.nombre_archivo)" alt="Imagen de foto" class="img-fluid large-image" />
+            <img :src="getImageUrl(fotoSeleccionada.legajo_id, fotoSeleccionada.nombre_archivo)" alt="Imagen de foto" class="img-fluid large-image" />
           </div>
         </div>
       </div>
@@ -88,7 +86,7 @@ export default {
         const response = await axios.get(`${import.meta.env.VITE_API_URL}/muestras/fotos_por_fecha/${props.legajoId}/${props.fechaSeleccionada}`, {
           headers: {
             "Authorization": `Bearer ${token}`,
-            "Content-Type": "multipart/form-data"
+            "Content-Type": "application/json"
           }
         });
         if (response.status < 200 || response.status >= 300) {
@@ -106,8 +104,8 @@ export default {
       }
     };
 
-    const getImageUrl = (muestraId, filename) => {
-      return `${import.meta.env.VITE_API_URL}/muestras/imagenes/${muestraId}/${filename.replace(/ /g, "_")}`;
+    const getImageUrl = (legajoId, filename) => {
+      return `${import.meta.env.VITE_API_URL}/muestras/imagenes/${props.legajoId}/${filename.replace(/ /g, "_")}`;
     };
 
     const mostrarVerFoto = (foto) => {
@@ -142,7 +140,7 @@ export default {
           const response = await fetch(`/muestras/descargar_fotos/${id}`, {
             headers: {
               "Authorization": `Bearer ${token}`,
-              "Content-Type": "multipart/form-data"
+              "Content-Type": "application/json"
             }
           });
           const blob = await response.blob();

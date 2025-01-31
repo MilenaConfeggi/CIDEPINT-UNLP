@@ -82,6 +82,7 @@ def crear_foto(data, muestra_id):
     )
     db.session.add(nueva_foto)
     db.session.commit()
+    print("nueva foto", nueva_foto)
     return nueva_foto
 
 def listar_fotos(id_muestra):
@@ -107,3 +108,6 @@ def tiene_permiso(id_legajo, mail):
         if empleado.area == legajo.area:
             return True
     return False
+
+def hay_muestra_legajo(legajo_id):
+    return Muestra.query.filter_by(legajo_id=legajo_id).first()

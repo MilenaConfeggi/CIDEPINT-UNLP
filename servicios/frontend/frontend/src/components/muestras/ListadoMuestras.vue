@@ -16,14 +16,8 @@
             <h5 class="card-title">Número de muestra: {{ muestra.nro_muestra }}</h5>
             <p class="card-text">Iden cliente: {{ muestra.iden_cliente }}</p>
             <p class="card-text">Fecha de ingreso: {{ muestra.fecha_ingreso }}</p>
-            <div class="d-flex align-items-center">
-              <template v-if="muestra.terminada">
-                <p class="text-danger mb-0 ml-2">Terminada</p>
-              </template>
-              <template v-else>
-                <button v-if="tienePermisoTerminar" @click="confirmarTerminarMuestra(muestra.id)" class="btn btn-danger ml-2">Terminar</button>
-              </template>
-            </div>
+            <p v-if="muestra.terminada" class="text-danger mb-0">Terminada</p>
+            <button v-if="tienePermisoTerminar && !muestra.terminada" @click="confirmarTerminarMuestra(muestra.id)" class="btn btn-danger btn-sm btn-terminar">Terminar</button>
           </div>
         </div>
       </div>
@@ -135,6 +129,9 @@ export default {
 
 .card-body {
   padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .card-title {
@@ -193,5 +190,16 @@ export default {
 
 .mb-0 {
   margin-bottom: 0;
+}
+
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  border-radius: 0.2rem;
+}
+
+.btn-terminar {
+  align-self: flex-end;
 }
 </style>

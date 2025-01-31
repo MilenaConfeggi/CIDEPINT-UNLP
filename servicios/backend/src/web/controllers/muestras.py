@@ -58,7 +58,7 @@ def cargar_muestra(id_legajo):
         for muestra in muestras:
             muestra = servicioMuestras.crear_muestra(muestra, id_legajo)
 
-        return jsonify({"message": "Muestras cargadas correctamente"}), 200
+        return jsonify({"message": "Muestras cargadas correctamente, recargue la página para ver los cambios"}), 200
     except ValidationError as e:
         return jsonify({"message": "Ha ocurrido un error inesperado, revise que muestras se han cargado antes de volver a intentarlo"}), 400
     except Exception as e:
@@ -110,7 +110,7 @@ def cargar_fotos(legajo_id):
             os.makedirs(folder_path, exist_ok=True)
             archivo.save(os.path.join(folder_path, filename))
 
-        return jsonify({"message": "Fotos subidas con éxito"}), 200
+        return jsonify({"message": "Fotos subidas con éxito, recargue la página para ver los cambios"}), 200
     except ValidationError as err:
         return jsonify({"message": f"Error en la validación de los datos: {err.messages}"}), 400
     except Exception as e:

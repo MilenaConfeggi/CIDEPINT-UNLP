@@ -110,7 +110,7 @@ export default {
           throw new Error(response.data.message || 'Error al enviar los datos');
         }
 
-        this.successMessage = response.data.message || 'Fotos subidas con éxito';
+        this.successMessage = response.data.message || 'Fotos subidas con éxito, recargue la página para ver los cambios';
         console.log('Respuesta del servidor:', response.data);
       } catch (error) {
         this.error = error.response?.data?.message || 'Hubo un problema al subir las fotos, asegúrate de que los archivos sean .png, .jpg o .jpeg';

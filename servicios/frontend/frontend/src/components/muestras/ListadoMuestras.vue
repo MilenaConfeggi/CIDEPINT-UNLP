@@ -17,7 +17,6 @@
             <p class="card-text">Iden cliente: {{ muestra.iden_cliente }}</p>
             <p class="card-text">Fecha de ingreso: {{ muestra.fecha_ingreso }}</p>
             <div class="d-flex align-items-center">
-              <button @click="mostrarFotos(muestra.id)" class="btn btn-primary">Ver fotos</button>
               <template v-if="muestra.terminada">
                 <p class="text-danger mb-0 ml-2">Terminada</p>
               </template>
@@ -33,13 +32,6 @@
       <p class="text-muted">No hay muestras disponibles.</p>
     </div>
 
-    <!-- Modal de ListadoFotosIden -->
-    <div v-if="mostrarListadoFotos" class="modal-overlay" @click="cerrarListadoFotos">
-      <div class="modal-content" @click.stop>
-        <button class="close-button" @click="cerrarListadoFotos">&times;</button>
-        <ListadoFotosIden :muestra-id="muestraSeleccionada" />
-      </div>
-    </div>
   </div>
 </template>
 
@@ -47,13 +39,11 @@
 import { ref, onMounted, watch, computed } from 'vue';
 import { useMuestrasStore } from '@/stores/muestras';
 import { storeToRefs } from 'pinia';
-import ListadoFotosIden from './ListadoFotosIden.vue';
 import axios from 'axios';
 import { useAuthStore } from '@/stores/auth';
 
 export default {
   components: {
-    ListadoFotosIden
   },
   props: {
     legajoId: {
@@ -93,16 +83,6 @@ export default {
       }
     };
 
-    const mostrarFotos = (muestraId) => {
-      muestraSeleccionada.value = muestraId;
-      mostrarListadoFotos.value = true;
-    };
-
-    const cerrarListadoFotos = () => {
-      mostrarListadoFotos.value = false;
-      muestraSeleccionada.value = null;
-    };
-
     const confirmarTerminarMuestra = (muestraId) => {
       if (confirm("¿Estás seguro de que deseas terminar esta muestra?")) {
         terminarMuestra(muestraId);
@@ -134,7 +114,7 @@ export default {
 
     watch(() => props.legajoId, fetchMuestras);
 
-    return { muestras, error, mostrarFotos, cerrarListadoFotos, mostrarListadoFotos, muestraSeleccionada, confirmarTerminarMuestra, tienePermisoTerminar, noMuestras };
+    return { muestras, error, muestraSeleccionada, confirmarTerminarMuestra, tienePermisoTerminar, noMuestras };
   }
 };
 </script>

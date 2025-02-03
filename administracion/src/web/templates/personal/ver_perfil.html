@@ -43,6 +43,9 @@
             <textarea name="{{ campo.name }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">{{ campo.value }}</textarea>
           {% elif campo.type == 'select' %}
             <select name="{{ campo.name }}" id="{{ campo.name }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" {% if campo.disabled %}disabled{% endif %}>
+              {% if not campo.value %}
+                <option value="" selected>Seleccione una opción</option>
+              {% endif %}
               {% for option in campo.options %}
                 {% if campo.name == 'area_id' %}
                   <option value="{{ option.id }}" {% if option.id == campo.value %}selected{% endif %}>{{ option.nombre }}</option>
@@ -155,6 +158,9 @@
         const optionElement = document.createElement('option');
         optionElement.value = option;
         optionElement.textContent = option;
+        if (option === '{{ user.empleado.subdivision_cargo }}') {
+          optionElement.selected = true;
+        }
         subdivisionCargoSelect.appendChild(optionElement);
       });
     }

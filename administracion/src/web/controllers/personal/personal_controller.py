@@ -17,7 +17,7 @@ from flask_login import current_user
 from models.personal.personal import User
 from models.personal.empleado import Empleado
 from models.archivos_admin.archivo import Archivo
-
+import textwrap
 
 personal_bp = Blueprint("personal", __name__, url_prefix="/personal")
 
@@ -81,7 +81,7 @@ def registrar_usuario():
         if success:
             msg = Message('Nuevo usuario', sender=current_app.config['MAIL_DEFAULT_SENDER'], recipients=[email])
             #Añadir link
-            msg.body = f'Se ha creado un nuevo usuario para esta dirección de correo electrónico en la página de administración del CIDEPINT. Tus datos para acceder a la página son Usuario: {username} y Contraseña: {password}'
+            msg.body = f'Se ha creado un nuevo usuario para esta dirección de correo electrónico en la página de administración del CIDEPINT https://administracion.cidepint.com/login. Tus datos para acceder a la página son Usuario: {username} y Contraseña: {password}'
             mail = current_app.extensions.get('mail')  # Obtén la instancia de Mail desde la aplicación
             mail.send(msg)
             flash('Usuario registrado con éxito', 'success')
@@ -188,17 +188,77 @@ def descargar_empleados():
         buffer = BytesIO()
         c = canvas.Canvas(buffer, pagesize=letter)
         width, height = letter
-        
-        y = height - 40
+
+        # Configuración de márgenes y espacios
+        x_positions = {
+            "nombre": 30,
+            "dni": 170,
+            "dependencia": 270,
+            "area": 370,
+            "cargo": 475,
+        }
+        col_widths = {
+            "nombre": 130,
+            "dni": 80,
+            "dependencia": 90,
+            "area": 90,
+            "cargo": 100,
+        }
+
+        # Función para envolver texto en varias líneas según el ancho de la columna
+        def wrap_text(text, width):
+            return textwrap.wrap(text, width=width // 6)  # Aproximación de caracteres por ancho
+
+        # Función para escribir filas en el PDF
+        def write_row(y_position, empleado):
+            lines = {}
+            max_lines = 1  # Número máximo de líneas en una celda
+
+            # Envolver texto en varias líneas para cada columna
+            lines["nombre"] = wrap_text(f"{empleado.nombre} {empleado.apellido}", col_widths["nombre"])
+            lines["dni"] = wrap_text(empleado.dni, col_widths["dni"])
+            lines["dependencia"] = wrap_text(empleado.dependencia if empleado.dependencia else "", col_widths["dependencia"])
+            lines["area"] = wrap_text(empleado.area.nombre, col_widths["area"])
+            lines["cargo"] = wrap_text(empleado.cargo if empleado.cargo else "", col_widths["cargo"])
+
+            max_lines = max(len(lines[col]) for col in lines)  # Determinar el número de líneas más grande en la fila
+
+            for i in range(max_lines):
+                for col in x_positions:
+                    if i < len(lines[col]):  # Evitar índices fuera de rango
+                        c.drawString(x_positions[col], y_position, lines[col][i])
+                y_position -= 15  # Espacio entre líneas
+
+            return y_position  # Retornar nueva posición de y después de escribir
+
+        # Función para dibujar el encabezado
+        def draw_header(y_position):
+            c.setFont("Helvetica-Bold", 12)
+            c.drawString(30, y_position, "Nombre")
+            c.drawString(170, y_position, "DNI")
+            c.drawString(270, y_position, "Dependencia")
+            c.drawString(370, y_position, "Área")
+            c.drawString(475, y_position, "Cargo")
+            return y_position - 20
+
+        # Dibujar encabezado inicial
+        y_position = draw_header(height - 30)
+        c.setFont("Helvetica", 10)
+
+        # Escribir datos
         for empleado in empleados:
-            c.drawString(30, y, f"Nombre: {empleado.nombre} {empleado.apellido}, DNI: {empleado.dni}, Dependencia: {empleado.dependencia}, Área: {empleado.area}, Cargo: {empleado.cargo}")
-            y -= 20
-            if y < 40:
-                c.showPage()
-                y = height - 40
-        
+            y_position = write_row(y_position, empleado)
+
+            # Verificar si la página está llena
+            if y_position < 40:
+                c.showPage()  # Nueva página
+                y_position = draw_header(height - 30)  # Dibujar nuevo encabezado
+                c.setFont("Helvetica", 10)
+
+        # Finalizar PDF
         c.save()
         buffer.seek(0)
+
         return send_file(buffer, download_name='empleados.pdf', as_attachment=True)
     
     elif formato == 'excel':
@@ -270,6 +330,7 @@ def ver_perfil(id):
             user.empleado.dni = dni
             user.empleado.dependencia = request.form.get('dependencia')
             user.empleado.cargo = request.form.get('cargo')
+            user.empleado.subdivision_cargo = request.form.get('subdivision_cargo')
             user.empleado.fecha_nacimiento = request.form.get('fecha_nacimiento') or None
             user.empleado.telefono = request.form.get('telefono') or None
             user.empleado.domicilio = request.form.get('domicilio') or None

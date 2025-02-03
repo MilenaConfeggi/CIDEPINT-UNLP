@@ -123,7 +123,7 @@ def descargar_archivo(id_carpeta, id_archivo):
         flash("Archivo no encontrado", "error")
         return redirect(url_for('archivos.ver_carpeta',id_carpeta=id_carpeta))
 
-    return send_from_directory(directorio, archivo.nombre, as_attachment=True)
+    return send_from_directory(directorio, archivo.nombre, as_attachment=False)
 
 
 @bp.post("/eliminar_archivo/<int:id_carpeta>")

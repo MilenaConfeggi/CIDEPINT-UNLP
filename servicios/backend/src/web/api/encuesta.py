@@ -19,7 +19,6 @@ def get_encuesta():
 def add_encuesta():
     params = request.args
     unique_key = params.get('unique_key')
-    print(unique_key)
     encuesta = create_resultado_encuesta(unique_key)
     if encuesta is None:
         return jsonify({"error": "No se pudo crear la encuesta"}), 400
@@ -33,9 +32,7 @@ def complete_encuesta():
     data = request.get_json()
     client_data = data.get('clientData')
     temas = data.get('temas')
-    print(data)
     unique_key = params.get('id')
-    print(unique_key)
     encuesta = find_resultado_encuesta_by_unique_key(unique_key)
     if encuesta is None:
         return jsonify({"error": "No se pudo completar la encuesta"}), 400

@@ -32,6 +32,7 @@
   
 <script>
 import axios from 'axios';
+import { useAuthStore } from '../../stores/auth';
   
 export default {
     data() {
@@ -53,7 +54,14 @@ export default {
     },
     methods: {
         async fetchPresupuestos() {
-            const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/documentos/list/2`);
+
+        const authStore = useAuthStore();
+        const token = authStore.getToken();
+            const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/documentos/list/2`,{
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
             this.presupuestos = response.data.filter(presupuesto => presupuesto.estado.id === 5);
         },
         formatFecha(fecha) {

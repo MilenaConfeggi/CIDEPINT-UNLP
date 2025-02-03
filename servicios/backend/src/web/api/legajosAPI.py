@@ -18,11 +18,17 @@ import smtplib
 import os
 from pathlib import Path
 from servicios.backend.src.core.config import config
+from servicios.backend.src.web.helpers.auth import check_permission
+from flask_jwt_extended import jwt_required
+
 bp = Blueprint("legajos", __name__, url_prefix="/api/legajos")
 
 
 @bp.get("/")
+@jwt_required()
 def listar_legajos():
+    if not check_permission("listar_legajos"):
+        return jsonify({"message": "No tiene permiso para acceder a este recurso"}), 403
     params = request.args
     empresa = params.get("empresa", "")
     fecha = params.get("fecha", "")
@@ -44,6 +50,8 @@ def listar_legajos():
 
 @bp.get("/<string:id>")
 def get_legajo(id):
+    if not check_permission("ver_legajo"):
+        return jsonify({"message": "No tiene permiso para acceder a este recurso"}), 403
     data = legajo_schema.dump(find_legajo_by_id(id))
     if data is None:
         return jsonify({"error": "No se encontro el legajo"}), 404
@@ -52,6 +60,8 @@ def get_legajo(id):
 
 @bp.post("/add")
 def add_legajo():
+    if not check_permission("crear_legajo"):
+        return jsonify({"message": "No tiene permiso para acceder a este recurso"}), 403
     data = request.get_json()
     legajo = create_legajo(data.get("legajo"))
     if legajo is None:
@@ -96,7 +106,6 @@ def enviar_correo_con_link_y_pdf():
     link = request.get_json().get("link")
     legajo_id = request.get_json().get("legajo_id")
     doc_id = request.get_json().get("arch")
-    print(doc_id)
     doc = get_documento(doc_id)
     if doc is None:
         return jsonify({"error": "No se encontro el documento"}), 404

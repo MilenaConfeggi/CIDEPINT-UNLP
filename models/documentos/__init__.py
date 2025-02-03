@@ -47,6 +47,7 @@ def listar_documentos(
         query = query.join(Ensayo, STAN.ensayos).filter(
             Ensayo.nombre.like(f"%{ensayo}%")
         )
+    query = query.order_by(Documento.fecha_creacion.desc())
     return query.paginate(page=page, per_page=per_page, error_out=False)
 
 

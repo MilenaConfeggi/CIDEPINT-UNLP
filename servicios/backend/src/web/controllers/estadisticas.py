@@ -3,11 +3,16 @@ from models.legajos import cant_legajos_estado
 from models.resultados_encuestas import cant_conformidad
 from servicios.backend.src.core.services import servicioPresupuesto
 from servicios.backend.src.web.schemas.estadistica import estadisticas_schema, estadisticasEnsayo_schema
+from servicios.backend.src.web.helpers.auth import is_authenticated, check_permission
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 bp = Blueprint("estadisticas", __name__, url_prefix="/estadisticas")
 
 @bp.get("/")
-def obtener_estadisticas_conformidad_legajos():
+@jwt_required()
+def obtener_estadisticas_conformidad_legajos():#Director y Secretaria
+    if not check_permission("obtener_estadisticas_conformidad_legajos"):
+        return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
 
     legajos_data = [
         {"estado": "Informados", "cantidad": cant_legajos_estado(1)},
@@ -34,7 +39,10 @@ def obtener_estadisticas_conformidad_legajos():
     return jsonify(estadisticas_serializadas), 200
 
 @bp.post("/ensayos")
-def obtener_estadisticas_ensayos():
+@jwt_required()
+def obtener_estadisticas_ensayos():#Director y Secretaria
+    if not check_permission("obtener_estadisticas_ensayos"):
+        return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
     
     fecha_desde = request.form.get('startDate')
     fecha_hasta = request.form.get('endDate')

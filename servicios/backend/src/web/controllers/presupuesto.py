@@ -41,7 +41,10 @@ def generar_presupuesto(id_legajo):
     #if data['medioDePago'] == []:
     #    return jsonify({"error": "No se seleccionó medio de pago"}), 400
     data['legajo'] = id_legajo
-    servicioPresupuesto.crear_presupuesto_con_stans(data)
+    try:
+        servicioPresupuesto.crear_presupuesto_con_stans(data)
+    except TypeError:
+        return jsonify({"message": "Uno de los STANs seleccionados no tiene precio en dólares, cárguele el precio e intente nuevamente"}), 400
     return jsonify({"message": "Presupuesto creado correctamente"}), 200
 
 
@@ -199,6 +202,7 @@ def cargar_presupuesto_firmado(id_legajo):
         for archiv in os.listdir(folder_path):
             archivo_path = os.path.join(folder_path, archiv)
             if os.path.isfile(archivo_path) and (archiv.startswith("fpresupuesto_firmado_") or archiv.startswith("presupuesto_")):
+                servicioDocumento.eliminar_documento(archiv)
                 os.remove(archivo_path)
 
         timestamp = datetime.now().strftime("%Y%m%d")

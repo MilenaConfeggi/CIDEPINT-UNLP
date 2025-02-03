@@ -119,7 +119,12 @@ export default {
             this.loading = true;
             this.error = null;
             try {
-                const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/documentos/list/4`);
+                const token = authStore.getToken();
+                const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/documentos/list/4`,{
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
                 if (response.status !== 200) {
                     throw ({message: 'Error al obtener los informes', status: response.status})
                 }

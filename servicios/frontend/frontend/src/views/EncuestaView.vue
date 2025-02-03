@@ -6,7 +6,9 @@ import { onMounted } from 'vue'
 import axios from 'axios'
 import { ref } from 'vue'
 import { useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
 const route = useRoute()
+const router = useRouter()
 
 const surveyId = route.query.id
 
@@ -132,7 +134,7 @@ survey.onComplete.add(function (sender, options) {
   // Display the "Saving..." message (pass a string value to display a custom message)
   options.showSaveInProgress();
   const xhr = new XMLHttpRequest();
-  xhr.open("POST", `${import.meta.env.VITE_API_URL}/api/encuestas/complete?id=${surveyId}`); 
+  xhr.open("POST", `${import.meta.env.VITE_API_URL}/api/encuestas/complete?id=${surveyId}`);
   xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
   xhr.onload = xhr.onerror = function () {
     if (xhr.status == 200) {
@@ -151,7 +153,7 @@ survey.onComplete.add(function (sender, options) {
 onMounted(() => {
 
   if (!surveyId) {
-    errorMessage.value = 'Enlace inválido.'
+    router.push('/notFound')
     return
   }
 
@@ -165,7 +167,11 @@ onMounted(() => {
         this.initializeSurvey()
       }
     })
-    .catch(() => {
+    .catch((e) => {
+      if (e.status === 404) {
+        router.push('/notFound')
+        return
+      }
       errorMessage.value = 'El enlace no es válido o ya ha sido usado.'
     })
 })

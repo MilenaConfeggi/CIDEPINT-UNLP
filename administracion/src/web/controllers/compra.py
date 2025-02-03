@@ -288,25 +288,38 @@ class ValidationError(Exception):
 def validar_montos_y_acumular(form):
     monto = 0
     fondos, empleados, areas = [], [], []
+
+    saldos_areas = {}
+    saldos_empleados = {}
+    saldos_fondos = {}
     
     for area in form.areas.data:
         area_obj = conseguir_area_de_id(area["id_area"])
-        if area["monto"] > area_obj.saldo:
-            raise ValidationError("El monto de un área no puede ser superior a su saldo")
+        if area["id_area"] not in saldos_areas:
+            saldos_areas[area["id_area"]] = 0
+        saldos_areas[area["id_area"]] += area["monto"]
+        if saldos_areas[area["id_area"]] > area_obj.saldo:
+            raise ValidationError(f"El monto total para un area no puede exceder su saldo disponible")
         areas.append((area_obj, area["monto"]))
         monto += area["monto"]
 
     for empleado in form.empleados.data:
         empleado_obj = conseguir_empleado_de_id(empleado["id_empleado"])
-        if empleado["monto"] > empleado_obj.saldo:
-            raise ValidationError("El monto de un empleado no puede ser superior a su saldo")
+        if empleado["id_empleado"] not in saldos_empleados:
+            saldos_empleados[empleado["id_empleado"]] = 0       
+        saldos_empleados[empleado["id_empleado"]] += empleado["monto"]
+        if saldos_empleados[empleado["id_empleado"]] > empleado_obj.saldo:
+            raise ValidationError(f"El monto total para un empleado no puede exceder su saldo disponible")
         empleados.append((empleado_obj, empleado["monto"]))
         monto += empleado["monto"]
-    
+
     for fondo in form.fondos.data:
         fondo_obj = conseguir_fondo_de_id(fondo["id_fondo"])
-        if fondo["monto"] > fondo_obj.saldo:
-            raise ValidationError("El monto de un fondo no puede ser superior a su saldo")
+        if fondo["id_fondo"] not in saldos_fondos:
+            saldos_fondos[fondo["id_fondo"]] = 0
+        saldos_fondos[fondo["id_fondo"]] += fondo["monto"]
+        if saldos_fondos[fondo["id_fondo"]] > fondo_obj.saldo:
+            raise ValidationError(f"El monto total para un fondo no puede exceder su saldo disponible")
         fondos.append((fondo_obj, fondo["monto"]))
         monto += fondo["monto"]
 
@@ -571,6 +584,7 @@ def rechazando_compra(id_compra):
 @role_required('Administrador', 'Colaborador')
 def revertir_compra(id_compra):
     compra = buscar_compra(id_compra)
+    
     if not compra:
         return redirect(url_for('compra.lista_compras'))
 

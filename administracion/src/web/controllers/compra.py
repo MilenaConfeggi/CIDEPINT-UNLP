@@ -4,7 +4,7 @@ from reportlab.pdfgen import canvas
 from io import BytesIO
 import pandas as pd
 from flask_login import current_user
-from administracion.src.core.compras.compra import filtrar_compras, buscar_compra, filtrar_compras_descargadas, crear_compra, borrar_compra, agregar_fuentes_a_compra, obtener_fondos, obtener_areas, obtener_empleados, editar_compra_espera, editar_compra_aprobada_o_realizada, realizar_compra_aprobada
+from administracion.src.core.compras.compra import filtrar_compras, buscar_compra, filtrar_compras_descargadas, crear_compra, borrar_compra, agregar_fuentes_a_compra, obtener_fondos, obtener_areas, obtener_empleados, editar_compra_espera, editar_compra_aprobada_o_realizada, realizar_compra_aprobada, realizada_a_aprobada
 from administracion.src.core.proveedores.proveedor import filtrar_proveedores, chequeo_razon_social_existente, crear_proveedor, borrar_proveedor, actualizar_proveedor, buscar_proveedor
 from administracion.src.web.forms.form_agregar_proveedor import form_agregar_proveedor
 from administracion.src.web.forms.form_editar_proveedor import form_editar_proveedor
@@ -565,4 +565,16 @@ def rechazando_compra(id_compra):
     borrar_compra(compra, motivo_rechazo)
 
     flash(f"Compra rechazada por el siguiente motivo: {motivo_rechazo}", "success")
+    return redirect(url_for("compra.lista_compras"))
+
+@bp.post("/revertir_compra/<int:id_compra>")
+@role_required('Administrador', 'Colaborador')
+def revertir_compra(id_compra):
+    compra = buscar_compra(id_compra)
+    if not compra:
+        return redirect(url_for('compra.lista_compras'))
+
+    realizada_a_aprobada(compra)
+
+    flash(f"Compra revertida con exito", "success")
     return redirect(url_for("compra.lista_compras"))

@@ -49,8 +49,7 @@
               v-if="
                 !legajo.admin_habilitado &&
                 existeDocumento('Presupuesto CIDEPINT') &&
-                existeDocumento('Presupuesto CONICET') &&
-                existeDocumento('Orden de compra')
+                existeDocumento('Presupuesto CONICET')
               "
               class="btn btn-dark"
               @click="adminLegajo"
@@ -72,7 +71,7 @@
                   <td>
                     <div class="dropdown">
                       <button
-                        class="btn btn-dark dropdown-toggle"
+                        :class="['btn dropdown-toggle', existeDocumento(documento.nombre) ? 'btn-success' : 'btn-dark']"
                         type="button"
                         data-bs-toggle="dropdown"
                         aria-expanded="false"

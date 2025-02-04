@@ -1,12 +1,13 @@
 from datetime import datetime
 from models.clientes.cliente import Cliente
 from models.base import db
-
+from models.clientes import create_cliente
 def seeds_clientes():
+    legajos_id = [33, 34, 35, 36]
     clientes_data = [
         {
             'email': 'milenaconfeggi@gmail.com',
-            'cuit': '123456789',
+            'cuit': '1',
             'telefono': '123456789',
             'celular': '123456789',
             'direccion': 'Calle 1',
@@ -18,12 +19,11 @@ def seeds_clientes():
             'codigo_postal': '00000',
             'piso': 'Piso 1',
             'depto': 'Depto 1',
-            'legajo_id': 33,
             'nombre': 'Cliente 1'
         },
         {
             'email': 'cliente2@mail.com',
-            'cuit': '123456789',
+            'cuit': '2',
             'telefono': '123456789',
             'celular': '123456789',
             'direccion': 'Calle 2',
@@ -35,12 +35,12 @@ def seeds_clientes():
             'codigo_postal': '00000',
             'piso': 'Piso 2',
             'depto': 'Depto 2',
-            'legajo_id': 34,
             'nombre': 'Cliente 2',
+
         },
         {
             'email': 'cliente3@mail.com',
-            'cuit': '123456789',
+            'cuit': '3',
             'telefono': '123456789',
             'celular': '123456789',
             'direccion': 'Calle 3',
@@ -52,12 +52,12 @@ def seeds_clientes():
             'codigo_postal': '00000',
             'piso': 'Piso 3',
             'depto': 'Depto 3',
-            'legajo_id': 35,
             'nombre': 'Cliente 3'
+
         },
         {
             'email': 'cliente4@mail.com',
-            'cuit': '123456789',
+            'cuit': '4',
             'telefono': '123456789',
             'celular': '123456789',
             'direccion': 'Calle 4',
@@ -69,11 +69,11 @@ def seeds_clientes():
             'codigo_postal': '00000',
             'piso': 'Piso 4',
             'depto': 'Depto 4',
-            'legajo_id': 36,
             'nombre': 'Cliente 4'
+
         },
     ]
 
-    for data in clientes_data:
-        db.session.add(Cliente(**data))
+    for i in range(4):
+        create_cliente(clientes_data[i], legajos_id[i])
     db.session.commit()

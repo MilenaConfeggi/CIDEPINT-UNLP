@@ -18,5 +18,4 @@ class Cliente(db.Model):
     depto = db.Column(db.String(100), nullable=True)
     nombre = db.Column(db.String(100))
     
-    legajo_id = db.Column(db.Integer, db.ForeignKey('legajo.id'))
-    legajo = db.relationship('Legajo', back_populates='cliente')
+    legajos = db.relationship('Legajo', back_populates='cliente')

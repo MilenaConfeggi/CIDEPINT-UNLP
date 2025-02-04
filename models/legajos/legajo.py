@@ -14,7 +14,8 @@ class Legajo(db.Model):
     nro_factura = db.Column(db.String(100), nullable=True)
     admin_habilitado = db.Column(db.Boolean, default=False)
     
-    cliente = db.relationship('Cliente', back_populates='legajo', uselist=False)
+    cliente_id = db.Column(db.Integer, db.ForeignKey('cliente.id'))
+    cliente = db.relationship('Cliente', back_populates='legajos')
     
     estado_id = db.Column(db.Integer, db.ForeignKey('estado.id'))
     estado = db.relationship('Estado', back_populates='legajos', uselist=False)

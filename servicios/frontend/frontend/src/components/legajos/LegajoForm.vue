@@ -20,10 +20,19 @@
     </div>
     <div class="col-md-6">
       <label for="cuit" class="form-label">CUIT</label>
-      <input type="number" class="form-control" id="cuit" required v-model="form.cuit" placeholder="Ingresar CUIT." />
+      <div class="d-flex">
+        <input type="number" class="form-control me-2" id="cuit" required v-model="form.cuit"
+          placeholder="Ingresar CUIT." />
+        <button class="btn btn-secondary" @click.prevent="validarCuit()"><svg xmlns="http://www.w3.org/2000/svg" width="24"
+            height="24" viewBox="0 0 24 24">
+            <path fill="currentColor"
+              d="M9.5 16q-2.725 0-4.612-1.888T3 9.5t1.888-4.612T9.5 3t4.613 1.888T16 9.5q0 1.1-.35 2.075T14.7 13.3l5.6 5.6q.275.275.275.7t-.275.7t-.7.275t-.7-.275l-5.6-5.6q-.75.6-1.725.95T9.5 16m0-2q1.875 0 3.188-1.312T14 9.5t-1.312-3.187T9.5 5T6.313 6.313T5 9.5t1.313 3.188T9.5 14" />
+          </svg></button>
+      </div>
       <div class="invalid-feedback">Por favor, ingrese CUIT.</div>
     </div>
     <div class="col-md-6">
+
       <label for="email" class="form-label">Email</label>
       <input type="email" class="form-control" id="email" required v-model="form.email" placeholder="Ingresar email." />
       <div class="invalid-feedback">Por favor, ingrese un email valido.</div>
@@ -162,6 +171,38 @@ export default {
         this.toast.error('Hubo un error cargando las áreas. Intente de nuevo más tarde.')
       }
     },
+    async validarCuit() {
+      const cuit = this.form.cuit;
+      if (!cuit || cuit.length === 0) {
+        return
+      }
+      try {
+        this.toast.info('Buscando cliente...')
+        const authStore = useAuthStore();
+        const token = authStore.getToken();
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/legajos/validar-cuit/${cuit}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        )
+        if (response.status === 404) {
+          throw new Error('No existe un cliente con ese CUIT.')
+        }
+        if (response.data) {
+          this.form = { ... this.form, ...response.data }
+          this.form.nombreCliente = response.data.nombre
+          this.toast.success('Cliente encontrado.')
+        }
+      } catch (e) {
+        console.error(e)
+        this.toast.error("No existe un cliente con ese CUIT.")
+        this.resetForm()
+      }
+      return
+    },
+
     async validateForm() {
       const form = this.$refs.formRef
       if (form.checkValidity()) {
@@ -232,7 +273,8 @@ export default {
       this.form.objetivo = ''
       this.form.es_juridico = false
       this.form.necesita_facturacion = false
-      this.form.area = ''
+      this.form.area = '',
+      this.form.nombreCliente = ''
     },
   },
 }

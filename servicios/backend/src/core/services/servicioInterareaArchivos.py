@@ -4,6 +4,7 @@ from servicios.backend.src.core.services.servicioInterarea import generarNroInte
 from docx import Document   
 import os
 import io
+import zipfile
 
 def generar_solicitud(tipo):
     output_file_name = None  
@@ -76,6 +77,36 @@ def subir_archivo_firmado(file, id):
             os.rename(original_file_path, new_file_path)
         
         return new_file_name
+    except Exception as e:
+        print(f"Error en servicio interarea: {str(e)}")
+        return None
+    
+
+def guardar_documentos_resultado(id, documentos):
+    try:
+        carpeta = "documentos/interareas/resultados"
+        for documento in documentos:
+            file_name = f"{id}-{documento.filename}"
+            file_path = os.path.join(carpeta, file_name)
+            documento.save(file_path)
+    except Exception as e:
+        print(f"Error en servicio interarea: {str(e)}")
+        return None
+
+def descargar_resultado(id):
+    try:
+        carpeta = "documentos/interareas/resultados"
+        archivos = [f for f in os.listdir(carpeta) if f.startswith(f"{id}-")]
+        if not archivos:
+            print("No se encontraron archivos para la ID proporcionada.")
+            return None
+        zip_buffer = io.BytesIO()
+        with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
+            for archivo in archivos:
+                file_path = os.path.join(carpeta, archivo)
+                zip_file.write(file_path, arcname=archivo)
+        zip_buffer.seek(0)
+        return zip_buffer
     except Exception as e:
         print(f"Error en servicio interarea: {str(e)}")
         return None

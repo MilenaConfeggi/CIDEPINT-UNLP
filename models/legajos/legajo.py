@@ -19,6 +19,7 @@ class Legajo(db.Model):
     estado_id = db.Column(db.Integer, db.ForeignKey('estado.id'))
     estado = db.relationship('Estado', back_populates='legajos', uselist=False)
     
+
     resultado_encuesta = db.relationship('ResultadoEncuesta', back_populates='legajo')
     mail = db.relationship('Mail', back_populates='legajo')
     muestras = db.relationship('Muestra', back_populates='legajo')

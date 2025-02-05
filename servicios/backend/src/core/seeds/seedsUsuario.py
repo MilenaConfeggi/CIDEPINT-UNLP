@@ -397,6 +397,7 @@ def seeds_usuarios():
             "get_documentos_adicionales",
             "view_adicional",
             "get_documentos_by_tipo",
+            "descargar_resultado_interarea"
         ]
         PERMISSIONS = {  # Acá van los permisos que tiene cada rol
             "Director": [  # Tienen que ser declarados previamente en todosLosPermisos
@@ -454,6 +455,7 @@ def seeds_usuarios():
                 "get_documentos_adicionales",
                 "view_adicional",
                 "get_documentos_by_tipo",
+                "descargar_resultado_interarea"
             ],
             "Secretaria": [
                 "listar_usuarios",
@@ -509,6 +511,7 @@ def seeds_usuarios():
                 "get_documentos_adicionales",
                 "view_adicional",
                 "get_documentos_by_tipo",
+                "descargar_resultado_interarea"
             ],
             "Jefe de area": [
                 "listar_muestras_identificadas",
@@ -522,7 +525,6 @@ def seeds_usuarios():
                 "cargar_interarea",
                 "generar_certificado",
                 "ver_certificado",
-                "cargar_interarea_firmada",
                 "listarStans",  # este es el de presupuestos
                 "generar_presupuesto",
                 "generar_presupuestont",
@@ -552,6 +554,7 @@ def seeds_usuarios():
                 "get_documentos_adicionales",
                 "view_adicional",
                 "get_documentos_by_tipo",
+                "descargar_resultado_interarea"
             ],
             "Trabajador": [
                 "listar_muestras_identificadas",
@@ -576,6 +579,7 @@ def seeds_usuarios():
                 "view_adicional",
                 "get_documentos_by_tipo",
                 "ver_documentacion",
+                "descargar_resultado_interarea"
             ],
         }
 

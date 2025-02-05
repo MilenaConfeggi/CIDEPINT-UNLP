@@ -82,13 +82,6 @@ const routes = [
     meta: { requiresAuth: true, showNavbar: true },
   },
   {
-    path: '/interarea-detalle/:id',
-    name: 'InterareaDetalle',
-    component: () => import('../components/interareas/DetalleInterarea.vue'),
-    props: true,
-    meta: { requiresAuth: true, showNavbar: true },
-  },
-  {
     path: '/nueva-interarea',
     name: 'NuevaInterarea',
     component: () => import('../components/interareas/NuevaInterarea.vue'),
@@ -160,6 +153,13 @@ const routes = [
     path: '/generar_presupuesto/:id_legajo',
     name: 'generar_presupuesto',
     component: () => import('../components/presupuestos/GenerarPresupuesto.vue'),
+    props: true,
+    meta: { requiresAuth: true, showNavbar: true },
+  },
+  {
+    path: '/generar_presupuesto_en_pesos/:id_legajo',
+    name: 'generar_presupuesto_en_pesos',
+    component: () => import('../components/presupuestos/GenerarPresupuestoPesos.vue'),
     props: true,
     meta: { requiresAuth: true, showNavbar: true },
   },

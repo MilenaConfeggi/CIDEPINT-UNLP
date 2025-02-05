@@ -138,4 +138,13 @@ def cambiar_jefe_area():
     servicioUsuario.cambiar_jefe_area(data)
     return jsonify({"message": "Se cambió el jefe de área exitosamente"}), 200
 
-
+@bp.get("/todos")
+@jwt_required()
+def listar_todos_los_usuarios():
+    if not check_permission("listar_usuarios"):
+        return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
+    
+    usuarios = servicioUsuario.listar_todos_los_usuarios()
+    data = usuariosConNombreSchema.dump(usuarios, many=True)
+    
+    return jsonify(data), 200

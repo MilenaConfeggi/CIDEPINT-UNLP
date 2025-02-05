@@ -117,3 +117,33 @@ def guardar_resultado(id):#Jefes de áreas
         print(f"Error: {str(e)}")
         return jsonify({"error": f"Error: {str(e)}"}), 500
     
+@bp.post("/guardar_resultado_documentos/<int:id>")
+@jwt_required()
+def guardar_resultado_documentos(id):
+    if not check_permission("guardar_resultado"):
+        return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
+    try:
+        documentos = request.files.getlist("documentos")  
+        servicioInterareaArchivos.guardar_documentos_resultado(id, documentos)
+        return jsonify({"message": "Resultado guardado exitosamente"}), 200
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        return jsonify({"error": f"Error: {str(e)}"}), 500
+    
+@bp.get("/descargar_resultado_documentos/<int:id>")
+@jwt_required()
+def descargar_resultado_documentos(id):
+    if not check_permission("descargar_resultado_interarea"):
+        return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
+    try:
+        print("Descargando archivos...")
+        archivos = servicioInterareaArchivos.descargar_resultado(id)
+        return send_file(
+            archivos,
+            mimetype="application/zip",
+            as_attachment=True,
+            download_name=f"resultados_interarea-{id}.zip"
+        )
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        return jsonify({"error": f"Error: {str(e)}"}), 500

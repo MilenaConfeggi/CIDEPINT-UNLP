@@ -16,29 +16,14 @@
             <h5 class="card-title">Número de muestra: {{ muestra.nro_muestra }}</h5>
             <p class="card-text">Iden cliente: {{ muestra.iden_cliente }}</p>
             <p class="card-text">Fecha de ingreso: {{ muestra.fecha_ingreso }}</p>
-            <div class="d-flex align-items-center">
-              <button @click="mostrarFotos(muestra.id)" class="btn btn-primary">Ver fotos</button>
-              <template v-if="muestra.terminada">
-                <p class="text-danger mb-0 ml-2">Terminada</p>
-              </template>
-              <template v-else>
-                <button v-if="tienePermisoTerminar" @click="confirmarTerminarMuestra(muestra.id)" class="btn btn-danger ml-2">Terminar</button>
-              </template>
-            </div>
+            <p v-if="muestra.terminada" class="text-danger mb-0">Terminada</p>
+            <button v-if="tienePermisoTerminar && !muestra.terminada" @click="confirmarTerminarMuestra(muestra.id)" class="btn btn-danger btn-sm btn-terminar">Terminar</button>
           </div>
         </div>
       </div>
     </div>
     <div v-else-if="!error && !noMuestras" class="text-center">
       <p class="text-muted">No hay muestras disponibles.</p>
-    </div>
-
-    <!-- Modal de ListadoFotosIden -->
-    <div v-if="mostrarListadoFotos" class="modal-overlay" @click="cerrarListadoFotos">
-      <div class="modal-content" @click.stop>
-        <button class="close-button" @click="cerrarListadoFotos">&times;</button>
-        <ListadoFotosIden :muestra-id="muestraSeleccionada" />
-      </div>
     </div>
   </div>
 </template>
@@ -47,14 +32,11 @@
 import { ref, onMounted, watch, computed } from 'vue';
 import { useMuestrasStore } from '@/stores/muestras';
 import { storeToRefs } from 'pinia';
-import ListadoFotosIden from './ListadoFotosIden.vue';
 import axios from 'axios';
 import { useAuthStore } from '@/stores/auth';
 
 export default {
-  components: {
-    ListadoFotosIden
-  },
+  components: {},
   props: {
     legajoId: {
       type: Number,
@@ -78,6 +60,7 @@ export default {
     const fetchMuestras = async () => {
       noMuestras.value = false;
       error.value = null;
+      muestras.value = []; // Limpiar el estado de las muestras antes de la nueva solicitud
       try {
         await store.fetchMuestras(props.legajoId);
         if (muestras.value.length === 0) {
@@ -91,16 +74,6 @@ export default {
           error.value = err.response?.data?.message || 'Error al obtener las muestras';
         }
       }
-    };
-
-    const mostrarFotos = (muestraId) => {
-      muestraSeleccionada.value = muestraId;
-      mostrarListadoFotos.value = true;
-    };
-
-    const cerrarListadoFotos = () => {
-      mostrarListadoFotos.value = false;
-      muestraSeleccionada.value = null;
     };
 
     const confirmarTerminarMuestra = (muestraId) => {
@@ -134,7 +107,7 @@ export default {
 
     watch(() => props.legajoId, fetchMuestras);
 
-    return { muestras, error, mostrarFotos, cerrarListadoFotos, mostrarListadoFotos, muestraSeleccionada, confirmarTerminarMuestra, tienePermisoTerminar, noMuestras };
+    return { muestras, error, muestraSeleccionada, confirmarTerminarMuestra, tienePermisoTerminar, noMuestras };
   }
 };
 </script>
@@ -156,6 +129,9 @@ export default {
 
 .card-body {
   padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .card-title {
@@ -214,5 +190,16 @@ export default {
 
 .mb-0 {
   margin-bottom: 0;
+}
+
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  border-radius: 0.2rem;
+}
+
+.btn-terminar {
+  align-self: flex-end;
 }
 </style>

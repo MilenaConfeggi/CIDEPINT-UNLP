@@ -415,7 +415,196 @@ def generar_presupuesto(data):
     delivery_info = [
         ("<b>Entrega de informes o muestras:</b> El CIDEPINT entregará el informe en mano o via mail una vez que el/los ensayo/s se encuentren abonados en su totalidad, lo mismo para la entrega de muestras.", normal_style),
         ("<b>Lugar de retiro de informes:</b> Sede CIDEPINT sito en calle 52 / 121 y 122 S/N La Plata.", normal_style),
-        ("<b>Retiro de muestras:</b> El cliente podrá solicitar la devolución de la/s muestra/s sobrantes, o los residuos de las ensayadas, en el momento de retirar el informe o bien dentro de los treinta (30) días de salida del mismo. Si transcurrido este plazo el cliente no hizo lugar a dicha solicitud, la Dirección del CIDEPINT podrá disponer el destino final de aquéllas/os.", normal_style),
+        ("<u><b>RETIRO DE MUESTRAS:</b> EL CLIENTE PODRÁ SOLICITAR LA DEVOLUCIÓN DE LA/S MUESTRA/S SOBRANTES, O LOS RESIDUOS DE LAS ENSAYADAS, EN EL MOMENTO DE RETIRAR EL INFORME O BIEN DENTRO DE LOS TREINTA (30) DÍAS DE SALIDA DEL MISMO. SI TRANSCURRIDO ESTE PLAZO EL CLIENTE NO HIZO LUGAR A DICHA SOLICITUD, LA DIRECCIÓN DEL CIDEPINT PODRÁ DISPONER EL DESTINO FINAL DE AQUÉLLAS/OS.</u>", normal_style),
+    ]
+
+    for info in delivery_info:
+        content.append(Paragraph(info[0], info[1]))
+        content.append(Spacer(1, 12))
+
+
+    # Nota final
+    content.append(Spacer(1, 60))
+    content.append(Paragraph("Nota:<b> En caso de aceptarse el presente presupuesto, se recomienda comunicarse con el CIDEPINT con el fin de solicitar información acerca de las condiciones en que debe remitirse el material a ensayar.</b>", chiquito_style))
+    
+    # Construir el PDF usando el canvas numerado
+    doc.build(content, canvasmaker=NumberedCanvas)
+
+    print(f"PDF generado: {output_filename}")
+
+    # Crear el documento en la base de datos
+    data = {
+        "nombre_documento": "presupuesto.pdf",
+        "estado_id": 5,
+        "legajo_id": legajo.id,
+        "tipo_id": 2
+    }
+    servicioDocumento.crear_documento(data)
+
+def generar_presupuesto_en_pesos(data):
+    # Completar con los datos necesarios
+    legajo = Legajo.query.filter_by(id=data.get('legajo')).first()
+    medioDePago = MedioPago.query.filter_by(id=data.get('medioDePago')).first()
+    presupuesto = data.get('presupuesto')
+
+    precio = 0
+    estans = []
+    estans_presu = []
+    cantidades = []
+    for dupla in data.get('seleccionados'):
+        estan = STAN.query.filter_by(id=dupla.get('id')).first()
+        estan_presu = PresupuestoStan.query.filter_by(stan_id=estan.id, presupuesto_id = presupuesto.id).first()
+        precio += estan_presu.precio_carga * dupla.get('cantidad')
+        estans.append(estan)
+        estans_presu.append(estan_presu)
+        cantidades.append(dupla.get('cantidad'))
+
+    # Crear la ruta de destino
+    certificado_dir = os.path.join(UPLOAD_FOLDER, "presupuestos", str(legajo.id))
+    os.makedirs(certificado_dir, exist_ok=True)  # Crear el directorio si no existe
+
+    # Eliminar archivos que comienzan con "presupuesto"
+    for archivo in os.listdir(certificado_dir):
+        archivo_path = os.path.join(certificado_dir, archivo)
+        if os.path.isfile(archivo_path) and archivo.startswith("fpresupuesto_firmado_"):
+            os.remove(archivo_path)
+
+    timestamp = datetime.now().strftime("%Y%m%d")
+    output_filename = os.path.join(certificado_dir, f"presupuesto_{timestamp}.pdf")
+
+    styles = getSampleStyleSheet()
+    # Configurar el documento
+    doc = SimpleDocTemplate(
+        output_filename,
+        pagesize=letter,
+        rightMargin=72,
+        leftMargin=72,
+        topMargin=186,  # Espacio adicional para el header
+        bottomMargin=80  # Espacio adicional para el footer
+    )
+
+    # Estilos predefinidos
+    header_style = ParagraphStyle(
+        'HeaderStyle',
+        parent=styles['Normal'],
+        fontSize=11,
+        leading=14,
+        alignment=0
+    )
+    
+    title_style = ParagraphStyle(
+        'TitleStyle',
+        parent=styles['Heading1'],
+        fontSize=14,
+        alignment=1,
+        spaceAfter=5
+    )
+
+    derecha_style = ParagraphStyle(
+        'DerechaStyle',
+        parent=styles['Normal'],
+        fontSize=11,
+        alignment=2,
+    )
+
+    rojo_style = ParagraphStyle(
+        'RojoStyle',
+        parent=styles['Normal'],
+        fontSize=11,
+        color='red',
+        textColor=colors.red
+    )
+    
+    normal_style = ParagraphStyle(
+        'NormalStyle',
+        parent=styles['Normal'],
+        fontSize=11,
+        leading=14,
+        fontName='Helvetica'
+    )
+    
+
+    chiquito_style = ParagraphStyle(
+        'ChiquitoStyle',
+        parent=styles['Normal'],
+        fontSize=8,
+        leading=14,
+        fontName='Helvetica'
+    )
+    
+    bold_style = ParagraphStyle(
+        'BoldStyle',
+        parent=styles['Normal'],
+        fontSize=11,
+        leading=14,
+        fontName='Helvetica-Bold'
+    )
+    content = []
+
+    # Referencia y fecha
+    content.append(Paragraph(f"Ref.: Leg. Int. N° {legajo.id}", derecha_style))
+    content.append(Spacer(1, 12))
+    content.append(Paragraph(f"LA PLATA, {datetime.now().strftime("%d de %B de %Y")}", derecha_style))
+    content.append(Spacer(1, 12))
+
+    # Datos del cliente
+    content.append(Paragraph("<b>Señores</b>", normal_style))
+    content.append(Paragraph(legajo.cliente.contacto, normal_style))
+    content.append(Paragraph(f"<b>Mail:</b> {legajo.cliente.email}", normal_style))
+    content.append(Paragraph(f"<b>At.</b> {legajo.cliente.nombre}", normal_style))
+    content.append(Spacer(1, 20))
+    
+    # Número de presupuesto
+    content.append(Paragraph(f"<b>PRESUPUESTO Nº {presupuesto.nro_presupuesto}</b>", title_style))
+    content.append(Paragraph("Por la realización de los siguientes ensayos:", normal_style))
+    content.append(Spacer(1, 12))
+
+    # Ensayos
+    total_costo = 0
+    i=0
+    for stan in estans:
+        if estans[i].precio_por_muestra:
+            content.append(Paragraph(f"• {estans[i].numero} de {cantidades[i]} muestras", normal_style))
+        else:
+            content.append(Paragraph(f"• {estans[i].numero} por {cantidades[i]} horas", normal_style))
+        content.append(Paragraph(f"<b>Costo: $ {round(estans_presu[i].precio_carga * cantidades[i],2)}</b>", normal_style))
+        content.append(Spacer(1, 6))
+        i+=1
+
+    content.append(Spacer(1, 12))
+    content.append(Paragraph(f"<b>Costo final del ensayo............................$ {precio:.2f}.-</b>", bold_style))
+    content.append(Spacer(1, 20))
+
+    # Información adicional
+    content.append(Paragraph("<b>Mantenimiento de la oferta:</b> 15 días corridos.", normal_style))
+    content.append(Spacer(1, 12))
+    content.append(Paragraph('<b>Aceptación del presupuesto:</b> <span color="red">"ORDEN DE COMPRA A NOMBRE DE FUNDACIÓN FACULTAD DE INGENIERIA".</span>', normal_style))
+    content.append(Spacer(1, 12))
+
+    # Percepciones
+    content.append(Paragraph("<b>Percepciones:</b> ESTA COTIZACIÓN NO INCLUYE EL MONTO CORRESPONDIENTE A LA PERCEPCIÓN DEL IMPUESTO SOBRE LOS INGRESOS BRUTOS DE LA PROVINCIA DE BUENOS AIRES, EL CUAL DEPENDERÁ DE LA SITUACIÓN IMPOSITIVA DE CADA CLIENTE.", normal_style))
+    content.append(Spacer(1, 12))
+
+    # Información de pago
+    content.append(Paragraph("<b>Facturación y pago:</b> a la recepción de la factura enviada por correo electrónico.", normal_style))
+    content.append(Spacer(1, 12))
+    content.append(Paragraph("Las posibilidades de pago son:", normal_style))
+    content.append(Spacer(1, 6))
+
+    payment_info = """• Transferencia o depósito bancario en BANCO NACION CTA. CTE 163005/45 CBU 0110030320000163005456 ó BANCO GALICIA CTA. CTE. 4916/2 172/3 CBU 0070172920000004916231. En caso de transferencia o depósito bancario enviar comprobante al correo electrónico servicios@cidepint.ing.unlp.edu.ar, sin este comprobante no se podrá imputar el pago."""
+    content.append(Paragraph(payment_info, normal_style))
+    content.append(Spacer(1, 12))
+
+    # Información legal
+    legal_info = """El CIDEPINT pone en conocimiento del Contratante que la FUNDACIÓN DE LA FACULTAD DE INGENIERÍA PARA LA TRANSFERENCIA TECNOLÓGICA Y LA PROMOCIÓN DE EMPRESAS DE BIENES Y SERVICIOS, matrícula N° 13705 de la Dirección de Personas Jurídicas de la Provincia de Buenos Aires, CUIT 30-67798003-2, con domicilio en calle 1 N° 732 de la ciudad de La Plata, provincia de Buenos Aires, administrará los fondos contemplados en el presente presupuesto, en su carácter de UNIDAD DE VINCULACIÓN TECNOLÓGICA (U.V.T.)."""
+    content.append(Paragraph(legal_info, normal_style))
+    content.append(Spacer(1, 12))
+
+    # Información de entrega
+    delivery_info = [
+        ("<b>Entrega de informes o muestras:</b> El CIDEPINT entregará el informe en mano o via mail una vez que el/los ensayo/s se encuentren abonados en su totalidad, lo mismo para la entrega de muestras.", normal_style),
+        ("<b>Lugar de retiro de informes:</b> Sede CIDEPINT sito en calle 52 / 121 y 122 S/N La Plata.", normal_style),
+        ("<u><b>RETIRO DE MUESTRAS:</b> EL CLIENTE PODRÁ SOLICITAR LA DEVOLUCIÓN DE LA/S MUESTRA/S SOBRANTES, O LOS RESIDUOS DE LAS ENSAYADAS, EN EL MOMENTO DE RETIRAR EL INFORME O BIEN DENTRO DE LOS TREINTA (30) DÍAS DE SALIDA DEL MISMO. SI TRANSCURRIDO ESTE PLAZO EL CLIENTE NO HIZO LUGAR A DICHA SOLICITUD, LA DIRECCIÓN DEL CIDEPINT PODRÁ DISPONER EL DESTINO FINAL DE AQUÉLLAS/OS.</u>", normal_style),
     ]
 
     for info in delivery_info:
@@ -574,6 +763,32 @@ def crear_presupuesto_con_stans(data):
     db.session.commit()
     data['presupuesto'] = presupuesto
     generar_presupuesto(data)
+    return presupuesto
+
+def crear_presupuesto_con_stans_en_pesos(data):
+    legajo = buscar_legajo(data.get('legajo'))
+    presupuesto = Presupuesto(
+        precio=-1,
+        legajo=legajo,
+        #medio_de_pago_id=data.get('medioDePago'),
+    )
+    db.session.add(presupuesto)
+    db.session.flush()
+
+    acu=0
+    for dupla in data.get('seleccionados'):
+        aux = buscar_stan(dupla.get('id')).precio_pesos
+        presupuesto_stan = PresupuestoStan(
+            presupuesto_id=presupuesto.id,
+            stan_id=dupla.get('id'),
+            precio_carga = aux,
+        )
+        acu += aux * dupla.get('cantidad')
+        db.session.add(presupuesto_stan)
+    presupuesto.precio = acu
+    db.session.commit()
+    data['presupuesto'] = presupuesto
+    generar_presupuesto_en_pesos(data)
     return presupuesto
 
 def crear_presupuestont_con_stans(data):

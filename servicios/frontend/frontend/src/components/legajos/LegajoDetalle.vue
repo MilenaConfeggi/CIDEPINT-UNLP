@@ -49,8 +49,7 @@
               v-if="
                 !legajo.admin_habilitado &&
                 existeDocumento('Presupuesto CIDEPINT') &&
-                existeDocumento('Presupuesto CONICET') &&
-                existeDocumento('Orden de compra')
+                existeDocumento('Presupuesto CONICET')
               "
               class="btn btn-dark"
               @click="adminLegajo"
@@ -72,7 +71,7 @@
                   <td>
                     <div class="dropdown">
                       <button
-                        class="btn btn-dark dropdown-toggle"
+                        :class="['btn dropdown-toggle', existeDocumento(documento.nombre) ? 'btn-success' : 'btn-dark']"
                         type="button"
                         data-bs-toggle="dropdown"
                         aria-expanded="false"
@@ -177,7 +176,15 @@
                               :to="`/generar_presupuesto/${legajo.id}`"
                               class="dropdown-item"
                             >
-                              Generar
+                              Generar Presupuesto en Dólares
+                            </RouterLink>
+                          </li>
+                          <li v-if="hasPermission('generar_presupuesto')">
+                            <RouterLink
+                              :to="`/generar_presupuesto_en_pesos/${legajo.id}`"
+                              class="dropdown-item"
+                            >
+                              Generar Presupuesto en Pesos
                             </RouterLink>
                           </li>
                           <li
@@ -264,7 +271,7 @@
                               Ver documento
                             </button>
                           </li>
-                          <li v-if="existeDocumento(documento.nombre)">
+                          <li v-if="existeDocumento(documento.nombre) && documento.nombre !== 'Orden Facturación'">
                             <label :for="`edit-pdf-${documento.id}`" class="dropdown-item">
                               Editar
                               <input
@@ -284,7 +291,8 @@
                             documento.nombre !== 'Presupuesto CIDEPINT' &&
                             documento.nombre !== 'Factura' &&
                             documento.nombre !== 'Adicional' &&
-                            documento.nombre !== 'Legajo'
+                            documento.nombre !== 'Legajo' &&
+                            documento.nombre !== 'Orden Facturación'
                           "
                         >
                           <li v-if="!existeDocumento(documento.nombre)">

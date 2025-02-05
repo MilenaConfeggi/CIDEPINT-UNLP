@@ -59,7 +59,6 @@ def create_legajo(data):
 
 
 def find_legajo_by_id(id):
-
     return db.session.query(Legajo).filter_by(id=id).first()
 
 

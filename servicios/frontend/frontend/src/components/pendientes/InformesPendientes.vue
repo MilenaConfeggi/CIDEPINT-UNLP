@@ -1,6 +1,5 @@
 <template>
     <div class="container my-5">
-        <!-- Títulos -->
         <div class="row">
             <div class="col-md-6">
                 <h2 class="text-center">Informes Pendientes por Firmar</h2>
@@ -9,9 +8,7 @@
                 <h2 class="text-center">Informes Pendientes por Cargar</h2>
             </div>
         </div>
-        <!-- Listados -->
         <div class="row">
-            <!-- Informes por Firmar -->
             <div class="col-md-6">
                 <div class="listado">
                     <div v-for="informe in paginatedFirmar" :key="informe.id" class="card mb-3 shadow-sm informe-card">
@@ -41,9 +38,7 @@
                 </div>
             </div>
         </div>
-        <!-- Paginación -->
         <div class="row mt-3">
-            <!-- Paginación por Firmar -->
             <div class="col-md-6 text-center">
                 <div class="pagination">
                     <button :disabled="currentFirmarPage === 1" @click="changeFirmarPage(currentFirmarPage - 1)" class="btn btn-primary">
@@ -55,7 +50,6 @@
                     </button>
                 </div>
             </div>
-            <!-- Paginación por Cargar (condicional) -->
             <div class="col-md-6 text-center" v-if="userRole.includes('informes_pendientes_cargar')">
                 <div class="pagination">
                     <button :disabled="currentCargarPage === 1" @click="changeCargarPage(currentCargarPage - 1)" class="btn btn-primary">
@@ -84,11 +78,9 @@ export default {
             userRole: JSON.parse(localStorage.getItem("permisos")) || [],
             area: JSON.parse(localStorage.getItem("area")) || 0,
 
-            // Paginación por Firmar
             currentFirmarPage: 1,
             itemsPerPageFirmar: 1,
 
-            // Paginación por Cargar
             currentCargarPage: 1,
             itemsPerPageCargar: 1,
 
@@ -171,25 +163,29 @@ export default {
 </script>
 
 <style scoped>
+.container {
+    max-width: 1200px;
+}
+
 .informe-card {
-    border: 1px solid #e0e0e0;
+    border: 1px solid #dee2e6;
     border-radius: 8px;
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    transition: all 0.3s ease-in-out;
+    background: white;
 }
 
 .informe-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-4px);
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
 }
 
-.card-title {
-    font-size: 1.2rem;
+.text-center h2 {
+    font-size: 1.4rem;
     font-weight: bold;
-}
-
-.card-text {
-    font-size: 0.9rem;
-    color: #555;
+    color: #343a40;
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 0.5rem;
+    display: inline-block;
 }
 
 .btn-success {
@@ -197,28 +193,40 @@ export default {
     padding: 0.5rem 1rem;
 }
 
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
 .pagination span {
-    margin: 0 1rem;
     font-weight: bold;
+    color: #495057;
 }
 
 .pagination .btn {
-    margin: 0 0.5rem;
-}
-
-.text-center h2 {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #333;
-    border-bottom: 2px solid #007bff;
-    padding-bottom: 0.5rem;
+    padding: 0.4rem 1rem;
+    font-size: 0.9rem;
 }
 
 .listado {
     padding: 1rem;
-    background: #f9f9f9;
+    background: #f8f9fa;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+.card-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #007bff;
+}
+
+.card-text {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-bottom: 0.3rem;
+}
 </style>

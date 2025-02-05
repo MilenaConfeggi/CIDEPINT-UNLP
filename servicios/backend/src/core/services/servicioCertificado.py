@@ -21,7 +21,6 @@ def generar_certificado(id_legajo, empleados, descripcion):
     fecha_desde = legajo.fecha_entrada.strftime("%d/%m/%Y")
     fecha_hasta = datetime.now().strftime("%d/%m/%Y")
     monto = legajo.presupuesto_cidepint[0].precio
-    print(legajo.nro_factura)
     if legajo.nro_factura is None:
         factura = ""
     else:
@@ -86,7 +85,8 @@ def generar_certificado(id_legajo, empleados, descripcion):
     # Agregar la tabla con datos de los integrantes
     datos_tabla = [["Nombre y Apellido", "Función", "% de Participación"]]
     for empleado in empleados:
-        datos_tabla.append([empleado["nombre"], empleado["funcion"], empleado["participacion"]])
+        nombre_completo = f"{empleado['nombre']} {empleado['apellido']}"
+        datos_tabla.append([nombre_completo, empleado["funcion"], empleado["participacion"]])
 
     # Crear y estilizar la tabla
     tabla_integrantes = Table(datos_tabla, colWidths=[200, 150, 100])

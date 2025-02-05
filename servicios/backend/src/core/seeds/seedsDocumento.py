@@ -85,6 +85,9 @@ def seeds_tipos_documento():
         {
             'nombre': 'Recibo',
         },
+        {
+            'nombre': 'Confirmación de pago',
+        }
     ]
     for data in tipos_documento_data:
         db.session.add(Tipo_Documento(**data))

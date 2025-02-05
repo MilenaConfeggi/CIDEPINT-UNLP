@@ -18,7 +18,7 @@
       <dl class="divide-y divide-gray-100">
         <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
           <dt class="text-sm/6 font-medium text-gray-900">Saldo</dt>
-          <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">${{ '{:,.0f}'.format(fondo.saldo) }}</dd>
+          <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">${{ '{:,.2f}'.format(fondo.saldo) }}</dd>
         </div>
         <form method="POST" action="{{ url_for('contable.crear_ingreso', fondo_id = fondo.id) }}" enctype="multipart/form-data">
             <input type="text" name="csrf_token" value="{{ csrf_token() }}" hidden>
@@ -28,7 +28,7 @@
                 <div class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0 flex space-x-4">
                     <div>
                         <label for="monto" class="block text-sm/6 font-medium text-gray-900">Monto</label>
-                        <input type="number" name="monto" id="monto" class="form-control block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm/6" placeholder="Ingrese el monto">
+                        <input type="number" step="any" name="monto" id="monto" class="form-control block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm/6" placeholder="Ingrese el monto">
                     </div>
                     <div>
                         <label for="file" class="block text-sm/6 font-medium text-gray-900">Archivo</label>
@@ -54,7 +54,7 @@
                                 clip-rule="evenodd" />
                             </svg>
                             <div class="ml-4 flex min-w-0 flex-1 gap-2">
-                                <span class="truncate font-medium">{{ '{:,.0f}'.format(ingreso.monto) }}</span>
+                                <span class="truncate font-medium">{{ '{:,.2f}'.format(ingreso.monto) }}</span>
                             </div>
                           </div>
                           <div class="flex w-0 flex-1 items-center">

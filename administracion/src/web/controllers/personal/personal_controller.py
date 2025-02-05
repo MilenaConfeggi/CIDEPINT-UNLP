@@ -46,7 +46,10 @@ def registrar_usuario():
         fecha_nacimiento = request.form.get('fecha_nacimiento') or None
         observaciones = request.form.get('observaciones') or None
         rol = request.form['rol']
+        saldo = request.form.get('saldo') or None
         
+        print(f'Saldo: {saldo}')
+
         # Verificar si el usuario ya existe
         existing_user = User.query.join(Empleado).filter(
             or_(User.username == username, Empleado.email == email)
@@ -75,7 +78,8 @@ def registrar_usuario():
             telefono=telefono,
             domicilio=domicilio,
             fecha_nacimiento=fecha_nacimiento,
-            observaciones=observaciones
+            observaciones=observaciones,
+            saldo=saldo
         )
         success, message = nuevo_empleado.save()
         if success:
@@ -94,7 +98,7 @@ def registrar_usuario():
     
     # Determinar las opciones de rol disponibles según el rol del usuario actual
     if current_user.rol == 'Administrador':
-        roles_disponibles = ['Colaborador', 'Administrador', 'Personal']
+        roles_disponibles = ['Personal', 'Colaborador', 'Administrador']
     elif current_user.rol == 'Colaborador':
         roles_disponibles = ['Personal']
     else:
@@ -108,6 +112,7 @@ def registrar_usuario():
         {'name': 'dni', 'label': 'DNI', 'type': 'text', 'required': True},
         {'name': 'nombre', 'label': 'Nombre', 'type': 'text', 'required': True},
         {'name': 'apellido', 'label': 'Apellido', 'type': 'text', 'required': True},
+        {'name': 'saldo', 'label': 'Saldo', 'type': 'number', 'required': False, 'step': 'any'},
         {'name': 'dependencia', 'label': 'Dependencia', 'type': 'select', 'required': False, 'options': ['UNLP', 'CIC', 'CONICET']},
         {'name': 'cargo', 'label': 'Cargo', 'type': 'select', 'required': False, 'options': ['Investigador', 'CPA', 'Administrativo', 'Técnico']},
         {'name': 'subdivision_cargo', 'label': 'Subdivisión del Cargo', 'type': 'select', 'required': False, 'options': {
@@ -316,6 +321,7 @@ def ver_perfil(id):
             nombre = request.form.get('nombre')
             apellido = request.form.get('apellido')
             dni = request.form.get('dni')
+            saldo = request.form.get('saldo')
             
             logging.debug(f'Username: {username}, Email: {email}, Nombre: {nombre}, Apellido: {apellido}, DNI: {dni}')
             
@@ -335,6 +341,8 @@ def ver_perfil(id):
             user.empleado.telefono = request.form.get('telefono') or None
             user.empleado.domicilio = request.form.get('domicilio') or None
             user.empleado.observaciones = request.form.get('observaciones') or None
+            if saldo:
+                user.empleado.saldo = saldo
             
             # Solo permitir modificar el área si el usuario es 'Administrador'
             if current_user.rol == 'Administrador':

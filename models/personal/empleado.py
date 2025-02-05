@@ -33,7 +33,7 @@ class Empleado(db.Model):
     telefono = db.Column(db.String(20), nullable=True)
     domicilio = db.Column(db.String(200), nullable=True)
     fecha_nacimiento = db.Column(db.Date, nullable=True)
-    saldo = db.Column(db.Float, default=0.0)   
+    saldo = db.Column(db.Float, default=0.00)   
     observaciones = db.Column(db.Text, nullable=True)
     archivos = db.relationship('Archivo', back_populates='empleado')
     ausencias = db.relationship('Ausencia', back_populates='empleado')
@@ -75,7 +75,7 @@ class Empleado(db.Model):
             raise ValueError(f"Subdivisión de cargo '{value}' no es válida para el cargo '{self.cargo}'.")
         return value
 
-    def __init__(self, user, email, area, dni, nombre, apellido, dependencia=None, cargo=None, subdivision_cargo=None, telefono=None, domicilio=None, fecha_nacimiento=None, observaciones=None, habilitado=True, rol='Personal'):
+    def __init__(self, user, email, area, dni, nombre, apellido, dependencia=None, cargo=None, subdivision_cargo=None, telefono=None, domicilio=None, fecha_nacimiento=None, observaciones=None, habilitado=True, rol='Personal', saldo=0.00):
         self.user = user
         self.email = email
         self.area = area
@@ -93,6 +93,7 @@ class Empleado(db.Model):
         self.rol = rol
         self.primer_login = True
         self.usuario_servicio = None
+        self.saldo = saldo
 
     def __repr__(self) -> str:
         return f"Empleado {self.nombre} {self.apellido}"

@@ -82,13 +82,6 @@ const routes = [
     meta: { requiresAuth: true, showNavbar: true },
   },
   {
-    path: '/interarea-detalle/:id',
-    name: 'InterareaDetalle',
-    component: () => import('../components/interareas/DetalleInterarea.vue'),
-    props: true,
-    meta: { requiresAuth: true, showNavbar: true },
-  },
-  {
     path: '/nueva-interarea',
     name: 'NuevaInterarea',
     component: () => import('../components/interareas/NuevaInterarea.vue'),

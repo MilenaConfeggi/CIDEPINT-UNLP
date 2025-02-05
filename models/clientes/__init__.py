@@ -1,20 +1,10 @@
 from models.base import db
 from models.clientes.cliente import Cliente
-from models.legajos import Legajo
 
 
 def create_cliente(data, legajo_id):
-    cliente = find_cliente_by_cuit(data.get("cuit"))
-    if cliente is None:
-        cliente = Cliente(**data)
-    else:
-        for key, value in data.items():
-            if getattr(cliente, key) != value:
-                setattr(cliente, key, value)
-    legajo = db.session.query(Legajo).filter_by(id=legajo_id).first()
-    if legajo is None:
-        return None
-    cliente.legajos.append(legajo)
+    cliente = Cliente(**data)
+    cliente.legajo_id = legajo_id
     db.session.add(cliente)
     db.session.commit()
     return cliente

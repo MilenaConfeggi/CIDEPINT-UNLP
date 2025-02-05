@@ -14,12 +14,12 @@ class Legajo(db.Model):
     nro_factura = db.Column(db.String(100), nullable=True)
     admin_habilitado = db.Column(db.Boolean, default=False)
     
-    cliente_id = db.Column(db.Integer, db.ForeignKey('cliente.id'))
-    cliente = db.relationship('Cliente', back_populates='legajos')
+    cliente = db.relationship('Cliente', back_populates='legajo', uselist=False)
     
     estado_id = db.Column(db.Integer, db.ForeignKey('estado.id'))
     estado = db.relationship('Estado', back_populates='legajos', uselist=False)
     
+
     resultado_encuesta = db.relationship('ResultadoEncuesta', back_populates='legajo')
     mail = db.relationship('Mail', back_populates='legajo')
     muestras = db.relationship('Muestra', back_populates='legajo')

@@ -33,7 +33,7 @@ class Empleado(db.Model):
     telefono = db.Column(db.String(20), nullable=True)
     domicilio = db.Column(db.String(200), nullable=True)
     fecha_nacimiento = db.Column(db.Date, nullable=True)
-    saldo = db.Column(db.Float, default=0.00)   
+    saldo = db.Column(db.DECIMAL(12,2), default=0.00)   
     observaciones = db.Column(db.Text, nullable=True)
     archivos = db.relationship('Archivo', back_populates='empleado')
     ausencias = db.relationship('Ausencia', back_populates='empleado')

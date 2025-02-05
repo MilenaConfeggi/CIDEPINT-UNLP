@@ -14,6 +14,8 @@ from administracion.src.core import Empleado as empleadoDB
 from models.base import db
 from models.personal.empleado import Empleado
 from models.empleado_distribucion.empleado_distribucion import Empleado_Distribucion
+from decimal import Decimal
+
 bp = Blueprint("contable",__name__,url_prefix="/contable")
 
 
@@ -273,7 +275,7 @@ def crear_distribucion(id):
         empleados = empleadoDB.list_empleados()
         colaboradores = [empleado for empleado in empleados if empleado.user.rol == "Colaborador" or empleado.user.rol == "Administrador"]
         for colaborador in colaboradores:
-            colaborador.saldo += round((((monto_modificado * (1 - porcentaje_area)) * 0.05) / len(colaboradores)), 2)
+            colaborador.saldo += Decimal(round((((monto_modificado * (1 - porcentaje_area)) * 0.05) / len(colaboradores)), 2))
         
         # Relación con los empleados
         if empleados_ids:
@@ -281,7 +283,7 @@ def crear_distribucion(id):
             for empleado_id in empleados_ids:
                 empleado = db.session.query(Empleado).get(empleado_id)
                 if empleado:
-                    empleado.saldo += monto_empleado
+                    empleado.saldo += Decimal(monto_empleado)
                     empleado_distribucion = Empleado_Distribucion(
                         empleado_id=empleado.id,
                         distribucion_id=nueva_distribucion.id
@@ -317,20 +319,20 @@ def delete_distribucion():
     #Restar lo que se sumo
     area_ganancias = distribucion.ganancias_de_id
     area_costos = distribucion.costos_de_id
-    porcentaje_area = distribucion.porcentaje_area * 0.01
-    porcentaje_empleados = distribucion.porcentaje_empleados * 0.01
-    porcentaje_comisiones = distribucion.porcentaje_comisiones * 0.01
+    porcentaje_area = Decimal(distribucion.porcentaje_area * 0.01)
+    porcentaje_empleados = Decimal(distribucion.porcentaje_empleados * 0.01)
+    porcentaje_comisiones = Decimal(distribucion.porcentaje_comisiones * 0.01)
     monto_a_distribuir = distribucion.monto_a_distribuir
     costos = distribucion.costos
     areaDB.sumar_saldo_area(area_costos, round(-costos, 2))
     monto_modificado = round((monto_a_distribuir * (1 - porcentaje_comisiones)) - costos, 2)
     areaDB.sumar_saldo_area(area_ganancias, round(-(monto_modificado * porcentaje_area) * (1 - porcentaje_empleados), 2))
     areaCidepint = areaDB.get_area_by_name("CIDEPINT")
-    areaDB.sumar_saldo_area(areaCidepint.id, round(-(monto_modificado * (1 - porcentaje_area)) * 0.95, 2))
+    areaDB.sumar_saldo_area(areaCidepint.id, round(-(monto_modificado * Decimal(1 - porcentaje_area)) * Decimal(0.95), 2))
     empleados = empleadoDB.list_empleados()
     colaboradores = [empleado for empleado in empleados if empleado.user.rol == "Colaborador" or empleado.user.rol == "Administrador"]
     for colaborador in colaboradores:
-        colaborador.saldo -= (((monto_modificado * (1 - porcentaje_area)) * 0.05) / len(colaboradores))
+        colaborador.saldo -= Decimal((((monto_modificado * Decimal(1 - porcentaje_area)) * Decimal(0.05)) / len(colaboradores)))
 
     empleados_ids = [ed.empleado_id for ed in distribucion.empleados_asociados]
     if empleados_ids:

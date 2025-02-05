@@ -16,7 +16,7 @@ class Compra(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     fecha = db.Column(db.DateTime, nullable=False)
     numero_factura = db.Column(db.String(30), nullable=False)
-    importe = db.Column(db.Float, nullable=False)
+    importe = db.Column(db.DECIMAL(12,2), nullable=False)
     causa_rechazo = db.Column(db.String(200), nullable=True)
     descripcion = db.Column(db.String(200), nullable=False)
     observaciones = db.Column(db.String(200), nullable=True)

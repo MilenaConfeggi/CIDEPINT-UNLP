@@ -5,7 +5,7 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 class Area(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(80), unique=True, nullable=False)
-    saldo = db.Column(db.Float, nullable=False)
+    saldo = db.Column(db.DECIMAL(12,2), nullable=False)
 
     bienes = db.relationship('Bien', back_populates='area')
     compras = db.relationship('Compra', secondary=compra_area, back_populates='areas')

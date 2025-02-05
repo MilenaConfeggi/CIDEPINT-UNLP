@@ -64,6 +64,7 @@ def crear_usuario(data):
         usuario.rol=data.get('rol')
         usuario.esta_borrado=False
         usuario.cambiar_contra=True
+        enviar_contrasena_por_mail(data.get('mail'), contrasena)
         db.session.commit()
         return usuario
     
@@ -269,3 +270,9 @@ def es_secretaria(usuario):
 
 def listar_usuarios_paginados(page, per_page):
     return Usuario.query.filter_by(esta_borrado=False).paginate(page=page, per_page=per_page)
+
+def listar_todos_los_usuarios():
+    return Usuario.query.filter(
+        Usuario.esta_borrado == False,
+        Usuario.rol.has(Rol.nombre.notin_(["Secretaria", "Director"]))
+    ).all()

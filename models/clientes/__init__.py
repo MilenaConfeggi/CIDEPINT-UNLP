@@ -9,11 +9,12 @@ def create_cliente(data, legajo_id):
     db.session.commit()
     return cliente
 
+
 def get_cliente(id):
     return db.session.query(Cliente).filter_by(id=id).first()
 
 def list_clientes():
     return db.session.query(Cliente).all()
 
-def find_cliente_by_mail(mail):
-    return db.session.query(Cliente).filter_by(email=mail).first()
+def find_cliente_by_cuit(cuit):
+    return db.session.query(Cliente).filter_by(cuit=cuit).first()

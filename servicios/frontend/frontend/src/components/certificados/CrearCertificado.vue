@@ -4,18 +4,32 @@
     <h1 class="text-center mb-4">Generar Certificado</h1>
     <hr class="line">
     <form @submit.prevent="submitForm" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 form-container">
-      <div v-for="(empleado, index) in empleados" :key="index" class="mb-4">
-        <label class="block text-gray-700 text-sm font-bold mb-2">{{ empleado.nombre }}</label>
-        <div class="mb-2">
-          <label class="block text-gray-700 text-sm font-bold mb-2">Función:</label>
-          <select v-model="empleado.funcion" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-            <option value="Responsable del equipo">Responsable del equipo</option>
-            <option value="Integrante del equipo">Integrante del equipo</option>
-          </select>
+      <div class="mb-4">
+        <label class="block text-gray-700 text-sm font-bold mb-2">Seleccionar Empleado:</label>
+        <select v-model="selectedEmpleado" @change="agregarEmpleado" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+          <option value="" disabled selected>Seleccione un empleado</option>
+          <option v-for="empleado in empleados" :key="empleado.id" :value="empleado">{{ empleado.nombre }} {{ empleado.apellido }}</option>
+        </select>
+      </div>
+      <div v-for="(empleado, index) in empleadosSeleccionados" :key="index" class="mb-4 card">
+        <div class="card-header">
+          <label class="block text-gray-700 text-sm font-bold mb-2">{{ empleado.nombre }} {{ empleado.apellido }}</label>
+          <button type="button" @click="eliminarEmpleado(index)" class="delete-button">
+            <i class="fas fa-trash-alt"></i>
+          </button>
         </div>
-        <div class="mb-2">
-          <label class="block text-gray-700 text-sm font-bold mb-2">Porcentaje de Participación:</label>
-          <input type="number" v-model="empleado.participacion" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
+        <div class="card-body">
+          <div class="mb-2">
+            <label class="block text-gray-700 text-sm font-bold mb-2">Función:</label>
+            <select v-model="empleado.funcion" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+              <option value="Responsable del equipo">Responsable del equipo</option>
+              <option value="Integrante del equipo">Integrante del equipo</option>
+            </select>
+          </div>
+          <div class="mb-2">
+            <label class="block text-gray-700 text-sm font-bold mb-2">Porcentaje de Participación:</label>
+            <input type="number" v-model="empleado.participacion" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
+          </div>
         </div>
       </div>
       <div class="mb-4">
@@ -50,6 +64,8 @@ const route = useRoute();
 const idLegajo = route.params.id_legajo;
 
 const empleados = ref([]);
+const empleadosSeleccionados = ref([]);
+const selectedEmpleado = ref(null);
 const descripcion = ref('');
 const fetchError = ref(null);
 const submitError = ref(null);
@@ -57,7 +73,7 @@ const successMessage = ref(null);
 
 const fetchEmpleados = async () => {
   try {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/certificado/obtener_empleados/${idLegajo}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/usuarios/todos`, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`,
       },
@@ -67,9 +83,9 @@ const fetchEmpleados = async () => {
       throw new Error(result.message || 'Error al obtener los empleados');
     }
     empleados.value = result.map(empleado => ({
-      nombre: empleado,
-      funcion: 'Integrante del equipo',
-      participacion: 0,
+      id: empleado.id,
+      nombre: empleado.nombre,
+      apellido: empleado.apellido,
     }));
   } catch (err) {
     fetchError.value = err.message || 'Error desconocido';
@@ -84,21 +100,36 @@ const fetchDescripcion = async () => {
       },
     });
 
-    const result = await response.text();
+    const result = await response.json();
     console.log('Descripción recibida:', result);
 
     if (response.status !== 200) {
       throw new Error('Error al obtener la descripción');
     }
 
-    // Asigna directamente el resultado como descripción
-    descripcion.value = result || ''; // Si es nulo, asegúrate de usar una cadena vacía
+    descripcion.value = result || '';
     console.log('Descripción actualizada:', descripcion.value);
   } catch {
-    // En caso de error, deja el campo descripción vacío
     descripcion.value = '';
     console.log('No se pudo obtener la descripción, el campo queda vacío.');
   }
+};
+
+const agregarEmpleado = () => {
+  if (selectedEmpleado.value && !empleadosSeleccionados.value.some(e => e.id === selectedEmpleado.value.id)) {
+    empleadosSeleccionados.value.push({
+      ...selectedEmpleado.value,
+      nombre: selectedEmpleado.value.nombre,
+      apellido: selectedEmpleado.value.apellido,
+      funcion: 'Integrante del equipo',
+      participacion: 0,
+    });
+    selectedEmpleado.value = null;
+  }
+};
+
+const eliminarEmpleado = (index) => {
+  empleadosSeleccionados.value.splice(index, 1);
 };
 
 const submitForm = async () => {
@@ -111,11 +142,11 @@ const submitForm = async () => {
   }
 
   const data = {
-    empleados: empleados.value,
+    empleados: empleadosSeleccionados.value,
     descripcion: descripcion.value,
   };
 
-  console.log('Datos enviados:', data); // <-- Aquí
+  console.log('Datos enviados:', data);
 
   try {
     toast.info('Generando certificado...')
@@ -129,7 +160,7 @@ const submitForm = async () => {
     });
 
     const result = await response.json();
-    console.log('Respuesta del servidor:', result); // <-- Aquí
+    console.log('Respuesta del servidor:', result);
 
     if (response.status !== 200) {
       throw new Error(result.message || 'Error al generar el certificado');
@@ -137,7 +168,7 @@ const submitForm = async () => {
     toast.success('Certificado generado correctamente')
     successMessage.value = result.message;
     setTimeout(() => {
-      
+      router.push(`/legajos/${idLegajo}`);
     }, 1500);
   } catch (err) {
     toast.error('Error al generar el certificado')
@@ -181,6 +212,38 @@ button {
 
 button:hover {
   background-color: #218838; 
+}
+
+.delete-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #dc3545;
+  font-size: 1.5rem;
+  padding: 0;
+}
+
+.delete-button:hover {
+  background-color: #ffdada;
+}
+
+.card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+  background-color: #f9f9f9;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.card-body {
+  padding: 8px 0;
 }
 
 .alert {

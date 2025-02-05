@@ -5,10 +5,13 @@ from models.legajos import (
     find_legajo_by_id,
     create_legajo,
     list_legajos_all,
+
 )
+from models.clientes import find_cliente_by_cuit
 from models.documentos import find_estado_by_nombre, get_documento
 from models.clientes import create_cliente
 from ..schemas.legajos import legajos_schema, legajo_schema, pagination_legajos_schema
+from ..schemas.cliente import cliente_schema
 from models.base import db
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -162,3 +165,13 @@ def enviar_correo_con_link_y_pdf():
     except Exception as e:
         print(f"Error al enviar el correo: {e}")
         return jsonify({"error": "Error al enviar el correo"}), 500
+
+@bp.get("/validar-cuit/<string:cuit>")
+@jwt_required()
+def validar_cuit(cuit):
+    cliente = find_cliente_by_cuit(cuit)
+    if cliente is None:
+        return jsonify({"error": "No se encontro el cliente"}), 404
+    data = cliente_schema.dump(cliente)
+    return jsonify(data), 200
+

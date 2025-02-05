@@ -33,6 +33,7 @@
 
 <script>
 import axios from 'axios';
+import { useAuthStore } from '@/stores/auth';
 
 export default {
   data() {
@@ -57,8 +58,12 @@ export default {
   methods: {
     async fetchInterareas() {
       try {
+        const authStore = useAuthStore();
+        const token = authStore.getToken();
         const status = this.userRole.includes('cargar_interarea_firmada') ? 1 : 2;
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/interareas`);
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/interareas`,{
+          headers: { Authorization : `Bearer ${token}` },
+        });
         if (status === 1) {
           this.interareas = response.data.filter((interarea) => interarea.estadoInterarea_id === 1);
         } else {

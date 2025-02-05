@@ -52,14 +52,13 @@ def cargar_muestra(id_legajo):
                 return jsonify({"message": f"La identificación {elem['iden_cliente']} está siendo ingresada más de una vez en este lote. Modificalo y vuelve a intentar"}), 400
             if not servicioMuestras.validar_longitud(muestra):
                 return jsonify({"message": "La identificación del cliente no puede superar los 100 caracteres"}), 400
-            print("fecha ingreso", elem['fecha_ingreso'])
             if not servicioMuestras.validar_fecha(elem['fecha_ingreso']):
                 return jsonify({"message": "La fecha de ingreso no puede ser mayor a la fecha actual"}), 400
             muestras.append(muestra)
         for muestra in muestras:
             muestra = servicioMuestras.crear_muestra(muestra, id_legajo)
 
-        return jsonify({"message": "Muestras cargadas correctamente"}), 200
+        return jsonify({"message": "Muestras cargadas correctamente, recargue la página para ver los cambios"}), 200
     except ValidationError as e:
         return jsonify({"message": "Ha ocurrido un error inesperado, revise que muestras se han cargado antes de volver a intentarlo"}), 400
     except Exception as e:
@@ -75,59 +74,52 @@ def terminar_muestra(id_muestra):
 @bp.post("/subir_fotos/<int:legajo_id>")
 @jwt_required()
 def cargar_fotos(legajo_id):
-    if 'archivo' not in request.files:
-        return jsonify({"error": "Debes seleccionar un archivo"}), 400
+    if 'archivos' not in request.files:
+        return jsonify({"error": "Debes seleccionar al menos un archivo"}), 400
 
-    archivo = request.files['archivo']
-    muestra_id = request.form.get('muestra_id')
+    archivos = request.files.getlist('archivos')
     fecha = request.form.get('fecha')
 
-    if not archivo or archivo.filename == '':
-        return jsonify({"error": "Por favor seleccione un archivo"}), 400
+    if not archivos or any(archivo.filename == '' for archivo in archivos):
+        return jsonify({"error": "Por favor selecciona archivos válidos"}), 400
 
-    if not muestra_id or not fecha:
-        return jsonify({"error": "Muestra y fecha son requeridos"}), 400
+    if not fecha:
+        return jsonify({"error": "La fecha es requerida"}), 400
 
     try:
-        muestra_id = int(muestra_id)
-        filename = secure_filename(archivo.filename).replace(" ", "_")  # Reemplazar espacios con guion bajo
-        foto_data = {
-            'nombre_archivo': filename,
-            'fecha': fecha,
-            'muestra_id': muestra_id
-        }
-        try:
-            foto = fotoSchema.load(foto_data)
-        except ValidationError as err:
-                return jsonify({"message": f"Error en la fecha  {fecha}"}), 400
-        if( not servicioMuestras.validar_fecha(foto.get('fecha'))):
-            return jsonify({"message": "La fecha de la foto no puede ser mayor a la fecha actual"}), 400
-        servicioMuestras.crear_foto(foto, muestra_id)
-        
-        # Guardar el archivo en el servidor
-        folder_path = os.path.join(UPLOAD_FOLDER, "muestras", str(muestra_id))
-        os.makedirs(folder_path, exist_ok=True)
-        archivo.save(os.path.join(folder_path, filename))
+        for archivo in archivos:
+            filename = secure_filename(archivo.filename).replace(" ", "_")  # Reemplazar espacios con guion bajo
+            foto_data = {
+                'nombre_archivo': filename,
+                'fecha': fecha,
+                'legajo_id': legajo_id,  # Añadir legajo_id
+                'muestra_id': None  # No se relaciona con una muestra
+            }
+            try:
+                foto = fotoSchema.load(foto_data)
+            except ValidationError as err:
+                return jsonify({"message": f"Error en la fecha {fecha}"}), 400
+            if not servicioMuestras.validar_fecha(foto.get('fecha')):
+                return jsonify({"message": "La fecha de la foto no puede ser mayor a la fecha actual"}), 400
+            if servicioMuestras.hay_muestra_legajo(legajo_id) == None:
+                return jsonify({"message": "Aun no hay muestras identificadas para este legajo"}), 404
+            servicioMuestras.crear_foto(foto, servicioMuestras.hay_muestra_legajo(legajo_id).id)
+            
+            # Guardar el archivo en el servidor
+            folder_path = os.path.join(UPLOAD_FOLDER, "muestras", str(legajo_id))
+            os.makedirs(folder_path, exist_ok=True)
+            archivo.save(os.path.join(folder_path, filename))
 
-        return jsonify({"message": "Fotos subidas con éxito"}), 200
+        return jsonify({"message": "Fotos subidas con éxito, recargue la página para ver los cambios"}), 200
     except ValidationError as err:
-        print(err.messages)  # Imprime los mensajes de error de validación
         return jsonify({"message": f"Error en la validación de los datos: {err.messages}"}), 400
     except Exception as e:
-        print(e)  # Imprime el error para depuración
         return jsonify({"message": "Ha ocurrido un error inesperado"}), 500
   
 
-@bp.get("/fotos/<int:id_muestra>")
-@jwt_required()
-def listar_fotos(id_muestra):
-    fotos = servicioMuestras.listar_fotos(id_muestra)
-    data = fotosSchema.dump(fotos, many=True)
-    return jsonify(data), 200
-
-@bp.get("/imagenes/<int:id_muestra>/<filename>")
-def obtener_imagen(id_muestra, filename):
-    folder_path = os.path.normpath(os.path.join(UPLOAD_FOLDER, "muestras", str(id_muestra)))
+@bp.get("/imagenes/<int:id_legajo>/<filename>")
+def obtener_imagen(id_legajo, filename):
+    folder_path = os.path.normpath(os.path.join(UPLOAD_FOLDER, "muestras", str(id_legajo)))
     file_path = os.path.normpath(os.path.join(folder_path, filename))
     if not os.path.exists(file_path):
         abort(404, description="Resource not found")
@@ -137,6 +129,7 @@ def obtener_imagen(id_muestra, filename):
 @jwt_required()
 def listar_fotos_por_legajo(id_legajo):
     fotos = servicioMuestras.listar_fotos_por_legajo(id_legajo)
+    print(fotos)
     data = fotosSchema.dump(fotos, many=True)
     return jsonify(data), 200
 

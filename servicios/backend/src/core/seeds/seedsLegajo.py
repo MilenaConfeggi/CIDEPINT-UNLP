@@ -2,7 +2,6 @@ from datetime import datetime
 from models.legajos.legajo import Legajo
 from models.clientes.cliente import Cliente
 from models.legajos import create_legajo, find_legajo_by_id
-from models.clientes import find_cliente_by_mail
 from models.base import db
 from models.presupuestos.presupuesto import Presupuesto
 from models.presupuestos.presupuesto_stan import PresupuestoStan

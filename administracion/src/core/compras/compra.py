@@ -7,7 +7,7 @@ from models.base import db
 from administracion.src.core.proveedores.proveedor import buscar_proveedor
 from administracion.src.core.servicios.personal import conseguir_empleado_de_id, conseguir_area_de_id
 from administracion.src.core.fondos.fondo import conseguir_fondo_de_id
-
+from decimal import Decimal
 
 def buscar_compra(id_compra):
     return Compra.query.filter(Compra.id == id_compra).first()
@@ -75,7 +75,7 @@ def procesar_contribuciones(compra_id, entidades, tabla_asociativa, atributo_sal
                 )
             )
         if estado_enum == estado_compra.REALIZADA and atributo_saldo:
-            setattr(entidad_obj, atributo_saldo, getattr(entidad_obj, atributo_saldo) - contribucion)
+            setattr(entidad_obj, atributo_saldo, getattr(entidad_obj, atributo_saldo) - Decimal(contribucion))
             db.session.add(entidad_obj)
 
 def obtener_estado_enum(estado):

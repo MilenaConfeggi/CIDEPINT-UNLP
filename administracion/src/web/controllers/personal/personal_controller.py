@@ -322,6 +322,7 @@ def ver_perfil(id):
             apellido = request.form.get('apellido')
             dni = request.form.get('dni')
             saldo = request.form.get('saldo')
+            rol = request.form.get('rol')
             
             logging.debug(f'Username: {username}, Email: {email}, Nombre: {nombre}, Apellido: {apellido}, DNI: {dni}')
             
@@ -341,8 +342,11 @@ def ver_perfil(id):
             user.empleado.telefono = request.form.get('telefono') or None
             user.empleado.domicilio = request.form.get('domicilio') or None
             user.empleado.observaciones = request.form.get('observaciones') or None
-            if saldo:
-                user.empleado.saldo = saldo
+            if current_user.rol == 'Administrador':
+                if saldo:
+                    user.empleado.saldo = saldo
+                if rol:
+                    user.rol = rol
             
             # Solo permitir modificar el área si el usuario es 'Administrador'
             if current_user.rol == 'Administrador':
@@ -384,6 +388,8 @@ def ver_perfil(id):
         'Administrativo': ['ART 9', 'Ley 10430']
     }
     
+    roles_disponibles = ['Personal', 'Colaborador', 'Administrador']
+
     campos = [
         {'name': 'username', 'label': 'Nombre de Usuario', 'type': 'text', 'value': user.username or ''},
         {'name': 'email', 'label': 'Correo Electrónico', 'type': 'email', 'value': user.empleado.email or ''},
@@ -398,6 +404,7 @@ def ver_perfil(id):
         {'name': 'telefono', 'label': 'Teléfono', 'type': 'text', 'value': user.empleado.telefono or ''},
         {'name': 'domicilio', 'label': 'Domicilio', 'type': 'text', 'value': user.empleado.domicilio or ''},
         {'name': 'observaciones', 'label': 'Observaciones', 'type': 'textarea', 'value': user.empleado.observaciones or ''},
+        {'name': 'rol', 'label': 'Rol', 'type': 'select', 'required': True, 'options': roles_disponibles, 'value': user.rol},
     ]
     
     # Loguear los campos que se envían al template

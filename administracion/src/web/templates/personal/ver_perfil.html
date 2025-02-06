@@ -42,7 +42,11 @@
           {% if campo.type == 'textarea' %}
             <textarea name="{{ campo.name }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">{{ campo.value }}</textarea>
           {% elif campo.type == 'select' %}
-            <select name="{{ campo.name }}" id="{{ campo.name }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" {% if campo.disabled %}disabled{% endif %}>
+            <select name="{{ campo.name }}" 
+            id="{{ campo.name }}" 
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" 
+            {% if campo.disabled %}disabled{% endif %}
+            {% if campo.name == 'rol' and (current_user.id == user.id or current_user.rol == 'Colaborador') %}disabled{% endif %}>
               {% if not campo.value %}
                 <option value="" selected>Seleccione una opción</option>
               {% endif %}

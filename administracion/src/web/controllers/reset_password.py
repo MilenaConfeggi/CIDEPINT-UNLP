@@ -15,7 +15,7 @@ def reset_password():
         # Verificar si el email existe en la base de datos
         empleado = Empleado.query.filter_by(email=email).first()
         if not empleado:
-            flash('Email not found.', 'danger')
+            flash('No existe un empleado con la dirección de correo electrónico ingresada.', 'danger')
             return redirect(url_for('reset.reset_password'))
         
         user = empleado.user

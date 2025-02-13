@@ -18,6 +18,9 @@ from models.personal.personal import User
 from models.personal.empleado import Empleado
 from models.archivos_admin.archivo import Archivo
 import textwrap
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 personal_bp = Blueprint("personal", __name__, url_prefix="/personal")
 
@@ -83,11 +86,20 @@ def registrar_usuario():
         )
         success, message = nuevo_empleado.save()
         if success:
-            msg = Message('Nuevo usuario', sender=current_app.config['MAIL_DEFAULT_SENDER'], recipients=[email])
-            #Añadir link
-            msg.body = f'Se ha creado un nuevo usuario para esta dirección de correo electrónico en la página de administración del CIDEPINT https://administracion.cidepint.com/login. Tus datos para acceder a la página son Usuario: {username} y Contraseña: {password}'
-            mail = current_app.extensions.get('mail')  # Obtén la instancia de Mail desde la aplicación
-            mail.send(msg)
+            servidor = smtplib.SMTP('smtp.gmail.com', 587)
+            servidor.starttls()
+            servidor.login(current_app.config["MAIL_USER"], current_app.config["MAIL_PASSWORD"])
+
+            msg = MIMEMultipart()
+            msg["From"] = current_app.config["MAIL_USER"]
+            msg["To"] = email
+            msg["Subject"] = "Nuevo usuario"
+
+            body = f'Se ha creado un nuevo usuario para esta dirección de correo electrónico en la página de administración del CIDEPINT https://administracion.cidepint.com/login. Tus datos para acceder a la página son Usuario: {username} y Contraseña: {password}'
+            msg.attach(MIMEText(body, 'plain', 'utf-8'))
+
+            servidor.sendmail(current_app.config["MAIL_USER"], email, msg.as_string().encode("utf-8"))
+            servidor.quit()
             flash('Usuario registrado con éxito', 'success')
         else:
             flash(message, 'error')

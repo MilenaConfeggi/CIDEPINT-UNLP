@@ -3,8 +3,13 @@
     Pagina de Cotable
 {% endblock %}
 {% block content %}
+{% if current_user.rol == 'Personal' %}
+<a href="{{url_for('home')}}"
+    class="inline-flex items-center px-3 py-4 rounded-md text-black-500 hover:bg-black-50">
+{% else %}
 <a href="{{url_for('contable.index')}}"
     class="inline-flex items-center px-3 py-4 rounded-md text-black-500 hover:bg-black-50">
+{% endif %}
     <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-6 w-6">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h18">
         </path>

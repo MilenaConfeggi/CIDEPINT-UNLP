@@ -3,10 +3,12 @@ from administracion.src.core.ingresos import ingreso as ingresoDB
 from administracion.src.core.servicios import archivos_admin as archivos_adminDB
 from models import distribucion as distribucionDB
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, send_file, send_from_directory
+from flask_login import current_user
 from administracion.src.web.forms.fondo_nuevo import FormularioNuevoFondo
 from administracion.src.web.forms.ingreso_nuevo import FormularioNuevoIngreso
 from administracion.src.web.forms.distribucion_nuevo import FormularioNuevaDistribucion
 from models import legajos as legajoDB
+from models.legajos.legajo import Legajo
 from administracion.src.web.controllers.roles import role_required
 from administracion.src.core import Area as areaDB
 from administracion.src.core import Empleado as empleadoDB
@@ -15,12 +17,6 @@ from models.base import db
 from models.personal.empleado import Empleado
 from models.empleado_distribucion.empleado_distribucion import Empleado_Distribucion
 from decimal import Decimal
-
-bp = Blueprint("contable",__name__,url_prefix="/contable")
-
-
-
-#
 from models.documentos import listar_tipos_documentos, get_tipo_documento, create_documento, find_documento, get_tipo_documento_nombre,get_documento
 from models.documentos import find_estado_by_nombre
 from models.documentos import create_estado
@@ -29,6 +25,9 @@ from datetime import datetime
 from pathlib import Path
 import os
 from administracion.src.web.forms.documento_legajo_nuevo import UploadDocumentoForm ,DownloadForm ,DeleteForm
+
+bp = Blueprint("contable",__name__,url_prefix="/contable")
+
 @bp.get("/")
 @role_required('Administrador', 'Colaborador')
 def index():
@@ -196,13 +195,17 @@ def descargar_ingreso(id):
 
 
 @bp.get("/legajos")
-@role_required('Administrador', 'Colaborador')
+@role_required('Administrador', 'Colaborador', 'Personal')
 def get_legajos():
     params = request.args.to_dict()
     page = request.args.get("page", 1, type=int)
     per_page = 10
-    legajos = legajoDB.list_legajos(page, per_page,None,None,None,None,None,True)
+    if current_user.rol == "Personal":
+        legajos = Legajo.query.filter(Legajo.area_id == current_user.empleado.area_id).paginate(page=page,per_page=per_page,error_out=True)
+    else:
+        legajos = legajoDB.list_legajos(page, per_page,None,None,None,None,None,True)
     #legajos = [legajo for legajo in legajos if legajo.necesita_facturacion]
+
     forms = {}
     for legajo in legajos:
         forms[legajo.id] = UploadDocumentoForm(legajo_id=legajo.id)

@@ -361,7 +361,7 @@ def get_documentosAdd(id):
     form = UploadDocumentoForm(legajo_id=id)
     form.tipo.data = "adicional"
     legajo = legajoDB.find_legajo_by_id(id)
-    documentos = [doc for doc in legajo.documento if doc.tipo_documento.nombre == "adicional"]
+    documentos = [doc for doc in legajo.documento if doc.tipo_documento.nombre == "Adicional"]
     delete_form = DeleteForm()
     return render_template("contable/legajo_adicionales.html",form = form,legajo = legajo,documentos = documentos, delete_form=delete_form)
 

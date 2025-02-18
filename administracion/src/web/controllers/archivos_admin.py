@@ -3,7 +3,7 @@ import os
 from administracion.src.core.servicios import archivos_admin as servicio_archivos
 from flask import Blueprint, render_template, request, redirect, url_for, flash, send_from_directory
 from flask_login import current_user
-from administracion.src.web.forms.carpeta_nueva import FormularioNuevaCarpeta
+from administracion.src.web.forms.carpeta_nueva import FormularioNuevaCarpeta, FormularioNuevaSubcarpeta
 from administracion.src.web.controllers.roles import role_required
 from administracion.src.core.servicios import personal as servicio_personal
 from administracion.src.core.ingresos import ingreso as ingresoDB
@@ -21,6 +21,18 @@ def index():
     return render_template("archivos_admin/lista_carpetas.html",carpetas=carpetas,anios=anios)
 
 
+def buscar_permiso_leer(carpeta):
+    if carpeta.padre:
+        return buscar_permiso_leer(carpeta.padre)
+    else:
+        return current_user in carpeta.usuarios_leen
+    
+def buscar_permiso_editar(carpeta):
+    if carpeta.padre:
+        return buscar_permiso_editar(carpeta.padre)
+    else:
+        return current_user in carpeta.usuarios_editan
+
 @bp.get("/carpeta/<int:id_carpeta>")
 @role_required('Administrador', 'Colaborador', 'Personal') 
 def ver_carpeta(id_carpeta):
@@ -31,17 +43,28 @@ def ver_carpeta(id_carpeta):
     if not carpeta:
         flash("Carpeta no encontrada", 'error')
         return redirect(url_for('archivos.index'))
-    
-    if current_user.rol == 'Personal' and current_user not in carpeta.usuarios_leen:
-        flash("No tienes permisos para ver esta carpeta", 'error')
-        return redirect(url_for('archivos.index'))
-    
-    if current_user.rol == 'Personal':
-        puede_editar = current_user in carpeta.usuarios_editan
+    if not carpeta.padre:
+        if current_user.rol == 'Personal' and current_user not in carpeta.usuarios_leen:
+            flash("No tienes permisos para ver esta carpeta", 'error')
+            return redirect(url_for('archivos.index'))
+        
+        if current_user.rol == 'Personal':
+            puede_editar = current_user in carpeta.usuarios_editan
+        else:
+            puede_editar = True
     else:
-        puede_editar = True
+        if current_user.rol == 'Personal' and not buscar_permiso_leer(carpeta):
+            flash("No tienes permisos para ver esta carpeta", 'error')
+            return redirect(url_for('archivos.index'))
+         
+        if current_user.rol == 'Personal':
+            puede_editar = buscar_permiso_editar(carpeta)
+        else:
+            puede_editar = True
+    
+    subcarpetas = servicio_archivos.listar_subcarpetas(id_carpeta)
 
-    return render_template("archivos_admin/lista_archivos.html",archivos=archivos, carpeta=carpeta, anio=anio, puede_editar=puede_editar)
+    return render_template("archivos_admin/lista_archivos.html",archivos=archivos, carpeta=carpeta, anio=anio, puede_editar=puede_editar,subcarpetas=subcarpetas)
 
 
 @bp.get("/carpeta/agregar")
@@ -51,6 +74,21 @@ def nueva_carpeta():
     usuarios = servicio_personal.listar_usuarios_personal()
 
     return render_template("archivos_admin/nueva_carpeta.html",form=form, users=usuarios)
+
+
+@bp.get("/carpeta/agregarSubcarpeta/<int:id_carpeta>")
+@role_required('Administrador', 'Colaborador') 
+def nueva_subcarpeta(id_carpeta):
+    form = FormularioNuevaSubcarpeta()
+
+    padre = servicio_archivos.conseguir_carpeta_de_id(id_carpeta)
+    if not padre:
+        flash("Carpeta no encontrada", 'error')
+        return redirect(url_for('archivos.index'))
+    
+    form.id_padre.data = id_carpeta
+
+    return render_template("archivos_admin/nueva_subcarpeta.html",form=form, padre=padre)
 
 
 @bp.post("/carpeta/agregar")
@@ -76,6 +114,29 @@ def agregar_carpeta():
                 nombre=data.get('nombre'),
                 usuarios_leen=list(usuarios_leen),
                 usuarios_editan=list(usuarios_editan),
+            )
+        flash('Carpeta agregada correctamente', 'success')
+        return redirect (url_for("archivos.ver_carpeta", id_carpeta=carpeta.id))
+    else:
+        # Obtener el primer campo con error
+        first_error_field = next(iter(form.errors))
+        first_error_message = form.errors[first_error_field][0]  # Primer error del campo
+        # Mostrar el error
+        flash(f"El campo {getattr(form, first_error_field).label.text} {first_error_message}", 'error')
+        return render_template("archivos_admin/nueva_carpeta.html", form=form)
+
+
+@bp.post("/carpeta/agregarSubcarpeta")
+@role_required('Administrador', 'Colaborador', 'Personal')
+def agregar_subcarpeta():
+    form = FormularioNuevaSubcarpeta()
+
+    if form.validate_on_submit():
+        data = request.form
+    
+        carpeta = servicio_archivos.crear_subcarpeta(
+                nombre=data.get('nombre'),
+                padre=servicio_archivos.conseguir_carpeta_de_id(data.get('id_padre'))
             )
         flash('Carpeta agregada correctamente', 'success')
         return redirect (url_for("archivos.ver_carpeta", id_carpeta=carpeta.id))
@@ -150,7 +211,7 @@ def eliminar_archivo(id_carpeta):
 def eliminar_carpeta():
     data = request.form
     carpeta = servicio_archivos.conseguir_carpeta_de_id(data.get('id_carpeta'))
-    if carpeta.fondo != []:
+    if carpeta.fondo:
         flash('Para eliminar una carpeta asociada a un fondo, por favor elimine el fondo en la parte de contable', 'error')
         return redirect(url_for('archivos.index'))
     if servicio_archivos.eliminar_carpeta(id_carpeta=data.get('id_carpeta')):

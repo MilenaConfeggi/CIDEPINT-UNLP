@@ -160,7 +160,7 @@ def delete_ingreso():
         return redirect(url_for('contable.index'))
     
     # Restar el monto del ingreso del saldo del fondo
-    fond.saldo -= float(ingreso.monto)
+    fond.saldo -= Decimal(ingreso.monto)
     fondo.modificar_fondo(fondo_id, saldo=fond.saldo)
     
     # Eliminar archivo asociado si existe

@@ -1,6 +1,6 @@
 <template>
   <div class="container mt-4">
-    <h3 class="text-center mb-4">Subir Imágenes</h3>
+    <h3 class="text-center mb-4">Subir Archivos</h3>
     <form @submit.prevent="submitForm" enctype="multipart/form-data">
       <div class="mb-3">
         <label for="archivo" class="form-label">Selecciona archivos:</label>
@@ -111,7 +111,7 @@ export default {
         this.successMessage = data.message || 'Archivos subidos con éxito';
         console.log('Respuesta del servidor:', data);
       } catch (error) {
-        this.error = error.message || 'Hubo un problema al subir los archivos, asegúrate de que los archivos sean .png, .jpg o .jpeg';
+        this.error = error.message || 'Hubo un problema al subir los archivos, asegúrate de que los archivos sean .png, .jpg, .jpeg o .pdf';
         console.error('Error:', error);
       } finally {
         this.isUploading = false;

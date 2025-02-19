@@ -2,7 +2,7 @@ from models import db
 from models.mails.mail import Mail
 from datetime import datetime
 
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'pdf'}  
 
 def crear_mail(data, legajo_id):
     nuevo_mail = Mail(

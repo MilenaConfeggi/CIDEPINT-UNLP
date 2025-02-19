@@ -45,23 +45,70 @@
           </div>
       </div>
   </form>
+  <form method="POST" action="{{ url_for('archivos.eliminar_carpeta') }}">
+    <div class="modalFolder hidden" data-id="1" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+      <div class="fixed inset-0 bg-gray-500/75 transition-opacity" aria-hidden="true"></div>
+          <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+              <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                  <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+                      <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                          <h3 class="text-base font-semibold text-gray-900" id="modal-title">¿Eliminar carpeta?</h3>
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="id_carpeta" value="" />
+                      </div>
+                      <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                        <button type="submit" class="mt-3 mx-2 mb-2 inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-red-500 sm:mt-0 sm:w-auto">Confirmar</button>
+                        <button type="button" class="close-modal-folder mx-2 mb-2 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm hover:bg-gray-50 sm:ml-3 sm:w-auto">Cancelar</button>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </form>
   <div class="mx-auto content max-w-2xl px-4 py-4 sm:px-6 sm:py-4 lg:max-w-7xl lg:px-8">
     <h2 class="sr-only">Archivos</h2>
     <div class="mb-4 flex flex-wrap justify-between items-end">
-      <a href="{{url_for('archivos.index', anio=anio)}}"
-        class="inline-flex items-center px-3 py-4 rounded-md text-black-500 hover:bg-black-50">
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-6 w-6">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h18">
-            </path>
-        </svg>
-        <span class="ml-1 font-bold text-lg">Volver</span>
-      </a>
+      {% if carpeta.padre %}
+        <a href="{{url_for('archivos.ver_carpeta', id_carpeta=carpeta.id_padre)}}"
+          class="inline-flex items-center px-3 py-4 rounded-md text-black-500 hover:bg-black-50">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-6 w-6">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h18">
+              </path>
+          </svg>
+          <span class="ml-1 font-bold text-lg">Volver</span>
+        </a>
+      {% else %}
+        <a href="{{url_for('archivos.index', anio=anio)}}"
+          class="inline-flex items-center px-3 py-4 rounded-md text-black-500 hover:bg-black-50">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-6 w-6">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h18">
+              </path>
+          </svg>
+          <span class="ml-1 font-bold text-lg">Volver</span>
+        </a>
+      {% endif %}
       <h3 class="mb-4 text-lg font-semibold text-gray-600">{{ carpeta.nombre }}</h3>
     </div>
     <hr />
     <div class="grid pt-4 grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 xl:gap-x-8">
+      {% for carpeta in subcarpetas %}
+        <a file="False" data-id="{{ carpeta.id }}" href="{{url_for('archivos.ver_carpeta', id_carpeta=carpeta.id)}}" class="group">
+          <svg class="px-2 aspect-square w-full rounded-lg object-cover group-hover:opacity-75 xl:aspect-[7/7]"
+                  aria-hidden="true"
+                  fill="currentColor"
+                  viewBox="0 0 512 512"
+                  >
+                  <path
+                      fill-rule="evenodd"
+                      d="M0 96C0 60.7 28.7 32 64 32l132.1 0c19.1 0 37.4 7.6 50.9 21.1L289.9 96 448 96c35.3 0 64 28.7 64 64l0 256c0 35.3-28.7 64-64 64L64 480c-35.3 0-64-28.7-64-64L0 96zM64 80c-8.8 0-16 7.2-16 16l0 320c0 8.8 7.2 16 16 16l384 0c8.8 0 16-7.2 16-16l0-256c0-8.8-7.2-16-16-16l-161.4 0c-10.6 0-20.8-4.2-28.3-11.7L213.1 87c-4.5-4.5-10.6-7-17-7L64 80z"
+                      clip-rule="evenodd"
+                  ></path>
+          </svg>
+          <p class="mt-1 text-md font-medium text-gray-900 break-words">{{ carpeta.nombre }}</p>
+        </a>
+      {% endfor %}
       {% for archivo in archivos %}
-        <a data-id="{{ archivo.id }}" class="group" href="{{ url_for('archivos.descargar_archivo', id_carpeta=carpeta.id, id_archivo= archivo.id) }}" target="_blank">
+        <a file="True" data-id="{{ archivo.id }}" class="group" href="{{ url_for('archivos.descargar_archivo', id_carpeta=carpeta.id, id_archivo= archivo.id) }}" target="_blank">
           {% if archivo.nombre.endswith('.jpg') or archivo.nombre.endswith('.jpeg') or archivo.nombre.endswith('.png') or archivo.nombre.endswith('.gif') %}
               <svg class="px-7 aspect-square w-full rounded-lg bg-gray-200 object-cover group-hover:opacity-75 xl:aspect-[7/7]"
                   aria-hidden="true"
@@ -101,13 +148,28 @@
           </label>
           <input id="archivo" name="archivo" type="file" class="hidden" onchange="this.form.submit()">
         </form>
+        <a href="{{url_for('archivos.nueva_subcarpeta', id_carpeta=carpeta.id)}}">
+          <svg class="px-4 aspect-square w-full rounded-lg object-cover group-hover:opacity-75 xl:aspect-[7/7]"
+                  aria-hidden="true"
+                  fill="currentColor"
+                  viewBox="0 0 448 512"
+                  >
+                  <path
+                      fill-rule="evenodd"
+                      d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"
+                      clip-rule="evenodd"
+                  ></path>
+          </svg>
+          <p class="mt-1 text-md font-medium text-gray-900 break-words">Agregar carpeta</p>
+      </a>
       {% endif %}
   </div>
 </div>
 <script>
   // script.js
   const contextMenu = document.getElementById("context-menu");
-  let selectedFileId = null;
+  let selectedId = null;
+  let selectedFile = null;
 
   // Función para mostrar el menú contextual
   document.querySelectorAll('.group').forEach(item => {
@@ -127,7 +189,9 @@
       contextMenu.classList.remove("hidden");
 
       // Guardar el ID del archivo seleccionado
-      selectedFileId = item.getAttribute('data-id');
+      selectedId = item.getAttribute('data-id');
+
+      selectedFile = item.getAttribute('file');
     });
   });
 
@@ -146,13 +210,24 @@
 
   // Añadir funcionalidad a las opciones del menú contextual
   document.getElementById('eliminar').addEventListener('click', () => {
-    const modal = document.querySelector(`.modal`);
-    document.querySelector('input[name="id_archivo"]').value = selectedFileId;
-    modal.classList.remove('hidden');
+    if (selectedFile == "True") {
+      const modal = document.querySelector(`.modal`);
+      modal.classList.remove('hidden');
+      document.querySelector('input[name="id_archivo"]').value = selectedId;
+    } else {
+      const modalFolder = document.querySelector(`.modalFolder`);
+      modalFolder.classList.remove('hidden');
+      document.querySelector('input[name="id_carpeta"]').value = selectedId;
+    }
   });
 
   document.querySelector('.close-modal').addEventListener('click', () => {
     const modal = document.querySelector(`.modal`);
+    modal.classList.add('hidden');
+  });
+
+  document.querySelector('.close-modal-folder').addEventListener('click', () => {
+    const modal = document.querySelector(`.modalFolder`);
     modal.classList.add('hidden');
   });
 
@@ -178,7 +253,9 @@
         contextMenu.classList.remove("hidden");
 
         // Guardar el ID del archivo seleccionado
-        selectedFileId = item.getAttribute('data-id');
+        selectedId = item.getAttribute('data-id');
+
+        selectedFile = item.getAttribute('file');
       }, 500); // Tiempo de espera para considerar una pulsación larga
     });
 

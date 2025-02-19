@@ -19,14 +19,19 @@ def listar_archivos_de_carpeta(id_carpeta):
 def listar_carpetas(anio):
     if current_user.rol != 'Personal':
         return Carpeta.query.filter(
-            (extract('year', Carpeta.fecha_ingreso) == anio) | (Carpeta.id_fondo.isnot(None))
+            ((extract('year', Carpeta.fecha_ingreso) == anio) | (Carpeta.id_fondo.isnot(None))) & 
+            (Carpeta.id_padre.is_(None))  # Filtrar solo carpetas sin padre
         ).order_by(Carpeta.nombre.asc()).all()
     else:
         return Carpeta.query.join(usuarios_leen_carpeta).filter(
             (extract('year', Carpeta.fecha_ingreso) == anio) & 
-            ((usuarios_leen_carpeta.c.id_user == current_user.id) | (Carpeta.id_fondo.isnot(None)))
+            ((usuarios_leen_carpeta.c.id_user == current_user.id) | (Carpeta.id_fondo.isnot(None))) & 
+            (Carpeta.id_padre.is_(None))  # Filtrar solo carpetas sin padre
         ).order_by(Carpeta.nombre.asc()).all()
 
+
+def listar_subcarpetas(id_carpeta):
+    return Carpeta.query.filter(Carpeta.id_padre == id_carpeta).order_by(Carpeta.nombre.asc()).all()
 
 def crear_carpeta(
     nombre,
@@ -39,6 +44,21 @@ def crear_carpeta(
             usuarios_editan=usuarios_editan,
             usuarios_leen=usuarios_leen,
             id_fondo=fondo
+            )
+    
+    db.session.add(nueva_carpeta)
+    db.session.commit()
+    
+    return nueva_carpeta
+
+
+def crear_subcarpeta(
+    nombre,
+    padre
+):
+    nueva_carpeta = Carpeta(
+            nombre=nombre,
+            padre=padre
             )
     
     db.session.add(nueva_carpeta)
@@ -65,7 +85,7 @@ def generar_nombre_unico(directorio, nombre):
 
 def conseguir_directorio(id_carpeta):
     carpeta = conseguir_carpeta_de_id(id_carpeta)
-    return os.path.join(current_app.root_path,'archivos',carpeta.nombre)
+    return os.path.join(current_app.root_path,'archivos',carpeta.nombre, str(carpeta.id))
 
 
 
@@ -107,6 +127,8 @@ def eliminar_carpeta(id_carpeta):
     if carpeta:
         for archivo in carpeta.archivos:
             eliminar_archivo(archivo.id)
+        for subcarpeta in carpeta.subcarpetas:
+            eliminar_carpeta(subcarpeta.id)
         directorio = conseguir_directorio(id_carpeta)
         if os.path.exists(directorio) and os.path.isdir(directorio):
             os.rmdir(directorio)
@@ -119,7 +141,8 @@ def eliminar_carpeta(id_carpeta):
 def chequear_nombre_carpeta_existente(nombre):
     carpeta = Carpeta.query.filter(
         Carpeta.nombre == nombre,
-        extract('year', Carpeta.fecha_ingreso) == datetime.now().year
+        extract('year', Carpeta.fecha_ingreso) == datetime.now().year,
+        Carpeta.id_padre.is_(None)
     ).first()
     if carpeta:
         return True

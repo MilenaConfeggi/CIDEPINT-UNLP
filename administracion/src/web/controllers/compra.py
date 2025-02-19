@@ -175,7 +175,7 @@ def descargar_compras_excel():
     return send_file(
         buffer,
         download_name='lista_compras.xlsx',
-        as_attachment=True,
+        as_attachment=False,
         mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
 

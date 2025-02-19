@@ -21,6 +21,10 @@ class Carpeta(db.Model):
     archivos = db.relationship('Archivo', back_populates='carpeta')
     fecha_ingreso = db.Column(db.Date, default=db.func.now())
 
+    id_padre = db.Column(db.Integer, db.ForeignKey('carpetas.id'), nullable=True)
+    padre = db.relationship('Carpeta', back_populates='subcarpetas', remote_side=[id])
+    subcarpetas = db.relationship('Carpeta', back_populates='padre', lazy='dynamic')
+
     usuarios_leen = db.relationship("User", secondary=usuarios_leen_carpeta, back_populates="carpetas_lee")
     usuarios_editan = db.relationship('User', secondary=usuarios_editan_carpeta, back_populates='carpetas_edita')
 

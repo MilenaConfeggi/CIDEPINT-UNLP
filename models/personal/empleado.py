@@ -58,7 +58,7 @@ class Empleado(db.Model):
 
     @validates('cargo')
     def validate_cargo(self, key, value):
-        allowed_cargos = ['Investigador', 'CPA', 'Administrativo', 'Técnico']
+        allowed_cargos = ['Investigador', 'CPA', 'Administrativo', 'Técnico', 'Becario']
         if value and value not in allowed_cargos:
             raise ValueError(f"Cargo '{value}' no es válido. Debe ser uno de {allowed_cargos}.")
         return value
@@ -67,9 +67,10 @@ class Empleado(db.Model):
     def validate_subdivision_cargo(self, key, value):
         allowed_subdivisiones = {
             'Investigador': ['Asistente', 'Adjunto', 'Independiente', 'Principal', 'Superior'],
-            'CPA': ['Profesional Principal', 'Profesional Adjunto', 'Profesional Asistente'],
-            'Técnico': ['Profesional', 'Asociado', 'Asistente', 'Auxiliar'],
-            'Administrativo': ['ART 9', 'Ley 10430']
+            'CPA': ['Profesional Principal', 'Profesional Adjunto', 'Profesional Asistente','Técnico Principal', 'Técnico Asociado', 'Técnico Asistente','Técnico Auxiliar','Otro'],
+            'Técnico': ['Otro'],
+            'Administrativo': ['ART 9', 'Ley 10430', 'Otro'],
+            'Becario' : ['De entrenamiento','Doctoral','Posdoctoral', 'Otro']
         }
         if self.cargo and (self.cargo not in allowed_subdivisiones or value not in allowed_subdivisiones[self.cargo]):
             raise ValueError(f"Subdivisión de cargo '{value}' no es válida para el cargo '{self.cargo}'.")

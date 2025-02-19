@@ -126,12 +126,13 @@ def registrar_usuario():
         {'name': 'apellido', 'label': 'Apellido', 'type': 'text', 'required': True},
         {'name': 'saldo', 'label': 'Saldo', 'type': 'number', 'required': False, 'step': 'any'},
         {'name': 'dependencia', 'label': 'Dependencia', 'type': 'select', 'required': False, 'options': ['UNLP', 'CIC', 'CONICET']},
-        {'name': 'cargo', 'label': 'Cargo', 'type': 'select', 'required': False, 'options': ['Investigador', 'CPA', 'Administrativo', 'Técnico']},
+        {'name': 'cargo', 'label': 'Cargo', 'type': 'select', 'required': False, 'options': ['Investigador', 'CPA', 'Administrativo', 'Técnico', 'Becario']},
         {'name': 'subdivision_cargo', 'label': 'Subdivisión del Cargo', 'type': 'select', 'required': False, 'options': {
             'Investigador': ['Asistente', 'Adjunto', 'Independiente', 'Principal', 'Superior'],
-            'CPA': ['Profesional Principal', 'Profesional Adjunto', 'Profesional Asistente'],
-            'Técnico': ['Profesional', 'Asociado', 'Asistente', 'Auxiliar'],
-            'Administrativo': ['ART 9', 'Ley 10430']
+            'CPA': ['Profesional Principal', 'Profesional Adjunto', 'Profesional Asistente','Técnico Principal', 'Técnico Asociado', 'Técnico Asistente','Técnico Auxiliar','Otro'],
+            'Técnico': ['Otro'],
+            'Administrativo': ['ART 9', 'Ley 10430', 'Otro'],
+            'Becario' : ['De entrenamiento','Doctoral','Posdoctoral', 'Otro']
         }},
         {'name': 'telefono', 'label': 'Teléfono', 'type': 'text', 'required': False},
         {'name': 'domicilio', 'label': 'Domicilio', 'type': 'text', 'required': False},
@@ -392,13 +393,14 @@ def ver_perfil(id):
     # Obtener la lista de áreas y otros valores necesarios para los select options
     areas = Area.query.all()
     dependencias = ['UNLP', 'CIC', 'CONICET']
-    cargos = ['Investigador', 'CPA', 'Administrativo', 'Técnico']
+    cargos = ['Investigador', 'CPA', 'Administrativo', 'Técnico', 'Becario']
     subdivisiones_cargo = {
-        'Investigador': ['Asistente', 'Adjunto', 'Independiente', 'Principal', 'Superior'],
-        'CPA': ['Profesional Principal', 'Profesional Adjunto', 'Profesional Asistente'],
-        'Técnico': ['Profesional', 'Asociado', 'Asistente', 'Auxiliar'],
-        'Administrativo': ['ART 9', 'Ley 10430']
-    }
+            'Investigador': ['Asistente', 'Adjunto', 'Independiente', 'Principal', 'Superior'],
+            'CPA': ['Profesional Principal', 'Profesional Adjunto', 'Profesional Asistente','Técnico Principal', 'Técnico Asociado', 'Técnico Asistente','Técnico Auxiliar','Otro'],
+            'Técnico': ['Otro'],
+            'Administrativo': ['ART 9', 'Ley 10430', 'Otro'],
+            'Becario' : ['De entrenamiento','Doctoral','Posdoctoral', 'Otro']
+        }
     
     roles_disponibles = ['Personal', 'Colaborador', 'Administrador']
 

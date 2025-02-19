@@ -160,7 +160,7 @@ def delete_ingreso():
         return redirect(url_for('contable.index'))
     
     # Restar el monto del ingreso del saldo del fondo
-    fond.saldo -= float(ingreso.monto)
+    fond.saldo -= Decimal(ingreso.monto)
     fondo.modificar_fondo(fondo_id, saldo=fond.saldo)
     
     # Eliminar archivo asociado si existe
@@ -191,7 +191,7 @@ def descargar_ingreso(id):
         flash("Archivo no encontrado", "error")
         return redirect(url_for('contable.mostrar_fondo',fondo_id=ingreso.receptor_id))
 
-    return send_from_directory(directorio, archivo.nombre, as_attachment=True)
+    return send_from_directory(directorio, archivo.nombre, as_attachment=False)
 
 
 @bp.get("/legajos")
@@ -492,6 +492,6 @@ def download(documento_id):
     # Enviar el archivo al cliente
     return send_file(
         file_path,
-        as_attachment=True,
+        as_attachment=False,
         download_name=filename  # Nombre que se verá al descargar
     )

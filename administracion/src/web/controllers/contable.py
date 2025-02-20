@@ -354,7 +354,59 @@ def delete_distribucion():
     flash("Distribución eliminada correctamente","success")
     return redirect(url_for("contable.get_distribuciones",id=legajo_id))
 
+@bp.get("/distribuciones/editar/<int:id>")
+@role_required('Administrador', 'Colaborador')
+def get_editar_distribucion(id):
+    distribucion = distribucionDB.get_distribucion(id)
 
+    empleadosDist = [ed.empleado_id for ed in distribucion.empleados_asociados]
+    print(empleadosDist[0])
+    if not distribucion:
+        return redirect(url_for("contable.get_legajos"))
+    form = FormularioNuevaDistribucion(obj=distribucion)
+    empleados = empleadoDB.list_empleados()
+    empleados_por_area = {}
+    for empleado in empleados:
+        empleados_por_area.setdefault(empleado.area_id, []).append(empleado.id)
+    return render_template("contable/editar_distribucion.html", form=form, distribucion=distribucion, empleados_por_area=empleados_por_area, empleadosDist=empleadosDist)
+@bp.post("/distribuciones/editar/<int:id>")
+@role_required('Administrador', 'Colaborador')
+def editar_distribucion(id):
+        distribucion = distribucionDB.get_distribucion(id)
+        if not distribucion:
+            return redirect(url_for("contable.get_legajos"))
+
+        form = FormularioNuevaDistribucion(request.form)
+        if form.validate_on_submit():
+            data = request.form.to_dict()
+            empleados_ids = form.empleados_seleccionados.data
+            porcentaje_empleados = round(float(data["porcentaje_empleados"]) * 0.01, 4)
+            if porcentaje_empleados == 0 and len(empleados_ids) > 0:
+                flash("El porcentaje de empleados no puede ser 0 si se seleccionaron empleados", "error")
+                return redirect(url_for("contable.get_editar_distribucion", id=id))
+            if porcentaje_empleados > 0 and len(empleados_ids) == 0:
+                flash("Debe seleccionar empleados si el porcentaje de empleados es mayor a 0", "error")
+                return redirect(url_for("contable.get_editar_distribucion", id=id))
+
+            # Validaciones
+            csrf_token = data.pop("csrf_token", None)
+            data["legajo_id"] = distribucion.legajo_id
+            emp = data.pop("empleados_seleccionados", None)
+
+            # Restar los valores antiguos
+            area_ganancias = distribucion.ganancias_de_id
+            area_costos = distribucion.costos_de_id
+            porcentaje_area = Decimal(distribucion.porcentaje_area * 0.01)
+            porcentaje_empleados = Decimal(distribucion.porcentaje_empleados * 0.01)
+            porcentaje_comisiones = Decimal(distribucion.porcentaje_comisiones * 0.01)
+            monto_a_distribuir = distribucion.monto_a_distribuir
+            costos = distribucion.costos
+            areaDB.sumar_saldo_area(area_costos, round(-costos, 2))
+            monto_modificado = round((monto_a_distribuir * (1 - porcentaje_comisiones)) - costos, 2)
+            areaDB.sumar_saldo_area(area_ganancias, round(-(monto_modificado * porcentaje_area) * (1 - porcentaje_empleados), 2))
+            areaCidepint = areaDB.get_area_by_name("CIDEPINT")
+            areaDB.sumar_saldo_area(areaCidepint.id, round(-(monto_modificado * Decimal(1 - porcentaje_area)) * Decimal(0.95), 2))
+            empleados = empleadoDB.list_empleados()
 @bp.get("/legajos/<int:id>/documentos")
 @role_required('Administrador', 'Colaborador')
 def get_documentosAdd(id):

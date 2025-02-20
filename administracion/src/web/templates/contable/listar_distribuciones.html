@@ -1,89 +1,126 @@
-{% extends 'layout.html' %}
-{% block title %}Distribuciones del Legajo{% endblock %}
-{% block content %}
-<a href="{{url_for('contable.get_legajos')}}"
-    class="inline-flex items-center px-3 py-4 rounded-md text-black-500 hover:bg-black-50">
-    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-6 w-6">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h18">
-        </path>
-    </svg>
-    <span class="ml-1 font-bold text-lg">Volver</span>
+{% extends 'layout.html' %} {% block title %}Distribuciones del Legajo{%
+endblock %} {% block content %}
+<a
+  href="{{url_for('contable.get_legajos')}}"
+  class="inline-flex items-center px-3 py-4 rounded-md text-black-500 hover:bg-black-50"
+>
+  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-6 w-6">
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      d="M7 16l-4-4m0 0l4-4m-4 4h18"
+    ></path>
+  </svg>
+  <span class="ml-1 font-bold text-lg">Volver</span>
 </a>
 <div class="px-4">
-    <div class="px-4 sm:px-0">
-        <h3 class="text-base/7 font-semibold text-gray-900">Distribuciones del legajo {{ legajo.nro_legajo }}</h3>
-    </div>
+  <div class="px-4 sm:px-0">
+    <h3 class="text-base/7 font-semibold text-gray-900">
+      Distribuciones del legajo {{ legajo.nro_legajo }}
+    </h3>
+  </div>
 </div>
 
 <div class="mt-6">
-    <a href="{{ url_for('contable.get_crear_distribucion', id=legajo.id) }}"
-       class="rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-        Crear Nueva Distribución
-    </a>
+  <a
+    href="{{ url_for('contable.get_crear_distribucion', id=legajo.id) }}"
+    class="rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+  >
+    Crear Nueva Distribución
+  </a>
 </div>
 
 <h3 class="mt-8">Distribuciones Pasadas</h3>
 <div class="w-full overflow-x-auto mt-4">
-    {% if distribuciones %}
-    <table class="w-full whitespace-no-wrap">
-        <thead>
-        <tr class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b bg-gray-50">
-            <th class="px-4 py-3">ID</th>
-            <th class="px-4 py-3">Porc. Área</th>
-            <th class="px-4 py-3">Porc. Empleados</th>
-            <th class="px-4 py-3">Porc. Comisiones</th>
-            <th class="px-4 py-3">Monto Distribuir</th>
-            <th class="px-4 py-3">Costos</th>
-            <th class="px-4 py-3">Area de Ganancias</th>
-            <th class="px-4 py-3">Area de Costos</th>
-            <th class="px-4 py-3">Empleados</th>
-            <th class="px-4 py-3">Acciones</th>
-        </tr>
-        </thead>
-        <tbody class="bg-white divide-y">
-        {% for distribucion in distribuciones %}
-            <tr class="text-gray-700">
-                <td class="px-4 py-3 text-sm">{{ distribucion.id }}</td>
-                <td class="px-4 py-3 text-sm">{{ distribucion.porcentaje_area }}%</td>
-                <td class="px-4 py-3 text-sm">{{ distribucion.porcentaje_empleados }}%</td>
-                <td class="px-4 py-3 text-sm">{{ distribucion.porcentaje_comisiones }}%</td>
-                <td class="px-4 py-3 text-sm">${{ distribucion.monto_a_distribuir }}</td>
-                <td class="px-4 py-3 text-sm">${{ distribucion.costos }}</td>
-                <td class="px-4 py-3 text-sm">{{ distribucion.ganancias_de.nombre }}</td>
-                <td class="px-4 py-3 text-sm">{{ distribucion.costos_de.nombre }}</td>
-                <td class="px-4 py-3 text-sm">
-                    {% if distribucion.empleados_asociados %}
-                    
-                        <ul>
-                        {% for empleado in distribucion.empleados_asociados %}
-                            <li>{{ empleado.empleado.nombre }} {{ empleado.empleado.apellido }}</li>
-                        {% endfor %}
-                        </ul>
-                    {% else %}
-                        <p>No hay empleados asignados</p>
-                    {% endif %}
-                </td>
-                <td class="px-4 py-3 text-sm">
-                <button data-id="{{ distribucion.id }}"
-                    class="open-modal-btn flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-black-600 rounded-lg focus:outline-none focus:shadow-outline-gray"
-                    aria-label="Borrar"
-                    >
-                    <svg
-                        class="w-5 h-5"
-                        aria-hidden="true"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                    >
-                        <path
-                        fill-rule="evenodd"
-                        d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                        clip-rule="evenodd"
-                        ></path>
-                    </svg>
-                </button>
-                    
+  {% if distribuciones %}
+  <table class="w-full whitespace-no-wrap">
+    <thead>
+      <tr
+        class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b bg-gray-50"
+      >
+        <th class="px-4 py-3">ID</th>
+        <th class="px-4 py-3">Porc. Área</th>
+        <th class="px-4 py-3">Porc. Empleados</th>
+        <th class="px-4 py-3">Porc. Comisiones</th>
+        <th class="px-4 py-3">Monto Distribuir</th>
+        <th class="px-4 py-3">Costos</th>
+        <th class="px-4 py-3">Area de Ganancias</th>
+        <th class="px-4 py-3">Area de Costos</th>
+        <th class="px-4 py-3">Empleados</th>
+        <th class="px-4 py-3">Acciones</th>
+      </tr>
+    </thead>
+    <tbody class="bg-white divide-y">
+      {% for distribucion in distribuciones %}
+      <tr class="text-gray-700">
+        <td class="px-4 py-3 text-sm">{{ distribucion.id }}</td>
+        <td class="px-4 py-3 text-sm">{{ distribucion.porcentaje_area }}%</td>
+        <td class="px-4 py-3 text-sm">
+          {{ distribucion.porcentaje_empleados }}%
+        </td>
+        <td class="px-4 py-3 text-sm">
+          {{ distribucion.porcentaje_comisiones }}%
+        </td>
+        <td class="px-4 py-3 text-sm">
+          ${{ distribucion.monto_a_distribuir }}
+        </td>
+        <td class="px-4 py-3 text-sm">${{ distribucion.costos }}</td>
+        <td class="px-4 py-3 text-sm">
+          {{ distribucion.ganancias_de.nombre }}
+        </td>
+        <td class="px-4 py-3 text-sm">{{ distribucion.costos_de.nombre }}</td>
+        <td class="px-4 py-3 text-sm">
+          {% if distribucion.empleados_asociados %}
 
-                <!--
+          <ul>
+            {% for empleado in distribucion.empleados_asociados %}
+            <li>
+              {{ empleado.empleado.nombre }} {{ empleado.empleado.apellido }}
+            </li>
+            {% endfor %}
+          </ul>
+          {% else %}
+          <p>No hay empleados asignados</p>
+          {% endif %}
+        </td>
+        <td class="px-4 py-3 text-sm">
+          <button
+            data-id="{{ distribucion.id }}"
+            class="open-modal-btn flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-black-600 rounded-lg focus:outline-none focus:shadow-outline-gray"
+            aria-label="Borrar"
+          >
+            <svg
+              class="w-5 h-5"
+              aria-hidden="true"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                clip-rule="evenodd"
+              ></path>
+            </svg>
+          </button>
+          <a
+            href="{{ url_for('contable.get_editar_distribucion', id=distribucion.id) }}"
+            class="flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-blue-600 rounded-lg focus:outline-none focus:shadow-outline-gray"
+            aria-label="Editar"
+          >
+            <svg
+              class="w-5 h-5"
+              aria-hidden="true"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828zM4 12v4h4l10-10-4-4L4 12z"
+              ></path>
+            </svg>
+          </a>
+
+          <!--
                 <form action="{{ url_for('contable.delete_distribucion', id=distribucion.id) }}" method="post" onsubmit="return confirm('¿Está seguro que desea eliminar esta distribución?');">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <button type="submit" class="text-red-600 hover:text-red-900">                         <svg
@@ -100,70 +137,108 @@
                     </svg></button>
                 </form>
 -->
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    {% else %}
-    <p class="text-gray-600 mt-4">No hay distribuciones registradas para este legajo.</p>
-    {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="text-gray-600 mt-4">
+    No hay distribuciones registradas para este legajo.
+  </p>
+  {% endif %}
 </div>
-<form id="modals" method="POST" action="{{ url_for('contable.delete_distribucion') }}">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <div class="modal hidden" id="modal-borrar" data-id="1" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-            <div class="fixed inset-0 bg-gray-500/75 transition-opacity" aria-hidden="true"></div>
-                <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
-                    <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-                        <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
-                            <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
-                                <h3 class="text-base font-semibold text-gray-900" id="modal-title">¿Eliminar Distribucion? Se revertiran todos los cambios a los saldos</h3>
-                                    <input type="hidden" id="documento_id" name="distribucion_id" value="" />
-                            </div>
-                            <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                            <button type="submit" class="px-3 py-2 text-white bg-green-600 rounded hover:bg-green-500 sm:ml-3 sm:w-auto">Confirmar</button>
-                            <button type="button" class="close-modal px-3 py-2 text-white bg-red-600 rounded hover:bg-red-500 sm:ml-3 sm:w-auto">Cancelar</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<form
+  id="modals"
+  method="POST"
+  action="{{ url_for('contable.delete_distribucion') }}"
+>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+  <div
+    class="modal hidden"
+    id="modal-borrar"
+    data-id="1"
+    aria-labelledby="modal-title"
+    role="dialog"
+    aria-modal="true"
+  >
+    <div
+      class="fixed inset-0 bg-gray-500/75 transition-opacity"
+      aria-hidden="true"
+    ></div>
+    <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+      <div
+        class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0"
+      >
+        <div
+          class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg"
+        >
+          <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+            <h3 class="text-base font-semibold text-gray-900" id="modal-title">
+              ¿Eliminar Distribucion? Se revertiran todos los cambios a los
+              saldos
+            </h3>
+            <input
+              type="hidden"
+              id="documento_id"
+              name="distribucion_id"
+              value=""
+            />
+          </div>
+          <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+            <button
+              type="submit"
+              class="px-3 py-2 text-white bg-green-600 rounded hover:bg-green-500 sm:ml-3 sm:w-auto"
+            >
+              Confirmar
+            </button>
+            <button
+              type="button"
+              class="close-modal px-3 py-2 text-white bg-red-600 rounded hover:bg-red-500 sm:ml-3 sm:w-auto"
+            >
+              Cancelar
+            </button>
+          </div>
         </div>
+      </div>
+    </div>
+  </div>
 </form>
 <script>
-    // Manejo de modales dinámicos
-document.addEventListener('DOMContentLoaded', () => {
+  // Manejo de modales dinámicos
+  document.addEventListener("DOMContentLoaded", () => {
     // Selecciona todos los botones para abrir modales
-    const openModalButtons = document.querySelectorAll('.open-modal-btn');
-    
+    const openModalButtons = document.querySelectorAll(".open-modal-btn");
+
     // Función para abrir el modal correspondiente
     const openModal = (id) => {
-        const modal = document.querySelector(`#modal-borrar`);
-        document.querySelector('#documento_id').value = id;
-        modal.classList.remove('hidden'); // Muestra el modal
+      const modal = document.querySelector(`#modal-borrar`);
+      document.querySelector("#documento_id").value = id;
+      modal.classList.remove("hidden"); // Muestra el modal
     };
-    
+
     // Asocia evento de clic a los botones de abrir modal
     openModalButtons.forEach((button) => {
-        button.addEventListener('click', () => {
-            const id = button.getAttribute('data-id');
-            openModal(id);
-        });
+      button.addEventListener("click", () => {
+        const id = button.getAttribute("data-id");
+        openModal(id);
+      });
     });
-    
-    document.querySelector('.close-modal').addEventListener('click', () => {
-        const modal = document.querySelector(`#modal-borrar`);
-        modal.classList.add('hidden');
+
+    document.querySelector(".close-modal").addEventListener("click", () => {
+      const modal = document.querySelector(`#modal-borrar`);
+      modal.classList.add("hidden");
     });
-    
+
     // Cierra el modal al hacer clic fuera del contenido
-    document.querySelectorAll('.modal').forEach((modal) => {
-        modal.addEventListener('click', (event) => {
+    document.querySelectorAll(".modal").forEach((modal) => {
+      modal.addEventListener("click", (event) => {
         if (event.target === modal) {
-            const id = modal.getAttribute('data-id');
-            closeModal(id);
+          const id = modal.getAttribute("data-id");
+          closeModal(id);
         }
-        });
+      });
     });
-    });  
+  });
 </script>
 {% endblock %}

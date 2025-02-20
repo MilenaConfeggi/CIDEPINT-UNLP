@@ -1,0 +1,149 @@
+{% extends 'layout.html' %}
+{% block title %}Editar Distribución{% endblock %}
+{% block content %}
+<a href="{{url_for('contable.get_legajos')}}"
+    class="inline-flex items-center px-3 py-4 rounded-md text-black-500 hover:bg-black-50">
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-6 w-6">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h18">
+        </path>
+    </svg>
+    <span class="ml-1 font-bold text-lg">Volver</span>
+</a>
+<form class="px-4" method="POST" action="{{ url_for('contable.editar_distribucion', id=distribucion.id) }}">
+    {{ form.hidden_tag() }}
+
+    <h2 class="text-lg font-bold mb-4">Editar Distribución</h2>
+
+    <div class="mb-4">
+        <label for="monto_a_distribuir" class="block text-sm font-medium text-gray-700">Monto total a distribuir</label>
+        {{ form.monto_a_distribuir(class_='block w-full border border-gray-300 rounded py-2 px-3', placeholder="Ingrese el monto a distribuir") }}
+        {% for error in form.monto_a_distribuir.errors %}
+            <p class="text-red-500 text-sm">{{ error }}</p>
+        {% endfor %}
+    </div>
+
+    <div class="mb-4 relative">
+        <label for="porcentaje_comisiones" class="block text-sm font-medium text-gray-700">
+            Porcentaje de Comisiones que se le descontará al monto total
+        </label>
+        <div class="relative">
+            {{ form.porcentaje_comisiones(
+                class_='block w-full border border-gray-300 rounded py-2 pl-3 pr-10', 
+                placeholder="Ingrese el porcentaje de comisiones"
+            ) }}
+            <span class="absolute top-0 bottom-0 right-3 flex items-center text-gray-1000 pointer-events-none">
+                %
+            </span>
+        </div>
+        {% for error in form.porcentaje_comisiones.errors %}
+            <p class="text-red-500 text-sm">{{ error }}</p>
+        {% endfor %}
+    </div>
+
+    <div class="mb-4">
+        <label for="costos" class="block text-sm font-medium text-gray-700">Costos que se le restara al monto despues de las comisiones</label>
+        {{ form.costos(class_='block w-full border border-gray-300 rounded py-2 px-3', placeholder="Ingrese los costos") }}
+        {% for error in form.costos.errors %}
+            <p class="text-red-500 text-sm">{{ error }}</p>
+        {% endfor %}
+    </div>
+
+    <div class="mb-4">
+        <label for="costos_de_id" class="block text-sm font-medium text-gray-700">Área de Costos que se llevará como ingreso el monto ingresado como costo</label>
+        {{ form.costos_de_id(class='block w-full border border-gray-300 rounded py-2 px-3', required=True) }}
+        {% for error in form.costos_de_id.errors %}
+            <p class="text-red-500 text-sm">{{ error }}</p>
+        {% endfor %}
+    </div>
+
+    <div class="mb-4 relative">
+        <label for="porcentaje_area" class="block text-sm font-medium text-gray-700">
+            Porcentaje Área para las ganancias, el resto se lo llevará el Cidepint
+        </label>
+        <div class="relative">
+            {{ form.porcentaje_area(
+                class_='block w-full border border-gray-300 rounded py-2 pl-3 pr-10', 
+                placeholder="Ingrese el porcentaje del área"
+            ) }}
+            <span class="absolute top-0 bottom-0 right-3 flex items-center text-gray-1000 pointer-events-none">
+                %
+            </span>
+        </div>
+        {% for error in form.porcentaje_area.errors %}
+            <p class="text-red-500 text-sm">{{ error }}</p>
+        {% endfor %}
+    </div>
+
+    <div class="mb-4">
+        <label for="ganancias_de_id" class="block text-sm font-medium text-gray-700">Área de Ganancias</label>
+        <select class="block w-full border border-gray-300 rounded py-2 px-3" id="ganancias-de-id" name="ganancias_de_id" required>
+            <option value="" disabled selected>Elija un área para las ganancias</option>
+            {% for choice in form.ganancias_de_id.choices %}
+                <option value="{{ choice[0] }}" {% if choice[0] == form.ganancias_de_id.data %}selected{% endif %}>{{ choice[1] }}</option>
+            {% endfor %}
+        </select>
+        {% for error in form.ganancias_de_id.errors %}
+            <p class="text-red-500 text-sm">{{ error }}</p>
+        {% endfor %}
+    </div>
+
+    <label for="empleados_seleccionados">Seleccionar Empleados que recibirán una parte del monto</label>
+    <div id="empleados-seleccionados" 
+        style="max-height: 10rem; overflow-y: auto; border: 1px solid #d1d5db; border-radius: 0.25rem; padding: 0.5rem;">
+        {% for subfield in form.empleados_seleccionados %}
+            <div class="flex items-center">
+                <input type="checkbox" id="empleado-{{ subfield.id }}" name="{{ subfield.name }}" value="{{ subfield.data }}" 
+                       {% if subfield.checked or subfield.data in empleadosDist %}checked{% endif %} class="mr-2">
+                <label for="empleado-{{ subfield.id }}" class="text-sm text-gray-700">{{ subfield.label.text }}</label>
+                <input type="hidden" name="{{ subfield.name }}" value="{{ subfield.data }}" {% if subfield.checked %}checked{% endif %}>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="mb-4 relative">
+        <label for="porcentaje_empleados" class="block text-sm font-medium text-gray-700">
+            Porcentaje del monto que se llevarán los empleados, el resto se lo llevará el área seleccionada como ganancia
+        </label>
+        <div class="relative">
+            {{ form.porcentaje_empleados(
+                class_='block w-full border border-gray-300 rounded py-2 pl-3 pr-10', 
+                placeholder="Ingrese el porcentaje de empleados"
+            ) }}
+            <span class="absolute top-0 bottom-0 right-3 flex items-center pointer-events-none text-gray-1000">
+                %
+            </span>
+        </div>
+        {% for error in form.porcentaje_empleados.errors %}
+            <p class="text-red-500 text-sm">{{ error }}</p>
+        {% endfor %}
+    </div>
+
+    <div class="mt-6">
+        <button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded hover:bg-indigo-700">
+            Guardar Distribución
+        </button>
+    </div>
+</form>
+
+<script>
+    let empleadosPorArea = {{ empleados_por_area | tojson }};
+    document.addEventListener('DOMContentLoaded', function () {
+        const areaSelect = document.getElementById('ganancias-de-id');
+        const empleadosCheckboxes = document.querySelectorAll('#empleados-seleccionados input[type="checkbox"]');
+        //empleadosCheckboxes.forEach(checkbox => {
+          //  checkbox.checked = false;
+        //});
+        areaSelect.addEventListener('change', function () {
+            const areaId = areaSelect.value;
+            empleadosCheckboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            if (!empleadosPorArea[areaId]) return;
+
+            empleadosCheckboxes.forEach(checkbox => {
+                checkbox.checked = empleadosPorArea[areaId].includes(parseInt(checkbox.value));
+            });
+        });
+    });
+</script>
+{% endblock %}</div>

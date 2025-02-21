@@ -95,7 +95,6 @@
                 <input type="checkbox" id="empleado-{{ subfield.id }}" name="{{ subfield.name }}" value="{{ subfield.data }}" 
                        {% if subfield.checked or subfield.data in empleadosDist %}checked{% endif %} class="mr-2">
                 <label for="empleado-{{ subfield.id }}" class="text-sm text-gray-700">{{ subfield.label.text }}</label>
-                <input type="hidden" name="{{ subfield.name }}" value="{{ subfield.data }}" {% if subfield.checked %}checked{% endif %}>
             </div>
         {% endfor %}
     </div>

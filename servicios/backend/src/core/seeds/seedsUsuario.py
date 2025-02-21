@@ -34,7 +34,13 @@ def seeds_usuarios():
         area_2 = get_area(2)
         area_3 = get_area(3)
 
-
+        admin_user = User(
+        username='admin',
+        password='admin',
+        habilitado=True,
+        rol='Administrador'
+        )
+        db.session.add(admin_user)
         usuario_1 = User(username="rober", password="rober")
 
         personal_1 = Empleado(

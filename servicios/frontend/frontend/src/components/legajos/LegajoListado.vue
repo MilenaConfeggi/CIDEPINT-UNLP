@@ -45,7 +45,7 @@
         </thead>
         <tbody>
           <tr v-for="legajo in legajos.items" :key="legajo.id">
-            <th scope="row">{{ legajo.id }}</th>
+            <th scope="row">{{ legajo.id }}/{{ legajo.fecha_entrada ? legajo.fecha_entrada.substring(2, 4) : '' }}</th>
             <td>
               <div v-if="legajo.presupuesto_cidepint[0]?.stans">
                 <div v-for="stan in legajo.presupuesto_cidepint[0].stans" :key="stan.id">

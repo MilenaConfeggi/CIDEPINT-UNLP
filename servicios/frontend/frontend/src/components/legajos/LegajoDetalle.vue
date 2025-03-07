@@ -22,7 +22,7 @@
           <StateBadge v-if="legajo.estado" :state="legajo.estado?.nombre" />
         </div>
         <div class="card-body">
-          <h1 class="card-title">LEG_{{ legajo.id }}</h1>
+          <h1 class="card-title">LEG_{{ legajo.id }}/{{ legajo.fecha_entrada ? legajo.fecha_entrada.substring(2, 4) : '' }}</h1>
           <span v-if="isAdmin" class="badge rounded-pill text-bg-dark">{{ legajo.area?.nombre }}</span>
           <div class="row row-cols-2">
             <p class="col">Objetivo: {{ legajo.objetivo }}</p>

@@ -36,7 +36,7 @@
             <select v-model="form.legajo" @change="filtrarMuestras" class="form-select">
               <option disabled value="">Legajos</option>
               <option v-for="legajo in legajos" :key="legajo.id" :value="legajo.id">
-                Legajo: {{ legajo.id }}
+                Legajo: {{ legajo.id }}/{{ legajo.fecha_entrada ? legajo.fecha_entrada.substring(2, 4) : '' }}
               </option>
             </select>
             <div v-if="errores.legajo" class="text-danger mt-1">{{ errores.legajo }}</div>

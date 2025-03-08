@@ -7,7 +7,7 @@ from models.legajos.legajo import Legajo
 from models.personal.empleado import Empleado
 from datetime import datetime
 
-NRO_MUESTRA_INICIAL = 5
+NRO_MUESTRA_INICIAL = 58
 
 def crear_muestra(data, legajo_id):
     fecha_ingreso = data.get('fecha_ingreso')

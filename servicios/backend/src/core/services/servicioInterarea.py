@@ -48,7 +48,10 @@ def obtener_interarea(id):
 
 def generarNroInterarea():
     ultima_interarea = Interarea.query.order_by(Interarea.id.desc()).first()
-    ultima_id = ultima_interarea.id if ultima_interarea else 0
+    if(ultima_id.id == None):
+        ultima_id = 10
+    else:
+        ultima_id = ultima_interarea.id + 1
     fecha_actual = datetime.now().strftime("%d%m%Y")
     nro_interarea = f"{ultima_id}-{fecha_actual}"
     return nro_interarea

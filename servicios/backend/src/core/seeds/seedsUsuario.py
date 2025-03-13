@@ -305,7 +305,7 @@ def seeds_usuarios():
                 "mail": "direccion@cidepint.ing.unlp.edu.ar",
                 "contra": "direccioncidepint",
                 "rol": rol_director,
-                "cambiar_contra": True,
+                "cambiar_contra": False,
             }
         )
         db.session.add(usuario_walter)

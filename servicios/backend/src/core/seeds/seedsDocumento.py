@@ -11,41 +11,41 @@ def seeds_documentos():
             'fecha_creacion': datetime(2024, 1, 1),
             'estado_id': 2,
             'tipo_documento_id': 2,
-            'legajo_id': 33
+            'legajo_id': 16837
         },
         {
             'nombre_documento': 'Documento 3',
             'fecha_creacion': datetime(2024, 1, 1),
             'estado_id': 3,
             'tipo_documento_id': 3,
-            'legajo_id': 33
+            'legajo_id': 16837
         },
         {
             'nombre_documento': 'Documento 4',
             'fecha_creacion': datetime(2024, 1, 1),
             'estado_id': 4,
             'tipo_documento_id': 4,
-            'legajo_id': 33
+            'legajo_id': 16837
         },
         {    'nombre_documento': 'orden_compra',
             'fecha_creacion': datetime(2024, 1, 1),
             'estado_id': 1,
             'tipo_documento_id': 5,
-            'legajo_id': 33
+            'legajo_id': 16837
         },
         {
             'nombre_documento': 'Adicional1.pdf',
             'fecha_creacion': datetime(2024, 1, 1),
             'estado_id': 1,
             'tipo_documento_id': 8,
-            'legajo_id': 33
+            'legajo_id': 16837
         },
         {
             'nombre_documento': 'Adicional2.pdf',
             'fecha_creacion': datetime(2024, 1, 1),
             'estado_id': 1,
             'tipo_documento_id': 8,
-            'legajo_id': 33
+            'legajo_id': 16837
         },
 
     ]

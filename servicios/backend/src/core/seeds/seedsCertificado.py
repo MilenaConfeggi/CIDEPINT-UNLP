@@ -13,7 +13,7 @@ def seed_distribuciones():
             'porcentaje_comisiones': 19.0,
             'monto_a_distribuir': 1000.0,
             'costos': 200.0,
-            'legajo_id': 33,  # Asignar un legajo existente
+            'legajo_id': 16837,  # Asignar un legajo existente
             'ganancias_de_id': 1,  # Asignar un área existente
             'costos_de_id': 1,  # Asignar un área existente
         },
@@ -23,7 +23,7 @@ def seed_distribuciones():
             'porcentaje_comisiones': 10.0,
             'monto_a_distribuir': 2000.0,
             'costos': 300.0,
-            'legajo_id': 34,  # Asignar un legajo existente
+            'legajo_id': 16838,  # Asignar un legajo existente
             'ganancias_de_id': 2,  # Asignar un área existente
             'costos_de_id': 2,  # Asignar un área existente
         }

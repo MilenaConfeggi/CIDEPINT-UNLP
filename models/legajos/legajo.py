@@ -1,7 +1,7 @@
 from models.base import db
 from sqlalchemy.orm import Session
 from sqlalchemy import event, func
-INITIAL_ID = 33
+INITIAL_ID = 16837
 class Legajo(db.Model):
     __tablename__ = 'legajo'
     id = db.Column(db.Integer, primary_key=True)

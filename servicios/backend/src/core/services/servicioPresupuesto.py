@@ -361,7 +361,7 @@ def generar_presupuesto(data):
     content.append(Paragraph("<b>Señores</b>", normal_style))
     content.append(Paragraph(legajo.cliente.nombre, normal_style))
     content.append(Paragraph(f"<b>Mail:</b> {legajo.cliente.email}", normal_style))
-    content.append(Paragraph(f"<b>At.</b> {legajo.cliente.cliente}", normal_style))
+    content.append(Paragraph(f"<b>At.</b> {legajo.cliente.contacto}", normal_style))
     content.append(Spacer(1, 20))
     
     # Número de presupuesto

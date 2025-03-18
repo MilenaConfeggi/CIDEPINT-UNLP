@@ -11,20 +11,20 @@ from models.presupuestos.STAN import STAN
 from models.presupuestos.ensayo import Ensayo
 
 
-def list_legajos(page=1, per_page=10, empresa=None, fecha=None, area=None, ensayo=None, facturacion=None,admin=None):
-    query = Legajo.query
+def list_legajos(page=1, per_page=10, empresa=None, fecha=None, area=None, ensayo=None, facturacion=None, admin=None):
     query = (
-        Legajo.query.outerjoin(Legajo.presupuesto_cidepint)  
+        Legajo.query
+        .outerjoin(Legajo.presupuesto_cidepint)  
         .outerjoin(Presupuesto.stans) 
         .outerjoin(STAN.ensayos)
         .options(
-            contains_eager(
-                Legajo.presupuesto_cidepint
-            )  
+            contains_eager(Legajo.presupuesto_cidepint)
             .contains_eager(Presupuesto.stans) 
             .contains_eager(STAN.ensayos)
         )
+        .distinct(Legajo.id)
     )
+
     if empresa:
         query = query.join(Legajo.cliente).filter(Cliente.nombre.like(f"%{empresa}%"))
     if fecha:

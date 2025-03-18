@@ -212,3 +212,23 @@ def permiso(id_legajo):
         return jsonify({"message": "No tiene permiso para acceder a esta muestra"}), 403
     return jsonify(""), 200
     
+@bp.delete("/eliminar_foto/<int:id_foto>")
+@jwt_required()
+def eliminar_foto(id_foto):
+    try:
+        foto = servicioMuestras.obtener_foto(id_foto)
+        if not foto:
+            return jsonify({"error": "Foto no encontrada"}), 404
+
+        # Eliminar el archivo del sistema de archivos
+        folder_path = os.path.join(UPLOAD_FOLDER, "muestras", str(foto.muestra.legajo_id))
+        file_path = os.path.join(folder_path, foto.nombre_archivo)
+        if os.path.exists(file_path):
+            os.remove(file_path)
+
+        # Eliminar la foto de la base de datos
+        servicioMuestras.eliminar_foto(id_foto)
+        return jsonify({"message": "Foto eliminada con éxito"}), 200
+    except Exception as e:
+        print(e)
+        return jsonify({"error": "Error al eliminar la foto"}), 500

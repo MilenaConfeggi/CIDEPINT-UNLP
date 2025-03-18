@@ -100,7 +100,7 @@ def generar_documento_de_legajo(id_legajo):
         ['Teléfono:', legajo.cliente.telefono],
         ['Cel:', legajo.cliente.celular],
         ['E-mail:', legajo.cliente.email],
-        ['Área:', legajo.area.nombre],c
+        ['Área:', legajo.area.nombre],
         ['Objetivo de la OT:', legajo.objetivo],
         ['Presupuesto Nº:', presupuesto.nro_presupuesto]
     ]
@@ -724,7 +724,7 @@ def crear_presupuesto(data):
 
 def crear_presupuesto_stan(presupuesto, stan_id):
     presupuesto_stan = PresupuestoStan(
-        presupuesto_id=presupuesto_id,
+        presupuesto_id=presupuesto.id,
         stan_id=stan_id
     )
 

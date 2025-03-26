@@ -202,12 +202,11 @@ def cargar_presupuesto_firmado(id_legajo):
         return jsonify({"error": "No hay presupuesto para este legajo"}), 404
     
     try:
-        # Eliminar el informe anterior
-        #chequeo si quien hizo la peticion es un jefe de area o un director
-        user = get_jwt_identity()
-        usuario = servicioUsuario.obtener_usuario_por_mail(user)
-        if not servicioUsuario.es_director(usuario):
-            return jsonify({"error": "No tienes permisos para realizar esta acción"}), 403
+        # Lo comenté para que lo pueda usar la secretaria
+        #user = get_jwt_identity()
+        #usuario = servicioUsuario.obtener_usuario_por_mail(user)
+        #if not servicioUsuario.es_director(usuario):
+        #    return jsonify({"error": "No tienes permisos para realizar esta acción"}), 403
         
         folder_path = os.path.join(UPLOAD_FOLDER, "presupuestos", str(id_legajo))
         os.makedirs(folder_path, exist_ok=True)

@@ -505,3 +505,30 @@ def seed():
     db.session.add_all([ausencia_1, ausencia_2, ausencia_3, ausencia_4, ausencia_5, ausencia_6, ausencia_7, ausencia_8])
     
     db.session.commit()
+
+def create_admin():
+    default_area = Area(nombre='x', saldo=0)
+    admin_user = User(
+        username='admin',
+        password='admin',
+        habilitado=True,
+        rol='Administrador'
+    )
+    db.session.add(admin_user)
+    admin_empleado = Empleado(
+        user=admin_user,
+        email='admin@example.com',
+        area=default_area,  # Asigna el área creada
+        dni='00000000',
+        nombre='Admin',
+        apellido='User',
+        dependencia='UNLP',
+        cargo='Administrativo',
+        subdivision_cargo='Ley 10430',
+        telefono='123456789',
+        domicilio='Admin Address',
+        fecha_nacimiento=datetime.strptime('1970-01-01', '%Y-%m-%d'),
+        observaciones='Usuario administrador por defecto',
+    )
+    db.session.add(admin_empleado)
+    db.session.commit()

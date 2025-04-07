@@ -14,8 +14,10 @@ from administracion.src.core import Empleado as empleadoDB
 from models.base import db
 from models.personal.empleado import Empleado
 from models.empleado_distribucion.empleado_distribucion import Empleado_Distribucion
+import os
 bp = Blueprint("contable",__name__,url_prefix="/contable")
 
+UPLOAD_FOLDER = os.path.abspath("documentos")
 
 
 #
@@ -490,3 +492,35 @@ def download(documento_id):
         as_attachment=True,
         download_name=filename  # Nombre que se verá al descargar
     )
+
+@bp.get('/legajos/<int:id_legajo>/documento')
+@role_required('Administrador', 'Colaborador')
+def donwload_presupuesto(id_legajo):
+    directory = os.path.normpath(os.path.join(UPLOAD_FOLDER, "presupuestos", str(id_legajo)))
+
+    # Verifica si el directorio existe
+    if not os.path.exists(directory) or not os.path.isdir(directory):
+        flash("El directorio no existe", "error")
+        return redirect(url_for("contable.get_legajos"))
+
+    # Filtra los archivos que coinciden con el formato de nombre
+    #PRIORIZO LOS FIRMADOS
+    archivos = [f for f in os.listdir(directory) if f.startswith("fpresupuesto_firmado_") and f.endswith(".pdf")]
+
+    if not archivos:
+        archivos = [f for f in os.listdir(directory) if f.startswith("presupuesto_") and f.endswith(".pdf")]
+
+    # Si no hay archivos que coincidan
+    if not archivos:
+        flash("No se encontraron documentos de presupuesto para este legajo", "error")
+        return redirect(url_for("contable.get_legajos"))
+
+    # Encuentra el archivo más reciente basado en el timestamp
+    archivos.sort(reverse=True)  # Ordenar por nombre en orden descendente (timestamps más recientes primero)
+    archivo_mas_reciente = archivos[0]
+
+    # Ruta completa al archivo
+    file_path = os.path.join(directory, archivo_mas_reciente)
+
+    # Enviar el archivo
+    return send_from_directory(directory, archivo_mas_reciente)

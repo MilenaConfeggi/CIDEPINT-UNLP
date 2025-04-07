@@ -55,5 +55,9 @@ def create_app(env="development", static_folder="../../static"):
     @app.cli.command(name="seeds-db")
     def seed_db():
         database.seed()
+
+    @app.cli.command(name="create-admin")
+    def create_admin():
+        database.create_admin()
         
     return app

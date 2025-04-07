@@ -5,7 +5,9 @@ from models.compras.compra_area import compra_area
 from sqlalchemy.orm import joinedload
 from models.base import db
 from administracion.src.core.proveedores.proveedor import buscar_proveedor
-from administracion.src.core.servicios.personal import conseguir_empleado_de_id
+from administracion.src.core.servicios.personal import conseguir_empleado_de_id, conseguir_area_de_id
+from administracion.src.core.fondos.fondo import conseguir_fondo_de_id
+from decimal import Decimal
 
 def buscar_compra(id_compra):
     return Compra.query.filter(Compra.id == id_compra).first()
@@ -73,7 +75,7 @@ def procesar_contribuciones(compra_id, entidades, tabla_asociativa, atributo_sal
                 )
             )
         if estado_enum == estado_compra.REALIZADA and atributo_saldo:
-            setattr(entidad_obj, atributo_saldo, getattr(entidad_obj, atributo_saldo) - contribucion)
+            setattr(entidad_obj, atributo_saldo, getattr(entidad_obj, atributo_saldo) - Decimal(contribucion))
             db.session.add(entidad_obj)
 
 def obtener_estado_enum(estado):
@@ -208,5 +210,19 @@ def realizar_compra_aprobada(compra, fondos, empleados, areas):
     procesar_contribuciones(compra.id, fondos, compra_fondo, atributo_saldo="saldo", tipo="fondo", estado_enum=estado_compra.REALIZADA)
     procesar_contribuciones(compra.id, empleados, compra_empleado, atributo_saldo="saldo", tipo="empleado", estado_enum=estado_compra.REALIZADA)
     procesar_contribuciones(compra.id, areas, compra_area, atributo_saldo="saldo", estado_enum=estado_compra.REALIZADA)
+    db.session.commit()
+    return compra
+
+def realizada_a_aprobada(compra):
+    fondos = obtener_fondos(compra.id)
+    for fondo in fondos:
+        conseguir_fondo_de_id(fondo.fondo_id).saldo += fondo.contribucion
+    empleados = obtener_empleados(compra.id)
+    for empleado in empleados:
+        conseguir_empleado_de_id(empleado.empleado_id).saldo += empleado.contribucion
+    areas = obtener_areas(compra.id)
+    for area in areas:
+        conseguir_area_de_id(area.area_id).saldo += area.contribucion
+    compra.estado = estado_compra.APROBADA
     db.session.commit()
     return compra

@@ -8,11 +8,15 @@
       <div v-for="mail in mails" :key="mail.id" class="col-md-3 mb-4">
         <div class="card">
           <div class="card-img-container" @click="mostrarVerMail(mail)">
-            <img
+            <img v-if="isImage(mail.nombre_archivo)"
               :src="getImageUrl(mail.legajo_id, mail.nombre_archivo)"
               alt="Imagen de mail"
               class="card-img"
             />
+            <div v-else class="pdf-icon">
+              <i class="fas fa-file-pdf"></i>
+              <p>{{ mail.nombre_archivo }}</p>
+            </div>
           </div>
           <div class="card-body">
             <h5 class="card-title">{{ mail.nombre_archivo }}</h5>
@@ -34,7 +38,12 @@
         <button class="close-button" @click="cerrarVerMail">&times;</button>
         <div v-if="mailSeleccionado">
           <div class="text-center">
-            <img :src="getImageUrl(mailSeleccionado.legajo_id, mailSeleccionado.nombre_archivo)" alt="Imagen de mail" class="img-fluid large-image" />
+            <img v-if="isImage(mailSeleccionado.nombre_archivo)"
+              :src="getImageUrl(mailSeleccionado.legajo_id, mailSeleccionado.nombre_archivo)"
+              alt="Imagen de mail"
+              class="img-fluid large-image"
+            />
+            <iframe v-else :src="getImageUrl(mailSeleccionado.legajo_id, mailSeleccionado.nombre_archivo)" class="pdf-viewer"></iframe>
           </div>
         </div>
       </div>
@@ -97,13 +106,18 @@ export default {
       mailSeleccionado.value = null;
     };
 
+    const isImage = (filename) => {
+      const extension = filename.split('.').pop().toLowerCase();
+      return ['png', 'jpg', 'jpeg'].includes(extension);
+    };
+
     onMounted(() => {
       fetchMails();
     });
 
     watch(() => props.legajoId, fetchMails);
 
-    return { mails, error, getImageUrl, confirmarEliminarMail, mostrarVerMail, cerrarVerMail, mostrarVerMailModal, mailSeleccionado };
+    return { mails, error, getImageUrl, confirmarEliminarMail, mostrarVerMail, cerrarVerMail, mostrarVerMailModal, mailSeleccionado, isImage };
   }
 };
 </script>
@@ -122,6 +136,22 @@ export default {
   max-height: 100%;
   max-width: 100%;
   object-fit: contain;
+}
+
+.pdf-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #dc3545;
+  font-size: 3rem;
+}
+
+.pdf-icon p {
+  margin-top: 10px;
+  font-size: 1rem;
+  text-align: center;
 }
 
 .card-body {
@@ -183,5 +213,11 @@ export default {
   max-width: 100%;
   height: auto;
   max-height: 80vh; 
+}
+
+.pdf-viewer {
+  width: 100%;
+  height: 80vh;
+  border: none;
 }
 </style>

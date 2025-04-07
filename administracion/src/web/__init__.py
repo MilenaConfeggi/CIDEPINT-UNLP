@@ -11,9 +11,6 @@ from administracion.src.core.bcrypt import bcrypt
 from sqlalchemy.sql import text
 from administracion.src.core import database
 from models.personal.personal import User
-from flask_mail import Mail
-
-mail = Mail()
 
 def create_app(env="development", static_folder="../../static"):
     app = Flask(__name__, static_folder=static_folder)
@@ -39,9 +36,6 @@ def create_app(env="development", static_folder="../../static"):
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(int(user_id))
-
-    # Initialize Flask-Mail
-    mail.init_app(app)
 
     # Register routes and handlers
     registrar_rutas(app)

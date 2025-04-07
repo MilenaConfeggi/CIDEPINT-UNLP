@@ -3,10 +3,12 @@ from administracion.src.core.ingresos import ingreso as ingresoDB
 from administracion.src.core.servicios import archivos_admin as archivos_adminDB
 from models import distribucion as distribucionDB
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, send_file, send_from_directory
+from flask_login import current_user
 from administracion.src.web.forms.fondo_nuevo import FormularioNuevoFondo
 from administracion.src.web.forms.ingreso_nuevo import FormularioNuevoIngreso
 from administracion.src.web.forms.distribucion_nuevo import FormularioNuevaDistribucion
 from models import legajos as legajoDB
+from models.legajos.legajo import Legajo
 from administracion.src.web.controllers.roles import role_required
 from administracion.src.core import Area as areaDB
 from administracion.src.core import Empleado as empleadoDB
@@ -14,13 +16,7 @@ from administracion.src.core import Empleado as empleadoDB
 from models.base import db
 from models.personal.empleado import Empleado
 from models.empleado_distribucion.empleado_distribucion import Empleado_Distribucion
-import os
-bp = Blueprint("contable",__name__,url_prefix="/contable")
-
-UPLOAD_FOLDER = os.path.abspath("documentos")
-
-
-#
+from decimal import Decimal
 from models.documentos import listar_tipos_documentos, get_tipo_documento, create_documento, find_documento, get_tipo_documento_nombre,get_documento
 from models.documentos import find_estado_by_nombre
 from models.documentos import create_estado
@@ -29,6 +25,11 @@ from datetime import datetime
 from pathlib import Path
 import os
 from administracion.src.web.forms.documento_legajo_nuevo import UploadDocumentoForm ,DownloadForm ,DeleteForm
+
+UPLOAD_FOLDER = os.path.abspath("documentos")
+
+bp = Blueprint("contable",__name__,url_prefix="/contable")
+
 @bp.get("/")
 @role_required('Administrador', 'Colaborador')
 def index():
@@ -161,7 +162,7 @@ def delete_ingreso():
         return redirect(url_for('contable.index'))
     
     # Restar el monto del ingreso del saldo del fondo
-    fond.saldo -= float(ingreso.monto)
+    fond.saldo -= Decimal(ingreso.monto)
     fondo.modificar_fondo(fondo_id, saldo=fond.saldo)
     
     # Eliminar archivo asociado si existe
@@ -192,17 +193,21 @@ def descargar_ingreso(id):
         flash("Archivo no encontrado", "error")
         return redirect(url_for('contable.mostrar_fondo',fondo_id=ingreso.receptor_id))
 
-    return send_from_directory(directorio, archivo.nombre, as_attachment=True)
+    return send_from_directory(directorio, archivo.nombre, as_attachment=False)
 
 
 @bp.get("/legajos")
-@role_required('Administrador', 'Colaborador')
+@role_required('Administrador', 'Colaborador', 'Personal')
 def get_legajos():
     params = request.args.to_dict()
     page = request.args.get("page", 1, type=int)
     per_page = 10
-    legajos = legajoDB.list_legajos(page, per_page,None,None,None,None,None,True)
+    if current_user.rol == "Personal":
+        legajos = Legajo.query.filter(Legajo.area_id == current_user.empleado.area_id).paginate(page=page,per_page=per_page,error_out=True)
+    else:
+        legajos = legajoDB.list_legajos(page, per_page,None,None,None,None,None,True)
     #legajos = [legajo for legajo in legajos if legajo.necesita_facturacion]
+
     forms = {}
     for legajo in legajos:
         forms[legajo.id] = UploadDocumentoForm(legajo_id=legajo.id)
@@ -243,6 +248,7 @@ def crear_distribucion(id):
     form = FormularioNuevaDistribucion(request.form)
     if form.validate_on_submit():
         data = request.form.to_dict()
+        
         empleados_ids = form.empleados_seleccionados.data
         porcentaje_empleados = round(float(data["porcentaje_empleados"]) * 0.01, 4)
         if porcentaje_empleados == 0 and len(empleados_ids) > 0:
@@ -275,7 +281,7 @@ def crear_distribucion(id):
         empleados = empleadoDB.list_empleados()
         colaboradores = [empleado for empleado in empleados if empleado.user.rol == "Colaborador" or empleado.user.rol == "Administrador"]
         for colaborador in colaboradores:
-            colaborador.saldo += round((((monto_modificado * (1 - porcentaje_area)) * 0.05) / len(colaboradores)), 2)
+            colaborador.saldo += Decimal(round((((monto_modificado * (1 - porcentaje_area)) * 0.05) / len(colaboradores)), 2))
         
         # Relación con los empleados
         if empleados_ids:
@@ -283,7 +289,7 @@ def crear_distribucion(id):
             for empleado_id in empleados_ids:
                 empleado = db.session.query(Empleado).get(empleado_id)
                 if empleado:
-                    empleado.saldo += monto_empleado
+                    empleado.saldo += Decimal(monto_empleado)
                     empleado_distribucion = Empleado_Distribucion(
                         empleado_id=empleado.id,
                         distribucion_id=nueva_distribucion.id
@@ -316,24 +322,31 @@ def delete_distribucion():
     if not distribucion:
         return redirect(url_for("contable.get_legajos"))
     legajo_id = distribucion.legajo_id
+    eliminar_distribucion(id)
+    flash("Distribución eliminada correctamente","success")
+    return redirect(url_for("contable.get_distribuciones",id=legajo_id))
+def eliminar_distribucion(id):
+    distribucion = distribucionDB.get_distribucion(id)
+    if not distribucion:
+        return redirect(url_for("contable.get_legajos"))
+    legajo_id = distribucion.legajo_id
     #Restar lo que se sumo
     area_ganancias = distribucion.ganancias_de_id
     area_costos = distribucion.costos_de_id
-    porcentaje_area = distribucion.porcentaje_area * 0.01
-    porcentaje_empleados = distribucion.porcentaje_empleados * 0.01
-    porcentaje_comisiones = distribucion.porcentaje_comisiones * 0.01
+    porcentaje_area = Decimal(distribucion.porcentaje_area * 0.01)
+    porcentaje_empleados = Decimal(distribucion.porcentaje_empleados * 0.01)
+    porcentaje_comisiones = Decimal(distribucion.porcentaje_comisiones * 0.01)
     monto_a_distribuir = distribucion.monto_a_distribuir
     costos = distribucion.costos
     areaDB.sumar_saldo_area(area_costos, round(-costos, 2))
     monto_modificado = round((monto_a_distribuir * (1 - porcentaje_comisiones)) - costos, 2)
     areaDB.sumar_saldo_area(area_ganancias, round(-(monto_modificado * porcentaje_area) * (1 - porcentaje_empleados), 2))
     areaCidepint = areaDB.get_area_by_name("CIDEPINT")
-    areaDB.sumar_saldo_area(areaCidepint.id, round(-(monto_modificado * (1 - porcentaje_area)) * 0.95, 2))
+    areaDB.sumar_saldo_area(areaCidepint.id, round(-(monto_modificado * Decimal(1 - porcentaje_area)) * Decimal(0.95), 2))
     empleados = empleadoDB.list_empleados()
     colaboradores = [empleado for empleado in empleados if empleado.user.rol == "Colaborador" or empleado.user.rol == "Administrador"]
     for colaborador in colaboradores:
-        colaborador.saldo -= (((monto_modificado * (1 - porcentaje_area)) * 0.05) / len(colaboradores))
-
+        colaborador.saldo -= Decimal((((monto_modificado * Decimal(1 - porcentaje_area)) * Decimal(0.05)) / len(colaboradores)))
     empleados_ids = [ed.empleado_id for ed in distribucion.empleados_asociados]
     if empleados_ids:
         monto_empleado = ((monto_modificado * porcentaje_area) * (porcentaje_empleados)) / len(empleados_ids)
@@ -345,20 +358,97 @@ def delete_distribucion():
                 empleado_id=empleado.id, distribucion_id=distribucion.id).first()
                 if empleado_distribucion:
                     db.session.delete(empleado_distribucion)
-
     db.session.commit()
     distribucionDB.delete_distribucion(id)
-    flash("Distribución eliminada correctamente","success")
-    return redirect(url_for("contable.get_distribuciones",id=legajo_id))
+@bp.get("/distribuciones/editar/<int:id>")
+@role_required('Administrador', 'Colaborador')
+def get_editar_distribucion(id):
+    distribucion = distribucionDB.get_distribucion(id)
 
-
+    empleadosDist = [ed.empleado_id for ed in distribucion.empleados_asociados]
+    if not distribucion:
+        return redirect(url_for("contable.get_legajos"))
+    form = FormularioNuevaDistribucion(obj=distribucion)
+    empleados = empleadoDB.list_empleados()
+    empleados_por_area = {}
+    for empleado in empleados:
+        empleados_por_area.setdefault(empleado.area_id, []).append(empleado.id)
+    return render_template("contable/editar_distribucion.html", form=form, distribucion=distribucion, empleados_por_area=empleados_por_area, empleadosDist=empleadosDist)
+@bp.post("/distribuciones/editar/<int:id>")
+@role_required('Administrador', 'Colaborador')
+def editar_distribucion(id):
+    distribucion = distribucionDB.get_distribucion(id)
+    if not distribucion:
+            return redirect(url_for("contable.get_legajos"))
+    id_legajo = distribucion.legajo_id
+    #crear_distribucion
+    form = FormularioNuevaDistribucion(request.form)
+    if form.validate_on_submit():
+        data = request.form.to_dict()
+        empleados_ids = form.empleados_seleccionados.data
+        porcentaje_empleados = round(float(data["porcentaje_empleados"]) * 0.01, 4)
+        if porcentaje_empleados == 0 and len(empleados_ids) > 0:
+            flash("El porcentaje de empleados no puede ser 0 si se seleccionaron empleados", "error")
+            return redirect(url_for("contable.get_editar_distribucion",id=id,form=form))
+        if porcentaje_empleados > 0 and len(empleados_ids) == 0:
+            flash("Debe seleccionar empleados si el porcentaje de empleados es mayor a 0", "error")
+            return redirect(url_for("contable.get_editar_distribucion",id=id,form=form))
+        eliminar_distribucion(id)
+        #Validaciones
+        csrf_token = data.pop("csrf_token", None)
+        data["legajo_id"] = id_legajo
+        emp = data.pop("empleados_seleccionados", None)
+        #Crea la distribucion
+        data["id"] = id
+        nueva_distribucion = distribucionDB.create_distribucion(**data)
+        #Sumo lo indicado al saldo de las areas
+        area_ganancias = int(data["ganancias_de_id"])
+        area_costos = int(data["costos_de_id"])
+        porcentaje_area = round(float(data["porcentaje_area"]) * 0.01, 4)
+        porcentaje_comisiones = round(float(data["porcentaje_comisiones"]) * 0.01, 4)
+        monto_a_distribuir = round(float(data["monto_a_distribuir"]), 4)
+        costos = round(float(data["costos"]), 2)
+        areaDB.sumar_saldo_area(area_costos, costos)
+        monto_modificado = round((monto_a_distribuir * (1 - porcentaje_comisiones)) - costos, 4)
+        areaDB.sumar_saldo_area(area_ganancias, round((monto_modificado * porcentaje_area) * (1 - porcentaje_empleados), 2))
+        areaCidepint = areaDB.get_area_by_name("CIDEPINT")
+        areaDB.sumar_saldo_area(areaCidepint.id, round((monto_modificado * (1 - porcentaje_area)) * 0.95, 2))
+        
+        # Obtener todos los colaboradores y admin
+        empleados = empleadoDB.list_empleados()
+        colaboradores = [empleado for empleado in empleados if empleado.user.rol == "Colaborador" or empleado.user.rol == "Administrador"]
+        for colaborador in colaboradores:
+            colaborador.saldo += Decimal(round((((monto_modificado * (1 - porcentaje_area)) * 0.05) / len(colaboradores)), 2))
+        
+        # Relación con los empleados
+        if empleados_ids:
+            monto_empleado = round(((monto_modificado * porcentaje_area) * (porcentaje_empleados)) / len(empleados_ids), 2)
+            for empleado_id in empleados_ids:
+                empleado = db.session.query(Empleado).get(empleado_id)
+                if empleado:
+                    empleado.saldo += Decimal(monto_empleado)
+                    empleado_distribucion = Empleado_Distribucion(
+                        empleado_id=empleado.id,
+                        distribucion_id=nueva_distribucion.id
+                    )
+                    db.session.add(empleado_distribucion) 
+        db.session.commit()
+        #Redirige a la lista de distribuciones
+        flash("Distribución editada correctamente","success")
+        return redirect(url_for("contable.get_distribuciones",id=id_legajo))
+    else:
+        # Obtener el primer campo con error
+        first_error_field = next(iter(form.errors))
+        first_error_message = form.errors[first_error_field][0]
+        flash(f"Error en el campo {first_error_field}: {first_error_message}", 'error')
+        return redirect(url_for("contable.get_editar_distribucion",id=id,form=form)) 
 @bp.get("/legajos/<int:id>/documentos")
 @role_required('Administrador', 'Colaborador')
 def get_documentosAdd(id):
     form = UploadDocumentoForm(legajo_id=id)
     form.tipo.data = "adicional"
     legajo = legajoDB.find_legajo_by_id(id)
-    documentos = [doc for doc in legajo.documento if doc.tipo_documento.nombre == "adicional"]
+    documentos = [doc for doc in legajo.documento if doc.tipo_documento.nombre == "Adicional"]
     delete_form = DeleteForm()
     return render_template("contable/legajo_adicionales.html",form = form,legajo = legajo,documentos = documentos, delete_form=delete_form)
 
@@ -489,7 +579,7 @@ def download(documento_id):
     # Enviar el archivo al cliente
     return send_file(
         file_path,
-        as_attachment=True,
+        as_attachment=False,
         download_name=filename  # Nombre que se verá al descargar
     )
 

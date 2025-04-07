@@ -5,7 +5,7 @@ import re
 
 class FormularioNuevoFondo(FlaskForm):
     def validar_solo_numeros(self, field):
-        if not re.match(r"^\d+$", field.data):
+        if not re.match(r"^-?\d*(\.\d+)?$", field.data):
             raise ValidationError("El campo solo puede contener números.")
         
     titulo = StringField('Titulo', validators=[DataRequired(message="es requerido"), 

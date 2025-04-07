@@ -54,6 +54,16 @@
                 {% endfor %}
               {% endif %}
             </select>
+          {% elif campo.type == 'number' %}
+            <input
+              type="{{ campo.type }}"
+              id="{{ campo.name }}"
+              name="{{ campo.name }}"
+              step="{{ campo.step }}"
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              placeholder="{{ campo.label }}"
+              {% if campo.required %} required {% endif %}
+            />
           {% else %}
             <input
               type="{{ campo.type }}"
@@ -88,9 +98,10 @@
 
     const subdivisiones = {
       'Investigador': ['Asistente', 'Adjunto', 'Independiente', 'Principal', 'Superior'],
-      'CPA': ['Profesional Principal', 'Profesional Adjunto', 'Profesional Asistente'],
-      'Técnico': ['Profesional', 'Asociado', 'Asistente', 'Auxiliar'],
-      'Administrativo': ['ART 9', 'Ley 10430']
+      'CPA': ['Profesional Principal', 'Profesional Adjunto', 'Profesional Asistente','Técnico Principal', 'Técnico Asociado', 'Técnico Asistente','Técnico Auxiliar','Otro'],
+      'Técnico': ['Otro'],
+      'Administrativo': ['ART 9', 'Ley 10430', 'Otro'],
+      'Becario' : ['De entrenamiento','Doctoral','Posdoctoral', 'Otro']
     };
 
     function updateSubdivisionCargoOptions() {

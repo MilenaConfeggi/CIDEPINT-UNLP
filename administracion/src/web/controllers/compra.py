@@ -4,7 +4,7 @@ from reportlab.pdfgen import canvas
 from io import BytesIO
 import pandas as pd
 from flask_login import current_user
-from administracion.src.core.compras.compra import filtrar_compras, buscar_compra, filtrar_compras_descargadas, crear_compra, borrar_compra, agregar_fuentes_a_compra, obtener_fondos, obtener_areas, obtener_empleados, editar_compra_espera, editar_compra_aprobada_o_realizada, realizar_compra_aprobada
+from administracion.src.core.compras.compra import filtrar_compras, buscar_compra, filtrar_compras_descargadas, crear_compra, borrar_compra, agregar_fuentes_a_compra, obtener_fondos, obtener_areas, obtener_empleados, editar_compra_espera, editar_compra_aprobada_o_realizada, realizar_compra_aprobada, realizada_a_aprobada
 from administracion.src.core.proveedores.proveedor import filtrar_proveedores, chequeo_razon_social_existente, crear_proveedor, borrar_proveedor, actualizar_proveedor, buscar_proveedor
 from administracion.src.web.forms.form_agregar_proveedor import form_agregar_proveedor
 from administracion.src.web.forms.form_editar_proveedor import form_editar_proveedor
@@ -15,6 +15,7 @@ from administracion.src.web.forms.form_realizar_compra import form_realizar_comp
 from administracion.src.web.controllers.roles import role_required
 from administracion.src.core.servicios.personal import listar_empleados, listar_areas, conseguir_area_de_id, conseguir_empleado_de_id
 from administracion.src.core.fondos.fondo import listar_fondos_activos, conseguir_fondo_de_id
+import textwrap
 
 bp = Blueprint("compra",__name__,url_prefix="/compra")
 
@@ -174,7 +175,7 @@ def descargar_compras_excel():
     return send_file(
         buffer,
         download_name='lista_compras.xlsx',
-        as_attachment=True,
+        as_attachment=False,
         mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
 
@@ -194,42 +195,82 @@ def descargar_compras_pdf():
         buffer = BytesIO()
         c = canvas.Canvas(buffer, pagesize=letter)
         width, height = letter
-        # Set up the PDF header
-        c.setFont("Helvetica-Bold", 12)
-        c.drawString(30, height - 30, "Fecha")
-        c.drawString(150, height - 30, "Descripcion")
-        c.drawString(250, height - 30, "Estado")
-        c.drawString(300, height - 30, "Numero de Factura")
-        c.drawString(425, height - 30, "Fuentes de financiamiento")
-        y_position = height - 50
-        # Write the data to the PDF
-        c.setFont("Helvetica", 10)
-        for compra in compras:
+
+        # Configuración de márgenes y espacios
+        x_positions = {
+            "fecha": 30,
+            "descripcion": 150,
+            "estado": 250,
+            "numero_factura": 300,
+            "fuentes": 425,
+        }
+        col_widths = {
+            "fecha": 100,
+            "descripcion": 90,
+            "estado": 50,
+            "numero_factura": 100,
+            "fuentes": 150,
+        }
+
+        # Función para envolver texto en varias líneas según el ancho de la columna
+        def wrap_text(text, width):
+            return textwrap.wrap(text, width=width // 6)  # Aproximación de caracteres por ancho
+
+        # Función para escribir filas en el PDF
+        def write_row(y_position, compra):
             fondos = "; ".join(fondo.titulo for fondo in compra.fondos)
             empleados = "; ".join(f"{empleado.nombre} {empleado.apellido}" for empleado in compra.empleados)
             areas = "; ".join(area.nombre for area in compra.areas)
-            fuentes = "; ".join([fondos, empleados, areas])
-            c.drawString(30, y_position, str(compra.fecha))
-            c.drawString(150, y_position, compra.descripcion)
-            c.drawString(250, y_position, compra.estado.value)
-            c.drawString(300, y_position, compra.numero_factura)
-            c.drawString(425, y_position, fuentes)
-            y_position -= 15
-            # Check if the page is full
+            fuentes = "; ".join(filter(None, [fondos, empleados, areas]))  # Evita ";;"
+
+            lines = {}
+            max_lines = 1  # Número máximo de líneas en una celda
+
+            # Envolver texto en varias líneas para cada columna
+            lines["fecha"] = wrap_text(compra.fecha.strftime("%d-%m-%Y"), col_widths["fecha"])
+            lines["descripcion"] = wrap_text(compra.descripcion, col_widths["descripcion"])
+            lines["estado"] = wrap_text(compra.estado.value, col_widths["estado"])
+            lines["numero_factura"] = wrap_text(compra.numero_factura, col_widths["numero_factura"])
+            lines["fuentes"] = wrap_text(fuentes, col_widths["fuentes"])
+
+            max_lines = max(len(lines[col]) for col in lines)  # Determinar el número de líneas más grande en la fila
+
+            for i in range(max_lines):
+                for col in x_positions:
+                    if i < len(lines[col]):  # Evitar índices fuera de rango
+                        c.drawString(x_positions[col], y_position, lines[col][i])
+                y_position -= 15  # Espacio entre líneas
+
+            return y_position  # Retornar nueva posición de y después de escribir
+
+        # Función para dibujar el encabezado
+        def draw_header(y_position):
+            c.setFont("Helvetica-Bold", 12)
+            c.drawString(30, y_position, "Fecha")
+            c.drawString(150, y_position, "Descripción")
+            c.drawString(250, y_position, "Estado")
+            c.drawString(300, y_position, "Número de Factura")
+            c.drawString(425, y_position, "Fuentes de Financiamiento")
+            return y_position - 20
+
+        # Dibujar encabezado inicial
+        y_position = draw_header(height - 30)
+        c.setFont("Helvetica", 10)
+
+        # Escribir datos
+        for compra in compras:
+            y_position = write_row(y_position, compra)
+
+            # Verificar si la página está llena
             if y_position < 40:
-                c.showPage()  # Create a new page
-                y_position = height - 30
-                # Recreate header on new page
-                c.setFont("Helvetica-Bold", 12)
-                c.drawString(30, y_position, "Fecha")
-                c.drawString(150, y_position, "Descripcion")
-                c.drawString(250, y_position, "Estado")
-                c.drawString(300, y_position, "Numero de Factura")
-                c.drawString(425, y_position, "Fuentes de financiamiento")
-                y_position -= 20
-        # Finalize the PDF
+                c.showPage()  # Nueva página
+                y_position = draw_header(height - 30)  # Dibujar nuevo encabezado
+                c.setFont("Helvetica", 10)
+
+        # Finalizar PDF
         c.save()
         buffer.seek(0)
+
         return buffer
     # Return PDF response
     pdf_buffer = generate_pdf()
@@ -247,25 +288,38 @@ class ValidationError(Exception):
 def validar_montos_y_acumular(form):
     monto = 0
     fondos, empleados, areas = [], [], []
+
+    saldos_areas = {}
+    saldos_empleados = {}
+    saldos_fondos = {}
     
     for area in form.areas.data:
         area_obj = conseguir_area_de_id(area["id_area"])
-        if area["monto"] > area_obj.saldo:
-            raise ValidationError("El monto de un área no puede ser superior a su saldo")
+        if area["id_area"] not in saldos_areas:
+            saldos_areas[area["id_area"]] = 0
+        saldos_areas[area["id_area"]] += area["monto"]
+        if saldos_areas[area["id_area"]] > area_obj.saldo:
+            raise ValidationError(f"El monto total para un area no puede exceder su saldo disponible")
         areas.append((area_obj, area["monto"]))
         monto += area["monto"]
 
     for empleado in form.empleados.data:
         empleado_obj = conseguir_empleado_de_id(empleado["id_empleado"])
-        if empleado["monto"] > empleado_obj.saldo:
-            raise ValidationError("El monto de un empleado no puede ser superior a su saldo")
+        if empleado["id_empleado"] not in saldos_empleados:
+            saldos_empleados[empleado["id_empleado"]] = 0       
+        saldos_empleados[empleado["id_empleado"]] += empleado["monto"]
+        if saldos_empleados[empleado["id_empleado"]] > empleado_obj.saldo:
+            raise ValidationError(f"El monto total para un empleado no puede exceder su saldo disponible")
         empleados.append((empleado_obj, empleado["monto"]))
         monto += empleado["monto"]
-    
+
     for fondo in form.fondos.data:
         fondo_obj = conseguir_fondo_de_id(fondo["id_fondo"])
-        if fondo["monto"] > fondo_obj.saldo:
-            raise ValidationError("El monto de un fondo no puede ser superior a su saldo")
+        if fondo["id_fondo"] not in saldos_fondos:
+            saldos_fondos[fondo["id_fondo"]] = 0
+        saldos_fondos[fondo["id_fondo"]] += fondo["monto"]
+        if saldos_fondos[fondo["id_fondo"]] > fondo_obj.saldo:
+            raise ValidationError(f"El monto total para un fondo no puede exceder su saldo disponible")
         fondos.append((fondo_obj, fondo["monto"]))
         monto += fondo["monto"]
 
@@ -524,4 +578,17 @@ def rechazando_compra(id_compra):
     borrar_compra(compra, motivo_rechazo)
 
     flash(f"Compra rechazada por el siguiente motivo: {motivo_rechazo}", "success")
+    return redirect(url_for("compra.lista_compras"))
+
+@bp.post("/revertir_compra/<int:id_compra>")
+@role_required('Administrador', 'Colaborador')
+def revertir_compra(id_compra):
+    compra = buscar_compra(id_compra)
+    
+    if not compra:
+        return redirect(url_for('compra.lista_compras'))
+
+    realizada_a_aprobada(compra)
+
+    flash(f"Compra revertida con exito", "success")
     return redirect(url_for("compra.lista_compras"))

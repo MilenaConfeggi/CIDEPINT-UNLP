@@ -22,6 +22,10 @@
           </div>
           <div class="card-body">
             <h5 class="card-title">{{ foto.nombre_archivo }}</h5>
+            <!-- Botón de eliminar -->
+            <button class="btn-icon btn-delete" @click.stop="confirmarEliminarFoto(foto.id)">
+              <i class="fas fa-trash-alt"></i>
+            </button>
           </div>
         </div>
       </div>
@@ -47,7 +51,7 @@
 <script>
 import { ref, onMounted, watch, computed } from 'vue';
 import axios from 'axios';
-import { useAuthStore } from '@/stores/auth'
+import { useAuthStore } from '@/stores/auth';
 import { useRouter } from 'vue-router';
 
 const permisos = JSON.parse(localStorage.getItem('permisos')) || [];
@@ -90,13 +94,13 @@ export default {
           }
         });
         if (response.status < 200 || response.status >= 300) {
-          throw ({message: 'Error en la petición', status: response.status})
+          throw ({ message: 'Error en la petición', status: response.status });
         }
         fotos.value = response.data;
       } catch (err) {
         if (err.status === 401 || err.status === 422) {
-          authStore.logout()
-          router.push('/log-in')
+          authStore.logout();
+          router.push('/log-in');
         } else {
           error.value = 'Error al cargar las fotos';
           console.error(err);
@@ -176,13 +180,55 @@ export default {
       }
     };
 
+    const confirmarEliminarFoto = (idFoto) => {
+      if (confirm("¿Estás seguro de que quieres eliminar esta foto?")) {
+        eliminarFoto(idFoto);
+      }
+    };
+
+    const eliminarFoto = async (idFoto) => {
+      const authStore = useAuthStore();
+      const token = authStore.getToken();
+      try {
+        const response = await axios.delete(`${import.meta.env.VITE_API_URL}/muestras/eliminar_foto/${idFoto}`, {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
+          }
+        });
+        if (response.status === 200) {
+          fotos.value = fotos.value.filter(foto => foto.id !== idFoto); // Eliminar la foto del listado
+        }
+      } catch (error) {
+        console.error('Error al eliminar la foto:', error);
+        error.value = 'Error al eliminar la foto';
+      }
+    };
+
     onMounted(() => {
       fetchFotos();
     });
 
     watch(() => props.fechaSeleccionada, fetchFotos);
 
-    return { fotos, error, getImageUrl, mostrarVerFoto, cerrarVerFoto, mostrarVerFotoModal, fotoSeleccionada, formatFecha, seleccionadas, toggleSeleccionar, descargarSeleccionadas, enviarMail, tienePermisoDescargar, tienePermisoEnviarMail };
+    return {
+      fotos,
+      error,
+      getImageUrl,
+      mostrarVerFoto,
+      cerrarVerFoto,
+      mostrarVerFotoModal,
+      fotoSeleccionada,
+      formatFecha,
+      seleccionadas,
+      toggleSeleccionar,
+      descargarSeleccionadas,
+      enviarMail,
+      confirmarEliminarFoto,
+      eliminarFoto,
+      tienePermisoDescargar,
+      tienePermisoEnviarMail
+    };
   }
 };
 </script>
@@ -282,5 +328,20 @@ export default {
 
 .ml-2 {
   margin-left: 0.5rem;
+}
+
+.btn-icon {
+  background: none;
+  border: none;
+  color: #dc3545; /* Rojo */
+  cursor: pointer;
+  font-size: 1.2rem;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.btn-icon:hover {
+  color: #a71d2a; /* Rojo más oscuro */
 }
 </style>

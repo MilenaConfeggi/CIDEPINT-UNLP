@@ -23,3 +23,16 @@ class FormularioNuevaCarpeta(FlaskForm):
 
     def __init__(self, *args, **kwargs):
         super(FormularioNuevaCarpeta, self).__init__(*args, **kwargs)
+
+
+class FormularioNuevaSubcarpeta(FlaskForm):
+        
+    nombre = StringField('Nombre', validators=[DataRequired(message="es requerido"), 
+                                             Length(max=255,message="no puede exceder los 255 caracteres")],
+                       render_kw={"aria-label": "Titulo"}
+                       )
+    
+    id_padre = HiddenField('Padre', validators=[DataRequired()])
+
+    def __init__(self, *args, **kwargs):
+        super(FormularioNuevaSubcarpeta, self).__init__(*args, **kwargs)

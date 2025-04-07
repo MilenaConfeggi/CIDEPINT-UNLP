@@ -247,7 +247,7 @@ def view_adicional(id):
         return jsonify({"message": "No tiene permiso para acceder a este recurso"}), 403
     UPLOAD_FOLDER = os.path.abspath("documentos")
     documento = find_documento_by_id(id)
-    directory = os.path.normpath(os.path.join(UPLOAD_FOLDER, "adicional"))
+    directory = os.path.normpath(os.path.join(UPLOAD_FOLDER, "Adicional"))
     filename = documento.nombre_documento
     file_path = os.path.join(directory, filename)
     if not os.path.exists(file_path):

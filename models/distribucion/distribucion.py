@@ -7,8 +7,8 @@ class Distribucion(db.Model):
     porcentaje_area = db.Column(db.Float, nullable=False,default=40.0)
     porcentaje_empleados = db.Column(db.Float, nullable=False,default=50.0)
     porcentaje_comisiones = db.Column(db.Float, nullable=False,default=19.0)
-    monto_a_distribuir = db.Column(db.Float, nullable=False)
-    costos = db.Column(db.Float, nullable=False)
+    monto_a_distribuir = db.Column(db.DECIMAL(12,2), nullable=False)
+    costos = db.Column(db.DECIMAL(12,2), nullable=False)
 
     legajo_id = db.Column(db.Integer, db.ForeignKey('legajo.id'))
     legajo = db.relationship('Legajo')

@@ -19,8 +19,10 @@ from datetime import datetime
 from servicios.backend.src.core.services import servicioDocumento
 from models.documentos.documento import Documento
 from sqlalchemy import desc
+import locale
 
 
+locale.setlocale(locale.LC_TIME, 'es_ES.utf8')
 UPLOAD_FOLDER = os.path.abspath("documentos")
 
 def generar_documento_de_legajo(id_legajo):
@@ -99,7 +101,6 @@ def generar_documento_de_legajo(id_legajo):
         ['Cel:', legajo.cliente.celular],
         ['E-mail:', legajo.cliente.email],
         ['Área:', legajo.area.nombre],
-        ['Fecha de entrada:', legajo.fecha_entrada.strftime("%d de %B de %Y")],
         ['Objetivo de la OT:', legajo.objetivo],
         ['Presupuesto Nº:', presupuesto.nro_presupuesto]
     ]
@@ -351,16 +352,16 @@ def generar_presupuesto(data):
     content = []
 
     # Referencia y fecha
-    content.append(Paragraph(f"Ref.: Leg. Int. N° {legajo.id}", derecha_style))
+    content.append(Paragraph(f"Ref.: Leg. Int. N° {legajo.id}/{legajo.fecha_entrada.strftime("%y")}", derecha_style))
     content.append(Spacer(1, 12))
     content.append(Paragraph(f"LA PLATA, {datetime.now().strftime("%d de %B de %Y")}", derecha_style))
     content.append(Spacer(1, 12))
 
     # Datos del cliente
     content.append(Paragraph("<b>Señores</b>", normal_style))
-    content.append(Paragraph(legajo.cliente.contacto, normal_style))
+    content.append(Paragraph(legajo.cliente.nombre, normal_style))
     content.append(Paragraph(f"<b>Mail:</b> {legajo.cliente.email}", normal_style))
-    content.append(Paragraph(f"<b>At.</b> {legajo.cliente.nombre}", normal_style))
+    content.append(Paragraph(f"<b>At.</b> {legajo.cliente.contacto}", normal_style))
     content.append(Spacer(1, 20))
     
     # Número de presupuesto
@@ -542,16 +543,16 @@ def generar_presupuesto_en_pesos(data):
     content = []
 
     # Referencia y fecha
-    content.append(Paragraph(f"Ref.: Leg. Int. N° {legajo.id}", derecha_style))
+    content.append(Paragraph(f"Ref.: Leg. Int. N° {legajo.id}/{legajo.fecha_entrada.strftime("%y")}", derecha_style))
     content.append(Spacer(1, 12))
     content.append(Paragraph(f"LA PLATA, {datetime.now().strftime("%d de %B de %Y")}", derecha_style))
     content.append(Spacer(1, 12))
 
     # Datos del cliente
     content.append(Paragraph("<b>Señores</b>", normal_style))
-    content.append(Paragraph(legajo.cliente.contacto, normal_style))
+    content.append(Paragraph(legajo.cliente.nombre, normal_style))
     content.append(Paragraph(f"<b>Mail:</b> {legajo.cliente.email}", normal_style))
-    content.append(Paragraph(f"<b>At.</b> {legajo.cliente.nombre}", normal_style))
+    content.append(Paragraph(f"<b>At.</b> {legajo.cliente.contacto}", normal_style))
     content.append(Spacer(1, 20))
     
     # Número de presupuesto
@@ -723,7 +724,7 @@ def crear_presupuesto(data):
 
 def crear_presupuesto_stan(presupuesto, stan_id):
     presupuesto_stan = PresupuestoStan(
-        presupuesto_id=presupuesto_id,
+        presupuesto_id=presupuesto.id,
         stan_id=stan_id
     )
 

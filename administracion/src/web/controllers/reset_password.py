@@ -4,6 +4,9 @@ from itsdangerous import URLSafeTimedSerializer
 from models.personal.personal import User
 from models.personal.empleado import Empleado
 from models.base import db  # Importa db para realizar operaciones en la base de datos
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 reset_bp = Blueprint("reset", __name__, url_prefix="/reset_password")
 
@@ -15,7 +18,7 @@ def reset_password():
         # Verificar si el email existe en la base de datos
         empleado = Empleado.query.filter_by(email=email).first()
         if not empleado:
-            flash('Email not found.', 'danger')
+            flash('No existe un empleado con la dirección de correo electrónico ingresada.', 'danger')
             return redirect(url_for('reset.reset_password'))
         
         user = empleado.user
@@ -25,10 +28,20 @@ def reset_password():
 
         token = s.dumps(email, salt='password-reset-salt')
         link = url_for('reset.reset_with_token', token=token, _external=True)
-        msg = Message('Solicitud de cambio de contraseña', sender=app.config['MAIL_DEFAULT_SENDER'], recipients=[email])
-        msg.body = f'Tu link para resetear tu contraseña es: {link}'
-        mail = app.extensions.get('mail')  # Obtén la instancia de Mail desde la aplicación
-        mail.send(msg)
+        servidor = smtplib.SMTP('smtp.gmail.com', 587)
+        servidor.starttls()
+        servidor.login(app.config["MAIL_USER"], app.config["MAIL_PASSWORD"])
+
+        msg = MIMEMultipart()
+        msg["From"] = app.config["MAIL_USER"]
+        msg["To"] = email
+        msg["Subject"] = "Solicitud de cambio de contraseña"
+
+        body = f'Tu link para resetear tu contraseña es: {link}'
+        msg.attach(MIMEText(body, 'plain', 'utf-8'))
+
+        servidor.sendmail(app.config["MAIL_USER"], email, msg.as_string().encode("utf-8"))
+        servidor.quit()
         flash('Un link para cambiar tu contraseña ha sido enviado a tu dirección de correo electrónico.', 'info')
         return redirect(url_for('auth.login'))  # Cambia 'login' por 'auth.login'
     return render_template('reset_password.html')

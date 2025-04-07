@@ -42,7 +42,14 @@
           {% if campo.type == 'textarea' %}
             <textarea name="{{ campo.name }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">{{ campo.value }}</textarea>
           {% elif campo.type == 'select' %}
-            <select name="{{ campo.name }}" id="{{ campo.name }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" {% if campo.disabled %}disabled{% endif %}>
+            <select name="{{ campo.name }}" 
+            id="{{ campo.name }}" 
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" 
+            {% if campo.disabled %}disabled{% endif %}
+            {% if campo.name == 'rol' and (current_user.id == user.id or current_user.rol == 'Colaborador') %}disabled{% endif %}>
+              {% if not campo.value %}
+                <option value="" selected>Seleccione una opción</option>
+              {% endif %}
               {% for option in campo.options %}
                 {% if campo.name == 'area_id' %}
                   <option value="{{ option.id }}" {% if option.id == campo.value %}selected{% endif %}>{{ option.nombre }}</option>
@@ -66,7 +73,20 @@
       
       <div class="mb-4">
         <label class="text-gray-700 text-sm font-bold mb-2">Saldo Actual:</label>
-        <p>{{ user.empleado.saldo }}</p>
+        {% if current_user.rol != "Personal" %}
+          <input
+                type="number"
+                id="saldo"
+                name="saldo"
+                step="any"
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                placeholder="Saldo"
+                value="{{ user.empleado.saldo }}"
+                required
+              />
+            {% else %}
+              <p>{{ user.empleado.saldo }}</p>
+            {% endif %}
       </div>
       <div class="mb-4">
         <label class="text-gray-700 text-sm font-bold mb-2">Saldo de su Área:</label>
@@ -141,9 +161,10 @@
 
     const subdivisiones = {
       'Investigador': ['Asistente', 'Adjunto', 'Independiente', 'Principal', 'Superior'],
-      'CPA': ['Profesional Principal', 'Profesional Adjunto', 'Profesional Asistente'],
-      'Técnico': ['Profesional', 'Asociado', 'Asistente', 'Auxiliar'],
-      'Administrativo': ['ART 9', 'Ley 10430']
+      'CPA': ['Profesional Principal', 'Profesional Adjunto', 'Profesional Asistente','Técnico Principal', 'Técnico Asociado', 'Técnico Asistente','Técnico Auxiliar','Otro'],
+      'Técnico': ['Otro'],
+      'Administrativo': ['ART 9', 'Ley 10430', 'Otro'],
+      'Becario' : ['De entrenamiento','Doctoral','Posdoctoral', 'Otro']
     };
 
     function updateSubdivisionCargoOptions() {
@@ -155,6 +176,9 @@
         const optionElement = document.createElement('option');
         optionElement.value = option;
         optionElement.textContent = option;
+        if (option === '{{ user.empleado.subdivision_cargo }}') {
+          optionElement.selected = true;
+        }
         subdivisionCargoSelect.appendChild(optionElement);
       });
     }

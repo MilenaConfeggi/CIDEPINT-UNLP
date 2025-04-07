@@ -33,7 +33,7 @@ class Empleado(db.Model):
     telefono = db.Column(db.String(20), nullable=True)
     domicilio = db.Column(db.String(200), nullable=True)
     fecha_nacimiento = db.Column(db.Date, nullable=True)
-    saldo = db.Column(db.Float, default=0.0)   
+    saldo = db.Column(db.DECIMAL(12,2), default=0.00)   
     observaciones = db.Column(db.Text, nullable=True)
     archivos = db.relationship('Archivo', back_populates='empleado')
     ausencias = db.relationship('Ausencia', back_populates='empleado')
@@ -58,7 +58,7 @@ class Empleado(db.Model):
 
     @validates('cargo')
     def validate_cargo(self, key, value):
-        allowed_cargos = ['Investigador', 'CPA', 'Administrativo', 'Técnico']
+        allowed_cargos = ['Investigador', 'CPA', 'Administrativo', 'Técnico', 'Becario']
         if value and value not in allowed_cargos:
             raise ValueError(f"Cargo '{value}' no es válido. Debe ser uno de {allowed_cargos}.")
         return value
@@ -67,15 +67,16 @@ class Empleado(db.Model):
     def validate_subdivision_cargo(self, key, value):
         allowed_subdivisiones = {
             'Investigador': ['Asistente', 'Adjunto', 'Independiente', 'Principal', 'Superior'],
-            'CPA': ['Profesional Principal', 'Profesional Adjunto', 'Profesional Asistente'],
-            'Técnico': ['Profesional', 'Asociado', 'Asistente', 'Auxiliar'],
-            'Administrativo': ['ART 9', 'Ley 10430']
+            'CPA': ['Profesional Principal', 'Profesional Adjunto', 'Profesional Asistente','Técnico Principal', 'Técnico Asociado', 'Técnico Asistente','Técnico Auxiliar','Otro'],
+            'Técnico': ['Otro'],
+            'Administrativo': ['ART 9', 'Ley 10430', 'Otro'],
+            'Becario' : ['De entrenamiento','Doctoral','Posdoctoral', 'Otro']
         }
         if self.cargo and (self.cargo not in allowed_subdivisiones or value not in allowed_subdivisiones[self.cargo]):
             raise ValueError(f"Subdivisión de cargo '{value}' no es válida para el cargo '{self.cargo}'.")
         return value
 
-    def __init__(self, user, email, area, dni, nombre, apellido, dependencia=None, cargo=None, subdivision_cargo=None, telefono=None, domicilio=None, fecha_nacimiento=None, observaciones=None, habilitado=True, rol='Personal'):
+    def __init__(self, user, email, area, dni, nombre, apellido, dependencia=None, cargo=None, subdivision_cargo=None, telefono=None, domicilio=None, fecha_nacimiento=None, observaciones=None, habilitado=True, rol='Personal', saldo=0.00):
         self.user = user
         self.email = email
         self.area = area
@@ -93,6 +94,7 @@ class Empleado(db.Model):
         self.rol = rol
         self.primer_login = True
         self.usuario_servicio = None
+        self.saldo = saldo
 
     def __repr__(self) -> str:
         return f"Empleado {self.nombre} {self.apellido}"

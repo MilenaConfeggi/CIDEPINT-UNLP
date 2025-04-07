@@ -3,7 +3,7 @@ from models.clientes.cliente import Cliente
 from models.base import db
 from models.clientes import create_cliente
 def seeds_clientes():
-    legajos_id = [33, 34, 35, 36]
+    legajos_id = [16837, 16838, 16839, 16840]
     clientes_data = [
         {
             'email': 'milenaconfeggi@gmail.com',

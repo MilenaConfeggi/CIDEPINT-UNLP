@@ -14,6 +14,7 @@ def seeds_legajos():
             "es_juridico": True,
             "necesita_facturacion": True,
             "objetivo": "Objetivo de legajo",
+            "admin_habilitado": True,
             "area_id": 1,
         },
         {

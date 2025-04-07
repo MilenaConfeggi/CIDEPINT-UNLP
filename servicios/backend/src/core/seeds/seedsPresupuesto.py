@@ -17,27 +17,28 @@ def seeds_presupuestos():
             "precio": 1000,
             "medio_de_pago_id": 1,
             "nro_presupuesto": 1,
-            "legajo_id": 33,
+            "legajo_id": 16837,
         },
         {
             "fecha_creacion": datetime(2024, 1, 1),
             "precio": 2000,
             "medio_de_pago_id": 2,
             "nro_presupuesto": 2,
-            "legajo_id": 34,
+            "legajo_id": 16838,
         },
         {
             "fecha_creacion": datetime(2024, 2, 1),
             "precio": 3000,
             "medio_de_pago_id": 3,
             "nro_presupuesto": 3,
-            "legajo_id": 35,
+            "legajo_id": 16839,
         },
         {
             "fecha_creacion": datetime(2024, 3, 1),
             "precio": 4000,
             "medio_de_pago_id": 1,
             "nro_presupuesto": 4,
+            "legajo_id": 16840,
         },
     ]
 

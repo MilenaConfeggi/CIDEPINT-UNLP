@@ -202,12 +202,11 @@ def cargar_presupuesto_firmado(id_legajo):
         return jsonify({"error": "No hay presupuesto para este legajo"}), 404
     
     try:
-        # Eliminar el informe anterior
-        #chequeo si quien hizo la peticion es un jefe de area o un director
-        user = get_jwt_identity()
-        usuario = servicioUsuario.obtener_usuario_por_mail(user)
-        if not servicioUsuario.es_director(usuario):
-            return jsonify({"error": "No tienes permisos para realizar esta acción"}), 403
+        # Lo comenté para que lo pueda usar la secretaria
+        #user = get_jwt_identity()
+        #usuario = servicioUsuario.obtener_usuario_por_mail(user)
+        #if not servicioUsuario.es_director(usuario):
+        #    return jsonify({"error": "No tienes permisos para realizar esta acción"}), 403
         
         folder_path = os.path.join(UPLOAD_FOLDER, "presupuestos", str(id_legajo))
         os.makedirs(folder_path, exist_ok=True)
@@ -236,6 +235,50 @@ def cargar_presupuesto_firmado(id_legajo):
     except ValidationError as err:
         print(err.messages)  # Imprime los mensajes de error de validación
         return jsonify({"message": f"Error en la validación de los datos: {err.messages}"}), 400
+    except Exception as e:
+        print(e)  # Imprime el error para depuración
+        return jsonify({"message": "Ha ocurrido un error inesperado"}), 500
+    
+
+@bp.post("/subir_presupuesto/<int:id_legajo>")
+@jwt_required()
+def subir_presupuesto(id_legajo):
+    if not check_permission("generar_presupuesto"):
+        return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
+    if 'archivo' not in request.files:
+        return jsonify({"error": "Debes seleccionar un archivo"}), 400
+
+    archivo = request.files['archivo']
+
+    if not archivo or archivo.filename == '':
+        return jsonify({"error": "Por favor seleccione un archivo"}), 400
+
+    if not permitir_pdf(archivo.filename):
+        return jsonify({"error": "Tipo de archivo no permitido. Solo se permiten archivos PDF."}), 400
+    
+    try:
+        folder_path = os.path.join(UPLOAD_FOLDER, "presupuestos", str(id_legajo))
+        os.makedirs(folder_path, exist_ok=True)
+
+        # Eliminar archivos que comienzan con "presupuesto"
+        for archiv in os.listdir(folder_path):
+            archivo_path = os.path.join(folder_path, archiv)
+            if os.path.isfile(archivo_path) and archiv.startswith("presupuesto_"):
+                os.remove(archivo_path)
+
+        timestamp = datetime.now().strftime("%Y%m%d")
+        filename = os.path.join(folder_path, f"presupuesto_{timestamp}.pdf")
+
+        archivo.save(filename)
+
+        doc_data = {
+            'nombre_documento': f"presupuesto_{timestamp}.pdf",
+            'estado_id': 5,
+            'legajo_id': id_legajo,
+            'tipo_id': 2
+        }
+        servicioDocumento.crear_documento(doc_data)
+        return jsonify({"message": "Presupuesto subido con éxito"}), 200
     except Exception as e:
         print(e)  # Imprime el error para depuración
         return jsonify({"message": "Ha ocurrido un error inesperado"}), 500

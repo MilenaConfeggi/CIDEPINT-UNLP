@@ -6,7 +6,7 @@
 
 <div class="px-4 py-8 sm:mx-3 md:mx-5 xl:mx-60 sm:pt-200  md:pt-20 xl:pt-40 flex flex-col justify-center items-center">
     <h1 class="text-3xl font-bold mb-8 animate-fade">Seleccionar tópico</h1>
-    <div class="grid gap-4 mb-8 md:grid-cols-3 {% if current_user.rol == 'Administrador' or current_user.rol == 'Colaborador' %} xl:grid-cols-5 {% else %} xl:grid-cols-3 {% endif %} animate-fade-up">
+    <div class="grid gap-4 mb-8 md:grid-cols-3 {% if current_user.rol == 'Administrador' or current_user.rol == 'Colaborador' %} xl:grid-cols-5 {% else %} xl:grid-cols-4 {% endif %} animate-fade-up">
         <a class="flex items-center p-4 bg-white rounded-lg shadow-md"
         href="{{ url_for('archivos.index') }}">
             <div class="p-3 mr-4 text-orange-500 bg-orange-100 rounded-full">
@@ -64,6 +64,10 @@
         {% if current_user.rol == 'Administrador' or current_user.rol == 'Colaborador' %}
             <a class="flex items-center p-4 bg-white rounded-lg shadow-md"
             href="{{ url_for('contable.index') }}">
+        {% else %}
+            <a class="flex items-center p-4 bg-white rounded-lg shadow-md"
+            href="{{ url_for('contable.get_legajos') }}">
+        {% endif %}
                 <div class="p-3 mr-4 text-red-500 bg-red-100 rounded-full">
                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 384 512">
                     <path
@@ -79,7 +83,6 @@
                     </p>
                 </div>
             </a>
-        {% endif %}
         <a class="flex items-center p-4 bg-white rounded-lg shadow-md"
         href="{{ url_for('patrimonio.index') }}">
             <div class="p-3 mr-4 text-green-500 bg-green-100 rounded-full">

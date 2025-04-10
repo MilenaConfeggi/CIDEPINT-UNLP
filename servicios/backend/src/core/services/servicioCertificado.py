@@ -153,9 +153,9 @@ def obtener_certificado(id_legajo):
     return documento.nombre_documento
 
 def calcular_suma_participacion(empleados):
-    suma = 0
+    suma = 0.0  # Asegúrate de que sea un float
     for empleado in empleados:
-        suma += empleado["participacion"]
+        suma += float(empleado["participacion"])
     return suma
 
 def chequear_solo_responsable(empleados):

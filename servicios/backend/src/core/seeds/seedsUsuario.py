@@ -28,7 +28,12 @@ def seeds_usuarios():
         db.session.commit()
 
     def seed_usuarios():
-
+        def find_role_by_name(rol):
+            return Rol.query.filter_by(nombre=rol).first()
+        rol_secretaria = find_role_by_name("Secretaria")
+        rol_director = find_role_by_name("Director")
+        rol_jefe_de_area = find_role_by_name("Jefe de area")
+        rol_trabajador = find_role_by_name("Trabajador")
         default_area = Area(nombre="Area 2fault", saldo=0)
         area_1 = get_area(1)
         area_2 = get_area(2)
@@ -274,6 +279,7 @@ def seeds_usuarios():
 
         rol_secretaria = find_role_by_name("Secretaria")
         rol_director = find_role_by_name("Director")
+        rol_jefe_de_area = find_role_by_name("Jefe de area")
 
         walter = User(
             username="w.egli", password="direccioncidepint", rol="Administrador"
@@ -339,7 +345,7 @@ def seeds_usuarios():
             }
         )
         db.session.add(usuario_alicia)
-
+   
         db.session.commit()
 
     def seeds_permisos():
@@ -615,4 +621,4 @@ def seeds_usuarios():
 
     seed_roles()
     seeds_permisos()
-    seed_usuarios_finales()
+    seed_usuarios()

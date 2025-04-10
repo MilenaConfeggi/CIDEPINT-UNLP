@@ -28,7 +28,7 @@
           </div>
           <div class="mb-2">
             <label class="block text-gray-700 text-sm font-bold mb-2">Porcentaje de Participación:</label>
-            <input type="number" v-model="empleado.participacion" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
+            <input type="number" v-model="empleado.participacion" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" step="0.01" min="0" required>
           </div>
         </div>
       </div>
@@ -141,6 +141,15 @@ const submitForm = async () => {
     return;
   }
 
+  const sumaParticipacion = empleadosSeleccionados.value.reduce((total, empleado) => {
+    return total + parseFloat(empleado.participacion || 0);
+  }, 0);
+
+  if (sumaParticipacion !== 100) {
+    submitError.value = 'La suma de las participaciones debe ser igual a 100';
+    return;
+  }
+
   const data = {
     empleados: empleadosSeleccionados.value,
     descripcion: descripcion.value,
@@ -149,7 +158,7 @@ const submitForm = async () => {
   console.log('Datos enviados:', data);
 
   try {
-    toast.info('Generando certificado...')
+    toast.info('Generando certificado...');
     const response = await fetch(`${import.meta.env.VITE_API_URL}/certificado/crear/${idLegajo}`, {
       method: 'POST',
       headers: {
@@ -165,13 +174,13 @@ const submitForm = async () => {
     if (response.status !== 200) {
       throw new Error(result.message || 'Error al generar el certificado');
     }
-    toast.success('Certificado generado correctamente')
+    toast.success('Certificado generado correctamente');
     successMessage.value = result.message;
     setTimeout(() => {
       router.push(`/legajos/${idLegajo}`);
     }, 1500);
   } catch (err) {
-    toast.error('Error al generar el certificado')
+    toast.error('Error al generar el certificado');
     submitError.value = err.message || 'Error desconocido';
   }
 };

@@ -4,8 +4,9 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
 
+// https://vite.dev/config/
 export default defineConfig({
-  base: '/', // 👈 IMPORTANTE: se sirve desde raíz, no './'
+  base: '/',
   plugins: [
     vue(),
     vueDevTools(),
@@ -17,8 +18,6 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: '../dist', // 👈 importante para que Flask lo encuentre
-    emptyOutDir: true,
     rollupOptions: {
       input: {
         main: './index.html',

@@ -26,8 +26,6 @@ from pathlib import Path
 import os
 from administracion.src.web.forms.documento_legajo_nuevo import UploadDocumentoForm ,DownloadForm ,DeleteForm
 
-UPLOAD_FOLDER = os.path.abspath("documentos")
-
 bp = Blueprint("contable",__name__,url_prefix="/contable")
 
 @bp.get("/")
@@ -586,7 +584,11 @@ def download(documento_id):
 @bp.get('/legajos/<int:id_legajo>/documento')
 @role_required('Administrador', 'Colaborador')
 def donwload_presupuesto(id_legajo):
-    directory = os.path.normpath(os.path.join(UPLOAD_FOLDER, "presupuestos", str(id_legajo)))
+    # Ruta base de los documentos
+    current_file = Path(__file__).resolve()
+    project_root = current_file.parents[4]
+    documentos_path = project_root / "documentos"
+    directory = os.path.normpath(os.path.join(documentos_path, "presupuestos", str(id_legajo)))
 
     # Verifica si el directorio existe
     if not os.path.exists(directory) or not os.path.isdir(directory):

@@ -9,7 +9,7 @@
       </g>
     </svg>
   </RouterLink>
-  <h2 class="mb-3 text-center mb-5">Crear legajo</h2>
+  <h2 class="mb-3 text-center mb-5">Crear legajo {{ nextLegajoId }}</h2>
   <form ref="formRef" @submit.prevent="validateForm" class="row g-3 needs-validation" novalidate
     :class="{ 'was-validated': wasValidated }">
     <div class="col-md-6">
@@ -140,71 +140,76 @@ export default {
         area: '',
       },
       wasValidated: false,
-    }
+      nextLegajoId: null, // Almacena el próximo ID del legajo
+    };
   },
 
   setup() {
     const areasStore = useAreasStore();
     const { areas, loading, error } = storeToRefs(areasStore);
     const toast = useToast();
-    const router = useRouter()
+    const router = useRouter();
 
     return {
       areas,
       loading,
       error,
       toast,
-      router
+      router,
     };
   },
+
   async mounted() {
     const areasStore = useAreasStore();
     await areasStore.getAreas();
+
+    try {
+      const authStore = useAuthStore();
+      const token = authStore.getToken();
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/legajos/next-id`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      this.nextLegajoId = response.data.next_id;
+    } catch (error) {
+      console.error('Error al obtener el próximo ID del legajo:', error);
+      this.toast.error('Hubo un error al obtener el próximo ID del legajo.');
+    }
   },
+
   methods: {
-    async loadAreas() {
-      try {
-        const areasStore = useAreasStore()
-        await areasStore.getAreas()
-      } catch (error) {
-        console.error('Error cargando áreas:', error)
-        this.toast.error('Hubo un error cargando las áreas. Intente de nuevo más tarde.')
-      }
-    },
     async validarCuit() {
       const cuit = this.form.cuit;
       if (!cuit || cuit.length === 0) {
-        return
+        return;
       }
       try {
-        this.toast.info('Buscando cliente...')
+        this.toast.info('Buscando cliente...');
         const authStore = useAuthStore();
         const token = authStore.getToken();
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/legajos/validar-cuit/${cuit}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          }
-        )
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/legajos/validar-cuit/${cuit}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         if (response.status === 404) {
-          throw new Error('No existe un cliente con ese CUIT.')
+          throw new Error('No existe un cliente con ese CUIT.');
         }
         if (response.data) {
-          this.form = { ... this.form, ...response.data }
-          this.form.nombreCliente = response.data.nombre
-          this.toast.success('Cliente encontrado.')
+          this.form = { ...this.form, ...response.data };
+          this.form.nombreCliente = response.data.nombre;
+          this.toast.success('Cliente encontrado.');
         }
       } catch (e) {
-        console.error(e)
-        this.toast.error("No existe un cliente con ese CUIT.")
-        this.resetForm()
+        console.error(e);
+        this.toast.error('No existe un cliente con ese CUIT.');
+        this.resetForm();
       }
-      return
     },
 
     async validateForm() {
-      const form = this.$refs.formRef
+      const form = this.$refs.formRef;
       if (form.checkValidity()) {
         const cliente = {
           email: this.form.email,
@@ -220,62 +225,63 @@ export default {
           piso: this.form.piso,
           depto: this.form.depto,
           nombre: this.form.nombreCliente,
-        }
+        };
         const legajo = {
           objetivo: this.form.objetivo,
           es_juridico: this.form.es_juridico,
           necesita_facturacion: this.form.necesita_facturacion,
           fecha_entrada: new Date().toISOString().replace('T', ' ').replace('Z', ''),
           area_id: this.form.area,
-        }
+        };
         const data = {
           legajo: legajo,
           cliente: cliente,
-        }
+        };
         try {
           const authStore = useAuthStore();
           const token = authStore.getToken();
           const response = await axios.post(
             `${import.meta.env.VITE_API_URL}/api/legajos/add`,
-            data,  
-            {      
+            data,
+            {
               headers: {
-                Authorization: `Bearer ${token}`
-              }
+                Authorization: `Bearer ${token}`,
+              },
             }
-          )
-          console.log(response)
-          this.toast.success('Formulario enviado correctamente')
-          this.wasValidated = false
-          this.resetForm()
+          );
+          console.log(response);
+          this.toast.success('Formulario enviado correctamente');
+          this.wasValidated = false;
+          this.resetForm();
           setTimeout(() => {
-            this.router.push('/legajos')
-          }, 1500)
+            this.router.push('/legajos');
+          }, 1500);
         } catch (error) {
-          this.toast.error('Error al enviar el formulario')
-          console.log(error)
+          this.toast.error('Error al enviar el formulario');
+          console.log(error);
         }
       } else {
-        this.wasValidated = true
+        this.wasValidated = true;
       }
     },
+
     resetForm() {
-      this.form.email = ''
-      this.form.cuit = ''
-      this.form.telefono = ''
-      this.form.contacto = ''
-      this.form.calle = ''
-      this.form.numero = ''
-      this.form.localidad = ''
-      this.form.codigo_postal = ''
-      this.form.piso = ''
-      this.form.depto = ''
-      this.form.objetivo = ''
-      this.form.es_juridico = false
-      this.form.necesita_facturacion = false
-      this.form.area = '',
-      this.form.nombreCliente = ''
+      this.form.email = '';
+      this.form.cuit = '';
+      this.form.telefono = '';
+      this.form.contacto = '';
+      this.form.calle = '';
+      this.form.numero = '';
+      this.form.localidad = '';
+      this.form.codigo_postal = '';
+      this.form.piso = '';
+      this.form.depto = '';
+      this.form.objetivo = '';
+      this.form.es_juridico = false;
+      this.form.necesita_facturacion = false;
+      this.form.area = '';
+      this.form.nombreCliente = '';
     },
   },
-}
+};
 </script>

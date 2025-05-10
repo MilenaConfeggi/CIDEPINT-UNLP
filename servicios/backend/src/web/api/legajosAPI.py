@@ -29,6 +29,7 @@ from models.mails.mail import Mail
 from models.muestras.muestra import Muestra
 from models.presupuestos.presupuesto import Presupuesto
 from models.documentos.documento import Documento
+from models.legajos.legajo import Legajo
 
 bp = Blueprint("legajos", __name__, url_prefix="/api/legajos")
 
@@ -221,3 +222,8 @@ def delete_legajo(id):
         print(f"Error al eliminar el legajo: {e}")
         return jsonify({"error": f"Error al eliminar el legajo: {str(e)}"}), 500
     
+@bp.get("/next-id")
+def get_next_legajo_id():
+    last_legajo = db.session.query(Legajo).order_by(Legajo.id.desc()).first()
+    next_id = last_legajo.id + 1 if last_legajo else 1  # Si no hay legajos, el próximo ID será 1
+    return jsonify({"next_id": next_id}), 200

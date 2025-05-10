@@ -7,35 +7,16 @@ from models.legajos.legajo import Legajo
 from models.personal.empleado import Empleado
 from datetime import datetime
 
-NRO_MUESTRA_INICIAL = 58
 
 def crear_muestra(data, legajo_id):
-    fecha_ingreso = data.get('fecha_ingreso')
-    anio_ingreso = fecha_ingreso.year
-
-    # Verificar si hay alguna muestra en la base de datos
-    ultima_muestra = Muestra.query.order_by(Muestra.fecha_ingreso.desc(), Muestra.nro_muestra.desc()).first()
-
-    if not ultima_muestra:
-        # No hay ninguna muestra en la base de datos
-        nro_muestra = NRO_MUESTRA_INICIAL
-    else:
-        # Hay muestras en la base de datos
-        ultima_muestra_anio_ingreso = Muestra.query.filter(db.extract('year', Muestra.fecha_ingreso) == anio_ingreso).order_by(Muestra.nro_muestra.desc()).first()
-        
-        if not ultima_muestra_anio_ingreso:
-            # Es la primera muestra del año de ingreso
-            nro_muestra = 1
-        else:
-            # Incrementar el número de muestra basado en la última muestra del año de ingreso
-            nro_muestra = ultima_muestra_anio_ingreso.nro_muestra + 1
-
+    # Crear una nueva muestra con los datos proporcionados por el usuario
     nueva_muestra = Muestra(
-        nro_muestra=nro_muestra,
-        fecha_ingreso=data.get('fecha_ingreso'),
-        iden_cliente=data.get('iden_cliente'),
-        terminada=False,
-        legajo_id=legajo_id
+        nro_muestra=data.get('nro_muestra'),  # Número de muestra ingresado por el usuario
+        nro_grupo=data.get('nro_grupo'),  # Número de grupo ingresado por el usuario (opcional)
+        fecha_ingreso=data.get('fecha_ingreso'),  # Fecha de ingreso proporcionada
+        iden_cliente=data.get('iden_cliente'),  # Identificación del cliente proporcionada
+        terminada=False,  # Por defecto, la muestra no está terminada
+        legajo_id=legajo_id  # Asociar la muestra al legajo correspondiente
     )
     db.session.add(nueva_muestra)
     db.session.commit()
@@ -119,3 +100,12 @@ def eliminar_foto(id_foto):
     foto = Foto.query.get(id_foto)
     db.session.delete(foto)
     db.session.commit()
+
+def obtener_ultima_muestra():
+    # Obtener la última muestra cargada al sistema (por ID, que refleja el orden de inserción)
+    ultima_muestra = Muestra.query.order_by(Muestra.id.desc()).first()
+    if ultima_muestra:
+        # Formatear el número como "nrodemuestra-nrodegrupo"
+        nro_grupo = f"-{ultima_muestra.nro_grupo}" if ultima_muestra.nro_grupo else ""
+        return f"{ultima_muestra.nro_muestra}{nro_grupo}"
+    return None

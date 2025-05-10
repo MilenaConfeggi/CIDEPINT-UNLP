@@ -13,7 +13,10 @@
       <div v-for="muestra in muestras" :key="muestra.id" class="col-md-3 mb-4">
         <div class="card">
           <div class="card-body">
-            <h5 class="card-title">Número de muestra: {{ muestra.nro_muestra }}</h5>
+            <!-- Mostrar nro_muestra-nro_grupo -->
+            <h5 class="card-title">
+              Número de muestra: {{ formatNumeroMuestra(muestra.nro_muestra, muestra.nro_grupo) }}
+            </h5>
             <p class="card-text">Iden cliente: {{ muestra.iden_cliente }}</p>
             <p class="card-text">Fecha de ingreso: {{ muestra.fecha_ingreso }}</p>
             <p v-if="muestra.terminada" class="text-danger mb-0">Terminada</p>
@@ -101,13 +104,18 @@ export default {
       }
     };
 
+    // Formatear el número de muestra como "nro_muestra-nro_grupo"
+    const formatNumeroMuestra = (nroMuestra, nroGrupo) => {
+      return nroGrupo ? `${nroMuestra}-${nroGrupo}` : `${nroMuestra}`;
+    };
+
     onMounted(() => {
       fetchMuestras();
     });
 
     watch(() => props.legajoId, fetchMuestras);
 
-    return { muestras, error, muestraSeleccionada, confirmarTerminarMuestra, tienePermisoTerminar, noMuestras };
+    return { muestras, error, muestraSeleccionada, confirmarTerminarMuestra, tienePermisoTerminar, noMuestras, formatNumeroMuestra };
   }
 };
 </script>

@@ -5,9 +5,27 @@
       <h3 class="text-center mb-4">Identificar Muestras</h3>
       <hr class="line">
     </div>
+    <div v-if="ultimaMuestra" class="alert alert-info">
+      La última muestra fue la {{ ultimaMuestra }}
+    </div>
     <div class="form-container">
-      <form @submit.prevent="submitForm">
+      <form @submit.prevent="submitForm" class="scrollable-form">
         <div v-for="(muestra, index) in muestras" :key="index" class="mb-3">
+          <label :for="'nroMuestra' + index" class="form-label">Número de Muestra:</label>
+          <input
+            type="number"
+            :id="'nroMuestra' + index"
+            v-model="muestra.nroMuestra"
+            class="form-control"
+            required
+          />
+          <label :for="'nroGrupo' + index" class="form-label">Número de Grupo (Opcional):</label>
+          <input
+            type="number"
+            :id="'nroGrupo' + index"
+            v-model="muestra.nroGrupo"
+            class="form-control"
+          />
           <label :for="'fechaIngreso' + index" class="form-label">Fecha de Ingreso:</label>
           <input
             type="date"
@@ -28,10 +46,12 @@
             <i class="fas fa-trash-alt"></i>
           </button>
         </div>
-        <button type="button" @click="addMuestra" class="btn btn-secondary mb-3">Agregar Muestra</button>
+        <div class="button-container">
+          <button type="button" @click="addMuestra" class="btn btn-secondary">Agregar Muestra</button>
+          <button type="submit" class="btn btn-success" :disabled="isSubmitting">Identificar</button>
+        </div>
         <div v-if="error" class="alert alert-danger" role="alert">{{ error }}</div>
         <div v-if="successMessage" class="alert alert-success" role="alert">{{ successMessage }}</div>
-        <button type="submit" class="btn btn-success custom-button" :disabled="isSubmitting">Identificar</button>
       </form>
     </div>
   </div>
@@ -39,7 +59,7 @@
 
 <script>
 import { useAuthStore } from '@/stores/auth';
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted } from 'vue';
 export default {
   props: {
     legajoId: {
@@ -50,16 +70,37 @@ export default {
   data() {
     return {
       muestras: [
-        { fechaIngreso: '', idenCliente: '' }
+        { nroMuestra: '', nroGrupo: '', fechaIngreso: '', idenCliente: '' }
       ],
+      ultimaMuestra: null,
       isSubmitting: false,
       error: null,
       successMessage: null
     };
   },
   methods: {
+    async fetchUltimaMuestra() {
+      const authStore = useAuthStore();
+      const token = authStore.getToken();
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/muestras/ultima_muestra`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          this.ultimaMuestra = data.ultimaMuestra; // Mostrar el formato "nrodemuestra-nrodegrupo"
+        }
+      } catch (error) {
+        console.error('Error al obtener la última muestra:', error);
+      }
+    },
     addMuestra() {
-      this.muestras.push({ fechaIngreso: '', idenCliente: '' });
+      this.muestras.push({ nroMuestra: '', nroGrupo: '', fechaIngreso: '', idenCliente: '' });
     },
     removeMuestra(index) {
       this.muestras.splice(index, 1);
@@ -76,9 +117,9 @@ export default {
           {
             method: 'POST',
             headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json"
-          },
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
             body: JSON.stringify(this.muestras)
           }
         );
@@ -98,59 +139,42 @@ export default {
         this.isSubmitting = false;
       }
     }
+  },
+  mounted() {
+    this.fetchUltimaMuestra();
   }
 };
 </script>
 
 <style scoped>
-.container {
-  max-width: 600px;
+.scrollable-form {
+  max-height: 400px; /* Ajusta el tamaño máximo del contenedor */
+  overflow-y: auto; /* Habilita el scroll vertical */
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #f9f9f9;
 }
 
-.form-control {
-  border-radius: 8px;
-}
-
-.btn-success {
-  width: 100%;
-  border-radius: 8px;
-}
-
-.custom-button {
-  background-color: #28a745;
-  border: none;
-  color: white;
-  padding: 10px 20px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  margin: 4px 2px;
-  cursor: pointer;
-  transition-duration: 0.4s;
-}
-
-.custom-button:hover {
-  background-color: white;
-  color: black;
-  border: 2px solid #28a745;
+.button-container {
+  display: flex;
+  justify-content: space-between; /* Alinea los botones horizontalmente */
+  margin-top: 15px;
 }
 
 .btn-icon {
+  margin-left: 10px;
+  color: #dc3545;
   background: none;
   border: none;
-  color: #dc3545;
   cursor: pointer;
+}
+
+.btn-icon i {
   font-size: 1.2rem;
-  margin-left: 10px;
 }
 
 .btn-icon:hover {
   color: #a71d2a;
-}
-.form-container {
-  max-height: 400px; 
-  overflow-y: auto;
-  overflow-x: hidden; 
 }
 </style>

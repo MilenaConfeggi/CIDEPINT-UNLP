@@ -37,28 +37,42 @@ def cargar_muestra(id_legajo):
         data = request.get_json()
         muestras = []
         for elem in data:
+            # Mapear los nombres de los campos enviados desde el frontend
+            elem['nro_muestra'] = elem.pop('nroMuestra')
+            elem['nro_grupo'] = elem.pop('nroGrupo', None)  # Opcional
             elem['fecha_ingreso'] = elem.pop('fechaIngreso')
             elem['iden_cliente'] = elem.pop('idenCliente')
+
+            # Validar los datos con el esquema
             try:
                 muestra = muestraSchema.load(elem)
             except ValidationError as err:
-                return jsonify({"message": f"Error en la fecha para la identificación {elem['iden_cliente']}"}), 400
-            muestra = muestraSchema.load(elem)
-            #valido que no haya muestras cargadas previamente con la misma identificacion
+                return jsonify({"message": f"Error en los datos para la identificación {elem['iden_cliente']}: {err.messages}"}), 400
+
+            # Validar que no haya muestras con la misma identificación en la base de datos
             if not servicioMuestras.validar_identificacion_cliente(muestra, id_legajo):
                 return jsonify({"message": f"Ya se ingresó la identificación {elem['iden_cliente']} para este legajo"}), 400
-            #valido que entre las que se cargar al mismo tiempo no tengan la misma identificacion
+
+            # Validar que no haya duplicados en el lote actual
             if not servicioMuestras.validar_entre_cargadas(muestras, muestra):
-                return jsonify({"message": f"La identificación {elem['iden_cliente']} está siendo ingresada más de una vez en este lote. Modificalo y vuelve a intentar"}), 400
+                return jsonify({"message": f"La identificación {elem['iden_cliente']} está siendo ingresada más de una vez en este lote. Modifícalo y vuelve a intentar"}), 400
+
+            # Validar longitud de la identificación del cliente
             if not servicioMuestras.validar_longitud(muestra):
                 return jsonify({"message": "La identificación del cliente no puede superar los 100 caracteres"}), 400
+
+            # Validar que la fecha de ingreso no sea mayor a la fecha actual
             if not servicioMuestras.validar_fecha(elem['fecha_ingreso']):
                 return jsonify({"message": "La fecha de ingreso no puede ser mayor a la fecha actual"}), 400
+
             muestras.append(muestra)
+
+        # Crear las muestras en la base de datos
         for muestra in muestras:
-            muestra = servicioMuestras.crear_muestra(muestra, id_legajo)
+            servicioMuestras.crear_muestra(muestra, id_legajo)
 
         return jsonify({"message": "Muestras cargadas correctamente, recargue la página para ver los cambios"}), 200
+
     except ValidationError as e:
         return jsonify({"message": "Ha ocurrido un error inesperado, revise que muestras se han cargado antes de volver a intentarlo"}), 400
     except Exception as e:
@@ -232,3 +246,11 @@ def eliminar_foto(id_foto):
     except Exception as e:
         print(e)
         return jsonify({"error": "Error al eliminar la foto"}), 500
+
+@bp.get("/ultima_muestra")
+@jwt_required()
+def obtener_ultima_muestra():
+    ultima_muestra = servicioMuestras.obtener_ultima_muestra()
+    if ultima_muestra:
+        return jsonify({"ultimaMuestra": ultima_muestra}), 200
+    return jsonify({}), 200

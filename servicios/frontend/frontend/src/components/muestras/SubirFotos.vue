@@ -74,9 +74,21 @@ export default {
   },
   methods: {
     handleFileUpload(event) {
-      this.files = Array.from(event.target.files);
-      this.fileNames = this.files.map(file => file.name);
-    },
+    const maxFileSize = 50 * 1024 * 1024; // 50 MB
+    const newFiles = Array.from(event.target.files);
+
+    this.files = [];
+    this.fileNames = [];
+
+    newFiles.forEach(file => {
+      if (file.size > maxFileSize) {
+        this.error = `El archivo ${file.name} excede el tamaño máximo permitido de 50 MB.`;
+      } else {
+        this.files.push(file);
+        this.fileNames.push(file.name);
+      }
+    });
+  },
     triggerFileInput() {
       document.getElementById('archivo').click();
     },

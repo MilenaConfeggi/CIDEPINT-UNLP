@@ -117,5 +117,14 @@ export const useLegajosStore = defineStore('legajos', {
         this.loading = false
       }
     },
+    async deleteLegajo(id) {
+      try {
+        const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/legajos/delete/${id}`)
+        return response.data;
+      } catch (error) {
+        console.error('Error en la solicitud de eliminación:', error.response || error);
+        throw error;
+      }
+    }
   },
 })

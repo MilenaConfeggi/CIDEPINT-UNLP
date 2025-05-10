@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+from sqlalchemy import text
 from flask import current_app as app
 from models.legajos import (
     list_legajos,
@@ -24,6 +25,10 @@ from servicios.backend.src.core.config import config
 from servicios.backend.src.web.helpers.auth import check_permission
 from flask_jwt_extended import jwt_required
 from models.distribucion import Distribucion
+from models.mails.mail import Mail
+from models.muestras.muestra import Muestra
+from models.presupuestos.presupuesto import Presupuesto
+from models.documentos.documento import Documento
 
 bp = Blueprint("legajos", __name__, url_prefix="/api/legajos")
 
@@ -176,17 +181,43 @@ def validar_cuit(cuit):
     data = cliente_schema.dump(cliente)
     return jsonify(data), 200
 
-@bp.delete("/delete/<int:id>")
+@bp.post("/delete/<int:id>")
 def delete_legajo(id):
     legajo = find_legajo_by_id(id)
     if legajo is None:
         return jsonify({"error": "No se encontró el legajo"}), 404
 
     try:
-        # Marcar el legajo como eliminado
-        legajo.objetivo = "-1"
+        # Eliminar dependencias relacionadas manualmente en el orden correcto
+        # 1. Eliminar registros relacionados en empleado_distribucion
+        db.session.execute(
+            text("DELETE FROM empleado_distribucion WHERE distribucion_id IN (SELECT id FROM distribucion WHERE legajo_id = :legajo_id)"),
+            {"legajo_id": id}
+        )
+
+        # 2. Eliminar registros relacionados en presupuesto_stan
+        db.session.execute(
+            text("DELETE FROM presupuesto_stan WHERE presupuesto_id IN (SELECT id FROM presupuesto WHERE legajo_id = :legajo_id)"),
+            {"legajo_id": id}
+        )
+
+        # 3. Eliminar registros relacionados en presupuesto
+        db.session.query(Presupuesto).filter_by(legajo_id=id).delete()
+
+        # 4. Eliminar registros relacionados en distribucion
+        db.session.query(Distribucion).filter_by(legajo_id=id).delete()
+
+        # 5. Eliminar otras dependencias
+        db.session.query(Mail).filter_by(legajo_id=id).delete()
+        db.session.query(Muestra).filter_by(legajo_id=id).delete()
+        db.session.query(Documento).filter_by(legajo_id=id).delete()
+
+        # 6. Finalmente, eliminar el legajo
+        db.session.delete(legajo)
         db.session.commit()
-        return jsonify({"message": "Legajo marcado como eliminado"}), 200
+        return jsonify({"message": "Legajo eliminado correctamente"}), 200
     except Exception as e:
         db.session.rollback()
-        return jsonify({"error": f"Error al marcar el legajo como eliminado: {str(e)}"}), 500
+        print(f"Error al eliminar el legajo: {e}")
+        return jsonify({"error": f"Error al eliminar el legajo: {str(e)}"}), 500
+    

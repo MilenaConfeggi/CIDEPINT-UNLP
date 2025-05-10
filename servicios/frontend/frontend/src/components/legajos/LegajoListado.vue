@@ -177,14 +177,16 @@ const goToPage = (page) => {
 const eliminarLegajo = async (id) => {
   if (confirm('¿Está seguro de que desea eliminar este legajo?')) {
     try {
-      await legajosStore.deleteLegajo(id)
-      toast.success('Legajo eliminado con éxito.')
-      fetchLegajos()
+      console.log(`Eliminando legajo con ID: ${id}`);
+      await legajosStore.deleteLegajo(id);
+      toast.success('Legajo eliminado con éxito.');
+      fetchLegajos();
     } catch (error) {
-      toast.error('Error al eliminar el legajo.')
+      console.error('Error al eliminar el legajo:', error);
+      toast.error('Error al eliminar el legajo.');
     }
   }
-}
+};
 
 onMounted(() => {
   fetchAreas()

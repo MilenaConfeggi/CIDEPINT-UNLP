@@ -14,6 +14,7 @@ from models.presupuestos.ensayo import Ensayo
 def list_legajos(page=1, per_page=10, empresa=None, fecha=None, area=None, ensayo=None, facturacion=None, admin=None):
     query = (
         Legajo.query
+        .filter(Legajo.objetivo != "-1")  # Excluir legajos con objetivo = -1
         .outerjoin(Legajo.presupuesto_cidepint)  
         .outerjoin(Presupuesto.stans) 
         .outerjoin(STAN.ensayos)
@@ -41,7 +42,6 @@ def list_legajos(page=1, per_page=10, empresa=None, fecha=None, area=None, ensay
         query = query.filter(Legajo.admin_habilitado)
     query = query.order_by(Legajo.fecha_entrada.desc())
     return query.paginate(page=page, per_page=per_page, error_out=False)
-
 
 def list_legajos_all():
     return db.session.query(Legajo).all()

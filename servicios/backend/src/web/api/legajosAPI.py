@@ -23,6 +23,7 @@ from pathlib import Path
 from servicios.backend.src.core.config import config
 from servicios.backend.src.web.helpers.auth import check_permission
 from flask_jwt_extended import jwt_required
+from models.distribucion import Distribucion
 
 bp = Blueprint("legajos", __name__, url_prefix="/api/legajos")
 
@@ -175,3 +176,17 @@ def validar_cuit(cuit):
     data = cliente_schema.dump(cliente)
     return jsonify(data), 200
 
+@bp.delete("/delete/<int:id>")
+def delete_legajo(id):
+    legajo = find_legajo_by_id(id)
+    if legajo is None:
+        return jsonify({"error": "No se encontró el legajo"}), 404
+
+    try:
+        # Marcar el legajo como eliminado
+        legajo.objetivo = "-1"
+        db.session.commit()
+        return jsonify({"message": "Legajo marcado como eliminado"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": f"Error al marcar el legajo como eliminado: {str(e)}"}), 500

@@ -68,6 +68,9 @@
                   Cancelar
                 </button>
               </RouterLink>
+              <button v-if="hasPermission('cancelar_legajo')" @click="eliminarLegajo(legajo.id)" class="btn btn-danger">
+                <i class="fas fa-trash-alt"></i>
+              </button>
             </td>
           </tr>
         </tbody>
@@ -169,6 +172,18 @@ const nextPage = () => {
 
 const goToPage = (page) => {
   currentPage.value = page
+}
+
+const eliminarLegajo = async (id) => {
+  if (confirm('¿Está seguro de que desea eliminar este legajo?')) {
+    try {
+      await legajosStore.deleteLegajo(id)
+      toast.success('Legajo eliminado con éxito.')
+      fetchLegajos()
+    } catch (error) {
+      toast.error('Error al eliminar el legajo.')
+    }
+  }
 }
 
 onMounted(() => {
@@ -297,7 +312,17 @@ watch([ensayo, area, empresa, fecha, currentPage], () => {
   opacity: 0;
   animation: fadeIn 0.5s forwards;
 }
+.btn-icon {
+  background: none;
+  border: none;
+  color: #dc354688;
+  cursor: pointer;
+  font-size: 1.2rem;
+}
 
+.btn-icon:hover {
+  color: #a71d2a;
+}
 @keyframes fadeIn {
   to {
     opacity: 1;

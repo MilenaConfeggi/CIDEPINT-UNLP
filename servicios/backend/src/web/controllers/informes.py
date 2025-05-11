@@ -23,7 +23,6 @@ def cargar_documentacion(id_legajo):
     if(servicioInforme.buscar_documentacion_por_legajo(id_legajo)):
         servicioInforme.eliminar_documentacion_anterior(id_legajo)
         servicioInforme.eliminar_informe_anterior(id_legajo)
-        legajo_en_curso(id_legajo)
         mensaje = "Se ha eliminado la documentación anterior e informes en caso de que los hubiera"
     else:
         mensaje = " "
@@ -225,3 +224,13 @@ def ver_informe_por_id(id_informe):
     if not os.path.exists(file_path):
         abort(404, description="El archivo no existe")
     return send_from_directory(folder_path, informe.nombre_documento)
+
+@bp.post("/marcar_informado/<int:id_legajo>")
+@jwt_required()
+def marcar_informado(id_legajo):
+    try:
+        legajo_informado(id_legajo)
+        return jsonify({"message": "El legajo ha sido marcado como informado."}), 200
+    except Exception as e:
+        print(f"Error al marcar el legajo como informado: {e}")
+        return jsonify({"error": "Error interno del servidor."}), 500

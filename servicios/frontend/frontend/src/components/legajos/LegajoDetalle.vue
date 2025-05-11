@@ -149,6 +149,15 @@
                               Enviar Informe
                             </button>
                           </li>
+                          <div v-if="legajo?.estado?.nombre !== 'Informado'">
+                            <button
+                              type="button"
+                              class="btn btn-primary"
+                              @click="marcarComoInformado(legajo.id)"
+                            >
+                              Marcar como Informado
+                            </button>
+                          </div>
                         </template>
                         <template v-else-if="documento.nombre === 'Certificado CIDEPINT'">
                           <li v-if="hasPermission('generar_certificado')">
@@ -627,7 +636,27 @@ const viewAdicional = async (adicionalId) => {
     toast.warning('No se pudo cargar el archivo adicional.')
   }
 }
-
+const marcarComoInformado = async (legajoId) => {
+  const token = authStore.getToken();
+  try {
+    const response = await axios.post(
+      `${import.meta.env.VITE_API_URL}/informes/marcar_informado/${legajoId}`,
+      {}, // Cuerpo vacío
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    if (response.status === 200) {
+      toast.success('El legajo ha sido marcado como informado.');
+      await legajosStore.getLegajo(legajoId); // Actualizar el estado del legajo
+    }
+  } catch (error) {
+    console.error('Error al marcar el legajo como informado:', error);
+    toast.error('No se pudo marcar el legajo como informado.');
+  }
+};
 const viewLegajo = async (legajoId) => {
   const token = authStore.getToken()
   try {

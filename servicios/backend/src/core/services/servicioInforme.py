@@ -25,16 +25,6 @@ def buscar_informe_firmado_JA_por_legajo(id_legajo):
     informe = Documento.query.filter_by(legajo_id=id_legajo, tipo_documento_id=4, estado_id=7).first()
     return informe
 
-def eliminar_informe_anterior(id_legajo):
-    informe = Documento.query.filter_by(legajo_id=id_legajo, tipo_documento_id=4).filter(Documento.estado_id.notin_([8, 9])).first()
-    if informe:
-        file_path = os.path.join(UPLOAD_FOLDER, 'informes', str(id_legajo), informe.nombre_documento)
-        if os.path.exists(file_path):
-            os.remove(file_path)
-
-        db.session.delete(informe)
-        db.session.commit()
-    return informe
     # Eliminar el archivo físico
 
 def cambiar_estado_documentacion(id_legajo):
@@ -42,4 +32,12 @@ def cambiar_estado_documentacion(id_legajo):
     if informe:
         informe.estado_id = 9
         db.session.commit()
+    return informe
+
+def buscar_todos_informes_por_legajo(id_legajo):
+    informes = Documento.query.filter_by(legajo_id=id_legajo, tipo_documento_id=4).all()
+    return informes
+
+def buscar_informe_por_id(id_informe):
+    informe = Documento.query.filter_by(id=id_informe).first()
     return informe

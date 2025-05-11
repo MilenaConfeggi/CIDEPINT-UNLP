@@ -7,7 +7,7 @@ class Muestra(db.Model):
     nro_muestra = db.Column(db.Integer, nullable=False)
     nro_grupo = db.Column(db.Integer, nullable=True)
     fecha_ingreso = db.Column(db.Date, nullable=False)
-    iden_cliente = db.Column(db.String(100), nullable=False)
+    iden_cliente = db.Column(db.String(1000), nullable=False)
     terminada = db.Column(db.Boolean, nullable=False)
 
     legajo_id = db.Column(db.Integer, db.ForeignKey('legajo.id'), nullable=False)

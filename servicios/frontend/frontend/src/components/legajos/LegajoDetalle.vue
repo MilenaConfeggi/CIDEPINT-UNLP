@@ -75,11 +75,13 @@
                         type="button"
                         data-bs-toggle="dropdown"
                         aria-expanded="false"
+                        @click="handleInformeDropdown(documento.nombre)"
                       >
                         Acciones
                       </button>
                       <ul class="dropdown-menu">
                         <template v-if="documento.nombre === 'Informe'">
+                          <!-- Botón para subir nueva documentación -->
                           <li v-if="hasPermission('cargar_documentacion')">
                             <label :for="`upload-doc-${documento.id}`" class="dropdown-item">
                               Subir Documentación
@@ -92,15 +94,7 @@
                               />
                             </label>
                           </li>
-                          <li v-if="hasPermission('ver_documentacion')">
-                            <button
-                              type="button"
-                              class="dropdown-item"
-                              @click="verDocumentacion(legajo.id)"
-                            >
-                              Ver Documentación
-                            </button>
-                          </li>
+                          <!-- Botón para subir un nuevo informe -->
                           <li v-if="hasPermission('cargar_informe')">
                             <label :for="`upload-informe-${documento.id}`" class="dropdown-item">
                               Subir Informe
@@ -113,15 +107,8 @@
                               />
                             </label>
                           </li>
-                          <li v-if="hasPermission('ver informe')">
-                            <button
-                              type="button"
-                              class="dropdown-item"
-                              @click="verInforme(legajo.id)"
-                            >
-                              Ver Informe
-                            </button>
-                          </li>
+
+                          <!-- Botón para subir informe firmado -->
                           <li v-if="hasPermission('cargar_informe_firmado')">
                             <label
                               :for="`upload-informe-firmado-${documento.id}`"
@@ -137,6 +124,22 @@
                               />
                             </label>
                           </li>
+
+                          <!-- Mostrar lista de informes subidos -->
+                          <div v-if="Object.keys(informesAgrupados).some(key => informesAgrupados[key].length > 0)">
+                            <div v-for="(informes, categoria) in informesAgrupados" :key="categoria">
+                              <h3 class="small-title">{{ categoria }}</h3>
+                              <ul>
+                                <li v-for="informe in informes" :key="informe.id">
+                                  <button type="button" class="btn btn-link" @click="verInforme(informe.id)">
+                                    {{ informe.nombre_documento }}
+                                  </button>
+                                </li>
+                              </ul>
+                            </div>
+                          </div>
+
+                          <!-- Botón para enviar informe -->
                           <li v-if="legajo?.estado?.nombre === 'Informado'">
                             <button
                               type="button"
@@ -464,6 +467,11 @@ const cargarFactura = (id) => {
   documentoID.value = id
 }
 
+const handleInformeDropdown = async (documentoNombre) => {
+  if (documentoNombre === 'Informe' && informes.value.length === 0) {
+    await fetchInformes(route.params.id);
+  }
+};
 const handleFileUpload = async (event, id, legajoId, editar = false) => {
   const file = event.target.files[0]
   if (file && file.type === 'application/pdf') {
@@ -642,7 +650,44 @@ const viewLegajo = async (legajoId) => {
     toast.warning('No se pudo cargar el archivo del legajo.')
   }
 }
+const informes = ref([]);
 
+const informesAgrupados = ref({
+  DOCUMENTACIONES: [],
+  INFORMES: [],
+  INFORMES_FIRMADOS_JA: [],
+  INFORMES_FIRMADOS_DIRECTOR: [],
+});
+
+const fetchInformes = async (legajoId) => {
+  const token = authStore.getToken();
+  try {
+    const response = await axios.get(`${import.meta.env.VITE_API_URL}/informes/ver_todos_informes/${legajoId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (response.status === 200) {
+      const data = response.data;
+      informesAgrupados.value = {
+        DOCUMENTACIONES: data.DOCUMENTACIONES || [],
+        INFORMES: data.INFORMES || [],
+        INFORMES_FIRMADOS_JA: data.INFORMES_FIRMADOS_JA || [],
+        INFORMES_FIRMADOS_DIRECTOR: data.INFORMES_FIRMADOS_DIRECTOR || [],
+      };
+    }
+  } catch (error) {
+    if (error.response?.status !== 404) {
+      console.error('Error al obtener los informes:', error);
+      toast.error('Error al obtener los informes');
+    }
+  }
+};
+
+// Llamar a `fetchInformes` al montar el componente
+onMounted(async () => {
+  await fetchInformes(route.params.id);
+});
 const adminLegajo = async () => {
   await legajosStore.habilitar(route.params.id)
 }
@@ -737,5 +782,10 @@ onMounted(async () => {
 .btn-primary:hover {
   background-color: #0056b3;
   border-color: #004085;
+}
+.small-title {
+  font-size: 1rem; /* Ajusta el tamaño del texto */
+  font-weight: normal; /* Opcional: cambia el peso de la fuente */
+  margin-bottom: 0.5rem; /* Opcional: ajusta el margen inferior */
 }
 </style>

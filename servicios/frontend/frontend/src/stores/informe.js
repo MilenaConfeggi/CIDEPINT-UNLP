@@ -13,13 +13,13 @@ export const useInformeStore = defineStore('informe', {
   }),
   actions: {
     async uploadInforme(event, id, legajoId) {
-      const toast = useToast()
-      const file = event.target.files[0]
-      const token = useAuthStore().getToken()
+      const toast = useToast();
+      const file = event.target.files[0];
+      const token = useAuthStore().getToken();
       if (file && file.type === 'application/pdf') {
         try {
-          const formData = new FormData()
-          formData.append('archivo', file)
+          const formData = new FormData();
+          formData.append('archivo', file);
           const response = await axios.post(
             `${import.meta.env.VITE_API_URL}/informes/cargar_informe/${legajoId}`,
             formData,
@@ -29,20 +29,19 @@ export const useInformeStore = defineStore('informe', {
                 'Content-Type': 'multipart/form-data',
               },
             },
-          )
-          console.log(response)
+          );
           if (response.status === 200) {
-            toast.success('Informe subido correctamente')
-            setTimeout(() => window.location.reload(), 2000)
+            toast.success('Informe subido correctamente');
+            setTimeout(() => window.location.reload(), 2000);
           } else {
-            throw new Error(response.data.error || 'No se pudo subir el archivo')
+            throw new Error(response.data.error || 'No se pudo subir el archivo');
           }
         } catch (error) {
-          console.error('Error al subir el archivo:', error)
-          toast.error(error.response?.data?.error || 'Error al subir el archivo')
+          console.error('Error al subir el archivo:', error);
+          toast.error(error.response?.data?.error || 'Error al subir el archivo');
         }
       } else {
-        toast.warning('Por favor selecciona un archivo PDF.')
+        toast.warning('Por favor selecciona un archivo PDF.');
       }
     },
     async uploadInformeFirmado(event, id, legajoId) {
@@ -79,25 +78,26 @@ export const useInformeStore = defineStore('informe', {
       }
     },
     async verInforme(id) {
-      const token = useAuthStore().getToken()
-      const toast = useToast()
+      const token = useAuthStore().getToken();
+      const toast = useToast();
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/informes/ver_informe/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data',
-          },
-        })
-        if (response.status !== 200) {
-          const errorData = await response.json()
-          throw new Error(errorData.message || 'Error al obtener el informe')
-        }
-        const blob = await response.blob()
-        const url = URL.createObjectURL(blob)
-        window.open(url, '_blank')
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_URL}/informes/ver_informe_por_id/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            responseType: 'blob', // Para manejar archivos binarios
+          }
+        );
+
+        // Crear una URL para visualizar el archivo
+        const blob = new Blob([response.data], { type: response.headers['content-type'] });
+        const fileUrl = URL.createObjectURL(blob);
+        window.open(fileUrl, '_blank'); // Abrir en una nueva pestaña
       } catch (error) {
-        console.error('Error al obtener el informe:', error)
-        toast.error(error.message || 'Error al obtener el informe')
+        console.error('Error al obtener el informe:', error);
+        toast.error(error.response?.data?.error || 'Error al obtener el informe');
       }
     },
     async uploadDocumentacion(event, id, legajoId) {

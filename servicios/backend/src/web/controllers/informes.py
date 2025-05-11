@@ -90,11 +90,6 @@ def cargar_informe(id_legajo):
     if not permitir_pdf(archivo.filename):
         return jsonify({"error": "Tipo de archivo no permitido. Solo se permiten archivos PDF o del paquete Office."}), 400
     
-    if not servicioInforme.buscar_documentacion_por_legajo(id_legajo):
-        return jsonify({"error": "No hay documentación para este legajo"}), 404
-    
-    servicioInforme.cambiar_estado_documentacion(id_legajo)
-    legajo_en_curso(id_legajo)
     try:
         filename = secure_filename(archivo.filename).replace(" ", "_")  # Reemplazar espacios con guion bajo
         user = get_jwt_identity()
@@ -106,7 +101,6 @@ def cargar_informe(id_legajo):
         }
 
         # Guardar el archivo en el servidor
-        servicioInforme.eliminar_informe_anterior(id_legajo)
         folder_path = os.path.join(UPLOAD_FOLDER, "informes", str(id_legajo))
         os.makedirs(folder_path, exist_ok=True)
         archivo.save(os.path.join(folder_path, filename))
@@ -122,7 +116,6 @@ def cargar_informe(id_legajo):
 @bp.get("/ver_informe/<int:id_legajo>")
 @jwt_required()
 def ver_informe(id_legajo):
-    print(id_legajo)
     folder_path = os.path.normpath(os.path.join(UPLOAD_FOLDER, "informes", str(id_legajo)))
     documentacion = servicioInforme.buscar_informe_por_legajo(id_legajo)
     if not documentacion:
@@ -161,7 +154,7 @@ def cargar_informe_firmado(id_legajo):
         user = get_jwt_identity()
         usuario = servicioUsuario.obtener_usuario_por_mail(user)
         if servicioUsuario.es_jefe_de_area(usuario):
-            legajo_en_curso(id_legajo)
+            print("es jefe de area")
             doc_data = {
                 'nombre_documento': filename,
                 'estado_id': 7,
@@ -178,11 +171,9 @@ def cargar_informe_firmado(id_legajo):
                     'legajo_id': id_legajo,
                     'tipo_id': 4
                 }
-                legajo_informado(id_legajo)
             else:
                 return jsonify({"error": "No tienes permisos para realizar esta acción"}), 403
         # Guardar el archivo en el servidor
-        servicioInforme.eliminar_informe_anterior(id_legajo)
         folder_path = os.path.join(UPLOAD_FOLDER, "informes", str(id_legajo))
         os.makedirs(folder_path, exist_ok=True)
         archivo.save(os.path.join(folder_path, filename))
@@ -194,3 +185,43 @@ def cargar_informe_firmado(id_legajo):
     except Exception as e:
         print(e)  # Imprime el error para depuración
         return jsonify({"message": "Ha ocurrido un error inesperado"}), 500
+    
+@bp.get("/ver_todos_informes/<int:id_legajo>")
+@jwt_required()
+def ver_todos_informes(id_legajo):
+    informes = servicioInforme.buscar_todos_informes_por_legajo(id_legajo)
+    if not informes:
+        return jsonify({"error": "No hay informes para este legajo"}), 404
+
+    # Agrupar los documentos por estado
+    agrupados = {
+        "DOCUMENTACIONES": [],
+        "INFORMES": [],
+        "INFORMES_FIRMADOS_JA": [],
+        "INFORMES_FIRMADOS_DIRECTOR": []
+    }
+
+    for informe in informes:
+        if informe.estado_id == 8:
+            agrupados["DOCUMENTACIONES"].append({"id": informe.id, "nombre_documento": informe.nombre_documento})
+        elif informe.estado_id == 5:
+            agrupados["INFORMES"].append({"id": informe.id, "nombre_documento": informe.nombre_documento})
+        elif informe.estado_id == 7:
+            agrupados["INFORMES_FIRMADOS_JA"].append({"id": informe.id, "nombre_documento": informe.nombre_documento})
+        elif informe.estado_id == 6:
+            agrupados["INFORMES_FIRMADOS_DIRECTOR"].append({"id": informe.id, "nombre_documento": informe.nombre_documento})
+
+    return jsonify(agrupados), 200
+
+@bp.get("/ver_informe_por_id/<int:id_informe>")
+@jwt_required()
+def ver_informe_por_id(id_informe):
+    informe = servicioInforme.buscar_informe_por_id(id_informe)
+    if not informe:
+        return jsonify({"error": "No se encontró el informe solicitado"}), 404
+
+    folder_path = os.path.normpath(os.path.join(UPLOAD_FOLDER, "informes", str(informe.legajo_id)))
+    file_path = os.path.normpath(os.path.join(folder_path, informe.nombre_documento))
+    if not os.path.exists(file_path):
+        abort(404, description="El archivo no existe")
+    return send_from_directory(folder_path, informe.nombre_documento)

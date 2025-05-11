@@ -7,43 +7,75 @@ import { useLegajosStore } from './legajos'
 
 export const useInformeStore = defineStore('informe', {
   state: () => ({
+    informesAgrupados: {
+      DOCUMENTACIONES: [],
+      INFORMES: [],
+      INFORMES_FIRMADOS_JA: [],
+      INFORMES_FIRMADOS_DIRECTOR: [],
+    },
     successMessage: '',
     errorMessage: '',
     showToast: false,
   }),
   actions: {
-    async uploadInforme(event, id, legajoId) {
-      const toast = useToast();
-      const file = event.target.files[0];
+    async fetchInformes(legajoId) {
       const token = useAuthStore().getToken();
-      if (file && file.type === 'application/pdf') {
-        try {
-          const formData = new FormData();
-          formData.append('archivo', file);
-          const response = await axios.post(
-            `${import.meta.env.VITE_API_URL}/informes/cargar_informe/${legajoId}`,
-            formData,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'multipart/form-data',
-              },
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_URL}/informes/ver_todos_informes/${legajoId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
             },
-          );
-          if (response.status === 200) {
-            toast.success('Informe subido correctamente');
-            setTimeout(() => window.location.reload(), 2000);
-          } else {
-            throw new Error(response.data.error || 'No se pudo subir el archivo');
           }
-        } catch (error) {
-          console.error('Error al subir el archivo:', error);
-          toast.error(error.response?.data?.error || 'Error al subir el archivo');
+        );
+        if (response.status === 200) {
+          const data = response.data;
+          this.informesAgrupados = {
+            DOCUMENTACIONES: data.DOCUMENTACIONES || [],
+            INFORMES: data.INFORMES || [],
+            INFORMES_FIRMADOS_JA: data.INFORMES_FIRMADOS_JA || [],
+            INFORMES_FIRMADOS_DIRECTOR: data.INFORMES_FIRMADOS_DIRECTOR || [],
+          };
         }
-      } else {
-        toast.warning('Por favor selecciona un archivo PDF.');
+      } catch (error) {
+        console.error('Error al obtener los informes:', error);
+        useToast().error('Error al obtener los informes');
       }
     },
+
+    async uploadInforme(event, id, legajoId) {
+    const toast = useToast();
+    const file = event.target.files[0];
+    const token = useAuthStore().getToken();
+    if (file && file.type === 'application/pdf') {
+      try {
+        const formData = new FormData();
+        formData.append('archivo', file);
+        const response = await axios.post(
+          `${import.meta.env.VITE_API_URL}/informes/cargar_informe/${legajoId}`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'multipart/form-data',
+            },
+          },
+        );
+        if (response.status === 200) {
+          toast.success('Informe subido correctamente');
+          await this.fetchInformes(legajoId); // Actualizar la lista de informes
+        } else {
+          throw new Error(response.data.error || 'No se pudo subir el archivo');
+        }
+      } catch (error) {
+        console.error('Error al subir el archivo:', error);
+        toast.error(error.response?.data?.error || 'Error al subir el archivo');
+      }
+    } else {
+      toast.warning('Por favor selecciona un archivo PDF.');
+    }
+  },
     async uploadInformeFirmado(event, id, legajoId) {
       const toast = useToast()
       const file = event.target.files[0]
@@ -164,6 +196,25 @@ export const useInformeStore = defineStore('informe', {
         toast.error(error.message || 'Error al obtener el documento')
       }
     },
+    async fetchInformes(legajoId) {
+      const token = useAuthStore().getToken();
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_URL}/informes/ver_todos_informes/${legajoId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+        if (response.status === 200) {
+          this.informesAgrupados = response.data; // Actualizar los informes agrupados
+        }
+      } catch (error) {
+        console.error('Error al obtener los informes:', error);
+        useToast().error('Error al obtener los informes');
+      }
+    },
     async enviarInforme(id, leg_id) {
       const toast = useToast()
       const legajosStore = useLegajosStore()
@@ -180,7 +231,7 @@ export const useInformeStore = defineStore('informe', {
         toast.success('Correo enviado con éxito')
       } catch (error) {
         console.error('Error al enviar el correo:', error)
-        toast.error(error.message || 'Error al enviar el correo')
+        toast.error('Error al enviar el correo, verifique que haya un informe cargado')
       }
     },
   },

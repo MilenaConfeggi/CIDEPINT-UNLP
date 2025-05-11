@@ -140,9 +140,6 @@ def cargar_informe_firmado(id_legajo):
     if not permitir_pdf(archivo.filename):
         return jsonify({"error": "Tipo de archivo no permitido. Solo se permiten archivos PDF o del paquete Office."}), 400
     
-    if not servicioInforme.buscar_documentacion_por_legajo(id_legajo):
-        return jsonify({"error": "No hay documentación para este legajo"}), 404
-    
     if not servicioInforme.buscar_informe_por_legajo(id_legajo):
         return jsonify({"error": "No hay informe para este legajo"}), 404
     

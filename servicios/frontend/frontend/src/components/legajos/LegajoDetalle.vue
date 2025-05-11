@@ -71,95 +71,16 @@
                   <td>
                     <div class="dropdown">
                       <button
-                        :class="['btn dropdown-toggle', existeDocumento(documento.nombre) ? 'btn-success' : 'btn-dark']"
-                        type="button"
-                        data-bs-toggle="dropdown"
-                        aria-expanded="false"
-                        @click="handleInformeDropdown(documento.nombre)"
+                          :class="['btn dropdown-toggle', existeDocumento(documento.nombre) ? 'btn-success' : 'btn-dark']"
+                          type="button"
+                          :data-bs-toggle="documento.nombre === 'Informe' ? '' : 'dropdown'"
+                          aria-expanded="false"
+                          @click="documento.nombre === 'Informe' ? openModal(documento.id) : handleInformeDropdown(documento.nombre)"
                       >
                         Acciones
                       </button>
-                      <ul class="dropdown-menu">
-                        <template v-if="documento.nombre === 'Informe'">
-                          <!-- Botón para subir nueva documentación -->
-                          <li v-if="hasPermission('cargar_documentacion')">
-                            <label :for="`upload-doc-${documento.id}`" class="dropdown-item">
-                              Subir Documentación
-                              <input
-                                :id="`upload-doc-${documento.id}`"
-                                type="file"
-                                accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
-                                @change="uploadDocumentacion($event, documento.id, legajo.id)"
-                                hidden
-                              />
-                            </label>
-                          </li>
-                          <!-- Botón para subir un nuevo informe -->
-                          <li v-if="hasPermission('cargar_informe')">
-                            <label :for="`upload-informe-${documento.id}`" class="dropdown-item">
-                              Subir Informe
-                              <input
-                                :id="`upload-informe-${documento.id}`"
-                                type="file"
-                                accept="application/pdf"
-                                @change="uploadInforme($event, documento.id, legajo.id)"
-                                hidden
-                              />
-                            </label>
-                          </li>
-
-                          <!-- Botón para subir informe firmado -->
-                          <li v-if="hasPermission('cargar_informe_firmado')">
-                            <label
-                              :for="`upload-informe-firmado-${documento.id}`"
-                              class="dropdown-item"
-                            >
-                              Subir Informe Firmado
-                              <input
-                                :id="`upload-informe-firmado-${documento.id}`"
-                                type="file"
-                                accept="application/pdf"
-                                @change="uploadInformeFirmado($event, documento.id, legajo.id)"
-                                hidden
-                              />
-                            </label>
-                          </li>
-
-                          <!-- Mostrar lista de informes subidos -->
-                          <div v-if="Object.keys(informesAgrupados).some(key => informesAgrupados[key].length > 0)">
-                            <div v-for="(informes, categoria) in informesAgrupados" :key="categoria">
-                              <h3 class="small-title">{{ categoria }}</h3>
-                              <ul>
-                                <li v-for="informe in informes" :key="informe.id">
-                                  <button type="button" class="btn btn-link" @click="verInforme(informe.id)">
-                                    {{ informe.nombre_documento }}
-                                  </button>
-                                </li>
-                              </ul>
-                            </div>
-                          </div>
-
-                          <!-- Botón para enviar informe -->
-                          <li v-if="legajo?.estado?.nombre === 'Informado'">
-                            <button
-                              type="button"
-                              class="dropdown-item"
-                              @click="enviarInforme(documento.id, legajo.id)"
-                            >
-                              Enviar Informe
-                            </button>
-                          </li>
-                          <div v-if="legajo?.estado?.nombre !== 'Informado'">
-                            <button
-                              type="button"
-                              class="btn btn-primary"
-                              @click="marcarComoInformado(legajo.id)"
-                            >
-                              Marcar como Informado
-                            </button>
-                          </div>
-                        </template>
-                        <template v-else-if="documento.nombre === 'Certificado CIDEPINT'">
+                      <ul v-if="documento.nombre !== 'Informe'" class="dropdown-menu">
+                        <template v-if="documento.nombre === 'Certificado CIDEPINT'">
                           <li v-if="hasPermission('generar_certificado')">
                             <RouterLink
                               :to="`/generar_certificado/${legajo.id}`"
@@ -169,9 +90,7 @@
                             </RouterLink>
                           </li>
                           <li
-                            v-if="
-                              hasPermission('ver_certificado') && existeDocumento(documento.nombre)
-                            "
+                            v-if="hasPermission('ver_certificado') && existeDocumento(documento.nombre)"
                           >
                             <button
                               type="button"
@@ -415,10 +334,18 @@
         <div class="toast-body">{{ errorMessage || successMessage }}</div>
       </div>
     </div>
+    <InformeModal
+      :isOpen="isModalOpen"
+      :legajoId="legajo.id"
+      :documentoId="selectedDocumentoId"
+      :hasPermission="hasPermission"
+      @close="closeModal"
+    />
   </main>
 </template>
 
 <script setup>
+import InformeModal from './InformeModal.vue';
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useLegajosStore } from '../../stores/legajos'
@@ -457,7 +384,18 @@ const fileUrl = ref(null)
 const authStore = useAuthStore()
 const permisos = JSON.parse(localStorage.getItem('permisos')) || []
 const isAdmin = ref(localStorage.getItem('area') === 'null')
+const isModalOpen = ref(false);
+const selectedDocumentoId = ref(null);
 
+const openModal = (documentoId) => {
+  selectedDocumentoId.value = documentoId;
+  isModalOpen.value = true;
+};
+
+const closeModal = () => {
+  isModalOpen.value = false;
+  selectedDocumentoId.value = null;
+};
 const hasPermission = (permiso) => {
   return permisos.includes(permiso)
 }
@@ -636,27 +574,7 @@ const viewAdicional = async (adicionalId) => {
     toast.warning('No se pudo cargar el archivo adicional.')
   }
 }
-const marcarComoInformado = async (legajoId) => {
-  const token = authStore.getToken();
-  try {
-    const response = await axios.post(
-      `${import.meta.env.VITE_API_URL}/informes/marcar_informado/${legajoId}`,
-      {}, // Cuerpo vacío
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    if (response.status === 200) {
-      toast.success('El legajo ha sido marcado como informado.');
-      await legajosStore.getLegajo(legajoId); // Actualizar el estado del legajo
-    }
-  } catch (error) {
-    console.error('Error al marcar el legajo como informado:', error);
-    toast.error('No se pudo marcar el legajo como informado.');
-  }
-};
+
 const viewLegajo = async (legajoId) => {
   const token = authStore.getToken()
   try {
@@ -688,30 +606,6 @@ const informesAgrupados = ref({
   INFORMES_FIRMADOS_DIRECTOR: [],
 });
 
-const fetchInformes = async (legajoId) => {
-  const token = authStore.getToken();
-  try {
-    const response = await axios.get(`${import.meta.env.VITE_API_URL}/informes/ver_todos_informes/${legajoId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    if (response.status === 200) {
-      const data = response.data;
-      informesAgrupados.value = {
-        DOCUMENTACIONES: data.DOCUMENTACIONES || [],
-        INFORMES: data.INFORMES || [],
-        INFORMES_FIRMADOS_JA: data.INFORMES_FIRMADOS_JA || [],
-        INFORMES_FIRMADOS_DIRECTOR: data.INFORMES_FIRMADOS_DIRECTOR || [],
-      };
-    }
-  } catch (error) {
-    if (error.response?.status !== 404) {
-      console.error('Error al obtener los informes:', error);
-      toast.error('Error al obtener los informes');
-    }
-  }
-};
 
 // Llamar a `fetchInformes` al montar el componente
 onMounted(async () => {

@@ -109,3 +109,12 @@ def obtener_ultima_muestra():
         nro_grupo = f"-{ultima_muestra.nro_grupo}" if ultima_muestra.nro_grupo else ""
         return f"{ultima_muestra.nro_muestra}{nro_grupo}"
     return None
+
+def obtener_muestra(id_muestra):
+    return Muestra.query.get(id_muestra)
+
+def eliminar_muestra(id_muestra):
+    muestra = Muestra.query.get(id_muestra)
+    if muestra:
+        db.session.delete(muestra)
+        db.session.commit()

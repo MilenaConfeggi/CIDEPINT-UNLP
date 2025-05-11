@@ -20,7 +20,18 @@
             <p class="card-text">Iden cliente: {{ muestra.iden_cliente }}</p>
             <p class="card-text">Fecha de ingreso: {{ muestra.fecha_ingreso }}</p>
             <p v-if="muestra.terminada" class="text-danger mb-0">Terminada</p>
-            <button v-if="tienePermisoTerminar && !muestra.terminada" @click="confirmarTerminarMuestra(muestra.id)" class="btn btn-danger btn-sm btn-terminar">Terminar</button>
+            <div class="d-flex justify-content-end align-items-center">
+              <button
+                v-if="tienePermisoTerminar && !muestra.terminada"
+                @click="confirmarTerminarMuestra(muestra.id)"
+                class="btn btn-warning btn-sm btn-terminar"
+              >
+                Terminar
+              </button>
+              <button @click="confirmarEliminarMuestra(muestra.id)" class="btn btn-icon">
+                <i class="fas fa-trash-alt text-danger"></i>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -104,6 +115,31 @@ export default {
       }
     };
 
+    const confirmarEliminarMuestra = (muestraId) => {
+      if (confirm("¿Estás seguro de que deseas eliminar esta muestra?")) {
+        eliminarMuestra(muestraId);
+      }
+    };
+
+    const eliminarMuestra = async (muestraId) => {
+      const authStore = useAuthStore();
+      const token = authStore.getToken();
+      try {
+        const response = await axios.delete(`${import.meta.env.VITE_API_URL}/muestras/eliminar_muestra/${muestraId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        if (response.status === 200) {
+          fetchMuestras(); // Refrescar la lista de muestras después de eliminar una muestra
+          alert(response.data.message); // Mostrar mensaje de éxito
+        }
+      } catch (err) {
+        alert(err.response?.data?.error || 'Error al eliminar la muestra');
+      }
+    };
+
     // Formatear el número de muestra como "nro_muestra-nro_grupo"
     const formatNumeroMuestra = (nroMuestra, nroGrupo) => {
       return nroGrupo ? `${nroMuestra}-${nroGrupo}` : `${nroMuestra}`;
@@ -115,7 +151,7 @@ export default {
 
     watch(() => props.legajoId, fetchMuestras);
 
-    return { muestras, error, muestraSeleccionada, confirmarTerminarMuestra, tienePermisoTerminar, noMuestras, formatNumeroMuestra };
+    return { muestras, error, muestraSeleccionada, confirmarTerminarMuestra, tienePermisoTerminar, noMuestras, formatNumeroMuestra, confirmarEliminarMuestra };
   }
 };
 </script>
@@ -152,62 +188,32 @@ export default {
   margin-bottom: 5px;
 }
 
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); 
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000; 
-}
-
-.modal-content {
-  background-color: white;
-  padding: 20px;
-  border-radius: 8px;
-  max-width: 80%;
-  width: 100%;
-  position: relative;
-}
-
-.close-button {
-  position: absolute;
-  top: 10px;
-  right: 10px;
+.btn-icon {
   background: none;
   border: none;
-  font-size: 24px;
   cursor: pointer;
 }
 
-.d-flex {
-  display: flex;
+.btn-icon i {
+  font-size: 1.2rem;
 }
 
-.align-items-center {
-  align-items: center;
+.btn-icon:hover i {
+  color: #a71d2a;
 }
 
-.ml-2 {
-  margin-left: 0.5rem;
+.btn-warning {
+  background-color: #ffc107; /* Color amarillo */
+  color: #000; /* Texto negro */
+  border: none;
 }
 
-.mb-0 {
-  margin-bottom: 0;
-}
-
-.btn-sm {
-  padding: 0.25rem 0.5rem;
-  font-size: 0.875rem;
-  line-height: 1.5;
-  border-radius: 0.2rem;
+.btn-warning:hover {
+  background-color: #e0a800; /* Amarillo más oscuro al pasar el mouse */
+  color: #000;
 }
 
 .btn-terminar {
-  align-self: flex-end;
+  margin-right: 2px; /* Espaciado entre el botón de terminar y el tachito */
 }
 </style>

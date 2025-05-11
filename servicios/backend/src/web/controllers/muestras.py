@@ -40,6 +40,8 @@ def cargar_muestra(id_legajo):
             # Mapear los nombres de los campos enviados desde el frontend
             elem['nro_muestra'] = elem.pop('nroMuestra')
             elem['nro_grupo'] = elem.pop('nroGrupo', None)  # Opcional
+            if elem['nro_grupo'] is not None and not isinstance(elem['nro_grupo'], int):
+                elem['nro_grupo'] = None
             elem['fecha_ingreso'] = elem.pop('fechaIngreso')
             elem['iden_cliente'] = elem.pop('idenCliente')
 
@@ -254,3 +256,17 @@ def obtener_ultima_muestra():
     if ultima_muestra:
         return jsonify({"ultimaMuestra": ultima_muestra}), 200
     return jsonify({}), 200
+
+@bp.delete("/eliminar_muestra/<int:id_muestra>")
+@jwt_required()
+def eliminar_muestra(id_muestra):
+    try:
+        muestra = servicioMuestras.obtener_muestra(id_muestra)
+        if not muestra:
+            return jsonify({"error": "Muestra no encontrada"}), 404
+
+        servicioMuestras.eliminar_muestra(id_muestra)
+        return jsonify({"message": "Muestra eliminada con éxito"}), 200
+    except Exception as e:
+        print(e)
+        return jsonify({"error": "Error al eliminar la muestra"}), 500

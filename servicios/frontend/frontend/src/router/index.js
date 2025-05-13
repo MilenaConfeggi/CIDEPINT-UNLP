@@ -153,14 +153,14 @@ const routes = [
     path: '/generar_presupuesto/:id_legajo',
     name: 'generar_presupuesto',
     component: () => import('../components/presupuestos/GenerarPresupuesto.vue'),
-    props: true,
+    props: (route) => ({ legajoId: route.query.legajoId }),
     meta: { requiresAuth: true, showNavbar: true },
   },
   {
     path: '/generar_presupuesto_en_pesos/:id_legajo',
     name: 'generar_presupuesto_en_pesos',
     component: () => import('../components/presupuestos/GenerarPresupuestoPesos.vue'),
-    props: true,
+    props: (route) => ({ legajoId: route.query.legajoId }),
     meta: { requiresAuth: true, showNavbar: true },
   },
   {

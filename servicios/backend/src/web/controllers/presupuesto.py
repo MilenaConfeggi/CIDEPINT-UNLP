@@ -10,6 +10,7 @@ from administracion.src.core.Empleado import get_empleado
 import os
 from werkzeug.utils import secure_filename
 from datetime import datetime
+from marshmallow.exceptions import ValidationError
 
 UPLOAD_FOLDER = os.path.abspath("documentos")
 
@@ -26,11 +27,6 @@ def listarStans():
     data = stansSchema.dump(STANS, many=True)
     return jsonify(data), 200
 
-#@bp.get("/medios_de_pago")
-#def listarMediosDePago():
-#    mp = servicioPresupuesto.listar_medios_de_pago()
-#    data = mediosPagoSchema.dump(mp, many=True)
-#    return jsonify(data), 200
 
 @bp.post("/crear/<int:id_legajo>")
 @jwt_required()
@@ -38,8 +34,6 @@ def generar_presupuesto(id_legajo):
     if not check_permission("generar_presupuesto"):
         return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
     data = request.get_json()
-    #if data['medioDePago'] == []:
-    #    return jsonify({"error": "No se seleccionó medio de pago"}), 400
     data['legajo'] = id_legajo
     try:
         servicioPresupuesto.crear_presupuesto_con_stans(data)
@@ -201,24 +195,11 @@ def cargar_presupuesto_firmado(id_legajo):
     if not servicioPresupuesto.buscar_presupuesto_por_legajo(id_legajo):
         return jsonify({"error": "No hay presupuesto para este legajo"}), 404
     
-    try:
-        # Lo comenté para que lo pueda usar la secretaria
-        #user = get_jwt_identity()
-        #usuario = servicioUsuario.obtener_usuario_por_mail(user)
-        #if not servicioUsuario.es_director(usuario):
-        #    return jsonify({"error": "No tienes permisos para realizar esta acción"}), 403
-        
+    try:      
         folder_path = os.path.join(UPLOAD_FOLDER, "presupuestos", str(id_legajo))
         os.makedirs(folder_path, exist_ok=True)
 
-        # Eliminar archivos que comienzan con "presupuesto"
-        for archiv in os.listdir(folder_path):
-            archivo_path = os.path.join(folder_path, archiv)
-            if os.path.isfile(archivo_path) and (archiv.startswith("fpresupuesto_firmado_") or archiv.startswith("presupuesto_")):
-                servicioDocumento.eliminar_documento(archiv)
-                os.remove(archivo_path)
-
-        timestamp = datetime.now().strftime("%Y%m%d")
+        timestamp = datetime.now().strftime("%Y%m%d%H%M%S")  # Incluye horas, minutos y segundos
         filename = os.path.join(folder_path, f"fpresupuesto_firmado_{timestamp}.pdf")
 
         doc_data = {
@@ -260,12 +241,6 @@ def subir_presupuesto(id_legajo):
         folder_path = os.path.join(UPLOAD_FOLDER, "presupuestos", str(id_legajo))
         os.makedirs(folder_path, exist_ok=True)
 
-        # Eliminar archivos que comienzan con "presupuesto"
-        for archiv in os.listdir(folder_path):
-            archivo_path = os.path.join(folder_path, archiv)
-            if os.path.isfile(archivo_path) and archiv.startswith("presupuesto_"):
-                os.remove(archivo_path)
-
         timestamp = datetime.now().strftime("%Y%m%d")
         filename = os.path.join(folder_path, f"presupuesto_{timestamp}.pdf")
 
@@ -282,3 +257,30 @@ def subir_presupuesto(id_legajo):
     except Exception as e:
         print(e)  # Imprime el error para depuración
         return jsonify({"message": "Ha ocurrido un error inesperado"}), 500
+
+@bp.get("/listar_presupuestos/<int:id_legajo>")
+@jwt_required()
+def listar_presupuestos(id_legajo):
+    if not check_permission("ver_presupuesto"):
+        return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
+
+    folder_path = os.path.join(UPLOAD_FOLDER, "presupuestos", str(id_legajo))
+    if not os.path.exists(folder_path):
+        return jsonify([]), 200
+
+    archivos = [f for f in os.listdir(folder_path) if f.startswith("presupuesto_") and f.endswith(".pdf")]
+    return jsonify(archivos), 200
+
+
+@bp.get("/listar_presupuestos_firmados/<int:id_legajo>")
+@jwt_required()
+def listar_presupuestos_firmados(id_legajo):
+    if not check_permission("ver_presupuesto"):
+        return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
+
+    folder_path = os.path.join(UPLOAD_FOLDER, "presupuestos", str(id_legajo))
+    if not os.path.exists(folder_path):
+        return jsonify([]), 200
+
+    archivos = [f for f in os.listdir(folder_path) if f.startswith("fpresupuesto_firmado_") and f.endswith(".pdf")]
+    return jsonify(archivos), 200

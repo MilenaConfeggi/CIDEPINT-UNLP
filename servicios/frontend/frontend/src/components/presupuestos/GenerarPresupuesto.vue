@@ -73,7 +73,9 @@ const idLegajo = route.params.id_legajo;
 const fetchError = ref(null);
 const submitError = ref(null);
 const successMessage = ref(null);
-
+const props = defineProps({
+  legajoId: Number,
+});
 const fetchStans = async () => {
   try {
     const token = authStore.getToken();

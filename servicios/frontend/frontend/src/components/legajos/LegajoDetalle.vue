@@ -73,13 +73,13 @@
                       <button
                           :class="['btn dropdown-toggle', existeDocumento(documento.nombre) ? 'btn-success' : 'btn-dark']"
                           type="button"
-                          :data-bs-toggle="documento.nombre === 'Informe' ? '' : 'dropdown'"
+                          :data-bs-toggle="documento.nombre === 'Informe' || documento.nombre === 'Presupuesto CIDEPINT' ? '' : 'dropdown'"
                           aria-expanded="false"
-                          @click="documento.nombre === 'Informe' ? openModal(documento.id) : handleInformeDropdown(documento.nombre)"
+                          @click="documento.nombre === 'Informe' ? openModal(documento.id) : documento.nombre === 'Presupuesto CIDEPINT' ? openPresupuestoModal() : handleInformeDropdown(documento.nombre)"
                       >
                         Acciones
                       </button>
-                      <ul v-if="documento.nombre !== 'Informe'" class="dropdown-menu">
+                      <ul v-if="documento.nombre !== 'Informe' && documento.nombre !== 'Presupuesto CIDEPINT'" class="dropdown-menu">
                         <template v-if="documento.nombre === 'Certificado CIDEPINT'">
                           <li v-if="hasPermission('generar_certificado')">
                             <RouterLink
@@ -102,72 +102,13 @@
                           </li>
                         </template>
                         <template v-else-if="documento.nombre === 'Presupuesto CIDEPINT'">
-                          <li v-if="hasPermission('generar_presupuesto')">
-                            <RouterLink
-                              :to="`/generar_presupuesto/${legajo.id}`"
-                              class="dropdown-item"
-                            >
-                              Generar Presupuesto en Dólares
-                            </RouterLink>
-                          </li>
-                          <li v-if="hasPermission('generar_presupuesto')">
-                            <RouterLink
-                              :to="`/generar_presupuesto_en_pesos/${legajo.id}`"
-                              class="dropdown-item"
-                            >
-                              Generar Presupuesto en Pesos
-                            </RouterLink>
-                          </li>
-                          <li
-                            v-if="
-                              hasPermission('generar_presupuestont') &&
-                              !existeDocumento(documento.nombre) &&
-                              presupuestont === false
-                            "
+                          <button
+                            type="button"
+                            class="btn dropdown-toggle"
+                            @click="openPresupuestoModal"
                           >
-                            <RouterLink
-                              :to="`/marcar_sin_presupuesto/${legajo.id}`"
-                              class="dropdown-item"
-                            >
-                              Marcar como sin presupuesto
-                            </RouterLink>
-                          </li>
-                          <li v-if="presupuestont === true" class="dropdown-item">
-                            Ya está marcado como SIN presupuesto
-                          </li>
-                          <li
-                            v-if="
-                              hasPermission('ver_presupuesto') && existeDocumento(documento.nombre)
-                            "
-                          >
-                            <button
-                              type="button"
-                              class="dropdown-item"
-                              @click="viewPresupuesto(legajo.id)"
-                            >
-                              Ver
-                            </button>
-                          </li>
-                          <li
-                            v-if="
-                              hasPermission('cargar_presupuesto_firmado') &&
-                              existeDocumento(documento.nombre)
-                            "
-                          >
-                            <label
-                              :for="`upload-presupuesto-firmado-${documento.id}`"
-                              class="dropdown-item"
-                            >
-                              Subir Presupuesto Firmado
-                              <input
-                                :id="`upload-presupuesto-firmado-${documento.id}`"
-                                type="file"
-                                accept="application/pdf"
-                                @change="uploadPresupuestoFirmado($event, documento.id, legajo.id)"
-                                hidden
-                              />
-                            </label>
-                          </li>
+                            Acciones
+                          </button>
                         </template>
                         <template v-else-if="documento.nombre === 'Legajo'">
                           <li>
@@ -341,6 +282,12 @@
       :hasPermission="hasPermission"
       @close="closeModal"
     />
+    <PresupuestoModal
+      :isOpen="isPresupuestoModalOpen"
+      :legajoId="legajo.id"
+      :hasPermission="hasPermission"
+      @close="closePresupuestoModal"
+    />
   </main>
 </template>
 
@@ -358,6 +305,7 @@ import axios from 'axios'
 import StateBadge from '../StateBadge.vue'
 import { useAuthStore } from '../../stores/auth'
 import { useRouter } from 'vue-router'
+import PresupuestoModal from '../presupuestos/PresupuestoModal.vue';
 const route = useRoute()
 const router = useRouter()
 const legajosStore = useLegajosStore()
@@ -395,6 +343,15 @@ const openModal = (documentoId) => {
 const closeModal = () => {
   isModalOpen.value = false;
   selectedDocumentoId.value = null;
+};
+const isPresupuestoModalOpen = ref(false);
+
+const openPresupuestoModal = () => {
+  isPresupuestoModalOpen.value = true;
+};
+
+const closePresupuestoModal = () => {
+  isPresupuestoModalOpen.value = false;
 };
 const hasPermission = (permiso) => {
   return permisos.includes(permiso)

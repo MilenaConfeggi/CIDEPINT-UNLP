@@ -273,13 +273,7 @@ def generar_presupuesto(data):
     certificado_dir = os.path.join(UPLOAD_FOLDER, "presupuestos", str(legajo.id))
     os.makedirs(certificado_dir, exist_ok=True)  # Crear el directorio si no existe
 
-    # Eliminar archivos que comienzan con "presupuesto"
-    for archivo in os.listdir(certificado_dir):
-        archivo_path = os.path.join(certificado_dir, archivo)
-        if os.path.isfile(archivo_path) and archivo.startswith("fpresupuesto_firmado_"):
-            os.remove(archivo_path)
-
-    timestamp = datetime.now().strftime("%Y%m%d")
+    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")  # Agregar horas, minutos y segundos
     output_filename = os.path.join(certificado_dir, f"presupuesto_{timestamp}.pdf")
 
     styles = getSampleStyleSheet()
@@ -435,10 +429,10 @@ def generar_presupuesto(data):
 
     # Crear el documento en la base de datos
     data = {
-        "nombre_documento": "presupuesto.pdf",
-        "estado_id": 5,
-        "legajo_id": legajo.id,
-        "tipo_id": 2
+    "nombre_documento": f"presupuesto_{timestamp}.pdf",
+    "estado_id": 5,
+    "legajo_id": legajo.id,
+    "tipo_id": 2
     }
     servicioDocumento.crear_documento(data)
 
@@ -464,13 +458,8 @@ def generar_presupuesto_en_pesos(data):
     certificado_dir = os.path.join(UPLOAD_FOLDER, "presupuestos", str(legajo.id))
     os.makedirs(certificado_dir, exist_ok=True)  # Crear el directorio si no existe
 
-    # Eliminar archivos que comienzan con "presupuesto"
-    for archivo in os.listdir(certificado_dir):
-        archivo_path = os.path.join(certificado_dir, archivo)
-        if os.path.isfile(archivo_path) and archivo.startswith("fpresupuesto_firmado_"):
-            os.remove(archivo_path)
 
-    timestamp = datetime.now().strftime("%Y%m%d")
+    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")  # Agregar horas, minutos y segundos
     output_filename = os.path.join(certificado_dir, f"presupuesto_{timestamp}.pdf")
 
     styles = getSampleStyleSheet()
@@ -624,11 +613,11 @@ def generar_presupuesto_en_pesos(data):
 
     # Crear el documento en la base de datos
     data = {
-        "nombre_documento": "presupuesto.pdf",
+        "nombre_documento": f"presupuesto_{timestamp}.pdf",
         "estado_id": 5,
         "legajo_id": legajo.id,
         "tipo_id": 2
-    }
+        }
     servicioDocumento.crear_documento(data)
 
 def buscar_stan(id):

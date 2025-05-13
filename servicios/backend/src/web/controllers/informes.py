@@ -187,7 +187,13 @@ def cargar_informe_firmado(id_legajo):
 def ver_todos_informes(id_legajo):
     informes = servicioInforme.buscar_todos_informes_por_legajo(id_legajo)
     if not informes:
-        return jsonify({"error": "No hay informes para este legajo"}), 404
+        # Devolver un objeto con categorías vacías si no hay informes
+        return jsonify({
+            "DOCUMENTACIONES": [],
+            "INFORMES": [],
+            "INFORMES_FIRMADOS_JA": [],
+            "INFORMES_FIRMADOS_DIRECTOR": []
+        }), 200
 
     # Agrupar los documentos por estado
     agrupados = {

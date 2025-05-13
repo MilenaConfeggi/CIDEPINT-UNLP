@@ -30,7 +30,7 @@ export const useInformeStore = defineStore('informe', {
           }
         );
         if (response.status === 200) {
-          const data = response.data;
+          const data = response.data || {};
           this.informesAgrupados = {
             DOCUMENTACIONES: data.DOCUMENTACIONES || [],
             INFORMES: data.INFORMES || [],
@@ -41,6 +41,13 @@ export const useInformeStore = defineStore('informe', {
       } catch (error) {
         console.error('Error al obtener los informes:', error);
         useToast().error('Error al obtener los informes');
+        // Inicializar categorías vacías en caso de error
+        this.informesAgrupados = {
+          DOCUMENTACIONES: [],
+          INFORMES: [],
+          INFORMES_FIRMADOS_JA: [],
+          INFORMES_FIRMADOS_DIRECTOR: [],
+        };
       }
     },
 

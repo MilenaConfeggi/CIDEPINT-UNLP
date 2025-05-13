@@ -13,9 +13,9 @@
             <ul class="document-list">
               <li v-for="informe in informes" :key="informe.id" class="document-item">
                 <button type="button" class="btn btn-link document-button" @click="verInforme(informe.id)">
-                    {{ informe.nombre_documento }}
+                  {{ informe.nombre_documento }}
                 </button>
-                </li>
+              </li>
             </ul>
           </div>
         </div>
@@ -62,6 +62,18 @@
             </li>
           </ul>
         </div>
+
+        <!-- Botón para marcar como informado -->
+        <div class="action-section">
+          <button
+            v-if="hasPermission('cargar_informe')"
+            type="button"
+            class="btn btn-small-muted"
+            @click="marcarComoInformado"
+            >
+            Marcar legajo como Informado
+            </button>
+        </div>
       </div>
     </div>
   </div>
@@ -88,6 +100,7 @@ const informeStore = useInformeStore();
 const { informesAgrupados } = storeToRefs(informeStore);
 const { uploadInforme, uploadInformeFirmado, uploadDocumentacion } = informeStore;
 const { verInforme } = informeStore;
+
 const closeModal = () => {
   emit('close');
 };
@@ -128,34 +141,26 @@ watch(
   }
 );
 
-const handleUploadDocumentacion = async (event) => {
-  console.log('Subiendo documentación...');
+const marcarComoInformado = async () => {
+  const toast = useToast();
   try {
-    await uploadDocumentacion(event, props.documentoId, props.legajoId);
-    console.log('Documentación subida correctamente');
-    await fetchInformes();
+    const token = useAuthStore().getToken();
+    const response = await axios.post(
+      `${import.meta.env.VITE_API_URL}/informes/marcar_informado/${props.legajoId}`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    if (response.status === 200) {
+      toast.success('El legajo ha sido marcado como informado.');
+      await fetchInformes(); // Actualizar la lista de informes
+    }
   } catch (error) {
-    console.error('Error al subir documentación:', error);
-  }
-};
-
-const handleUploadInforme = async (event) => {
-  console.log('Subiendo informe...');
-  try {
-    await uploadInforme(event, props.documentoId, props.legajoId);
-    console.log('Informe subido correctamente');
-    await fetchInformes();
-  } catch (error) {
-    console.error('Error al subir informe:', error);
-  }
-};
-
-const handleUploadInformeFirmado = async (event) => {
-  try {
-    await uploadInformeFirmado(event, props.documentoId, props.legajoId);
-    await fetchInformes();
-  } catch (error) {
-    console.error('Error al subir informe firmado:', error);
+    console.error('Error al marcar como informado:', error);
+    toast.error('No se pudo marcar el legajo como informado.');
   }
 };
 </script>
@@ -324,7 +329,20 @@ const handleUploadInformeFirmado = async (event) => {
 .btn-success:hover {
   background-color: #218838;
 }
+.btn-small-muted {
+  padding: 5px 10px; /* Reducir el padding */
+  font-size: 0.875rem; /* Reducir el tamaño de la fuente */
+  border-radius: 3px; /* Ajustar el radio de los bordes */
+  background-color: #d6eaff; /* Color de fondo más neutro */
+  color: #4d6174; /* Color de texto más apagado */
+  border: 1px solid #7694b3; /* Borde gris claro */
+  cursor: pointer;
+}
 
+.btn-small-muted:hover {
+  background-color: #e2e6ea; /* Color de fondo más oscuro al pasar el mouse */
+  color: #495057; /* Color de texto más oscuro al pasar el mouse */
+}
 /* Animación */
 @keyframes fadeIn {
   from {

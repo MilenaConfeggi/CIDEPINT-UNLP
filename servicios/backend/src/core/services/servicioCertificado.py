@@ -17,24 +17,31 @@ UPLOAD_FOLDER = os.path.abspath("documentos")
 def generar_certificado(id_legajo, empleados, descripcion):
     # Completar con los datos necesarios
     legajo = Legajo.query.filter_by(id=id_legajo).first()
+    
+    # Formatear el número de legajo con una barra y los últimos dos dígitos del año
+    legajo_numero = f"{legajo.id}/{(datetime.now().year ) % 100}"
     cliente = legajo.cliente.nombre
     fecha_desde = legajo.fecha_entrada.strftime("%d/%m/%Y")
     fecha_hasta = datetime.now().strftime("%d/%m/%Y")
-    monto = legajo.presupuesto_cidepint[0].precio
-    if legajo.nro_factura is None:
-        factura = ""
-    else:
-        factura = legajo.nro_factura
 
-    # Obtener los ensayos de los STANs del presupuesto del legajo
+    # Calcular el monto total sumando los precios de todos los presupuestos
+    monto = sum(presupuesto.precio for presupuesto in legajo.presupuesto_cidepint)
+
+    # Concatenar los números de todos los presupuestos
+    presupuestos = [str(presupuesto.nro_presupuesto) for presupuesto in legajo.presupuesto_cidepint]
+    presupuesto_texto = ", ".join(presupuestos)
+
+    # Obtener todos los ensayos de los STANs relacionados a los presupuestos
     ensayos = []
     for presupuesto in legajo.presupuesto_cidepint:
         for stan in presupuesto.stans:
             stan.descripcion = descripcion
             for ensayo in stan.ensayos:
                 ensayos.append(ensayo.nombre)
-    ensayo_texto = ", ".join(set(ensayos))  
-    presupuesto = legajo.presupuesto_cidepint[0].nro_presupuesto
+    ensayo_texto = ", ".join(set(ensayos))  # Eliminar duplicados con `set`
+
+    # Obtener el número de factura
+    factura = legajo.nro_factura if legajo.nro_factura else ""
 
     # Crear la ruta de destino
     certificado_dir = os.path.join(UPLOAD_FOLDER, "certificados", str(id_legajo))
@@ -107,8 +114,8 @@ def generar_certificado(id_legajo, empleados, descripcion):
     content.append(Paragraph("<b>Datos de la Transferencia de Resultados</b>", styles["BodyText"]))
     content.append(Paragraph("<b>Modalidad de vinculación:</b> STAN", styles["BodyText"]))
     content.append(Paragraph("<b>UVT actuante:</b> Fundación de la Facultad de Ingeniería para la Transferencia Tecnológica y la Promoción de Empresas de Bienes y Servicios de la UNLP (Ffi)", styles["BodyText"]))
-    content.append(Paragraph(f"<b>Legajo CIDEPINT:</b> {id_legajo}", styles["BodyText"]))
-    content.append(Paragraph(f"<b>Presupuesto NRO:</b> {presupuesto}", styles["BodyText"]))
+    content.append(Paragraph(f"<b>Legajo CIDEPINT:</b> {legajo_numero}", styles["BodyText"]))
+    content.append(Paragraph(f"<b>Presupuesto NRO:</b> {presupuesto_texto}", styles["BodyText"]))
     content.append(Paragraph(f"<b>Monto:</b> U$S{monto}", styles["BodyText"]))
     content.append(Paragraph(f"<b>Factura C NRO:</b> {factura}", styles["BodyText"]))
     content.append(Spacer(1, 10))

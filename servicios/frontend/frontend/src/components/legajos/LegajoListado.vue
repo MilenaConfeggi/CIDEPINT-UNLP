@@ -47,11 +47,13 @@
           <tr v-for="legajo in legajos.items" :key="legajo.id">
             <th scope="row">{{ legajo.id }}/{{ legajo.fecha_entrada ? legajo.fecha_entrada.substring(2, 4) : '' }}</th>
             <td>
-              <div v-if="legajo.presupuesto_cidepint[0]?.stans">
-                <div v-for="stan in legajo.presupuesto_cidepint[0].stans" :key="stan.id">
-                  <span v-for="ensayo in stan.ensayos" :key="ensayo.id">{{
-                    ensayo.nombre + ', '
-                  }}</span>
+              <div v-if="legajo.presupuesto_cidepint">
+                <div v-for="presupuesto in legajo.presupuesto_cidepint" :key="presupuesto.id">
+                  <div v-for="stan in presupuesto.stans" :key="stan.id">
+                    <span v-for="ensayo in stan.ensayos" :key="ensayo.id">
+                      {{ ensayo.nombre }}<span v-if="!$last">, </span>
+                    </span>
+                  </div>
                 </div>
               </div>
             </td>

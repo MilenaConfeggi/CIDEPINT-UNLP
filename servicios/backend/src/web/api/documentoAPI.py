@@ -109,12 +109,19 @@ def upload():
             return jsonify({"error": "No se pudo crear el documento"}), 400
 
         file.save(str(file_path))
+        
         if nro_factura:
             legajo = find_legajo_by_id(legajo_id)
             if legajo is None:
                 return jsonify({"error": "No se encontro el legajo"}), 404
-            legajo.nro_factura = nro_factura
+            if legajo.nro_factura:
+                # Concatenar el nuevo número de factura con los existentes
+                legajo.nro_factura = f"{legajo.nro_factura}, {nro_factura}"
+            else:
+                # Asignar el nuevo número de factura si no había ninguno
+                legajo.nro_factura = nro_factura
             db.session.commit()
+
         return (
             jsonify({"message": f"Archivo guardado exitosamente en {file_path}"}),
             200,

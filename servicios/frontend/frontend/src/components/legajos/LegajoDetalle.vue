@@ -132,7 +132,7 @@
                           </li>
                         </template>
                         <template v-else>
-                          <li v-if="existeDocumento(documento.nombre)">
+                          <li v-if="existeDocumento(documento.nombre) && documento.nombre !== 'Factura'">">
                             <button
                               type="button"
                               class="dropdown-item"
@@ -143,7 +143,7 @@
                               Ver documento
                             </button>
                           </li>
-                          <li v-if="existeDocumento(documento.nombre) && documento.nombre !== 'Orden Facturación'">
+                          <li v-if="existeDocumento(documento.nombre) && documento.nombre !== 'Orden Facturación' && documento.nombre !== 'Factura'">
                             <label :for="`edit-pdf-${documento.id}`" class="dropdown-item">
                               Editar
                               <input
@@ -181,7 +181,14 @@
                           </li>
                         </template>
                         <template v-if="documento.nombre === 'Factura'">
-                          <li v-if="!existeDocumento(documento.nombre)">
+                            <li
+                              v-for="factura in facturas"
+                              :key="factura.id"
+                              class="dropdown-item"
+                              @click="viewFactura(factura.id)"
+                            >
+                              {{ factura.nombre_documento }}
+                            </li>
                             <button
                               data-bs-toggle="modal"
                               data-bs-target="#exampleModal3"
@@ -190,7 +197,7 @@
                             >
                               Cargar
                             </button>
-                          </li>
+                          
                         </template>
                       </ul>
                     </div>
@@ -306,6 +313,7 @@ import StateBadge from '../StateBadge.vue'
 import { useAuthStore } from '../../stores/auth'
 import { useRouter } from 'vue-router'
 import PresupuestoModal from '../presupuestos/PresupuestoModal.vue';
+
 const route = useRoute()
 const router = useRouter()
 const legajosStore = useLegajosStore()
@@ -359,7 +367,7 @@ const hasPermission = (permiso) => {
 const nroFactura = ref('')
 const documentoID = ref('')
 const adicionales = ref([])
-
+const facturas = ref([])
 const presupuestont = ref('')
 
 const formatDate = (dateString) => {
@@ -479,6 +487,32 @@ const fetchAdicionales = async (legajoId) => {
   }
 }
 
+const fetchFacturas = async (legajoId) => {
+  const token = authStore.getToken()
+  try {
+    const response = await axios.get(
+      `${import.meta.env.VITE_API_URL}/api/documentos/facturas/${legajoId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    )
+    if (response.status !== 200) {
+      throw ({message: 'Error al obtener las facturas', status: response.status})
+    }
+    facturas.value = response.data
+  } catch (error) {
+    if (error.status === 422 || error.status === 401) {
+      authStore.logout()
+      router.push('/log-in')
+    } else {
+      toast.error('Error al obtener las facturas', error)
+    }
+    console.error('Error al obtener los documentos facturas:', error)
+  }
+}
+  
 const fetchSinPresupuesto = async (legajoId) => {
   const token = authStore.getToken()
   if (!hasPermission('generar_presupuestont')) {
@@ -531,7 +565,28 @@ const viewAdicional = async (adicionalId) => {
     toast.warning('No se pudo cargar el archivo adicional.')
   }
 }
+const viewFactura = async (facturaId) => {
+  const token = authStore.getToken()
+  try {
+    const response = await axios.get(
+      `${import.meta.env.VITE_API_URL}/api/documentos/view_factura/${facturaId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        responseType: 'blob',
+      },
+    )
 
+    // Crear una URL para visualizar el archivo
+    const blob = new Blob([response.data], { type: response.headers['content-type'] })
+    const fileUrl = URL.createObjectURL(blob)
+    window.open(fileUrl, '_blank')
+  } catch (error) {
+    console.error('Error al obtener el archivo adicional:', error)
+    toast.warning('No se pudo cargar el archivo adicional.')
+  }
+}
 const viewLegajo = async (legajoId) => {
   const token = authStore.getToken()
   try {
@@ -578,6 +633,7 @@ onMounted(async () => {
     await documentosStore.getTiposDocumentos()
     await fetchAdicionales(route.params.id)
     await fetchSinPresupuesto(route.params.id)
+    await fetchFacturas(route.params.id)
   } catch (err) {
     console.error('Error al cargar el legajo:', err)
     toast.error('Error al cargar el legajo', err)

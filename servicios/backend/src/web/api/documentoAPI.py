@@ -1,5 +1,6 @@
 from flask_jwt_extended import jwt_required
 from models.base import db
+from models.documentos.documento import Documento
 from models.legajos import find_legajo_by_id  
 from models.documentos import (
     listar_tipos_documentos,
@@ -80,7 +81,7 @@ def upload():
     if td is None:
         return jsonify({"error": "El tipo de documento no existe"}), 400
 
-    current_file = Path(__file__).resolve()  # Ruta absoluta del archivo actual
+    current_file = Path(__file__).resolve()
     project_root = current_file.parents[5]
     DOCUMENTS_DIR = project_root / "documentos"
 
@@ -89,64 +90,35 @@ def upload():
 
     try:
         file_path = documentos_path / file.filename
+        counter = 1
+        while file_path.exists():
+            file.filename = (
+                f"{Path(file.filename).stem}({counter}){Path(file.filename).suffix}"
+            )
+            file_path = documentos_path / file.filename
+            counter += 1
+
         data = {
+            "nombre_documento": file.filename,
+            "fecha_creacion": datetime.now(),
+            "estado_id": 1,
             "legajo_id": legajo_id,
             "tipo_documento_id": td.id,
-            "nombre_documento": None,
         }
-        old_file = find_documento(data)
-        if old_file:
-            old_documento_path = documentos_path / old_file.nombre_documento
-            if old_documento_path.exists():
-                old_documento_path.unlink()
-                file.save(str(file_path))
-                old_file.nombre_documento = file.filename
-                db.session.commit()
-                return (
-                    jsonify(
-                        {"message": f"Archivo guardado exitosamente en {file_path}"}
-                    ),
-                    200,
-                )
-            else:
-                return (
-                    jsonify(
-                        {
-                            "error": f"No se encontro el archivo {file.filename}, {old_documento_path}"
-                        }
-                    ),
-                    404,
-                )
-        else:
-            counter = 1
-            while file_path.exists():
-                file.filename = (
-                    f"{Path(file.filename).stem}({counter}){Path(file.filename).suffix}"
-                )
-                file_path = documentos_path / file.filename
-                counter += 1
+        if not create_documento(data):
+            return jsonify({"error": "No se pudo crear el documento"}), 400
 
-            data = {
-                "nombre_documento": file.filename,
-                "fecha_creacion": datetime.now(),
-                "estado_id": 1,
-                "legajo_id": legajo_id,
-                "tipo_documento_id": td.id,
-            }
-            if not create_documento(data):
-                return jsonify({"error": "No se pudo crear el documento"}), 400
-
-            file.save(str(file_path))
-            if nro_factura:
-                legajo = find_legajo_by_id(legajo_id)
-                if legajo is None:
-                    return jsonify({"error": "No se encontro el legajo"}), 404
-                legajo.nro_factura = nro_factura
-                db.session.commit()
-            return (
-                jsonify({"message": f"Archivo guardado exitosamente en {file_path}"}),
-                200,
-            )
+        file.save(str(file_path))
+        if nro_factura:
+            legajo = find_legajo_by_id(legajo_id)
+            if legajo is None:
+                return jsonify({"error": "No se encontro el legajo"}), 404
+            legajo.nro_factura = nro_factura
+            db.session.commit()
+        return (
+            jsonify({"message": f"Archivo guardado exitosamente en {file_path}"}),
+            200,
+        )
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -248,6 +220,28 @@ def view_adicional(id):
     UPLOAD_FOLDER = os.path.abspath("documentos")
     documento = find_documento_by_id(id)
     directory = os.path.normpath(os.path.join(UPLOAD_FOLDER, "Adicional"))
+    filename = documento.nombre_documento
+    file_path = os.path.join(directory, filename)
+    if not os.path.exists(file_path):
+        abort(404, description="El documento no existe, prueba generar uno primero")
+    return send_from_directory(directory, filename)
+
+@bp.get("/facturas/<int:id>")
+@jwt_required()
+def get_facturas(id):
+    if not check_permission("get_documentos_adicionales"):
+        return jsonify({"message": "No tiene permiso para acceder a este recurso"}), 403
+    data = documentos_schema.dump(db.session.query(Documento).filter_by(legajo_id=id, tipo_documento_id=6).all())
+    return jsonify(data), 200
+
+@bp.get("/view_factura/<int:id>")
+@jwt_required()
+def view_factura(id):
+    if not check_permission("view_adicional"):
+        return jsonify({"message": "No tiene permiso para acceder a este recurso"}), 403
+    UPLOAD_FOLDER = os.path.abspath("documentos")
+    documento = find_documento_by_id(id)
+    directory = os.path.normpath(os.path.join(UPLOAD_FOLDER, "Factura"))
     filename = documento.nombre_documento
     file_path = os.path.join(directory, filename)
     if not os.path.exists(file_path):

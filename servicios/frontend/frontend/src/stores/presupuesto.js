@@ -107,7 +107,7 @@ export const usePresupuestoStore = defineStore('presupuesto', {
         },
       }
     );
-    return response.data; // Devuelve la lista de presupuestos
+    return response.data; // Devuelve la lista de presupuestos con IDs y nombres
   } catch (error) {
     console.error('Error al obtener los presupuestos:', error);
     toast.error('Error al obtener los presupuestos.');
@@ -134,5 +134,18 @@ async fetchPresupuestosFirmados(legajoId) {
     return [];
   }
 },
+async fetchPresupuestos(legajoId) {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/presupuestos/listar_presupuestos/${legajoId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return response.data; // Devuelve la lista de presupuestos
+    },
+    async eliminarPresupuesto(idPresupuesto) {
+      const token = localStorage.getItem('token');
+      await axios.get(`${import.meta.env.VITE_API_URL}/presupuestos/eliminar/${idPresupuesto}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+    },
   },
 })

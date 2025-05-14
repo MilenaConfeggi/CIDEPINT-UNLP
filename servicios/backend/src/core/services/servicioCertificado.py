@@ -32,13 +32,13 @@ def generar_certificado(id_legajo, empleados, descripcion):
     presupuesto_texto = ", ".join(presupuestos)
 
     # Obtener todos los ensayos de los STANs relacionados a los presupuestos
-    ensayos = []
+    ensayos = set()
     for presupuesto in legajo.presupuesto_cidepint:
         for stan in presupuesto.stans:
             stan.descripcion = descripcion
             for ensayo in stan.ensayos:
-                ensayos.append(ensayo.nombre)
-    ensayo_texto = ", ".join(set(ensayos))  # Eliminar duplicados con `set`
+                ensayos.add(ensayo.nombre)
+    ensayo_texto = ", ".join(ensayos)
 
     # Obtener el número de factura
     factura = legajo.nro_factura if legajo.nro_factura else ""

@@ -9,10 +9,19 @@
                 <!-- Sección de Presupuestos -->
         <div v-if="presupuestos.length > 0" class="presupuestos-section">
           <h3>Presupuestos</h3>
+          <!-- filepath: c:\Users\carob\Desktop\TTPS\CIDEPINT-UNLP\servicios\frontend\frontend\src\components\presupuestos\PresupuestoModal.vue -->
           <ul>
             <li v-for="archivo in presupuestos" :key="archivo">
-              <a href="#" @click.prevent="abrirArchivo(archivo, 'presupuestos')">{{ archivo }}</a>
-            </li>
+            <a href="#" @click.prevent="abrirArchivo(archivo, 'presupuestos')">{{ archivo.nombre_documento }}</a>
+            <button
+              v-if="hasPermission('generar_presupuesto')"
+              class="delete-button"
+              @click="confirmarEliminarPresupuesto(archivo)"
+              title="Eliminar presupuesto"
+            >
+              🗑️
+            </button>
+          </li>
           </ul>
         </div>
 
@@ -146,7 +155,37 @@ const abrirArchivo = (archivo, tipo) => {
   const url = `${baseUrl}/${archivo}`;
   window.open(url, '_blank');
 };
+const obtenerIdPresupuestoDesdeArchivo = async (archivo, legajoId) => {
+  try {
+    const response = await presupuestoStore.fetchPresupuestos(legajoId);
+    const nombreArchivo = typeof archivo === 'string' ? archivo : archivo.nombre_documento;
+    const presupuesto = response.find((presu) => presu.nombre_documento === nombreArchivo);
 
+    if (presupuesto) {
+      return presupuesto.id;
+    } else {
+      throw new Error(`No se encontró un presupuesto asociado al archivo: ${nombreArchivo}`);
+    }
+  } catch (error) {
+    console.error('Error al obtener el ID del presupuesto:', error);
+    throw error;
+  }
+};
+const confirmarEliminarPresupuesto = async (archivo) => {
+  const confirmacion = window.confirm(`¿Estás seguro que deseas eliminar el presupuesto "${archivo}"?`);
+  if (!confirmacion) return;
+
+  try {
+    const idPresupuesto = await obtenerIdPresupuestoDesdeArchivo(archivo, props.legajoId);
+    console.log("ID del presupuesto a eliminar:", idPresupuesto); // Verificar el ID
+    await presupuestoStore.eliminarPresupuesto(idPresupuesto);
+    toast.success('Presupuesto eliminado con éxito.');
+    cargarPresupuestos(); // Recargar la lista de presupuestos
+  } catch (error) {
+    console.error('Error al eliminar el presupuesto:', error);
+    toast.error('Error al eliminar el presupuesto.');
+  }
+};
 // Watch para cargar los datos cuando el modal se abre
 watch(
   () => props.isOpen,
@@ -267,5 +306,16 @@ onMounted(() => {
 
 .btn-success:hover {
   background-color: #218838;
+}
+.delete-button {
+  background: none;
+  border: none;
+  color: red;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.delete-button:hover {
+  color: darkred;
 }
 </style>

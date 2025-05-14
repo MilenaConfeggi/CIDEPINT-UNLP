@@ -41,3 +41,14 @@ def buscar_todos_informes_por_legajo(id_legajo):
 def buscar_informe_por_id(id_informe):
     informe = Documento.query.filter_by(id=id_informe).first()
     return informe
+
+def eliminar_informe(id_informe):
+    informe = Documento.query.filter_by(id=id_informe).first()
+    if informe:
+        file_path = os.path.join(UPLOAD_FOLDER, 'informes', str(informe.legajo_id), informe.nombre_documento)
+        if os.path.exists(file_path):
+            os.remove(file_path)
+
+        db.session.delete(informe)
+        db.session.commit()
+    return informe

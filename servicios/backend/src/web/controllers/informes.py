@@ -237,3 +237,21 @@ def marcar_informado(id_legajo):
     except Exception as e:
         print(f"Error al marcar el legajo como informado: {e}")
         return jsonify({"error": "Error interno del servidor."}), 500
+
+@bp.get("/eliminar_informe/<int:id_informe>")
+@jwt_required()
+def eliminar_informe(id_informe):
+    try:
+        informe = servicioInforme.buscar_informe_por_id(id_informe)
+        if not informe:
+            return jsonify({"error": "No se encontró el informe solicitado"}), 404
+
+        folder_path = os.path.normpath(os.path.join(UPLOAD_FOLDER, "informes", str(informe.legajo_id)))
+        file_path = os.path.normpath(os.path.join(folder_path, informe.nombre_documento))
+        if os.path.exists(file_path):
+            os.remove(file_path)
+        servicioInforme.eliminar_informe(id_informe)
+        return jsonify({"message": "Informe eliminado con éxito"}), 200
+    except Exception as e:
+        print(f"Error al eliminar el informe: {e}")
+        return jsonify({"error": "Error interno del servidor."}), 500

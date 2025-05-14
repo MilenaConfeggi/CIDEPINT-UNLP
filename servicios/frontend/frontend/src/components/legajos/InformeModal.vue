@@ -10,13 +10,19 @@
         <div v-if="informesAgrupados && Object.keys(informesAgrupados).some(key => informesAgrupados[key].length > 0)">
           <div v-for="(informes, categoria) in informesAgrupados" :key="categoria" class="category-section">
             <h3 class="category-title">{{ categoria }}</h3>
-            <ul class="document-list">
-              <li v-for="informe in informes" :key="informe.id" class="document-item">
-                <button type="button" class="btn btn-link document-button" @click="verInforme(informe.id)">
-                  {{ informe.nombre_documento }}
-                </button>
-              </li>
-            </ul>
+            <div class="document-card" v-for="informe in informes" :key="informe.id">
+              <span class="document-name" @click="verInforme(informe.id)">
+                {{ informe.nombre_documento }}
+              </span>
+              <button
+                type="button"
+                class="delete-button"
+                @click="eliminarInforme(informe.id)"
+                title="Eliminar informe"
+              >
+                🗑️
+              </button>
+            </div>
           </div>
         </div>
 
@@ -196,6 +202,36 @@ const marcarComoInformado = async () => {
     toast.error('No se pudo marcar el legajo como informado.');
   }
 };
+const eliminarInforme = async (idInforme) => {
+  const toast = useToast();
+
+  // Mostrar confirmación antes de eliminar
+  const confirmacion = window.confirm('¿Estás seguro que deseas eliminar este informe?');
+  if (!confirmacion) {
+    return; // Si el usuario cancela, no se ejecuta la eliminación
+  }
+
+  try {
+    const token = useAuthStore().getToken();
+    const response = await axios.get(
+      `${import.meta.env.VITE_API_URL}/informes/eliminar_informe/${idInforme}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    if (response.status === 200) {
+      toast.success('Informe eliminado con éxito');
+      await fetchInformes(); // Actualizar la lista de informes
+    } else {
+      toast.error('No se pudo eliminar el informe');
+    }
+  } catch (error) {
+    console.error('Error al eliminar el informe:', error);
+    toast.error('Error al eliminar el informe');
+  }
+};
 </script>
 
 <style scoped>
@@ -224,6 +260,23 @@ const marcarComoInformado = async () => {
   animation: fadeIn 0.3s ease-in-out;
   max-height: 80vh; /* Limitar la altura máxima del modal */
   overflow-y: auto; /* Habilitar el scroll vertical */
+}
+
+/* Cards de documentos */
+.document-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 10px 15px;
+  margin-bottom: 10px;
+  transition: background-color 0.3s ease;
+}
+
+.document-card:hover {
+  background-color: #f1f1f1;
 }
 
 /* Encabezado del modal */
@@ -284,11 +337,18 @@ const marcarComoInformado = async () => {
   text-decoration: none;
   font-size: 1rem;
 }
-
+.document-name {
+  font-size: 1rem;
+  color: #007bff;
+  cursor: pointer;
+  text-decoration: none;
+}
 .document-button:hover {
   text-decoration: underline;
 }
-
+.document-name:hover {
+  text-decoration: underline;
+}
 /* Sección de acciones */
 .upload-section,
 .action-section {
@@ -379,7 +439,17 @@ const marcarComoInformado = async () => {
   background-color: #e2e6ea;
   color: #495057;
 }
+.delete-button {
+  background: none;
+  border: none;
+  color: red;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
 
+.delete-button:hover {
+  color: darkred;
+}
 /* Animación */
 @keyframes fadeIn {
   from {

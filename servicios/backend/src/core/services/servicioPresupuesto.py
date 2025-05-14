@@ -28,7 +28,11 @@ UPLOAD_FOLDER = os.path.abspath("documentos")
 def generar_documento_de_legajo(id_legajo):
     # Completar con los datos necesarios
     legajo = Legajo.query.filter_by(id=id_legajo).first()
-    presupuesto = Presupuesto.query.filter_by(legajo_id=legajo.id).order_by(desc(Presupuesto.fecha_creacion)).first()
+    # Obtener todos los presupuestos del legajo ordenados por fecha de creación descendente
+    presupuestos = Presupuesto.query.filter_by(legajo_id=legajo.id).order_by(Presupuesto.fecha_creacion.asc()).all()
+    # Listar todos los números de presupuesto separados por comas
+    nros_presupuestos = ', '.join(str(p.nro_presupuesto) for p in presupuestos if p.nro_presupuesto)
+    
 
     # Crear la ruta de destino
     doc_dir = os.path.join(UPLOAD_FOLDER, "legajos", str(legajo.id))
@@ -102,7 +106,7 @@ def generar_documento_de_legajo(id_legajo):
         ['E-mail:', legajo.cliente.email],
         ['Área:', legajo.area.nombre],
         ['Objetivo de la OT:', legajo.objetivo],
-        ['Presupuesto Nº:', presupuesto.nro_presupuesto]
+        ['Presupuesto Nº:', nros_presupuestos]
     ]
     
     # Create form table

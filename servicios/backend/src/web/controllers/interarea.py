@@ -147,3 +147,11 @@ def descargar_resultado_documentos(id):
     except Exception as e:
         print(f"Error: {str(e)}")
         return jsonify({"error": f"Error: {str(e)}"}), 500
+    
+@bp.get("/proximo_numero")
+@jwt_required()
+def proximo_numero_interarea():
+    if not check_permission("crear_intearea"):
+        return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
+    nro = servicioInterarea.generarNroInterarea()
+    return jsonify({"nro_interarea": nro}), 200

@@ -2,7 +2,10 @@
   <div class="container py-5">
     <div class="card shadow">
       <div class="card-body">
-        <h4 class="card-title text-center mb-4">Solicitar Interarea</h4>
+        <h4 class="card-title text-center mb-4">
+          Solicitar Interarea
+          <span v-if="nroInterarea">nro {{ nroInterarea }}</span>
+        </h4>
         <form @submit.prevent="enviarFormulario">
           <div class="form-group mb-3">
             <label class="form-label fw-bold">Seleccionar tipo de interarea</label>
@@ -82,7 +85,6 @@
   </div>
 </template>
 
-
 <script>
 import { useRouter } from "vue-router";
 import { useAuthStore } from '@/stores/auth';
@@ -100,6 +102,7 @@ export default {
       muestrasFiltradas: [],
       errores: {},
       mensajeExito: "",
+      nroInterarea: "", // Nuevo: para mostrar el número de interárea
       form: {
         legajo: "",
         lineaInvestigacion: "",
@@ -134,6 +137,22 @@ export default {
         this.muestras = await muestrasRes.json();
       } catch (error) {
         console.error("Error al cargar los datos:", error);
+      }
+    },
+    async obtenerNroInterarea() {
+      try {
+        const authStore = useAuthStore();
+        const token = authStore.getToken();
+        const baseUrl = import.meta.env.VITE_API_URL;
+        const response = await fetch(`${baseUrl}/interareas/proximo_numero`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          this.nroInterarea = data.nro_interarea;
+        }
+      } catch (error) {
+        console.error("Error al obtener el número de interárea:", error);
       }
     },
     async enviarFormulario() {
@@ -225,6 +244,7 @@ export default {
   },
   mounted() {
     this.fetchData();
+    this.obtenerNroInterarea(); // Nuevo: obtener el número de interárea al montar
   },
 };
 </script>

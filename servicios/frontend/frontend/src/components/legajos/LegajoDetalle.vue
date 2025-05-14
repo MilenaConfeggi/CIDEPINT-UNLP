@@ -204,10 +204,24 @@
                             <li
                               v-for="recibo in recibos"
                               :key="recibo.id"
-                              class="dropdown-item"
-                              @click="viewRecibo(recibo.id)"
+                              class="dropdown-item d-flex justify-content-between align-items-center"
                             >
-                              {{ recibo.nombre_documento }}
+                              <span @click="viewRecibo(recibo.id)" style="cursor:pointer;">
+                                {{ recibo.nombre_documento }}
+                              </span>
+                              <button
+                                class="icon-btn"
+                                title="Eliminar recibo"
+                                @click.stop="eliminarRecibo(recibo.id)"
+                              >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="red" viewBox="0 0 24 24">
+                                  <path d="M3 6h18" stroke="red" stroke-width="2" stroke-linecap="round"/>
+                                  <path d="M8 6v12a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V6" stroke="red" stroke-width="2" fill="none"/>
+                                  <path d="M10 11v6M14 11v6" stroke="red" stroke-width="2" stroke-linecap="round"/>
+                                  <rect x="5" y="6" width="14" height="2" fill="red"/>
+                                  <rect x="9" y="2" width="6" height="2" fill="red"/>
+                                </svg>
+                              </button>
                             </li>
                             <label :for="`upload-pdf-${documento.id}`" class="dropdown-item">
                               Cargar
@@ -654,6 +668,27 @@ const viewRecibo = async (reciboId) => {
     toast.warning('No se pudo cargar el archivo adicional.')
   }
 }
+const eliminarRecibo = async (reciboId) => {
+  if (!window.confirm('¿Seguro que desea eliminar este recibo?')) return;
+  const token = authStore.getToken();
+  try {
+    const response = await axios.delete(
+      `${import.meta.env.VITE_API_URL}/api/documentos/recibos/${reciboId}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    if (response.status === 200) {
+      toast.success('Recibo eliminado correctamente');
+      await fetchRecibos(legajo.value.id); // Recarga la lista
+    } else {
+      throw new Error('No se pudo eliminar el recibo');
+    }
+  } catch (error) {
+    toast.error('Error al eliminar el recibo');
+    console.error(error);
+  }
+};
 const viewLegajo = async (legajoId) => {
   const token = authStore.getToken()
   try {
@@ -787,5 +822,17 @@ onMounted(async () => {
   font-size: 1rem; /* Ajusta el tamaño del texto */
   font-weight: normal; /* Opcional: cambia el peso de la fuente */
   margin-bottom: 0.5rem; /* Opcional: ajusta el margen inferior */
+}
+.icon-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  margin-left: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+.icon-btn svg {
+  display: block;
 }
 </style>

@@ -276,3 +276,15 @@ def view_recibo(id):
     if not os.path.exists(file_path):
         abort(404, description="El documento no existe, prueba generar uno primero")
     return send_from_directory(directory, filename)
+
+@bp.delete("/recibos/<int:id>")
+@jwt_required()
+def delete_recibo(id):
+    if not check_permission("view_adicional"):
+        return jsonify({"message": "No tiene permiso para eliminar este documento"}), 403
+    documento = find_documento_by_id(id)
+    if not documento or documento.tipo_documento_id != 10:
+        return jsonify({"error": "Recibo no encontrado"}), 404
+    db.session.delete(documento)
+    db.session.commit()
+    return jsonify({"message": "Recibo eliminado correctamente"}), 200

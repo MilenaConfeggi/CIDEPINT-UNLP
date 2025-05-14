@@ -274,19 +274,25 @@ def listar_presupuestos_firmados(id_legajo):
     if not check_permission("ver_presupuesto"):
         return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
 
-    folder_path = os.path.join(UPLOAD_FOLDER, "presupuestos", str(id_legajo))
-    if not os.path.exists(folder_path):
-        return jsonify([]), 200
-
-    archivos = [f for f in os.listdir(folder_path) if f.startswith("fpresupuesto_firmado_") and f.endswith(".pdf")]
-    return jsonify(archivos), 200
+    presupuestos = servicioPresupuesto.buscar_presupuestos_firmados_por_legajo(id_legajo)
+    data = [{"id": presu.id, "nombre_documento": presu.nombre_documento} for presu in presupuestos]
+    return jsonify(data), 200
 
 @bp.get("/eliminar/<int:id_presupuesto>")
 @jwt_required()
 def eliminar_presupuesto(id_presupuesto):
-
     try:
         servicioPresupuesto.eliminar_presupuesto(id_presupuesto)
+        return jsonify({"message": "Presupuesto eliminado con éxito"}), 200
+    except Exception as e:
+        print(f"Error al eliminar el presupuesto: {e}")
+        return jsonify({"Error": "No se pudo eliminar el presupuesto"}), 500
+    
+@bp.get("/eliminar_presupuesto_firmado/<int:id_presupuesto>")
+@jwt_required()
+def eliminar_presupuesto_firmado(id_presupuesto):
+    try:
+        servicioPresupuesto.eliminar_presupuesto_firmado(id_presupuesto)
         return jsonify({"message": "Presupuesto eliminado con éxito"}), 200
     except Exception as e:
         print(f"Error al eliminar el presupuesto: {e}")

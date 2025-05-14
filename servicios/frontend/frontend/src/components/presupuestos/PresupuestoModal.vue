@@ -29,8 +29,16 @@
         <div v-if="presupuestosFirmados.length > 0" class="presupuestos-firmados-section">
           <h3>Presupuestos Firmados</h3>
           <ul>
-            <li v-for="archivo in presupuestosFirmados" :key="archivo">
-              <a href="#" @click.prevent="abrirArchivo(archivo, 'presupuestos_firmados')">{{ archivo }}</a>
+            <li v-for="archivo in presupuestosFirmados" :key="archivo.id">
+              <a href="#" @click.prevent="abrirArchivo(archivo.nombre_documento, 'presupuestos_firmados')">{{ archivo.nombre_documento }}</a>
+              <button
+                v-if="hasPermission('cargar_presupuesto_firmado')"
+                class="delete-button"
+                @click="confirmarEliminarPresupuestoFirmado(archivo)"
+                title="Eliminar presupuesto firmado"
+              >
+                🗑️
+              </button>
             </li>
           </ul>
         </div>
@@ -184,6 +192,19 @@ const confirmarEliminarPresupuesto = async (archivo) => {
   } catch (error) {
     console.error('Error al eliminar el presupuesto:', error);
     toast.error('Error al eliminar el presupuesto.');
+  }
+};
+const confirmarEliminarPresupuestoFirmado = async (archivo) => {
+  const confirmacion = window.confirm(`¿Estás seguro que deseas eliminar el presupuesto firmado "${archivo.nombre_documento}"?`);
+  if (!confirmacion) return;
+
+  try {
+    await presupuestoStore.eliminarPresupuestoFirmado(archivo.id);
+    toast.success('Presupuesto firmado eliminado con éxito.');
+    cargarPresupuestosFirmados(); // Recargar la lista
+  } catch (error) {
+    console.error('Error al eliminar el presupuesto firmado:', error);
+    toast.error('Error al eliminar el presupuesto firmado.');
   }
 };
 // Watch para cargar los datos cuando el modal se abre

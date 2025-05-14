@@ -134,6 +134,15 @@ async fetchPresupuestosFirmados(legajoId) {
     return [];
   }
 },
+async eliminarPresupuestoFirmado(idPresupuestoFirmado) {
+  const token = localStorage.getItem('token');
+  await axios.get(
+    `${import.meta.env.VITE_API_URL}/presupuestos/eliminar_presupuesto_firmado/${idPresupuestoFirmado}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+},
 async fetchPresupuestos(legajoId) {
       const token = localStorage.getItem('token');
       const response = await axios.get(`${import.meta.env.VITE_API_URL}/presupuestos/listar_presupuestos/${legajoId}`, {

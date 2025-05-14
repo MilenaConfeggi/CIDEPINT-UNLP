@@ -833,14 +833,23 @@ def buscar_presupuestos_por_legajo(id_legajo):
     presupuestos = Documento.query.filter_by(legajo_id=id_legajo, tipo_documento_id=2).filter(Documento.estado_id == 5)
     return presupuestos
 
+def buscar_presupuestos_firmados_por_legajo(id_legajo):
+    presupuestos = Documento.query.filter_by(legajo_id=id_legajo, tipo_documento_id=2).filter(Documento.estado_id == 6)
+    return presupuestos
 
+def eliminar_presupuesto_firmado(id_documento):
+    documento = Documento.query.get(id_documento)
+    if not documento:
+        raise ValueError("Documento no encontrado")
+    db.session.delete(documento)
+    db.session.commit()
 
 def eliminar_presupuesto(id_documento):
-    print("Eliminando presupuesto asociado al documento con ID:", id_documento)
+    
 
     # Buscar el documento
     documento = Documento.query.get(id_documento)
-    print("Documento encontrado:", documento)
+    
 
     if not documento:
         raise ValueError("Documento no encontrado")
@@ -851,23 +860,23 @@ def eliminar_presupuesto(id_documento):
         tipo_documento_id=2, 
         estado_id=5
     ).order_by(Documento.id).all()
-    print("Documentos del legajo encontrados:", [doc.id for doc in documentos_legajo])
+    
 
     # Determinar la posición del documento en la lista
     posicion_documento = next((index for index, doc in enumerate(documentos_legajo) if doc.id == id_documento), None)
-    print("Posición del documento en el legajo:", posicion_documento)
+    
 
     if posicion_documento is None:
         raise ValueError("No se pudo determinar la posición del documento en el legajo")
 
     # Obtener todos los presupuestos del legajo ordenados por ID
     presupuestos_legajo = Presupuesto.query.filter_by(legajo_id=documento.legajo_id).order_by(Presupuesto.id).all()
-    print("Presupuestos del legajo encontrados:", [presu.id for presu in presupuestos_legajo])
+    
 
     # Determinar el presupuesto correspondiente a la misma posición
     if posicion_documento < len(presupuestos_legajo):
         presupuesto_a_eliminar = presupuestos_legajo[posicion_documento]
-        print("Presupuesto a eliminar:", presupuesto_a_eliminar.id)
+        
 
         # Eliminar las relaciones en la tabla intermedia `PresupuestoStan`
         PresupuestoStan.query.filter_by(presupuesto_id=presupuesto_a_eliminar.id).delete()
@@ -875,8 +884,6 @@ def eliminar_presupuesto(id_documento):
         # Eliminar el presupuesto
         db.session.delete(presupuesto_a_eliminar)
 
-    else:
-        print("No se encontró un presupuesto correspondiente a la posición del documento.")
 
     # Eliminar el documento
     db.session.delete(documento)

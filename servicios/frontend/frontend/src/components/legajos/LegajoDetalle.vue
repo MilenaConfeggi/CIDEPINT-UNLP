@@ -402,11 +402,6 @@ const cargarFactura = (id) => {
   documentoID.value = id
 }
 
-const handleInformeDropdown = async (documentoNombre) => {
-  if (documentoNombre === 'Informe' && informes.value.length === 0) {
-    await fetchInformes(route.params.id);
-  }
-};
 const handleFileUpload = async (event, id, legajoId, editar = false) => {
   const file = event.target.files[0]
   if (file && file.type === 'application/pdf') {
@@ -691,10 +686,6 @@ const informesAgrupados = ref({
 });
 
 
-// Llamar a `fetchInformes` al montar el componente
-onMounted(async () => {
-  await fetchInformes(route.params.id);
-});
 const adminLegajo = async () => {
   await legajosStore.habilitar(route.params.id)
 }

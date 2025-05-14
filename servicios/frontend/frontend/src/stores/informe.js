@@ -55,6 +55,7 @@ export const useInformeStore = defineStore('informe', {
     const toast = useToast();
     const file = event.target.files[0];
     const token = useAuthStore().getToken();
+    console.log("archivo seleccionado")
     if (file && file.type === 'application/pdf') {
       try {
         const formData = new FormData();

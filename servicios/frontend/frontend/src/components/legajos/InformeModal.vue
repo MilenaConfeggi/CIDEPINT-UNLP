@@ -70,9 +70,9 @@
             type="button"
             class="btn btn-small-muted"
             @click="marcarComoInformado"
-            >
+          >
             Marcar legajo como Informado
-            </button>
+          </button>
         </div>
       </div>
     </div>
@@ -129,6 +129,39 @@ const fetchInformes = async () => {
     console.error('Error al obtener los informes:', error);
     useToast().error('Error al obtener los informes');
   }
+};
+
+const handleUploadInforme = async (event) => {
+  console.log('handleUploadInforme ejecutado'); // Depuración
+  const file = event.target.files[0];
+  if (!file) {
+    console.log('No se seleccionó ningún archivo');
+    return;
+  }
+  console.log('Archivo seleccionado:', file); // Depuración
+  await uploadInforme(event, props.documentoId, props.legajoId);
+};
+
+const handleUploadDocumentacion = async (event) => {
+  console.log('handleUploadDocumentacion ejecutado'); // Depuración
+  const file = event.target.files[0];
+  if (!file) {
+    console.log('No se seleccionó ningún archivo');
+    return;
+  }
+  console.log('Archivo seleccionado:', file); // Depuración
+  await uploadDocumentacion(event, props.documentoId, props.legajoId);
+};
+
+const handleUploadInformeFirmado = async (event) => {
+  console.log('handleUploadInformeFirmado ejecutado'); // Depuración
+  const file = event.target.files[0];
+  if (!file) {
+    console.log('No se seleccionó ningún archivo');
+    return;
+  }
+  console.log('Archivo seleccionado:', file); // Depuración
+  await uploadInformeFirmado(event, props.documentoId, props.legajoId);
 };
 
 watch(
@@ -189,6 +222,8 @@ const marcarComoInformado = async () => {
   padding: 20px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   animation: fadeIn 0.3s ease-in-out;
+  max-height: 80vh; /* Limitar la altura máxima del modal */
+  overflow-y: auto; /* Habilitar el scroll vertical */
 }
 
 /* Encabezado del modal */
@@ -329,20 +364,22 @@ const marcarComoInformado = async () => {
 .btn-success:hover {
   background-color: #218838;
 }
+
 .btn-small-muted {
-  padding: 5px 10px; /* Reducir el padding */
-  font-size: 0.875rem; /* Reducir el tamaño de la fuente */
-  border-radius: 3px; /* Ajustar el radio de los bordes */
-  background-color: #d6eaff; /* Color de fondo más neutro */
-  color: #4d6174; /* Color de texto más apagado */
-  border: 1px solid #7694b3; /* Borde gris claro */
+  padding: 5px 10px;
+  font-size: 0.875rem;
+  border-radius: 3px;
+  background-color: #d6eaff;
+  color: #4d6174;
+  border: 1px solid #7694b3;
   cursor: pointer;
 }
 
 .btn-small-muted:hover {
-  background-color: #e2e6ea; /* Color de fondo más oscuro al pasar el mouse */
-  color: #495057; /* Color de texto más oscuro al pasar el mouse */
+  background-color: #e2e6ea;
+  color: #495057;
 }
+
 /* Animación */
 @keyframes fadeIn {
   from {

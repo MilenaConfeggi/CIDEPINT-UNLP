@@ -254,3 +254,25 @@ def view_factura(id):
     if not os.path.exists(file_path):
         abort(404, description="El documento no existe, prueba generar uno primero")
     return send_from_directory(directory, filename)
+
+@bp.get("/recibos/<int:id>")
+@jwt_required()
+def get_recibos(id):
+    if not check_permission("get_documentos_adicionales"):
+        return jsonify({"message": "No tiene permiso para acceder a este recurso"}), 403
+    data = documentos_schema.dump(db.session.query(Documento).filter_by(legajo_id=id, tipo_documento_id=10).all())
+    return jsonify(data), 200
+
+@bp.get("/view_recibo/<int:id>")
+@jwt_required()
+def view_recibo(id):
+    if not check_permission("view_adicional"):
+        return jsonify({"message": "No tiene permiso para acceder a este recurso"}), 403
+    UPLOAD_FOLDER = os.path.abspath("documentos")
+    documento = find_documento_by_id(id)
+    directory = os.path.normpath(os.path.join(UPLOAD_FOLDER, "Recibo"))
+    filename = documento.nombre_documento
+    file_path = os.path.join(directory, filename)
+    if not os.path.exists(file_path):
+        abort(404, description="El documento no existe, prueba generar uno primero")
+    return send_from_directory(directory, filename)

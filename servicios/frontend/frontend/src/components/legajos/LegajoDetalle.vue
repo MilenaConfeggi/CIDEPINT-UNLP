@@ -132,7 +132,7 @@
                           </li>
                         </template>
                         <template v-else>
-                          <li v-if="existeDocumento(documento.nombre) && documento.nombre !== 'Factura'">">
+                          <li v-if="existeDocumento(documento.nombre) && documento.nombre !== 'Factura' && documento.nombre !== 'Recibo'">">
                             <button
                               type="button"
                               class="dropdown-item"
@@ -143,7 +143,7 @@
                               Ver documento
                             </button>
                           </li>
-                          <li v-if="existeDocumento(documento.nombre) && documento.nombre !== 'Orden Facturación' && documento.nombre !== 'Factura'">
+                          <li v-if="existeDocumento(documento.nombre) && documento.nombre !== 'Orden Facturación' && documento.nombre !== 'Factura' && documento.nombre !== 'Recibo'">
                             <label :for="`edit-pdf-${documento.id}`" class="dropdown-item">
                               Editar
                               <input
@@ -164,7 +164,8 @@
                             documento.nombre !== 'Factura' &&
                             documento.nombre !== 'Adicional' &&
                             documento.nombre !== 'Legajo' &&
-                            documento.nombre !== 'Orden Facturación'
+                            documento.nombre !== 'Orden Facturación' &&
+                            documento.nombre !== 'Recibo'
                           "
                         >
                           <li v-if="!existeDocumento(documento.nombre)">
@@ -197,6 +198,27 @@
                             >
                               Cargar
                             </button>
+                          
+                        </template>
+                        <template v-if="documento.nombre === 'Recibo'">
+                            <li
+                              v-for="recibo in recibos"
+                              :key="recibo.id"
+                              class="dropdown-item"
+                              @click="viewRecibo(recibo.id)"
+                            >
+                              {{ recibo.nombre_documento }}
+                            </li>
+                            <label :for="`upload-pdf-${documento.id}`" class="dropdown-item">
+                              Cargar
+                              <input
+                                :id="`upload-pdf-${documento.id}`"
+                                type="file"
+                                accept="application/pdf"
+                                @change="handleFileUpload($event, documento.id, legajo.id)"
+                                hidden
+                              />
+                            </label>
                           
                         </template>
                       </ul>
@@ -368,6 +390,7 @@ const nroFactura = ref('')
 const documentoID = ref('')
 const adicionales = ref([])
 const facturas = ref([])
+const recibos = ref([])
 const presupuestont = ref('')
 
 const formatDate = (dateString) => {
@@ -512,6 +535,33 @@ const fetchFacturas = async (legajoId) => {
     console.error('Error al obtener los documentos facturas:', error)
   }
 }
+
+
+const fetchRecibos = async (legajoId) => {
+  const token = authStore.getToken()
+  try {
+    const response = await axios.get(
+      `${import.meta.env.VITE_API_URL}/api/documentos/recibos/${legajoId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    )
+    if (response.status !== 200) {
+      throw ({message: 'Error al obtener los recibos', status: response.status})
+    }
+    recibos.value = response.data
+  } catch (error) {
+    if (error.status === 422 || error.status === 401) {
+      authStore.logout()
+      router.push('/log-in')
+    } else {
+      toast.error('Error al obtener los recibos', error)
+    }
+    console.error('Error al obtener los documentos recibos:', error)
+  }
+}
   
 const fetchSinPresupuesto = async (legajoId) => {
   const token = authStore.getToken()
@@ -587,6 +637,28 @@ const viewFactura = async (facturaId) => {
     toast.warning('No se pudo cargar el archivo adicional.')
   }
 }
+const viewRecibo = async (reciboId) => {
+  const token = authStore.getToken()
+  try {
+    const response = await axios.get(
+      `${import.meta.env.VITE_API_URL}/api/documentos/view_recibo/${reciboId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        responseType: 'blob',
+      },
+    )
+
+    // Crear una URL para visualizar el archivo
+    const blob = new Blob([response.data], { type: response.headers['content-type'] })
+    const fileUrl = URL.createObjectURL(blob)
+    window.open(fileUrl, '_blank')
+  } catch (error) {
+    console.error('Error al obtener el archivo adicional:', error)
+    toast.warning('No se pudo cargar el archivo adicional.')
+  }
+}
 const viewLegajo = async (legajoId) => {
   const token = authStore.getToken()
   try {
@@ -634,6 +706,7 @@ onMounted(async () => {
     await fetchAdicionales(route.params.id)
     await fetchSinPresupuesto(route.params.id)
     await fetchFacturas(route.params.id)
+    await fetchRecibos(route.params.id)
   } catch (err) {
     console.error('Error al cargar el legajo:', err)
     toast.error('Error al cargar el legajo', err)

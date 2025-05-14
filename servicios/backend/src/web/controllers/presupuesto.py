@@ -281,6 +281,8 @@ def listar_presupuestos_firmados(id_legajo):
 @bp.get("/eliminar/<int:id_presupuesto>")
 @jwt_required()
 def eliminar_presupuesto(id_presupuesto):
+    if not check_permission("crear_usuario"):
+        return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
     try:
         servicioPresupuesto.eliminar_presupuesto(id_presupuesto)
         return jsonify({"message": "Presupuesto eliminado con éxito"}), 200
@@ -291,6 +293,8 @@ def eliminar_presupuesto(id_presupuesto):
 @bp.get("/eliminar_presupuesto_firmado/<int:id_presupuesto>")
 @jwt_required()
 def eliminar_presupuesto_firmado(id_presupuesto):
+    if not check_permission("crear_usuario"):
+        return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
     try:
         servicioPresupuesto.eliminar_presupuesto_firmado(id_presupuesto)
         return jsonify({"message": "Presupuesto eliminado con éxito"}), 200

@@ -8,6 +8,9 @@ from models.documentos.documento import Documento
 from models.legajos import legajo_informado, legajo_en_curso
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
+# Importa check_permission desde el módulo correspondiente
+from servicios.backend.src.web.helpers.auth import check_permission
+
 bp = Blueprint("informes", __name__, url_prefix="/informes")
 UPLOAD_FOLDER = os.path.abspath("documentos")
 
@@ -241,6 +244,8 @@ def marcar_informado(id_legajo):
 @bp.get("/eliminar_informe/<int:id_informe>")
 @jwt_required()
 def eliminar_informe(id_informe):
+    if not check_permission("cargar_informe"):
+        return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
     try:
         informe = servicioInforme.buscar_informe_por_id(id_informe)
         if not informe:

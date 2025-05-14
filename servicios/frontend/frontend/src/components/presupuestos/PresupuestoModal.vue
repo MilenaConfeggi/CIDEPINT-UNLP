@@ -43,23 +43,24 @@
           </ul>
         </div>
       </div>
+        <!-- ... -->
         <div class="action-section">
           <button
-            v-if="hasPermission('generar_presupuesto')"
+            v-if="hasPermission('crear_usuario')"
             class="btn btn-primary"
             @click="generarPresupuestoDolares"
           >
             Generar Presupuesto en Dólares
           </button>
           <button
-            v-if="hasPermission('generar_presupuesto')"
+            v-if="hasPermission('crear_usuario')"
             class="btn btn-primary"
             @click="generarPresupuestoPesos"
           >
             Generar Presupuesto en Pesos
           </button>
           <label
-            v-if="hasPermission('cargar_presupuesto_firmado')"
+            v-if="hasPermission('crear_usuario')"
             class="btn btn-success"
           >
             Subir Presupuesto Firmado
@@ -71,6 +72,7 @@
             />
           </label>
         </div>
+<!-- ... -->
         </div>
 
     <!-- Renderiza el componente GenerarPresupuesto -->

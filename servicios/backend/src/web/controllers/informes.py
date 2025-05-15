@@ -22,7 +22,8 @@ def allowed_file(filename):
 @bp.post("/cargar_documentacion/<int:id_legajo>")
 @jwt_required()
 def cargar_documentacion(id_legajo):
-    print(id_legajo)
+    if not check_permission("cargar_documentacion"):
+        return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
     if(servicioInforme.buscar_documentacion_por_legajo(id_legajo)):
         mensaje = "Se ha eliminado la documentación anterior e informes en caso de que los hubiera"
     else:
@@ -79,6 +80,8 @@ def permitir_pdf(filename):
 @bp.post("/cargar_informe/<int:id_legajo>")
 @jwt_required()
 def cargar_informe(id_legajo):
+    if not check_permission("cargar_informe"):
+        return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
     if 'archivo' not in request.files:
         return jsonify({"error": "Debes seleccionar un archivo"}), 400
 
@@ -130,6 +133,8 @@ def ver_informe(id_legajo):
 @bp.post("/cargar_informe_firmado/<int:id_legajo>")
 @jwt_required()
 def cargar_informe_firmado(id_legajo):
+    if not check_permission("cargar_informe_firmado"):
+        return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
     if 'archivo' not in request.files:
         return jsonify({"error": "Debes seleccionar un archivo"}), 400
 
@@ -232,6 +237,8 @@ def ver_informe_por_id(id_informe):
 @bp.post("/marcar_informado/<int:id_legajo>")
 @jwt_required()
 def marcar_informado(id_legajo):
+    if not check_permission("cargar_informe"):
+        return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
     try:
         legajo_informado(id_legajo)
         return jsonify({"message": "El legajo ha sido marcado como informado."}), 200

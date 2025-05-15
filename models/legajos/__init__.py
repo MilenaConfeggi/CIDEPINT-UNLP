@@ -12,25 +12,15 @@ from models.presupuestos.ensayo import Ensayo
 
 
 def list_legajos(page=1, per_page=10, empresa=None, fecha=None, area=None, ensayo=None, facturacion=None, admin=None):
-    query = (
-        Legajo.query
-        .outerjoin(Legajo.presupuesto_cidepint)  
-        .outerjoin(Presupuesto.stans) 
-        .outerjoin(STAN.ensayos)
-        .options(
-            contains_eager(Legajo.presupuesto_cidepint)
-            .contains_eager(Presupuesto.stans) 
-            .contains_eager(STAN.ensayos)
-        )
-        .distinct(Legajo.id)
-    )
+    # 1. Armar el query base solo con Legajo
+    query = Legajo.query
 
     if empresa:
         query = query.join(Legajo.cliente).filter(Cliente.nombre.like(f"%{empresa}%"))
     if fecha:
         fecha = fecha.strip()
         fecha = datetime.strptime(fecha, "%Y-%m-%d")
-        query = query.filter(func.date(Legajo.fecha_entrada) == fecha.date()) 
+        query = query.filter(func.date(Legajo.fecha_entrada) == fecha.date())
     if area:
         query = query.join(Legajo.area).filter(Area.id == area)
     if ensayo:
@@ -40,7 +30,46 @@ def list_legajos(page=1, per_page=10, empresa=None, fecha=None, area=None, ensay
     if admin:
         query = query.filter(Legajo.admin_habilitado)
     query = query.order_by(Legajo.fecha_entrada.desc())
-    return query.paginate(page=page, per_page=per_page, error_out=False)
+
+    # 2. Paginar solo los IDs
+    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+    legajo_ids = [l.id for l in pagination.items]
+
+    # 3. Traer los legajos completos con joins y options
+    if legajo_ids:
+        legajos = (
+            Legajo.query
+            .filter(Legajo.id.in_(legajo_ids))
+            .outerjoin(Legajo.presupuesto_cidepint)
+            .outerjoin(Presupuesto.stans)
+            .outerjoin(STAN.ensayos)
+            .options(
+                contains_eager(Legajo.presupuesto_cidepint)
+                .contains_eager(Presupuesto.stans)
+                .contains_eager(STAN.ensayos)
+            )
+            .order_by(Legajo.fecha_entrada.desc())
+            .all()
+        )
+    else:
+        legajos = []
+
+    # 4. Devolver un objeto tipo paginación con los legajos completos
+    class Pagination:
+        def __init__(self, items, total, page, per_page, pages):
+            self.items = items
+            self.total = total
+            self.page = page
+            self.per_page = per_page
+            self.pages = pages
+
+    return Pagination(
+        items=legajos,
+        total=pagination.total,
+        page=pagination.page,
+        per_page=pagination.per_page,
+        pages=pagination.pages
+    )
 
 def list_legajos_all():
     return db.session.query(Legajo).all()

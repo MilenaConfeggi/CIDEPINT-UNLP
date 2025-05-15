@@ -54,8 +54,16 @@ def listar_legajos():
         area=area,
         ensayo=ensayo,
     )
-    result = pagination_legajos_schema.dump(pagination)
-    return jsonify(result), 200
+    # Serializa solo los items
+    result = legajos_schema.dump(pagination.items)
+    # Devuelve también los metadatos de paginación
+    return jsonify({
+        "items": result,
+        "total": pagination.total,
+        "page": pagination.page,
+        "pages": pagination.pages,
+        "per_page": pagination.per_page
+    }), 200
 
 
 @bp.get("/<string:id>")

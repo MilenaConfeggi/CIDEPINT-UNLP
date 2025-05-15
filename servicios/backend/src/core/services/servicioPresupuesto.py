@@ -268,12 +268,15 @@ def generar_presupuesto(data):
     horas_list = []
     muestras_list = []
 
+    # ...existing code...
     for dupla in data.get('seleccionados'):
         estan = STAN.query.filter_by(id=dupla.get('id')).first()
         estan_presu = PresupuestoStan.query.filter_by(stan_id=estan.id, presupuesto_id=presupuesto.id).first()
         if not estan_presu or estan_presu.precio_carga is None:
             raise TypeError(f"El STAN {estan.id} no tiene precio en dólares asignado en el presupuesto.")
         cantidad = None
+        horas = None      # <-- Añadir esto
+        muestras = None   # <-- Añadir esto
         if estan.rack is not None:
             horas = int(dupla.get('horas', 1))
             muestras = int(dupla.get('muestras', 1))
@@ -281,14 +284,14 @@ def generar_presupuesto(data):
         else:
             cantidad = int(dupla.get('cantidad', 1))
         precio_stan = estan_presu.precio_carga * cantidad
-        # ... resto igual ...
 
         precio += precio_stan
         estans.append(estan)
         estans_presu.append(estan_presu)
         cantidades.append(cantidad)
-        horas_list.append(horas)
-        muestras_list.append(muestras)
+        horas_list.append(horas)        # horas será None si no corresponde
+        muestras_list.append(muestras)  # muestras será None si no corresponde
+    # ...existing code...
 
     # Crear la ruta de destino
     certificado_dir = os.path.join(UPLOAD_FOLDER, "presupuestos", str(legajo.id))
@@ -481,13 +484,14 @@ def generar_presupuesto_en_pesos(data):
     for dupla in data.get('seleccionados'):
         estan = STAN.query.filter_by(id=dupla.get('id')).first()
         estan_presu = PresupuestoStan.query.filter_by(stan_id=estan.id, presupuesto_id=presupuesto.id).first()
+        cantidad = None
+        horas = None
+        muestras = None
         if estan.rack is not None:
             horas = int(dupla.get('horas', 1))
             muestras = int(dupla.get('muestras', 1))
             cantidad = horas * ceil(muestras / estan.rack)
         else:
-            horas = None
-            muestras = None
             cantidad = int(dupla.get('cantidad', 1))
         precio += estan_presu.precio_carga * cantidad
         estans.append(estan)

@@ -66,8 +66,24 @@
                 </tr>
               </thead>
               <tbody class="table-group-divider">
-                <tr v-for="documento in tipos_documentos" :key="documento.id">
-                  <td>{{ documento.nombre }}</td>
+                                <tr>
+                  <td>Mails</td>
+                  <td>
+                    <RouterLink :to="`/mails/${legajo.id}`" class="btn btn-primary"
+                      >Ver Mails</RouterLink
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td class="">Muestras</td>
+                  <td>
+                    <RouterLink :to="`/muestras/${legajo.id}`" class="btn btn-primary"
+                      >Ver Muestras</RouterLink
+                    >
+                  </td>
+                </tr>
+                <tr v-for="documento in tipos_documentos.slice().sort((a, b) => ordenDocumento(a, b))" :key="documento.id">
+                  <td>{{ documento.nombre === 'Confirmación de pago' ? 'Comprobante de pago' : documento.nombre }}</td>
                   <td>
                     <div class="dropdown">
                       <button
@@ -144,6 +160,7 @@
                             </button>
                           </li>
                           <li v-if="existeDocumento(documento.nombre) && documento.nombre !== 'Orden Facturación' && documento.nombre !== 'Factura' && documento.nombre !== 'Recibo'">
+                          <template v-if="hasPermission('listar_usuarios')">
                             <label :for="`edit-pdf-${documento.id}`" class="dropdown-item">
                               Editar
                               <input
@@ -154,7 +171,8 @@
                                 hidden
                               />
                             </label>
-                          </li>
+                          </template>
+                        </li>
                         </template>
                         <template
                           v-if="
@@ -168,7 +186,8 @@
                             documento.nombre !== 'Recibo'
                           "
                         >
-                          <li v-if="!existeDocumento(documento.nombre)">
+                        <li v-if="!existeDocumento(documento.nombre)">
+                          <template v-if="hasPermission('listar_usuarios')">
                             <label :for="`upload-pdf-${documento.id}`" class="dropdown-item">
                               Cargar
                               <input
@@ -179,7 +198,8 @@
                                 hidden
                               />
                             </label>
-                          </li>
+                          </template>
+                        </li>
                         </template>
                         <template v-if="documento.nombre === 'Factura'">
                             <li
@@ -190,7 +210,9 @@
                             >
                               {{ factura.nombre_documento }}
                             </li>
+                            <!-- Factura -->
                             <button
+                              v-if="hasPermission('listar_usuarios')"
                               data-bs-toggle="modal"
                               data-bs-target="#exampleModal3"
                               class="dropdown-item"
@@ -198,32 +220,9 @@
                             >
                               Cargar
                             </button>
-                          
-                        </template>
-                        <template v-if="documento.nombre === 'Recibo'">
-                            <li
-                              v-for="recibo in recibos"
-                              :key="recibo.id"
-                              class="dropdown-item d-flex justify-content-between align-items-center"
-                            >
-                              <span @click="viewRecibo(recibo.id)" style="cursor:pointer;">
-                                {{ recibo.nombre_documento }}
-                              </span>
-                              <button
-                                class="icon-btn"
-                                title="Eliminar recibo"
-                                @click.stop="eliminarRecibo(recibo.id)"
-                              >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="red" viewBox="0 0 24 24">
-                                  <path d="M3 6h18" stroke="red" stroke-width="2" stroke-linecap="round"/>
-                                  <path d="M8 6v12a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V6" stroke="red" stroke-width="2" fill="none"/>
-                                  <path d="M10 11v6M14 11v6" stroke="red" stroke-width="2" stroke-linecap="round"/>
-                                  <rect x="5" y="6" width="14" height="2" fill="red"/>
-                                  <rect x="9" y="2" width="6" height="2" fill="red"/>
-                                </svg>
-                              </button>
-                            </li>
-                            <label :for="`upload-pdf-${documento.id}`" class="dropdown-item">
+
+                            <!-- Recibo -->
+                            <label v-if="hasPermission('listar_usuarios')" :for="`upload-pdf-${documento.id}`" class="dropdown-item">
                               Cargar
                               <input
                                 :id="`upload-pdf-${documento.id}`"
@@ -235,24 +234,40 @@
                             </label>
                           
                         </template>
+                        <template v-if="documento.nombre === 'Recibo'">
+                          <li
+                            v-for="recibo in recibos"
+                            :key="recibo.id"
+                            class="dropdown-item d-flex justify-content-between align-items-center"
+                          >
+                            <span @click="viewRecibo(recibo.id)" style="cursor:pointer;">
+                              {{ recibo.nombre_documento }}
+                            </span>
+                            <button
+                              class="icon-btn"
+                              title="Eliminar recibo"
+                              @click.stop="eliminarRecibo(recibo.id)"
+                            >
+                              <!-- SVG aquí -->
+                            </button>
+                          </li>
+                          <label
+                            v-if="hasPermission('listar_usuarios')"
+                            :for="`upload-pdf-${documento.id}`"
+                            class="dropdown-item"
+                          >
+                            Cargar
+                            <input
+                              :id="`upload-pdf-${documento.id}`"
+                              type="file"
+                              accept="application/pdf"
+                              @change="handleFileUpload($event, documento.id, legajo.id)"
+                              hidden
+                            />
+                          </label>
+                        </template>
                       </ul>
                     </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td>Mails</td>
-                  <td>
-                    <RouterLink :to="`/mails/${legajo.id}`" class="btn btn-primary"
-                      >Ver Mails</RouterLink
-                    >
-                  </td>
-                </tr>
-                <tr>
-                  <td class="">Muestras</td>
-                  <td>
-                    <RouterLink :to="`/muestras/${legajo.id}`" class="btn btn-primary"
-                      >Ver Muestras</RouterLink
-                    >
                   </td>
                 </tr>
               </tbody>
@@ -411,7 +426,29 @@ const formatDate = (dateString) => {
   const options = { year: 'numeric', day: '2-digit', month: '2-digit' }
   return new Date(dateString).toLocaleDateString('es-ES', options)
 }
+const ordenDeseado = [
+  'Legajo',
+  'Presupuesto CIDEPINT',
+  'Orden de compra',
+  'Presupuesto CONICET',
+  'Orden Facturación',
+  'Adicional',
+  'Factura',
+  'Confirmación de pago',
+  'Recibo',
+  'Informe',
+  'Certificado CIDEPINT',
 
+];
+
+function ordenDocumento(a, b) {
+  const idxA = ordenDeseado.indexOf(a.nombre);
+  const idxB = ordenDeseado.indexOf(b.nombre);
+  if (idxA === -1 && idxB === -1) return a.nombre.localeCompare(b.nombre);
+  if (idxA === -1) return 1;
+  if (idxB === -1) return -1;
+  return idxA - idxB;
+}
 const cargarFactura = (id) => {
   documentoID.value = id
 }

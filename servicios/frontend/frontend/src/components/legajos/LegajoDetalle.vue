@@ -186,7 +186,9 @@
                             documento.nombre !== 'Recibo'
                           "
                         >
-                        <li v-if="!existeDocumento(documento.nombre)">
+                        <li
+                          v-if="!existeDocumento(documento.nombre) && documento.nombre !== 'Factura'"
+                        >
                           <template v-if="hasPermission('listar_usuarios')">
                             <label :for="`upload-pdf-${documento.id}`" class="dropdown-item">
                               Cargar
@@ -202,37 +204,24 @@
                         </li>
                         </template>
                         <template v-if="documento.nombre === 'Factura'">
-                            <li
-                              v-for="factura in facturas"
-                              :key="factura.id"
-                              class="dropdown-item"
-                              @click="viewFactura(factura.id)"
-                            >
-                              {{ factura.nombre_documento }}
-                            </li>
-                            <!-- Factura -->
-                            <button
-                              v-if="hasPermission('listar_usuarios')"
-                              data-bs-toggle="modal"
-                              data-bs-target="#exampleModal3"
-                              class="dropdown-item"
-                              @click="cargarFactura(documento.id)"
-                            >
-                              Cargar
-                            </button>
-
-                            <!-- Recibo -->
-                            <label v-if="hasPermission('listar_usuarios')" :for="`upload-pdf-${documento.id}`" class="dropdown-item">
-                              Cargar
-                              <input
-                                :id="`upload-pdf-${documento.id}`"
-                                type="file"
-                                accept="application/pdf"
-                                @change="handleFileUpload($event, documento.id, legajo.id)"
-                                hidden
-                              />
-                            </label>
-                          
+                          <li
+                            v-for="factura in facturas"
+                            :key="factura.id"
+                            class="dropdown-item"
+                            @click="viewFactura(factura.id)"
+                          >
+                            {{ factura.nombre_documento }}
+                          </li>
+                          <button
+                            v-if="hasPermission('listar_usuarios')"
+                            data-bs-toggle="modal"
+                            data-bs-target="#exampleModal3"
+                            class="dropdown-item"
+                            @click="cargarFactura(documento.id)"
+                          >
+                            Subir factura
+                          </button>
+                          <!-- NO AGREGUES NINGÚN LABEL DE CARGAR AQUÍ -->
                         </template>
                         <template v-if="documento.nombre === 'Recibo'">
                           <li

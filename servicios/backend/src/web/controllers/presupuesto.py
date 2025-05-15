@@ -39,6 +39,10 @@ def generar_presupuesto(id_legajo):
         servicioPresupuesto.crear_presupuesto_con_stans(data)
     except TypeError:
         return jsonify({"message": "Uno de los STANs seleccionados no tiene precio en dólares, cárguele el precio e intente nuevamente"}), 400
+    except Exception as e:
+        # Esto te mostrará el error real en el frontend y en consola
+        print("ERROR inesperado:", e)
+        return jsonify({"message": f"Error inesperado: {str(e)}"}), 400
     return jsonify({"message": "Presupuesto en dólares creado correctamente"}), 200
 
 @bp.post("/crear_pesos/<int:id_legajo>")
@@ -143,35 +147,6 @@ def ver_legajo(id_legajo):
     # Enviar el archivo
     return send_from_directory(directory, archivo_mas_reciente)
 
-#@bp.get("/ver_documento_firmado/<int:id_legajo>")
-#@jwt_required()
-#def ver_presupuesto_firmado(id_legajo):
-#    if not check_permission("ver_presupuesto_firmado"):
-#        return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
-#    directory = os.path.normpath(os.path.join(UPLOAD_FOLDER, "presupuestos_firmados", str(id_legajo)))
-
-    # Verifica si el directorio existe
-#    if not os.path.exists(directory) or not os.path.isdir(directory):
-#        print("El directorio no existe")
-#        abort(404, description="El documento no existe, prueba generar uno primero")
-
-    # Filtra los archivos que coinciden con el formato de nombre
-#    archivos = [f for f in os.listdir(directory) if f.startswith("presupuesto_") and f.endswith(".pdf")]
-
-    # Si no hay archivos que coincidan
-#    if not archivos:
-#        print("No hay archivos de presupuesto")
-#        abort(404, description="No se encontraron documentos de presupuesto para este legajo")
-
-    # Encuentra el archivo más reciente basado en el timestamp
-#    archivos.sort(reverse=True)  # Ordenar por nombre en orden descendente (timestamps más recientes primero)
-#    archivo_mas_reciente = archivos[0]
-
-    # Ruta completa al archivo
- #   file_path = os.path.join(directory, archivo_mas_reciente)
-
-    # Enviar el archivo
-#    return send_from_directory(directory, archivo_mas_reciente)
 
 def permitir_pdf(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in {"pdf"}
@@ -301,3 +276,14 @@ def eliminar_presupuesto_firmado(id_presupuesto):
     except Exception as e:
         print(f"Error al eliminar el presupuesto: {e}")
         return jsonify({"Error": "No se pudo eliminar el presupuesto"}), 500
+    
+@bp.get("/ver_documento/<int:id_legajo>/<nombre_archivo>")
+@jwt_required()
+def ver_presupuesto_especifico(id_legajo, nombre_archivo):
+    if not check_permission("ver_presupuesto"):
+        return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
+    directory = os.path.normpath(os.path.join(UPLOAD_FOLDER, "presupuestos", str(id_legajo)))
+    file_path = os.path.join(directory, nombre_archivo)
+    if not os.path.exists(file_path):
+        abort(404, description="El documento solicitado no existe")
+    return send_from_directory(directory, nombre_archivo)

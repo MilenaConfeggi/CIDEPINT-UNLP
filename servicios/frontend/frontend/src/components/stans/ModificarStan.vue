@@ -22,6 +22,11 @@
         <label for="precio_dolares" class="block text-gray-700 text-sm font-bold mb-2">Precio en Dólares:</label>
         <input type="number" id="precio_dolares" v-model="stan.precio_dolares" min="0" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
       </div>
+      <!-- ...dentro del <form>... -->
+      <div class="mb-4">
+        <label for="rack" class="block text-gray-700 text-sm font-bold mb-2">Rack:</label>
+        <input type="number" id="rack" v-model="stan.rack" min="0" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+      </div>
       <div class="flex items-center justify-between">
         <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Modificar Stan</button>
       </div>
@@ -44,6 +49,7 @@ const stan = ref({
   precio_pesos: null,
   precio_dolares: null,
   precio_por_muestra: true,
+  rack: null, // <-- nuevo campo
 });
 
 const error = ref(null);

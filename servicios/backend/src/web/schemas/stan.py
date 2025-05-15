@@ -10,6 +10,7 @@ class StanSchema(Schema):
     precio_pesos = fields.Float(required=False)
     precio_dolares = fields.Float(required=False)
     precio_por_muestra = fields.Bool(required=True)
+    rack = fields.Int(required=False)  
     ensayos = fields.List(fields.Nested(EnsayoSchema))
 
 stanSchema = StanSchema()

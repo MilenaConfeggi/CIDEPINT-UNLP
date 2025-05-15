@@ -15,18 +15,42 @@
             {{ stan.numero }} - {{ stan.descripcion }}
           </label>
           <div v-if="seleccionados.includes(stan.id)" class="quantity-input">
-            <div v-if="stan.precio_por_muestra">
-              Cantidad de muestras:
-            </div>
-            <div v-else>
-              Cantidad de horas:
-            </div>
-            <input
-              v-model="cantidadSeleccionada[stan.id]"
-              type="number"
-              min="1"
-              placeholder="Cantidad"
-            />
+            <template v-if="stan.rack !== null && stan.rack !== undefined">
+              <div>
+                Cantidad de horas:
+                <input
+                  v-model.number="horasSeleccionadas[stan.id]"
+                  type="number"
+                  min="1"
+                  placeholder="Horas"
+                  style="width: 70px; margin-left: 5px;"
+                />
+              </div>
+              <div>
+                Cantidad de muestras:
+                <input
+                  v-model.number="muestrasSeleccionadas[stan.id]"
+                  type="number"
+                  min="1"
+                  placeholder="Muestras"
+                  style="width: 70px; margin-left: 5px;"
+                />
+              </div>
+            </template>
+            <template v-else>
+              <div v-if="stan.precio_por_muestra">
+                Cantidad de muestras:
+              </div>
+              <div v-else>
+                Cantidad de horas:
+              </div>
+              <input
+                v-model.number="cantidadSeleccionada[stan.id]"
+                type="number"
+                min="1"
+                placeholder="Cantidad"
+              />
+            </template>
           </div>
         </div>
       </div>
@@ -64,6 +88,8 @@ const selectedStan = ref(null);
 const authStore = useAuthStore();
 const seleccionados = ref([]);
 const cantidadSeleccionada = ref({});
+const horasSeleccionadas = ref({});
+const muestrasSeleccionadas = ref({});
 const archivo = ref(null);
 
 const route = useRoute();
@@ -102,27 +128,38 @@ const handleFileUpload = (event) => {
 };
 
 const enviarSeleccion = async () => {
-  submitError.value = null; // Limpia errores previos
-  successMessage.value = null; // Limpia mensajes previos
+  submitError.value = null;
+  successMessage.value = null;
 
-  // Validar que se haya seleccionado al menos un stan
   if (seleccionados.value.length === 0) {
     submitError.value = 'Debes seleccionar al menos un stan.';
     return;
   }
 
-  // Crear un arreglo con los datos a enviar: id y cantidad
-  const datosSeleccionados = seleccionados.value.map((id) => ({
-    id,
-    cantidad: cantidadSeleccionada.value[id] || 0, // Usar 0 si no se ingresó cantidad
-  }));
+  // Construir el array de seleccionados según si tiene rack o no
+  const datosSeleccionados = seleccionados.value.map((id) => {
+    const stan = stans.value.find(s => s.id === id);
+    if (stan.rack !== null && stan.rack !== undefined) {
+      return {
+        id,
+        horas: horasSeleccionadas.value[id] || 0,
+        muestras: muestrasSeleccionadas.value[id] || 0,
+      };
+    } else {
+      return {
+        id,
+        cantidad: cantidadSeleccionada.value[id] || 0,
+      };
+    }
+  });
 
-  // Validar que todas las cantidades sean mayores a 0
-  const cantidadesInvalidas = datosSeleccionados.some(
-    (item) => item.cantidad <= 0
-  );
+  // Validar cantidades
+  const cantidadesInvalidas = datosSeleccionados.some(item => {
+    if ('cantidad' in item) return item.cantidad <= 0;
+    return item.horas <= 0 || item.muestras <= 0;
+  });
   if (cantidadesInvalidas) {
-    submitError.value = 'Todos los stans seleccionados deben tener una cantidad mayor a 0.';
+    submitError.value = 'Todos los stans seleccionados deben tener cantidades mayores a 0.';
     return;
   }
 
@@ -150,7 +187,7 @@ const enviarSeleccion = async () => {
       toast.success(result.message);
       setTimeout(() => {
         router.push({ path: `/legajos/${idLegajo}` });
-      }, 1500); // 1500 milisegundos = 1,5 segundos
+      }, 1500);
     } else {
       // Generar el presupuesto automáticamente
       toast.info("Generando presupuesto...");
@@ -173,7 +210,7 @@ const enviarSeleccion = async () => {
         toast.success(result.message);
         setTimeout(() => {
           router.push({ path: `/legajos/${idLegajo}` });
-        }, 1500); // 1500 milisegundos = 1,5 segundos
+        }, 1500);
       }
     }
   } catch (err) {

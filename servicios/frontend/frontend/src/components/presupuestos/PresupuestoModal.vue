@@ -160,10 +160,27 @@ const cargarPresupuestosFirmados = async () => {
   presupuestosFirmados.value = await presupuestoStore.fetchPresupuestosFirmados(props.legajoId);
 };
 
-const abrirArchivo = (archivo, tipo) => {
-  const baseUrl = `${import.meta.env.VITE_API_URL}/presupuestos/ver_documento/${props.legajoId}`;
-  const url = `${baseUrl}/${archivo}`;
-  window.open(url, '_blank');
+const abrirArchivo = async (archivo, tipo) => {
+  const nombreArchivo = typeof archivo === 'string' ? archivo : archivo.nombre_documento;
+  const url = `${import.meta.env.VITE_API_URL}/presupuestos/ver_documento/${props.legajoId}/${nombreArchivo}`;
+  const token = localStorage.getItem('token'); // O usa tu método para obtener el token
+
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    if (!response.ok) {
+      throw new Error('No se pudo descargar el archivo');
+    }
+    const blob = await response.blob();
+    const blobUrl = window.URL.createObjectURL(blob);
+    window.open(blobUrl, '_blank');
+  } catch (error) {
+    toast.error('No se pudo abrir el archivo.');
+  }
 };
 const obtenerIdPresupuestoDesdeArchivo = async (archivo, legajoId) => {
   try {

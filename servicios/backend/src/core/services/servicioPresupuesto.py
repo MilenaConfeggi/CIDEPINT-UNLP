@@ -20,7 +20,7 @@ from servicios.backend.src.core.services import servicioDocumento
 from models.documentos.documento import Documento
 from sqlalchemy import desc
 import locale
-
+from math import ceil
 
 locale.setlocale(locale.LC_TIME, 'es_ES.utf8')
 UPLOAD_FOLDER = os.path.abspath("documentos")
@@ -256,7 +256,7 @@ class NumberedCanvas(canvas.Canvas):
         self.restoreState()
 
 def generar_presupuesto(data):
-    # Completar con los datos necesarios
+    print("DATA RECIBIDA:", data)
     legajo = Legajo.query.filter_by(id=data.get('legajo')).first()
     medioDePago = MedioPago.query.filter_by(id=data.get('medioDePago')).first()
     presupuesto = data.get('presupuesto')
@@ -265,13 +265,30 @@ def generar_presupuesto(data):
     estans = []
     estans_presu = []
     cantidades = []
+    horas_list = []
+    muestras_list = []
+
     for dupla in data.get('seleccionados'):
         estan = STAN.query.filter_by(id=dupla.get('id')).first()
-        estan_presu = PresupuestoStan.query.filter_by(stan_id=estan.id, presupuesto_id = presupuesto.id).first()
-        precio += estan_presu.precio_carga * dupla.get('cantidad')
+        estan_presu = PresupuestoStan.query.filter_by(stan_id=estan.id, presupuesto_id=presupuesto.id).first()
+        if not estan_presu or estan_presu.precio_carga is None:
+            raise TypeError(f"El STAN {estan.id} no tiene precio en dólares asignado en el presupuesto.")
+        cantidad = None
+        if estan.rack is not None:
+            horas = int(dupla.get('horas', 1))
+            muestras = int(dupla.get('muestras', 1))
+            cantidad = horas * ceil(muestras / estan.rack)
+        else:
+            cantidad = int(dupla.get('cantidad', 1))
+        precio_stan = estan_presu.precio_carga * cantidad
+        # ... resto igual ...
+
+        precio += precio_stan
         estans.append(estan)
         estans_presu.append(estan_presu)
-        cantidades.append(dupla.get('cantidad'))
+        cantidades.append(cantidad)
+        horas_list.append(horas)
+        muestras_list.append(muestras)
 
     # Crear la ruta de destino
     certificado_dir = os.path.join(UPLOAD_FOLDER, "presupuestos", str(legajo.id))
@@ -369,15 +386,24 @@ def generar_presupuesto(data):
 
     # Ensayos
     total_costo = 0
-    i=0
+    i = 0
     for stan in estans:
-        if estans[i].precio_por_muestra:
-            content.append(Paragraph(f"• {estans[i].numero} de {cantidades[i]} muestras", normal_style))
+        if stan.rack is not None:
+            # Mostrar la cantidad de horas y muestras reales
+            content.append(Paragraph(
+                f"• {stan.numero}: {horas_list[i]} horas",
+                normal_style
+            ))
+        elif estans[i].precio_por_muestra:
+            content.append(Paragraph(f"• {stan.numero} de {cantidades[i]} muestras", normal_style))
         else:
-            content.append(Paragraph(f"• {estans[i].numero} por {cantidades[i]} horas", normal_style))
-        content.append(Paragraph(f"<b>Costo: U$S {round(estans_presu[i].precio_carga * cantidades[i],2)}</b>", normal_style))
+            content.append(Paragraph(f"• {stan.numero} por {cantidades[i]} horas", normal_style))
+        content.append(Paragraph(
+            f"<b>Costo: U$S {round(estans_presu[i].precio_carga * cantidades[i],2)}</b>",
+            normal_style
+        ))
         content.append(Spacer(1, 6))
-        i+=1
+        i += 1
 
     content.append(Spacer(1, 12))
     content.append(Paragraph(f"<b>Costo final del ensayo............................U$S {precio:.2f}.-</b>", bold_style))
@@ -450,13 +476,25 @@ def generar_presupuesto_en_pesos(data):
     estans = []
     estans_presu = []
     cantidades = []
+    horas_list = []
+    muestras_list = []
     for dupla in data.get('seleccionados'):
         estan = STAN.query.filter_by(id=dupla.get('id')).first()
-        estan_presu = PresupuestoStan.query.filter_by(stan_id=estan.id, presupuesto_id = presupuesto.id).first()
-        precio += estan_presu.precio_carga * dupla.get('cantidad')
+        estan_presu = PresupuestoStan.query.filter_by(stan_id=estan.id, presupuesto_id=presupuesto.id).first()
+        if estan.rack is not None:
+            horas = int(dupla.get('horas', 1))
+            muestras = int(dupla.get('muestras', 1))
+            cantidad = horas * ceil(muestras / estan.rack)
+        else:
+            horas = None
+            muestras = None
+            cantidad = int(dupla.get('cantidad', 1))
+        precio += estan_presu.precio_carga * cantidad
         estans.append(estan)
         estans_presu.append(estan_presu)
-        cantidades.append(dupla.get('cantidad'))
+        cantidades.append(cantidad)
+        horas_list.append(horas)
+        muestras_list.append(muestras)
 
     # Crear la ruta de destino
     certificado_dir = os.path.join(UPLOAD_FOLDER, "presupuestos", str(legajo.id))
@@ -555,15 +593,23 @@ def generar_presupuesto_en_pesos(data):
 
     # Ensayos
     total_costo = 0
-    i=0
+    i = 0
     for stan in estans:
-        if estans[i].precio_por_muestra:
-            content.append(Paragraph(f"• {estans[i].numero} de {cantidades[i]} muestras", normal_style))
+        if stan.rack is not None:
+            content.append(Paragraph(
+                f"• {stan.numero}: {horas_list[i]} horas",
+                normal_style
+            ))
+        elif estans[i].precio_por_muestra:
+            content.append(Paragraph(f"• {stan.numero} de {cantidades[i]} muestras", normal_style))
         else:
-            content.append(Paragraph(f"• {estans[i].numero} por {cantidades[i]} horas", normal_style))
-        content.append(Paragraph(f"<b>Costo: $ {round(estans_presu[i].precio_carga * cantidades[i],2)}</b>", normal_style))
+            content.append(Paragraph(f"• {stan.numero} por {cantidades[i]} horas", normal_style))
+        content.append(Paragraph(
+            f"<b>Costo: $ {round(estans_presu[i].precio_carga * cantidades[i],2)}</b>",
+            normal_style
+        ))
         content.append(Spacer(1, 6))
-        i+=1
+        i += 1
 
     content.append(Spacer(1, 12))
     content.append(Paragraph(f"<b>Costo final del ensayo............................$ {precio:.2f}.-</b>", bold_style))
@@ -635,8 +681,10 @@ def crear_stan(data):
         precio_pesos=data.get('precio_pesos'),
         precio_dolares=data.get('precio_dolares'),
         precio_por_muestra=data.get('precio_por_muestra'),
-        descripcion=data.get('descripcion')
+        descripcion=data.get('descripcion'),
+        rack=data.get('rack')  # <-- AGREGAR ESTA LÍNEA
     )
+    # ...resto igual...
 
     if validar_numero_stan(stan.numero) == False:
         return None
@@ -703,6 +751,7 @@ def modificar_precio_stan(id_stan, data):
     stan = STAN.query.get(id_stan)
     stan.precio_pesos = data.get('precio_pesos')
     stan.precio_dolares = data.get('precio_dolares')
+    stan.rack = data.get('rack')  # <-- AGREGAR ESTA LÍNEA
     db.session.commit()
 
 def crear_presupuesto(data):
@@ -743,15 +792,25 @@ def crear_presupuesto_con_stans(data):
     db.session.add(presupuesto)
     db.session.flush()
 
-    acu=0
+    acu = 0
     for dupla in data.get('seleccionados'):
-        aux = buscar_stan(dupla.get('id')).precio_dolares
+        stan = buscar_stan(dupla.get('id'))
+        aux = stan.precio_dolares
+
+        # Si el STAN tiene rack, usar horas y muestras
+        if stan.rack is not None:
+            horas = dupla.get('horas', 1)
+            muestras = dupla.get('muestras', 1)
+            cantidad = horas * ceil(muestras / stan.rack)
+        else:
+            cantidad = dupla.get('cantidad', 1)
+
         presupuesto_stan = PresupuestoStan(
             presupuesto_id=presupuesto.id,
             stan_id=dupla.get('id'),
-            precio_carga = aux,
+            precio_carga=aux,
         )
-        acu += aux * dupla.get('cantidad')
+        acu += aux * cantidad
         db.session.add(presupuesto_stan)
     presupuesto.precio = acu
     db.session.commit()
@@ -769,22 +828,30 @@ def crear_presupuesto_con_stans_en_pesos(data):
     db.session.add(presupuesto)
     db.session.flush()
 
-    acu=0
+    acu = 0
     for dupla in data.get('seleccionados'):
-        aux = buscar_stan(dupla.get('id')).precio_pesos
+        stan = buscar_stan(dupla.get('id'))
+        aux = stan.precio_pesos
+
+        if stan.rack is not None:
+            horas = dupla.get('horas', 1)
+            muestras = dupla.get('muestras', 1)
+            cantidad = horas * ceil(muestras / stan.rack)
+        else:
+            cantidad = dupla.get('cantidad', 1)
+
         presupuesto_stan = PresupuestoStan(
             presupuesto_id=presupuesto.id,
             stan_id=dupla.get('id'),
-            precio_carga = aux,
+            precio_carga=aux,
         )
-        acu += aux * dupla.get('cantidad')
+        acu += aux * cantidad
         db.session.add(presupuesto_stan)
     presupuesto.precio = acu
     db.session.commit()
     data['presupuesto'] = presupuesto
     generar_presupuesto_en_pesos(data)
     return presupuesto
-
 def crear_presupuestont_con_stans(data):
     legajo = buscar_legajo(data.get('legajo'))
     presupuesto = Presupuesto(

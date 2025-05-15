@@ -27,6 +27,11 @@
         <label for="ensayos" class="block text-gray-700 text-sm font-bold mb-2">Ensayos Asociados:</label>
         <input type="text" id="ensayos" v-model="ensayos" placeholder="Ingrese nombres de ensayo separados por comas" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ensayos-input">
       </div>
+      <!-- ...dentro del <form>... -->
+      <div class="mb-4">
+        <label for="rack" class="block text-gray-700 text-sm font-bold mb-2">Rack:</label>
+        <input type="number" id="rack" v-model="stan.rack" min="0" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+      </div>
       <div v-if="error" class="alert alert-danger mb-4" role="alert">
         {{ error }}
       </div>
@@ -48,6 +53,7 @@ const stan = ref({
   precio_pesos: null,
   precio_dolares: null,
   precio_por_muestra: true,
+  rack: null, // <-- nuevo campo
 });
 
 const ensayos = ref('');

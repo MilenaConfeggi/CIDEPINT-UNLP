@@ -24,8 +24,6 @@ def allowed_file(filename):
 def cargar_documentacion(id_legajo):
     print(id_legajo)
     if(servicioInforme.buscar_documentacion_por_legajo(id_legajo)):
-        servicioInforme.eliminar_documentacion_anterior(id_legajo)
-        servicioInforme.eliminar_informe_anterior(id_legajo)
         mensaje = "Se ha eliminado la documentación anterior e informes en caso de que los hubiera"
     else:
         mensaje = " "

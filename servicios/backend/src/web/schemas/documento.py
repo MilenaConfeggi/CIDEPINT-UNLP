@@ -17,6 +17,7 @@ class LDSchema(Schema):
     documento_id = fields.Integer(allow_none=True)
     estado_id = fields.Integer(dump_only=True)
     estado = fields.Nested(EstadoSchema, dump_only=True)
+    area_id = fields.Integer(attribute="area_id", dump_only=True)
     area = fields.Nested(AreaSchema, dump_only=True)
     presupuesto_cidepint = fields.List(fields.Nested(PresupuestoSchema, dump_only=True, allow_none=True))
 

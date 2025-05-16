@@ -168,9 +168,10 @@ const enviarSeleccion = async () => {
 
   try {
     if (archivo.value) {
-      // Subir el PDF
       const formData = new FormData();
       formData.append('archivo', archivo.value);
+      formData.append('seleccionados', JSON.stringify(datosSeleccionados));
+      // Si necesitas enviar más datos, agrégalos aquí
       const response = await fetch(`${import.meta.env.VITE_API_URL}/presupuestos/subir_presupuesto/${idLegajo}`, {
         method: 'POST',
         headers: {

@@ -825,17 +825,20 @@ def crear_presupuesto_con_stans(data):
 def crear_presupuesto_con_stans_en_pesos(data):
     legajo = buscar_legajo(data.get('legajo'))
     presupuesto = Presupuesto(
-        precio=-1,
+        precio=-1,  # Se actualiza después
         legajo=legajo,
-        #medio_de_pago_id=data.get('medioDePago'),
     )
     db.session.add(presupuesto)
     db.session.flush()
 
-    acu = 0
+    acu_dolares = 0
     for dupla in data.get('seleccionados'):
         stan = buscar_stan(dupla.get('id'))
-        aux = stan.precio_pesos
+        aux_pesos = stan.precio_pesos
+        aux_dolares = stan.precio_dolares
+
+        if aux_pesos is None:
+            raise ValueError(f"El STAN {stan.numero} no tiene precio en pesos asignado.")
 
         if stan.rack is not None:
             horas = dupla.get('horas', 1)
@@ -847,15 +850,16 @@ def crear_presupuesto_con_stans_en_pesos(data):
         presupuesto_stan = PresupuestoStan(
             presupuesto_id=presupuesto.id,
             stan_id=dupla.get('id'),
-            precio_carga=aux,
+            precio_carga=aux_pesos,  # Para el PDF, sigue usando pesos
         )
-        acu += aux * cantidad
+        acu_dolares += (aux_dolares or 0) * cantidad
         db.session.add(presupuesto_stan)
-    presupuesto.precio = acu
+    presupuesto.precio = acu_dolares  # Guardar en dólares
     db.session.commit()
     data['presupuesto'] = presupuesto
     generar_presupuesto_en_pesos(data)
     return presupuesto
+
 def crear_presupuestont_con_stans(data):
     legajo = buscar_legajo(data.get('legajo'))
     presupuesto = Presupuesto(

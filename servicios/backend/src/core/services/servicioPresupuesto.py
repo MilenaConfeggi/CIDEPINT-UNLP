@@ -22,7 +22,7 @@ from sqlalchemy import desc
 import locale
 from math import ceil
 
-locale.setlocale(locale.LC_TIME, 'es_ES.utf8')
+locale.setlocale(locale.LC_TIME, 'es_AR.utf8')
 UPLOAD_FOLDER = os.path.abspath("documentos")
 
 def generar_documento_de_legajo(id_legajo):
@@ -858,7 +858,7 @@ def crear_presupuesto_con_stans_en_pesos(data):
     return presupuesto
 def crear_presupuestont_con_stans(data):
     legajo = buscar_legajo(data.get('legajo'))
-    presupuesto = Presupuesto(
+	presupuesto = Presupuesto(
         precio=-1,
         legajo=legajo,
         #medio_de_pago_id=data.get('medioDePago'),

@@ -966,3 +966,4 @@ def eliminar_presupuesto(id_documento):
     # Confirmar los cambios
     db.session.commit()
     print("Presupuesto, relaciones y documento eliminados correctamente.")
+

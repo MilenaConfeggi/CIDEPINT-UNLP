@@ -11,7 +11,7 @@ import os
 from werkzeug.utils import secure_filename
 from datetime import datetime
 from marshmallow.exceptions import ValidationError
-
+import json
 UPLOAD_FOLDER = os.path.abspath("documentos")
 
 ALLOWED_EXTENSIONS = {'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'}
@@ -211,8 +211,25 @@ def subir_presupuesto(id_legajo):
 
     if not permitir_pdf(archivo.filename):
         return jsonify({"error": "Tipo de archivo no permitido. Solo se permiten archivos PDF."}), 400
-    
+
+    # Obtener los datos de los STANs seleccionados
+    seleccionados_json = request.form.get('seleccionados')
+    if not seleccionados_json:
+        return jsonify({"error": "Faltan los datos de los STANs seleccionados"}), 400
+
     try:
+        seleccionados = json.loads(seleccionados_json)
+    except Exception:
+        return jsonify({"error": "Error al procesar los datos de los STANs seleccionados"}), 400
+
+    try:
+        # Crear el presupuesto y asociar los STANs (en pesos, puedes adaptar para dólares si es necesario)
+        data = {
+            'legajo': id_legajo,
+            'seleccionados': seleccionados
+        }
+        servicioPresupuesto.crear_presupuesto_con_stans(data)
+
         folder_path = os.path.join(UPLOAD_FOLDER, "presupuestos", str(id_legajo))
         os.makedirs(folder_path, exist_ok=True)
 
@@ -228,7 +245,7 @@ def subir_presupuesto(id_legajo):
             'tipo_id': 2
         }
         servicioDocumento.crear_documento(doc_data)
-        return jsonify({"message": "Presupuesto subido con éxito"}), 200
+        return jsonify({"message": "Presupuesto subido y registrado con éxito"}), 200
     except Exception as e:
         print(e)  # Imprime el error para depuración
         return jsonify({"message": "Ha ocurrido un error inesperado"}), 500

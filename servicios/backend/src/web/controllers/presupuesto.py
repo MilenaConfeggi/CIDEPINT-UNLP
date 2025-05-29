@@ -36,7 +36,7 @@ def generar_presupuesto(id_legajo):
     data = request.get_json()
     data['legajo'] = id_legajo
     try:
-        servicioPresupuesto.crear_presupuesto_con_stans(data)
+        servicioPresupuesto.crear_presupuesto_con_stans(data, es_subido=False)
     except TypeError:
         return jsonify({"message": "Uno de los STANs seleccionados no tiene precio en dólares, cárguele el precio e intente nuevamente"}), 400
     except Exception as e:
@@ -214,6 +214,7 @@ def subir_presupuesto(id_legajo):
 
     # Obtener los datos de los STANs seleccionados
     seleccionados_json = request.form.get('seleccionados')
+    nro_presupuesto = request.form.get('nro_presupuesto')
     if not seleccionados_json:
         return jsonify({"error": "Faltan los datos de los STANs seleccionados"}), 400
 
@@ -226,9 +227,10 @@ def subir_presupuesto(id_legajo):
         # Crear el presupuesto y asociar los STANs (en pesos, puedes adaptar para dólares si es necesario)
         data = {
             'legajo': id_legajo,
-            'seleccionados': seleccionados
+            'seleccionados': seleccionados,
+            'nro_presupuesto': nro_presupuesto
         }
-        servicioPresupuesto.crear_presupuesto_con_stans(data)
+        servicioPresupuesto.crear_presupuesto_con_stans(data, es_subido=True)
 
         folder_path = os.path.join(UPLOAD_FOLDER, "presupuestos", str(id_legajo))
         os.makedirs(folder_path, exist_ok=True)

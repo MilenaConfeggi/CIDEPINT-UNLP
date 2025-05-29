@@ -2,6 +2,17 @@
   <div>
     <h3>Selecciona los Stans</h3>
     <form @submit.prevent="enviarSeleccion">
+      <div class="form-group">
+        <label for="nro">Nro de Presupuesto:</label>
+        <input
+          type="text"
+          id="nro_presupuesto"
+          v-model="nro_presupuesto"
+          required
+          class="form-control"
+          placeholder="Ingrese el número de presupuesto"
+        />
+      </div>
       <div class="checkbox-grid">
         <div v-for="stan in stans" :key="stan.id" class="checkbox-item">
           <input
@@ -91,6 +102,7 @@ const cantidadSeleccionada = ref({});
 const horasSeleccionadas = ref({});
 const muestrasSeleccionadas = ref({});
 const archivo = ref(null);
+const nro_presupuesto = ref('');
 
 const route = useRoute();
 const router = useRouter();
@@ -130,6 +142,11 @@ const handleFileUpload = (event) => {
 const enviarSeleccion = async () => {
   submitError.value = null;
   successMessage.value = null;
+
+  if (!nro_presupuesto.value) {
+    submitError.value = 'Debe ingresar el número de presupuesto.';
+    return;
+  }
 
   if (seleccionados.value.length === 0) {
     submitError.value = 'Debes seleccionar al menos un stan.';
@@ -171,6 +188,8 @@ const enviarSeleccion = async () => {
       // Subir el PDF
       const formData = new FormData();
       formData.append('archivo', archivo.value);
+      formData.append('seleccionados', JSON.stringify(datosSeleccionados));
+      formData.append('nro_presupuesto', nro_presupuesto.value); // Enviar nro de presupuesto
       const response = await fetch(`${import.meta.env.VITE_API_URL}/presupuestos/subir_presupuesto/${idLegajo}`, {
         method: 'POST',
         headers: {
@@ -200,6 +219,7 @@ const enviarSeleccion = async () => {
         body: JSON.stringify({
           seleccionados: datosSeleccionados,
           legajo: idLegajo,
+          nro_presupuesto: nro_presupuesto.value, // Enviar nro de presupuesto
         }),
       });
 

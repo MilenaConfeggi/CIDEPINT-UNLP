@@ -41,7 +41,11 @@ def generar_certificado(id_legajo, empleados, descripcion):
     ensayo_texto = ", ".join(ensayos)
 
     # Obtener el número de factura
-    factura = legajo.nro_factura if legajo.nro_factura else ""
+    if legajo.nro_factura:
+        facturas = list({f.strip() for f in legajo.nro_factura.split(",") if f.strip()})
+        factura = ", ".join(sorted(facturas))
+    else:
+        factura = ""
 
     # Crear la ruta de destino
     certificado_dir = os.path.join(UPLOAD_FOLDER, "certificados", str(id_legajo))

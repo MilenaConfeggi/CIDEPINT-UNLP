@@ -74,7 +74,7 @@ export default {
   },
   methods: {
     handleFileUpload(event) {
-    const maxFileSize = 50 * 1024 * 1024; // 50 MB
+    const maxFileSize =  4 * 1024 * 1024 * 1024; // 4gb
     const newFiles = Array.from(event.target.files);
 
     this.files = [];
@@ -82,7 +82,7 @@ export default {
 
     newFiles.forEach(file => {
       if (file.size > maxFileSize) {
-        this.error = `El archivo ${file.name} excede el tamaño máximo permitido de 50 MB.`;
+        this.error = `El archivo ${file.name} excede el tamaño máximo permitido de 4gb.`;
       } else {
         this.files.push(file);
         this.fileNames.push(file.name);

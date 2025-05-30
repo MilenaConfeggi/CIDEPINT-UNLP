@@ -7,6 +7,8 @@ bp = Blueprint('auth', __name__, url_prefix='/auth')
 @bp.post("/authenticate")
 def authenticate():
     try:
+        #print("ASDSADSADASDAS")
+        #return jsonify({"message": "So vo crack"}), 400
         # Extraer correo y contraseña del request
         mail = request.json.get("mail")
         password = request.json.get("password")

@@ -22,7 +22,7 @@ from sqlalchemy import desc
 import locale
 from math import ceil
 
-locale.setlocale(locale.LC_TIME, 'es_ES.utf8')
+locale.setlocale(locale.LC_TIME, 'es_AR.utf8')
 UPLOAD_FOLDER = os.path.abspath("documentos")
 
 def generar_documento_de_legajo(id_legajo):
@@ -973,3 +973,4 @@ def eliminar_presupuesto(id_documento):
     # Confirmar los cambios
     db.session.commit()
     print("Presupuesto, relaciones y documento eliminados correctamente.")
+

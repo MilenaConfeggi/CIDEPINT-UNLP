@@ -33,7 +33,6 @@ from servicios.backend.src.web.controllers.frontend_routes import frontend_bp
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
-
 bcrypt = Bcrypt()
 
 
@@ -46,7 +45,7 @@ def create_app(env="development", static_folder=""):
     db.init_app(app)
     bcrypt.init_app(app)
     JWTManager(app)
-    CORS(app)
+    CORS(app, resources={r"/*": {"origins": "https://servicios.cidepint.com"}})
     @app.route("/")
     def home():
         return "SLAY"

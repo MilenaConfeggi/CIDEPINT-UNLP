@@ -41,11 +41,15 @@ def create_app(env="development", static_folder=""):
     app.config.from_object(config[env])
     app.config["JWT_TOKEN_LOCATION"] = ["headers"]
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = 6 * 3600 #El token de autenticación caducará en 6 horas
+    app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024  # 16 MB
     app.url_map.strict_slashes = False
     db.init_app(app)
     bcrypt.init_app(app)
     JWTManager(app)
-    CORS(app, resources={r"/*": {"origins": "https://servicios.cidepint.com"}})
+    CORS(app, origins=[
+        "https://servicios.cidepint.com",  # producción
+        "http://localhost:5173",           # desarrollo
+        ], supports_credentials=True)
     @app.route("/")
     def home():
         return "SLAY"

@@ -28,7 +28,9 @@
               >
                 Terminar
               </button>
-              <button @click="confirmarEliminarMuestra(muestra.id)" class="btn btn-icon">
+              <button 
+                v-if="tienePermisoTerminar"
+                @click="confirmarEliminarMuestra(muestra.id)" class="btn btn-icon">
                 <i class="fas fa-trash-alt text-danger"></i>
               </button>
             </div>

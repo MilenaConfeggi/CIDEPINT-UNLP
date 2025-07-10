@@ -109,6 +109,7 @@ def cargar_fotos(legajo_id):
                 'nombre_archivo': filename,
                 'fecha': fecha,
                 'legajo_id': legajo_id,  # Añadir legajo_id
+                'descripcion': request.form.get('descripcion', ''),  # Descripción opcional
                 'muestra_id': None  # No se relaciona con una muestra
             }
             try:
@@ -145,7 +146,6 @@ def obtener_imagen(id_legajo, filename):
 @jwt_required()
 def listar_fotos_por_legajo(id_legajo):
     fotos = servicioMuestras.listar_fotos_por_legajo(id_legajo)
-    print(fotos)
     data = fotosSchema.dump(fotos, many=True)
     return jsonify(data), 200
 

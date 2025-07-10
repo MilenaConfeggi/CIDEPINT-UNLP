@@ -16,6 +16,7 @@ class FotoSchema(Schema):
     id = fields.Int(dump_only=True)
     nombre_archivo = fields.Str(required=True)
     fecha = fields.Date(required=True)
+    descripcion = fields.Str(required=False, allow_none=True)
     legajo_id = fields.Int(required=True)  # Añadir legajo_id
     muestra_id = fields.Int(required=False, allow_none=True)  # Permitir None
     muestra = fields.Nested(MuestraSchema, dump_only=True)

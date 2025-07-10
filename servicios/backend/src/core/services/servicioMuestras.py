@@ -59,6 +59,7 @@ def crear_foto(data, muestra_id):
     nueva_foto = Foto(
         nombre_archivo=data.get('nombre_archivo'),
         fecha=data.get('fecha'),
+        descripcion=data.get('descripcion'),
         muestra_id=muestra_id
     )
     db.session.add(nueva_foto)

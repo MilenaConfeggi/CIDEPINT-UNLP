@@ -30,6 +30,10 @@
           <label for="fecha" class="form-label">Fecha:</label>
           <input id="fecha" type="date" v-model="fecha" class="form-control" required />
         </div>
+        <div class="mb-4">
+          <label for="descripcion" class="form-label">Horas:</label>
+          <input id="descripcion" type="text" v-model="descripcion" class="form-control" maxlength="255" placeholder="horas" />
+        </div>
         <div class="mb-3">
           <button type="submit" class="btn btn-success custom-button" :disabled="isUploading">Subir</button>
         </div>
@@ -68,27 +72,28 @@ export default {
       error: null,
       successMessage: null,
       fecha: null,
+      descripcion: "", // Nuevo campo
       files: [],
       fileNames: []
     };
   },
   methods: {
     handleFileUpload(event) {
-    const maxFileSize =  4 * 1024 * 1024 * 1024; // 4gb
-    const newFiles = Array.from(event.target.files);
+      const maxFileSize =  4 * 1024 * 1024 * 1024; // 4gb
+      const newFiles = Array.from(event.target.files);
 
-    this.files = [];
-    this.fileNames = [];
+      this.files = [];
+      this.fileNames = [];
 
-    newFiles.forEach(file => {
-      if (file.size > maxFileSize) {
-        this.error = `El archivo ${file.name} excede el tamaño máximo permitido de 4gb.`;
-      } else {
-        this.files.push(file);
-        this.fileNames.push(file.name);
-      }
-    });
-  },
+      newFiles.forEach(file => {
+        if (file.size > maxFileSize) {
+          this.error = `El archivo ${file.name} excede el tamaño máximo permitido de 4gb.`;
+        } else {
+          this.files.push(file);
+          this.fileNames.push(file.name);
+        }
+      });
+    },
     triggerFileInput() {
       document.getElementById('archivo').click();
     },
@@ -106,6 +111,7 @@ export default {
           formData.append('archivos', file);
         });
         formData.append('fecha', this.fecha);
+        formData.append('descripcion', this.descripcion); // Enviar descripción
 
         const response = await axios.post(
           `${import.meta.env.VITE_API_URL}/muestras/subir_fotos/${this.legajoId}`,

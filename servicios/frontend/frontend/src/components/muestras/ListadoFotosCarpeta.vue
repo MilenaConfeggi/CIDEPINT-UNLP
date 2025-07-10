@@ -30,6 +30,9 @@
           </div>
           <div class="card-body">
             <h5 class="card-title">{{ foto.nombre_archivo }}</h5>
+            <p class="card-text" v-if="foto.descripcion && foto.descripcion.trim() !== ''">
+              <strong>horas:</strong> {{ foto.descripcion }}
+            </p>
             <!-- Botón de eliminar -->
             <button class="btn-icon btn-delete" @click.stop="confirmarEliminarFoto(foto.id)">
               <i class="fas fa-trash-alt"></i>

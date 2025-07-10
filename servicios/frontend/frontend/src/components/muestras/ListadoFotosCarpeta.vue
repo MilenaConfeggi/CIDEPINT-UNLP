@@ -14,11 +14,19 @@
       <div v-for="foto in fotos" :key="foto.id" class="col-md-3 mb-4">
         <div class="card" :class="{ 'selected': seleccionadas.includes(foto.id) }" @click="toggleSeleccionar(foto.id)">
           <div class="card-img-container" @click.stop="mostrarVerFoto(foto)">
-            <img
-              :src="getImageUrl(foto.legajo_id, foto.nombre_archivo)"
-              alt="Imagen de foto"
-              class="card-img"
-            />
+            <template v-if="isPdf(foto.nombre_archivo)">
+              <div class="pdf-icon">
+                <i class="fas fa-file-pdf"></i>
+                <p>{{ foto.nombre_archivo }}</p>
+              </div>
+            </template>
+            <template v-else>
+              <img
+                :src="getImageUrl(foto.legajo_id, foto.nombre_archivo)"
+                alt="Imagen de foto"
+                class="card-img"
+              />
+            </template>
           </div>
           <div class="card-body">
             <h5 class="card-title">{{ foto.nombre_archivo }}</h5>
@@ -40,7 +48,17 @@
         <button class="close-button" @click="cerrarVerFoto">&times;</button>
         <div v-if="fotoSeleccionada">
           <div class="text-center">
-            <img :src="getImageUrl(fotoSeleccionada.legajo_id, fotoSeleccionada.nombre_archivo)" alt="Imagen de foto" class="img-fluid large-image" />
+            <img
+              v-if="!isPdf(fotoSeleccionada.nombre_archivo)"
+              :src="getImageUrl(fotoSeleccionada.legajo_id, fotoSeleccionada.nombre_archivo)"
+              alt="Imagen de foto"
+              class="img-fluid large-image"
+            />
+            <iframe
+              v-else
+              :src="getImageUrl(fotoSeleccionada.legajo_id, fotoSeleccionada.nombre_archivo)"
+              class="pdf-viewer"
+            ></iframe>
           </div>
         </div>
       </div>
@@ -205,6 +223,11 @@ export default {
       }
     };
 
+    // Detecta si el archivo es PDF
+    const isPdf = (filename) => {
+      return filename && filename.toLowerCase().endsWith('.pdf');
+    };
+
     onMounted(() => {
       fetchFotos();
     });
@@ -227,7 +250,8 @@ export default {
       confirmarEliminarFoto,
       eliminarFoto,
       tienePermisoDescargar,
-      tienePermisoEnviarMail
+      tienePermisoEnviarMail,
+      isPdf
     };
   }
 };
@@ -252,6 +276,22 @@ export default {
   max-height: 100%;
   max-width: 100%;
   object-fit: contain;
+}
+
+.pdf-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #dc3545;
+  font-size: 3rem;
+}
+
+.pdf-icon p {
+  margin-top: 10px;
+  font-size: 1rem;
+  text-align: center;
 }
 
 .card-body {
@@ -296,6 +336,12 @@ export default {
   max-width: 100%;
   height: auto;
   max-height: 80vh; 
+}
+
+.pdf-viewer {
+  width: 100%;
+  height: 80vh;
+  border: none;
 }
 
 .foto-card {

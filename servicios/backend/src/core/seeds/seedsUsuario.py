@@ -171,7 +171,7 @@ def seeds_usuarios():
         personal_7 = Empleado(
             user=usuario_6,
             email="lucas@example.com",
-            area=area_3,
+            area=area_1,
             dni="2040095",
             nombre="Lucas",
             apellido="Fernandez",

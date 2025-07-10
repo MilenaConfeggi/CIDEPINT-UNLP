@@ -1,7 +1,6 @@
 <template>
   <div>
     <button @click="mostrarFormularioCrear" class="stans-button">Crear Usuario</button>
-    <button @click="mostrarJefeArea" class="stans-button">Cambiar Jefe de Área</button>
     <ListadoUsuarios />
 
     <!-- Modal de CrearUsuario -->
@@ -24,7 +23,7 @@
 import { ref } from 'vue';
 import ListadoUsuarios from '../components/usuarios/ListadoUsuarios.vue';
 import CrearUsuario from '../components/usuarios/CrearUsuario.vue';
-import CambiarJefeArea from '../components/areas/CambiarJefeArea.vue';
+
 
 const mostrarCrearUsuario = ref(false);
 
@@ -38,13 +37,7 @@ const cerrarFormularioCrear = () => {
 
 const mostrarCambiarJefe = ref(false);
 
-const mostrarJefeArea = () => {
-  mostrarCambiarJefe.value = true;
-};
 
-const cerrarJefeArea = () => {
-  mostrarCambiarJefe.value = false;
-};
 </script>
 
 <style scoped>

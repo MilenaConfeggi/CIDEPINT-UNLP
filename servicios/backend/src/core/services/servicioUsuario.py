@@ -49,14 +49,6 @@ def crear_usuario(data):
     if Usuario.query.filter_by(mail=data.get('mail'), esta_borrado=False).first() is not None:
         raise ValueError("Ya existe un usuario con ese mail")
 
-    #verifico que no pueda haber usuarios jefes de areas en la misma área
-    if data.get('rol').nombre == "Jefe de area":
-        jefesDeAreas = Usuario.query.filter_by(rol=data.get('rol'), esta_borrado=False).all()
-        for jefe in jefesDeAreas:
-            emp = Empleado.query.filter_by(usuario_servicio_id=jefe.id).first()
-            if emp is not None and emp.area == empleado.area:
-                raise ValueError("Ya existe un jefe de area para esa área, por favor saque al jefe de área anterior para ingresar uno nuevo")
-
     usuario = Usuario.query.filter_by(mail=data.get('mail'), esta_borrado=True).first()
     if usuario is not None:
         contrasena = generar_contrasena_aleatoria()
@@ -276,3 +268,17 @@ def listar_todos_los_usuarios():
         Usuario.esta_borrado == False,
         Usuario.rol.has(Rol.nombre.notin_(["Secretaria", "Director"]))
     ).all()
+
+def cambiar_rol_usuario(id_usuario, nuevo_rol_nombre):
+    usuario = Usuario.query.get(id_usuario)
+    if usuario is None:
+        raise ValueError("No se encontró el usuario seleccionado")
+    if usuario.rol.nombre not in ["Jefe de area", "Trabajador"]:
+        raise ValueError("Solo se puede cambiar el rol de Jefe de area o Trabajador")
+    if nuevo_rol_nombre not in ["Jefe de area", "Trabajador"]:
+        raise ValueError("Rol destino inválido")
+    nuevo_rol = Rol.query.filter_by(nombre=nuevo_rol_nombre).first()
+    if not nuevo_rol:
+        raise ValueError("Rol destino no existe")
+    usuario.rol = nuevo_rol
+    db.session.commit()

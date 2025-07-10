@@ -148,3 +148,17 @@ def listar_todos_los_usuarios():
     data = usuariosConNombreSchema.dump(usuarios, many=True)
     
     return jsonify(data), 200
+
+@bp.post("/cambiar-rol")
+@jwt_required()
+def cambiar_rol_usuario():
+    if not check_permission("listar_usuarios"):
+        return jsonify({"Error": "No tiene permiso para acceder a este recurso"}), 403
+    data = request.get_json()
+    id_usuario = data.get('id')
+    nuevo_rol = data.get('nuevo_rol')
+    try:
+        servicioUsuario.cambiar_rol_usuario(id_usuario, nuevo_rol)
+        return jsonify({"message": "Rol cambiado correctamente"}), 200
+    except ValueError as e:
+        return jsonify({"message": str(e)}), 406

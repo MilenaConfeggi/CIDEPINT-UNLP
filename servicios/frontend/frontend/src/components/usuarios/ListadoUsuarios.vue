@@ -11,7 +11,8 @@
         <tr>
           <th>Mail</th>
           <th>Rol</th>
-          <th>Eliminar</th>
+          <th>Área</th>
+          <th>Acciones</th>
         </tr>
       </thead>
       <tbody>
@@ -19,9 +20,19 @@
           <td>{{ usuario.mail }}</td>
           <td>{{ usuario.rol }}</td>
           <td>
+            {{ usuario.empleado && usuario.empleado.area && usuario.empleado.area.nombre ? usuario.empleado.area.nombre : 'Sin área' }}
+          </td>
+          <td>
+            <button
+              v-if="usuario.rol !== 'Director' && usuario.rol !== 'Secretaria'"
+              @click.stop="abrirModalCambiarRol(usuario)"
+              class="btn-cambiar-rol"
+            >
+              Cambiar Rol
+            </button>
             <button
               @click.stop="confirmarEliminacion(usuario.id)"
-              class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+              class="btn-eliminar"
             >
               Eliminar
             </button>
@@ -42,6 +53,21 @@
         </li>
       </ul>
     </nav>
+
+    <!-- Modal Cambiar Rol -->
+    <div v-if="mostrarModalCambiarRol" class="modal-overlay" @click="cerrarModalCambiarRol">
+      <div class="modal-content" @click.stop>
+        <button class="close-button" @click="cerrarModalCambiarRol">&times;</button>
+        <h5 class="mb-3">Cambiar Rol de Usuario</h5>
+        <div class="mb-3">
+          <label for="nuevoRol" class="form-label">Nuevo Rol:</label>
+          <select id="nuevoRol" v-model="nuevoRolSeleccionado" class="form-control">
+            <option v-for="rol in rolesDisponibles" :key="rol" :value="rol">{{ rol }}</option>
+          </select>
+        </div>
+        <button class="btn btn-success" @click="cambiarRolUsuario">Guardar</button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -55,6 +81,11 @@ const currentPage = ref(1);
 const totalPages = ref(1);
 const loading = ref(true);
 const authStore = useAuthStore();
+
+const mostrarModalCambiarRol = ref(false);
+const usuarioCambiarRol = ref(null);
+const nuevoRolSeleccionado = ref(null);
+const rolesDisponibles = ['Jefe de area', 'Trabajador'];
 
 const fetchUsuarios = async (page = 1) => {
   loading.value = true;
@@ -115,6 +146,46 @@ const eliminarUsuario = async (id) => {
   }
 };
 
+// Cambiar Rol
+const abrirModalCambiarRol = (usuario) => {
+  usuarioCambiarRol.value = usuario;
+  // Por defecto, selecciona el otro rol
+  nuevoRolSeleccionado.value = usuario.rol === 'Jefe de area' ? 'Trabajador' : 'Jefe de area';
+  mostrarModalCambiarRol.value = true;
+};
+
+const cerrarModalCambiarRol = () => {
+  mostrarModalCambiarRol.value = false;
+  usuarioCambiarRol.value = null;
+};
+
+const cambiarRolUsuario = async () => {
+  if (!usuarioCambiarRol.value || !nuevoRolSeleccionado.value) return;
+  try {
+    const token = authStore.getToken();
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/usuarios/cambiar-rol`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        id: usuarioCambiarRol.value.id,
+        nuevo_rol: nuevoRolSeleccionado.value
+      })
+    });
+
+    if (response.status !== 200) {
+      throw new Error("Error al cambiar el rol del usuario");
+    }
+
+    await fetchUsuarios(currentPage.value);
+    cerrarModalCambiarRol();
+  } catch (error) {
+    console.error("Error al cambiar el rol del usuario:", error);
+  }
+};
+
 onMounted(() => {
   fetchUsuarios();
 });
@@ -154,8 +225,24 @@ onMounted(() => {
   background-image: linear-gradient(to right, #ccc, #333, #ccc);
 }
 
-button {
-  background-color: #dF2b00;
+.btn-cambiar-rol {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-right: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.btn-cambiar-rol:hover {
+  background-color: #0056b3;
+}
+
+.btn-eliminar {
+  background-color: #dc3545;
   color: white;
   padding: 10px 20px;
   border: none;
@@ -165,8 +252,8 @@ button {
   transition: background-color 0.3s ease;
 }
 
-button:hover {
-  background-color: #A01b00;
+.btn-eliminar:hover {
+  background-color: #a71d2a;
 }
 
 .pagination {
@@ -213,5 +300,38 @@ button:hover {
 .page-item.next .page-link {
   padding: 8px 16px;
   font-weight: bold;
+}
+
+/* Modal styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; 
+}
+
+.modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 400px;
+  width: 100%;
+  position: relative;
+}
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
 }
 </style>

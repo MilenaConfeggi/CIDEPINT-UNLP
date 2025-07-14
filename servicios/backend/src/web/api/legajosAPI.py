@@ -30,7 +30,7 @@ from models.muestras.muestra import Muestra
 from models.presupuestos.presupuesto import Presupuesto
 from models.documentos.documento import Documento
 from models.legajos.legajo import Legajo
-
+from models.muestras.token import FotoShareToken
 bp = Blueprint("legajos", __name__, url_prefix="/api/legajos")
 
 
@@ -220,6 +220,7 @@ def delete_legajo(id):
         db.session.query(Mail).filter_by(legajo_id=id).delete()
         db.session.query(Muestra).filter_by(legajo_id=id).delete()
         db.session.query(Documento).filter_by(legajo_id=id).delete()
+        db.session.query(FotoShareToken).filter_by(id=id).delete()
 
         # 6. Finalmente, eliminar el legajo
         db.session.delete(legajo)

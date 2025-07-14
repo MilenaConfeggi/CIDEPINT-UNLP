@@ -316,7 +316,7 @@ def compartir_con_cliente(legajo_id, fecha):
     if not mail_cliente:
         return jsonify({"message": "No se encontró el mail del cliente"}), 404
     # 3. Generar link
-    link = f"{request.host_url}compartido/fotos/{token}"
+    link = f"{request.host_url.replace('api.', '')}compartido/fotos/{token}"
     # 4. Enviar mail (simplificado)
     enviar_mail(mail_cliente, "Acceso a fotos", f"Puede ver sus fotos aquí: {link}", fecha)
     return jsonify({"message": "Enlace enviado al cliente"}), 200

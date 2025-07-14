@@ -5,7 +5,10 @@ from models.muestras.foto import Foto
 from models.usuarios.usuario import Usuario
 from models.legajos.legajo import Legajo
 from models.personal.empleado import Empleado
-from datetime import datetime
+import uuid
+from datetime import datetime, timedelta
+from models.muestras.token import FotoShareToken
+from models.base import db
 
 
 def crear_muestra(data, legajo_id):
@@ -127,3 +130,14 @@ def obtener_legajo(id_muestra):
         if legajo:
             return legajo.id
     return None
+
+def crear_token_compartir(legajo_id, fecha, dias_validez=7):
+    token = str(uuid.uuid4())
+    expiracion = datetime.utcnow() + timedelta(days=dias_validez)
+    nuevo_token = FotoShareToken(token=token, legajo_id=legajo_id, fecha=fecha, expiracion=expiracion)
+    db.session.add(nuevo_token)
+    db.session.commit()
+    return token
+
+def obtener_token(token):
+    return FotoShareToken.query.filter_by(token=token).first()

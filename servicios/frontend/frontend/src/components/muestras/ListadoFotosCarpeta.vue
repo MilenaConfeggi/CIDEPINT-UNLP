@@ -16,7 +16,7 @@
       <button
         v-if="tienePermisoEnviarMail"
         class="btn btn-secondary ml-2"
-        @click="enviarMail"
+        @click="compartirConCliente"
         :disabled="loadingMail"
         style="position: relative;"
       >
@@ -121,16 +121,35 @@ export default {
     const seleccionadas = ref([]);
     const router = useRouter();
 
+    async function compartirConCliente() {
+      const authStore = useAuthStore();
+      const token = authStore.getToken();
+      try {
+      await axios.post(
+        `${import.meta.env.VITE_API_URL}/muestras/compartir_con_cliente/${props.legajoId}/${props.fechaSeleccionada}`,
+        {},
+        {
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
+        }
+      );
+      alert('Enlace enviado al cliente');
+      } catch (e) {
+      alert('Error al compartir');
+      }
+    }
     const fetchFotos = async () => {
       const authStore = useAuthStore();
       const token = authStore.getToken();
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/muestras/fotos_por_fecha/${props.legajoId}/${props.fechaSeleccionada}`, {
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json"
-          }
-        });
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/muestras/fotos_por_fecha/${props.legajoId}/${props.fechaSeleccionada}`, {
+        headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+        }
+      });
         if (response.status < 200 || response.status >= 300) {
           throw ({ message: 'Error en la petición', status: response.status });
         }
@@ -283,7 +302,8 @@ export default {
       mensajeMail,
       tipoMensajeMail,
       loadingMail,
-      enviarMail
+      enviarMail,
+      compartirConCliente
     };
   }
 };

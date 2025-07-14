@@ -189,6 +189,10 @@ const routes = [
     meta: { requiresAuth: true, showNavbar: true },
   },
   {
+    path: '/compartido/fotos/:token',
+    component: () => import('@/views/FotosCompartidasView.vue')
+  },
+  {
     path: '/:catchAll(.*)',
     name: 'Error',
     component: () => import('../views/ErrorView.vue'),

@@ -15,6 +15,7 @@ import zipfile
 from io import BytesIO
 from servicios.backend.src.core.config import config
 from models.legajos import find_mail_legajo
+from flask import url_for
 
 UPLOAD_FOLDER = os.path.abspath("documentos")
 
@@ -109,9 +110,8 @@ def cargar_fotos(legajo_id):
             foto_data = {
                 'nombre_archivo': filename,
                 'fecha': fecha,
-                'legajo_id': legajo_id,  # Añadir legajo_id
-                'descripcion': request.form.get('descripcion', ''),  # Descripción opcional
-                'muestra_id': None  # No se relaciona con una muestra
+                'descripcion': request.form.get('descripcion', ''),
+                'muestra_id': None
             }
             try:
                 foto = fotoSchema.load(foto_data)
@@ -130,6 +130,7 @@ def cargar_fotos(legajo_id):
 
         return jsonify({"message": "Fotos subidas con éxito, recargue la página para ver los cambios"}), 200
     except ValidationError as err:
+        print("ValidationError:", err.messages)
         return jsonify({"message": f"Error en la validación de los datos: {err.messages}"}), 400
     except Exception as e:
         return jsonify({"message": "Ha ocurrido un error inesperado"}), 500
@@ -139,6 +140,7 @@ def cargar_fotos(legajo_id):
 def obtener_imagen(id_legajo, filename):
     folder_path = os.path.normpath(os.path.join(UPLOAD_FOLDER, "muestras", str(id_legajo)))
     file_path = os.path.normpath(os.path.join(folder_path, filename))
+    print("Buscando archivo:", filename)
     if not os.path.exists(file_path):
         abort(404, description="Resource not found")
     return send_from_directory(folder_path, filename)
@@ -202,7 +204,7 @@ def listar_muestras():
 
 @bp.post("/enviar_mail/<int:id_legajo>/<fecha>")
 @jwt_required()
-def enviar_mail(id_legajo, fecha):
+def enviar_mail_vieja(id_legajo, fecha):
     fotos = servicioMuestras.listar_fotos_por_fecha(id_legajo, fecha)
     if not fotos:
         return jsonify({"error": "No se encontraron fotos para la fecha proporcionada"}), 404
@@ -303,3 +305,47 @@ def eliminar_muestra(id_muestra):
     except Exception as e:
         print(e)
         return jsonify({"error": "Error al eliminar la muestra"}), 500
+
+@bp.post("/compartir_con_cliente/<int:legajo_id>/<fecha>")
+@jwt_required()
+def compartir_con_cliente(legajo_id, fecha):
+    # 1. Crear token
+    token = servicioMuestras.crear_token_compartir(legajo_id, fecha)
+    # 2. Buscar mail del cliente
+    mail_cliente = find_mail_legajo(legajo_id)
+    if not mail_cliente:
+        return jsonify({"message": "No se encontró el mail del cliente"}), 404
+    # 3. Generar link
+    link = f"{request.host_url}compartido/fotos/{token}"
+    # 4. Enviar mail (simplificado)
+    enviar_mail(mail_cliente, "Acceso a fotos", f"Puede ver sus fotos aquí: {link}", fecha)
+    return jsonify({"message": "Enlace enviado al cliente"}), 200
+
+def enviar_mail(destinatario, asunto, cuerpo, fecha):
+    try:
+        servidor = smtplib.SMTP('smtp.gmail.com', 587)
+        servidor.starttls()
+        servidor.login(config["development"].MAIL_USER, config["development"].MAIL_PASSWORD)
+
+        msg = MIMEMultipart()
+        msg["From"] = config["development"].MAIL_USER
+        msg["To"] = destinatario
+        msg["Subject"] = asunto
+
+        body = f"Adjunto encontrarás las fotos de las muestras correspondientes a la fecha {fecha}. {cuerpo}"
+        msg.attach(MIMEText(body, 'plain'))
+
+        servidor.sendmail(config["development"].MAIL_USER, destinatario, msg.as_string())
+        servidor.quit()
+        return jsonify({"message": "Correo enviado correctamente"}), 200
+    except Exception as e:
+        print(e)
+        return jsonify({"error": "No se pudo enviar el correo"}), 500
+
+@bp.get("/compartido/fotos/<token>")
+def fotos_compartidas(token):
+    token_obj = servicioMuestras.obtener_token(token)
+    if not token_obj or token_obj.expirado():
+        return jsonify({"message": "Link inválido o expirado"}), 404
+    fotos = servicioMuestras.listar_fotos_por_fecha(token_obj.legajo_id, token_obj.fecha)
+    return jsonify(fotosSchema.dump(fotos, many=True)), 200

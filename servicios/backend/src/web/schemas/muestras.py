@@ -20,6 +20,10 @@ class FotoSchema(Schema):
     legajo_id = fields.Int(required=True)  # Añadir legajo_id
     muestra_id = fields.Int(required=False, allow_none=True)  # Permitir None
     muestra = fields.Nested(MuestraSchema, dump_only=True)
+    legajo_id = fields.Method("get_legajo_id")  # Solo para dump
+
+    def get_legajo_id(self, obj):
+        return obj.muestra.legajo_id if obj.muestra else None
 
 fotoSchema = FotoSchema()
 fotosSchema = FotoSchema(many=True)

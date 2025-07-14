@@ -119,3 +119,11 @@ def eliminar_muestra(id_muestra):
     if muestra:
         db.session.delete(muestra)
         db.session.commit()
+
+def obtener_legajo(id_muestra):
+    muestra = Muestra.query.get(id_muestra)
+    if muestra:
+        legajo = Legajo.query.get(muestra.legajo_id)
+        if legajo:
+            return legajo.id
+    return None

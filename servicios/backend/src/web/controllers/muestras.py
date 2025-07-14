@@ -15,6 +15,7 @@ import zipfile
 from io import BytesIO
 from servicios.backend.src.core.config import config
 from models.legajos import find_mail_legajo
+
 UPLOAD_FOLDER = os.path.abspath("documentos")
 
 bp = Blueprint('muestras', __name__, url_prefix='/muestras')
@@ -159,12 +160,37 @@ def listar_fotos_por_fecha(id_legajo, fecha):
 @bp.get("/descargar_fotos/<int:id_muestra>/<filename>")
 @jwt_required()
 def descargar_foto(id_muestra, filename):
-    folder_path = os.path.normpath(os.path.join(UPLOAD_FOLDER, "muestras", str(id_muestra)))
+    folder_path = os.path.normpath(os.path.join(UPLOAD_FOLDER, "muestras", str(servicioMuestras.obtener_legajo)))
     file_path = os.path.normpath(os.path.join(folder_path, filename))
     if not os.path.exists(file_path):
         abort(404, description="Resource not found")
     return send_file(file_path, as_attachment=True)
 
+@bp.post("/descargar_zip")
+@jwt_required()
+def descargar_zip():
+    data = request.get_json()
+    ids = data.get("ids", [])
+    if not ids or not isinstance(ids, list):
+        return jsonify({"error": "No se recibieron IDs válidos"}), 400
+
+    
+    zip_buffer = BytesIO()
+    with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+        for id_foto in ids:
+            foto = servicioMuestras.obtener_foto(id_foto)
+            if not foto:
+                continue
+            file_path = os.path.join(UPLOAD_FOLDER, "muestras", str(foto.muestra.legajo_id), foto.nombre_archivo)
+            if os.path.exists(file_path):
+                zip_file.write(file_path, foto.nombre_archivo)
+    zip_buffer.seek(0)
+    return send_file(
+        zip_buffer,
+        mimetype='application/zip',
+        as_attachment=True,
+        download_name='fotos_seleccionadas.zip'
+    )
 @bp.get("/")
 def listar_muestras():
     muestras = servicioMuestras.listar_todas()
@@ -185,8 +211,14 @@ def enviar_mail(id_legajo, fecha):
     zip_buffer = BytesIO()
     with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
         for foto in fotos:
-            file_path = os.path.join(UPLOAD_FOLDER, "muestras", str(foto.muestra_id), foto.nombre_archivo)
-            zip_file.write(file_path, os.path.basename(file_path))
+            file_path = os.path.join(UPLOAD_FOLDER, "muestras", str(id_legajo), foto.nombre_archivo)
+            if os.path.exists(file_path):
+                nombre, ext = os.path.splitext(foto.nombre_archivo)
+                descripcion = f" ({foto.descripcion})" if foto.descripcion else ""
+                nuevo_nombre = f"{nombre}{descripcion}{ext}"
+                zip_file.write(file_path, nuevo_nombre)
+            else:
+                print(f"Archivo no encontrado y omitido: {file_path}")
 
     zip_buffer.seek(0)
 
@@ -201,7 +233,7 @@ def enviar_mail(id_legajo, fecha):
         msg["To"] = correo
         msg["Subject"] = "Fotos de muestras"
 
-        body = "Adjunto encontrarás las fotos de las muestras correspondientes a la fecha proporcionada."
+        body = f"Adjunto encontrarás las fotos de las muestras correspondientes a la fecha {fecha}."
         msg.attach(MIMEText(body, 'plain'))
 
         # Adjuntar el archivo ZIP
@@ -217,6 +249,7 @@ def enviar_mail(id_legajo, fecha):
     except Exception as e:
         print(e)
         return jsonify({"error": "No se pudo enviar el correo"}), 500
+
 
 @bp.get("/permiso/<int:id_legajo>")
 @jwt_required()  

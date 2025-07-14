@@ -1,12 +1,28 @@
 <template>
   <div class="container mt-4">
     <h1 class="text-center mb-4">Fotos para la fecha {{ formatFecha(fechaSeleccionada) }}</h1>
+    
+    <div v-if="mensajeMail" 
+         :class="['alert', tipoMensajeMail === 'success' ? 'alert-success' : 'alert-danger']" 
+         role="alert" 
+         style="text-align:center; width: 100%;">
+      {{ mensajeMail }}
+    </div>
+
     <div class="d-flex justify-content-end mb-3">
       <button v-if="tienePermisoDescargar" class="btn btn-primary" @click="descargarSeleccionadas">
         <i class="fas fa-download"></i> Descargar
       </button>
-      <button v-if="tienePermisoEnviarMail" class="btn btn-secondary ml-2" @click="enviarMail">
-        <i class="fas fa-envelope"></i> Enviar Correo
+      <button
+        v-if="tienePermisoEnviarMail"
+        class="btn btn-secondary ml-2"
+        @click="enviarMail"
+        :disabled="loadingMail"
+        style="position: relative;"
+      >
+        <span v-if="loadingMail" class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="margin-right: 5px;"></span>
+        <i v-else class="fas fa-envelope"></i>
+        Enviar Correo
       </button>
     </div>
     <div v-if="error" class="alert alert-danger" role="alert">{{ error }}</div>
@@ -28,16 +44,15 @@
               />
             </template>
           </div>
-          <div class="card-body">
-            <h5 class="card-title">{{ foto.nombre_archivo }}</h5>
-            <p class="card-text" v-if="foto.descripcion && foto.descripcion.trim() !== ''">
-              <strong>horas:</strong> {{ foto.descripcion }}
-            </p>
-            <!-- Botón de eliminar -->
-            <button class="btn-icon btn-delete" @click.stop="confirmarEliminarFoto(foto.id)">
-              <i class="fas fa-trash-alt"></i>
-            </button>
-          </div>
+            <div class="card-body">
+              <button class="btn-icon btn-delete" @click.stop="confirmarEliminarFoto(foto.id)">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+              <h5 class="card-title">{{ foto.nombre_archivo }}</h5>
+              <p class="card-text" v-if="foto.descripcion && foto.descripcion.trim() !== ''">
+                <strong>horas:</strong> {{ foto.descripcion }}
+              </p>
+            </div>
         </div>
       </div>
     </div>
@@ -74,8 +89,10 @@ import { ref, onMounted, watch, computed } from 'vue';
 import axios from 'axios';
 import { useAuthStore } from '@/stores/auth';
 import { useRouter } from 'vue-router';
-
+const mensajeMail = ref('');
+const tipoMensajeMail = ref('');
 const permisos = JSON.parse(localStorage.getItem('permisos')) || [];
+const loadingMail = ref(false);
 
 const tienePermisoDescargar = computed(() => {
   return permisos.includes('descargar_fotos');
@@ -160,46 +177,54 @@ export default {
     const descargarSeleccionadas = async () => {
       const authStore = useAuthStore();
       const token = authStore.getToken();
-      for (const id of seleccionadas.value) {
-        try {
-          const response = await fetch(`/muestras/descargar_fotos/${id}`, {
-            headers: {
-              "Authorization": `Bearer ${token}`,
-              "Content-Type": "application/json"
-            }
-          });
-          const blob = await response.blob();
-          const url = window.URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.style.display = 'none';
-          a.href = url;
-          a.download = `foto_${id}.jpg`; // Cambia la extensión según sea necesario
-          document.body.appendChild(a);
-          a.click();
-          window.URL.revokeObjectURL(url);
-        } catch (error) {
-          console.error('Error al descargar la foto:', error);
-        }
-      }
-    };
-
-    const enviarMail = async () => {
-      const authStore = useAuthStore();
-      const token = authStore.getToken();
+      if (!seleccionadas.value.length) return;
       try {
-        const response = await axios.post(`${import.meta.env.VITE_API_URL}/muestras/enviar_mail/${props.legajoId}/${props.fechaSeleccionada}`, {}, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/muestras/descargar_zip`, {
+          method: "POST",
           headers: {
             "Authorization": `Bearer ${token}`,
             "Content-Type": "application/json"
-          }
+          },
+          body: JSON.stringify({ ids: seleccionadas.value })
         });
-        console.log(response.data);
-        this.toast.success('Correo enviado correctamente');
+        if (!response.ok) throw new Error("Error al descargar el ZIP");
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = 'fotos_seleccionadas.zip';
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
       } catch (error) {
-        console.error('Error al enviar el correo:', error);
-        this.toast.error('Error al enviar el correo');
+        console.error('Error al descargar el ZIP:', error);
       }
     };
+    
+    const enviarMail = async () => {
+    const authStore = useAuthStore();
+    const token = authStore.getToken();
+    loadingMail.value = true;
+    mensajeMail.value = '';
+    try {
+      await axios.post(`${import.meta.env.VITE_API_URL}/muestras/enviar_mail/${props.legajoId}/${props.fechaSeleccionada}`, {}, {
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
+      });
+      mensajeMail.value = 'Correo enviado correctamente';
+      tipoMensajeMail.value = 'success';
+    } catch (error) {
+      console.error('Error al enviar el correo:', error);
+      mensajeMail.value = 'No se pudo enviar el correo';
+      tipoMensajeMail.value = 'error';
+    } finally {
+      loadingMail.value = false;
+    }
+  };
+  
 
     const confirmarEliminarFoto = (idFoto) => {
       if (confirm("¿Estás seguro de que quieres eliminar esta foto?")) {
@@ -254,7 +279,11 @@ export default {
       eliminarFoto,
       tienePermisoDescargar,
       tienePermisoEnviarMail,
-      isPdf
+      isPdf,
+      mensajeMail,
+      tipoMensajeMail,
+      loadingMail,
+      enviarMail
     };
   }
 };
@@ -300,7 +329,8 @@ export default {
 .card-body {
   position: relative;
   color: #000000;
-  background-color: #ffffff; 
+  background-color: #ffffff;
+  padding-right: 40px; /* Agrega espacio para el botón */
 }
 
 .modal-overlay {
